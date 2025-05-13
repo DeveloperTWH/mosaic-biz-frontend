@@ -22,10 +22,10 @@ export default function Home() {
 
         <div className="space-x-2">
           <Link href="/login?type=customer">
-            <button className="border border-blue-600 text-blue-600 px-4 py-1.5 rounded">Login As Customer</button>
+            <button className="border border-sky-500 text-sky-500 px-4 py-1.5 rounded">Login As Customer</button>
           </Link>
           <Link href="/login?type=vendor">
-            <button className="border border-blue-600 text-blue-600 px-4 py-1.5 rounded">Login As Vendor</button>
+            <button className="border border-sky-500 text-sky-500 px-4 py-1.5 rounded">Login As Vendor</button>
           </Link>
         </div>
       </header>
