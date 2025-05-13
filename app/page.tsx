@@ -6,9 +6,9 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white">
       {/* Navbar */}
-      <header className="flex justify-between items-center px-6 py-4 shadow">
+      <header className="flex justify-between items-center px-20 py-4 shadow">
         <div className="flex items-center">
-          <Image src="/logo.png" alt="Mosaic Biz Hub Logo" width={160} height={60} />
+          <Image src="/logo.png" alt="Mosaic Biz Hub Logo" width={300} height={60} />
         </div>
 
         <nav className="hidden md:flex space-x-6 text-sm font-medium">
@@ -31,7 +31,7 @@ export default function Home() {
       </header>
 
       {/* Search & Filters */}
-      <section className="bg-gray-50 py-4 px-6 flex flex-col md:flex-row items-start justify-between space-y-4 md:space-y-0 md:space-x-4">
+      <section className="bg-gray-50 py-4 px-20 flex flex-col md:flex-row items-start justify-between space-y-4 md:space-y-0 md:space-x-4">
         <div className="flex flex-col w-full md:w-1/2">
           <label htmlFor="search" className="text-sm font-medium mb-1">Search</label>
           <input
@@ -68,17 +68,18 @@ export default function Home() {
 
       {/* Hero Section */}
       <section className="relative h-[650px] bg-cover bg-center" style={{ backgroundImage: 'url(/hero-image.png)' }}>
-        <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-center text-center text-white px-4">
-          <h2 className="text-3xl md:text-5xl font-bold mb-4">Empowering Minority-Owned Businesses to Thrive in the Digital Age</h2>
+        <div className="absolute inset-0 bg-stone-800 bg-opacity-50 flex flex-col justify-center items-center text-center text-white px-4">
+          <h2 className="text-3xl md:text-5xl font-bold mb-4">Empowering Minority-Owned</h2>
+          <h2 className="text-3xl md:text-5xl font-bold mb-4">Businesses to Thrive in the Digital Age</h2>
           <p className="mb-6 max-w-2xl">
             Lorem Ipsum Dolor Sit Amet, Consectetur Adipiscing Elit. Nullam Laoreet, Diam Sit Amet Porta Eleifend, Turpis Justo Maximus Eros, Rhoncus Ullamcorper Mi Tortor Et Libero. Maecenas Lacinia Lorem Ultrices Ligulaeros.
           </p>
           <div className="space-x-4">
             <Link href="/login?type=customer">
-              <button className="bg-white text-black px-6 py-2 rounded">Login As Customer</button>
+              <button className="border border-white text-white py-2 rounded px-7">Login As Customer</button>
             </Link>
             <Link href="/login?type=vendor">
-              <button className="bg-white text-black px-6 py-2 rounded">Login As Vendor</button>
+              <button className="border border-white text-white py-2 rounded px-7">Login As Vendor</button>
             </Link>
           </div>
         </div>
