@@ -9,12 +9,12 @@ const Product = () => {
             <div className='w-screen md:w-4/5' >
                 <div className='flex justify-between mb-10'>
                     <div>
-                        <h1 className='text-3xl font-bold text-zinc-800'>BROWSE BY CATEGORY</h1>
+                        <h1 className='text-3xl font-bold text-zinc-800 heading'>BROWSE BY CATEGORY</h1>
                     </div>
                     <div className='flex justify-items-end items-end space-x-3'>
                         <button
                             onClick={() => setActive("left")}
-                            className={`border border-orange-500 px-1 py-1 ${active === "left" ? "bg-orange-500 text-white" : "text-orange-500"
+                            className={`border border-custom-orange px-1 py-1 ${active === "left" ? "bg-custom-orange text-white" : "text-custom-orange"
                                 }`}
                         >
                             <svg
@@ -35,7 +35,7 @@ const Product = () => {
 
                         <button
                             onClick={() => setActive("right")}
-                            className={`border border-orange-500 px-1 py-1 ${active === "right" ? "bg-orange-500 text-white" : "text-orange-500"
+                            className={`border border-custom-orange px-1 py-1 ${active === "right" ? "bg-custom-orange text-white" : "text-custom-orange"
                                 }`}
                         >
                             <svg

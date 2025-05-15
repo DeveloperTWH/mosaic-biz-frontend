@@ -16,7 +16,7 @@ export default function AboutMinority() {
           className="w-full md:w-1/2 object-cover"
         />
         <div className="md:w-[40%]">
-          <h2 className="text-4xl font-semibold mb-4 uppercase">
+          <h2 className="text-4xl font-semibold mb-4 uppercase heading">
             About Minority Owned Business
           </h2>
           <hr className="h-[2px] w-[100px] bg-green-900" />
@@ -35,7 +35,7 @@ export default function AboutMinority() {
             distinctio, aperiam voluptas nostrum cumque accusamus vel et maiores
             molestiae soluta repellat quasi?
           </p>
-          <button className="px-4 py-2 mt-5 bg-orange-500 text-white ">
+          <button className="px-4 py-2 mt-5 bg-custom-orange text-white ">
             Learn More
           </button>
         </div>

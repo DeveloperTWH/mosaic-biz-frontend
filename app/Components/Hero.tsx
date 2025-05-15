@@ -34,7 +34,7 @@ const Hero = () => {
 
         <div className="flex flex-col justify-end w-full md:w-auto">
           <label className="text-sm font-medium mb-1 invisible">Search</label> {/* invisible just to maintain alignment */}
-          <button className="bg-red-500 text-white px-20 py-2">Search Here</button>
+          <button className="bg-custom-orange text-white px-20 py-2">Search Here</button>
         </div>
       </section>
 
