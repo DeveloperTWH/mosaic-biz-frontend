@@ -1,4 +1,7 @@
 {
   "/_not-found/page": "/_not-found",
-  "/page": "/"
+  "/(auth)/login/page": "/login",
+  "/(auth)/signup/page": "/signup",
+  "/(home)/page": "/",
+  "/(home)/search/page": "/search"
 }
