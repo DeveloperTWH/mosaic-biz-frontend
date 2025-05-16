@@ -22,7 +22,7 @@ const items = [
 
 export default function FreshnessSection() {
     return (
-        <section className="py-20 px-5 md:px-20 bg-white text-center">
+        <section className="pt-20 px-5 md:px-20 bg-white text-center">
             <div className="mb-10">
                 <h2 className="text-2xl md:text-3xl font-semibold uppercase text-gray-800 mb-2">
                     Freshness All Around - Pantry Picks & Nearby Kitchens

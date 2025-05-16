@@ -10,6 +10,7 @@ module.exports = {
         'custom-orange': '#CE5F44',
         'custom-yellow': '#F9AE53',
         'custom-blue': '#16A1C0',
+        'custom-soil': '#FFF6E0',
       },
     },
   },

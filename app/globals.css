@@ -33,3 +33,18 @@
     --tw-text-opacity: 1;
     color: rgb(39 39 42 / var(--tw-text-opacity));
 }
+
+
+.footer-background {
+  background-image: 
+    linear-gradient(
+      216.65deg,
+      rgba(0, 0, 0, 0.36) -10.96%,
+      rgba(0, 0, 0, 0.87) 29.64%,
+      #000000 70.76%
+    ),
+    url('/Footer/footer-bg.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}

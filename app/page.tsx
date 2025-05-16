@@ -1,6 +1,8 @@
 import AboutMinority from "./Components/AboutMinority";
 import BookServices from "./Components/BookServices";
+import ClientTestimonials from "./Components/ClientTestimonials";
 import FAQSection from "./Components/FaQ";
+import FeatureBlogs from "./Components/FeatureBlogs";
 import FreshnessSection from "./Components/FreshnessSection";
 import Hero from "./Components/Hero";
 import HowWeWork from "./Components/HowWeWork";
@@ -23,6 +25,8 @@ export default function Home() {
       <PromoCarousel/>
       <FreshnessSection />
       <FAQSection/>
+      <FeatureBlogs/>
+      <ClientTestimonials />
     </>
   );
 }
