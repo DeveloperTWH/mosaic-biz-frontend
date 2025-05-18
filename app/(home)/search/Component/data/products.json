@@ -1,0 +1,30 @@
+[
+    {
+      "id": "1",
+      "brand": "Levi's",
+      "title": "Men Slim Fit Printed Spread Collar Casual Shirt",
+      "price": 799,
+      "image": "/products/image.png",
+      "rating": 4.2,
+      "ratingCount": 234
+    },
+    {
+      "id": "2",
+      "brand": "U.S. POLO ASSN.",
+      "title": "Men Slim Fit Checked Spread Collar Casual Shirt",
+      "price": 899,
+      "image": "/products/image 1.png",
+      "rating": 4.0,
+      "ratingCount": 180
+    },
+    {
+      "id": "3",
+      "brand": "S.M.",
+      "title": "Men Slim Fit Checked Spread Collar Casual T-Shirt",
+      "price": 745,
+      "image": "/products/image 2.png",
+      "rating": 4.0,
+      "ratingCount": 180
+    }
+  ]
+  
