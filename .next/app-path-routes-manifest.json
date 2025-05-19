@@ -3,5 +3,6 @@
   "/(auth)/login/page": "/login",
   "/(auth)/signup/page": "/signup",
   "/(home)/page": "/",
+  "/(home)/product/[id]/page": "/product/[id]",
   "/(home)/search/page": "/search"
 }

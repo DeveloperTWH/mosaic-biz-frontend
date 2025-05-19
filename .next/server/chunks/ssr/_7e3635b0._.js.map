@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 7, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/Lenovo/OneDrive/Desktop/Techware%20hut/mosaic-biz-frontend/app/%28auth%29/layout.tsx"],"sourcesContent":["import '../globals.css'\r\n\r\nexport default function LoginLayout({ children }: { children: React.ReactNode }) {\r\n  return (\r\n    <html lang=\"en\">\r\n      <body>\r\n        {children}\r\n      </body>\r\n    </html>\r\n  )\r\n}\r\n"],"names":[],"mappings":";;;;;;AAEe,SAAS,YAAY,EAAE,QAAQ,EAAiC;IAC7E,qBACE,8OAAC;QAAK,MAAK;kBACT,cAAA,8OAAC;sBACE;;;;;;;;;;;AAIT","debugId":null}},
-    {"offset": {"line": 34, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/Lenovo/OneDrive/Desktop/Techware%20hut/mosaic-biz-frontend/node_modules/next/src/server/route-modules/app-page/vendored/rsc/react-jsx-dev-runtime.ts"],"sourcesContent":["module.exports = require('../../module.compiled').vendored[\n  'react-rsc'\n].ReactJsxDevRuntime\n"],"names":["module","exports","require","vendored","ReactJsxDevRuntime"],"mappings":";AAAAA,OAAOC,OAAO,GAAGC,QAAQ,4HAAyBC,QAAQ,CACxD,YACD,CAACC,kBAAkB","ignoreList":[0],"debugId":null}}]
-}

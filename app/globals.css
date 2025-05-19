@@ -48,3 +48,15 @@
   background-position: center;
   background-repeat: no-repeat;
 }
+
+.swiper-pagination-bullet {
+  background-color: #a3a3a3;
+  opacity: 1;
+}
+
+.swiper-pagination-bullet-active {
+  background-color: #fb923c; /* Your custom orange */
+}
+.swiper-pagination-bullets.swiper-pagination-horizontal{
+  bottom: -5px !important;
+}
