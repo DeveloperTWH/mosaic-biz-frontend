@@ -26,10 +26,13 @@ const Hero = () => {
         </div>
 
         <div className="flex flex-col w-full md:w-auto">
-          <label htmlFor="priceRange" className="text-sm font-medium mb-1">Filter By Price Range</label>
-          <select id="priceRange" className="px-4 py-2 border rounded">
-            <option value="">Choose Price Range</option>
-          </select>
+          <label htmlFor="priceRange" className="text-sm font-medium mb-1">Filter By Loaction</label>
+          <input
+            id="search"
+            type="text"
+            placeholder="e.g. India, USA , Location..."
+            className="px-4 py-2 border rounded"
+          />
         </div>
 
         <div className="flex flex-col justify-end w-full md:w-auto">

@@ -15,12 +15,20 @@
   "headers": [],
   "dynamicRoutes": [
     {
-      "page": "/product/[id]",
-      "regex": "^/product/([^/]+?)(?:/)?$",
+      "page": "/products/[id]",
+      "regex": "^/products/([^/]+?)(?:/)?$",
       "routeKeys": {
         "nxtPid": "nxtPid"
       },
-      "namedRegex": "^/product/(?<nxtPid>[^/]+?)(?:/)?$"
+      "namedRegex": "^/products/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/services/[id]",
+      "regex": "^/services/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/services/(?<nxtPid>[^/]+?)(?:/)?$"
     }
   ],
   "staticRoutes": [
@@ -43,10 +51,16 @@
       "namedRegex": "^/login(?:/)?$"
     },
     {
-      "page": "/search",
-      "regex": "^/search(?:/)?$",
+      "page": "/products",
+      "regex": "^/products(?:/)?$",
       "routeKeys": {},
-      "namedRegex": "^/search(?:/)?$"
+      "namedRegex": "^/products(?:/)?$"
+    },
+    {
+      "page": "/services",
+      "regex": "^/services(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/services(?:/)?$"
     },
     {
       "page": "/signup",

@@ -1,8 +1,10 @@
 {
   "/_not-found/page": "/_not-found",
-  "/(auth)/login/page": "/login",
-  "/(auth)/signup/page": "/signup",
   "/(home)/page": "/",
-  "/(home)/product/[id]/page": "/product/[id]",
-  "/(home)/search/page": "/search"
+  "/(home)/products/[id]/page": "/products/[id]",
+  "/(home)/products/page": "/products",
+  "/(home)/services/page": "/services",
+  "/(home)/services/[id]/page": "/services/[id]",
+  "/(auth)/login/page": "/login",
+  "/(auth)/signup/page": "/signup"
 }
