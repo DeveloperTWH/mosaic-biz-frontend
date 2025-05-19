@@ -33,7 +33,7 @@ export default function FAQSection() {
   };
 
   return (
-    <section className="relative h-[90vh] p-6 md:p-12 overflow-hidden">
+    <section className="relative md:h-[90vh] p-6 md:p-12 overflow-hidden">
       {/* Background image */}
       <div
         className="absolute inset-0 -z-10"
