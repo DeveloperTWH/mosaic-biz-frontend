@@ -9,7 +9,10 @@ export default function BookServices() {
     ];
 
     return (
-        <section className="relative bg-black text-white pt-12 overflow-hidden">
+        <section className="relative bg-black text-white pt-12 overflow-hidden" style={{
+            clipPath: "polygon(0px 0px, 100% 0px, 100% 100%, 26% 100%, 21.5% 92.5%, 0% 100%)",
+            WebkitClipPath: "polygon(0px 0px, 100% 0px, 100% 100%, 26% 100%, 21.5% 92.5%, 0% 100%)",
+        }}>
             <div className="w-[90%] mx-auto relative z-10">
                 <h2 className="text-center text-3xl font-semibold mb-2 heading" style={{ "color": "white" }}>BOOK YOUR SERVICES</h2>
                 <hr className="h-[2px] w-[100px] mx-auto" />
@@ -46,31 +49,16 @@ export default function BookServices() {
                 </div>
             </div>
 
-            {/* Triangle White Area */}
-            <div className="absolute bottom-0 left-0 w-full h-full pointer-events-none z-0">
-                <div
-                    className="absolute bottom-0 left-0 w-full h-full"
-                    style={{
-                        clipPath: "polygon(25% 100%, 20% 91%, 0% 100%)",
-                        WebkitClipPath: "polygon(25% 100%, 20% 91%, 0% 100%)",
-                        backgroundColor: "white",
-                        transform: "translateY(1px)", // nudges it down
-                    }}
-
-                />
-            </div>
-
-            {/* Clipped image */}
             <img
-                src="/Group 42.png"
+                src="/Service Box.png"
                 alt="clip path"
                 className="w-full h-auto relative z-10"
-                style={{
-                    clipPath:
-                        "polygon(20% 58%, 100% 0px, 100% 100%, 25% 100%, 20% 58%, 0px 100%, 0px 0px)",
-                    WebkitClipPath:
-                        "polygon(20% 58%, 100% 0px, 100% 100%, 25% 100%, 20% 58%, 0px 100%, 0px 0px)",
-                }}
+            // style={{
+            //     clipPath:
+            //         "polygon(20% 58%, 100% 0px, 100% 100%, 25% 100%, 20% 58%, 0px 100%, 0px 0px)",
+            //     WebkitClipPath:
+            //         "polygon(20% 58%, 100% 0px, 100% 100%, 25% 100%, 20% 58%, 0px 100%, 0px 0px)",
+            // }}
             />
         </section>
     );

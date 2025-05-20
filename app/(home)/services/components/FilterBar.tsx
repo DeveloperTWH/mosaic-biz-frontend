@@ -29,7 +29,7 @@ const FilterBar = () => {
         />
 
         <select
-          className="border px-4 py-2 rounded w-full md:w-1/4"
+          className="border px-4 py-2 rounded w-full md:w-1/4 text-gray-500"
           value={minorityType}
           onChange={(e) => setMinorityType(e.target.value)}
         >
@@ -39,16 +39,13 @@ const FilterBar = () => {
           <option value="women-owned">Women-Owned</option>
         </select>
 
-        <select
+        <input
+          type="text"
+          placeholder="Search by Location"
           className="border px-4 py-2 rounded w-full md:w-1/4"
-          value={priceRange}
-          onChange={(e) => setPriceRange(e.target.value)}
-        >
-          <option value="">Choose Price Range</option>
-          <option value="0-50">$0 - $50</option>
-          <option value="50-100">$50 - $100</option>
-          <option value="100+">$100+</option>
-        </select>
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+        />
 
         <button
           onClick={handleSearch}
