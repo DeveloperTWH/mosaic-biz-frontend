@@ -177,7 +177,7 @@ const ServiceDetailPage = () => {
 
 
                                 {/* Action Buttons */}
-                                <div className="flex gap-3 mt-4 items-center">
+                                <div className="flex flex-wrap gap-3 mt-4 items-center">
                                     <button className="flex items-center gap-1 px-4 py-1 border border-custom-blue text-custom-blue transition-all duration-200 ease-in-out hover:bg-custom-orange hover:text-white hover:border-transparent active:bg-custom-orange active:text-white active:border-transparent">
                                         <PenTool size={16} /> Add Review
                                     </button>

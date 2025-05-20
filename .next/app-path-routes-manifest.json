@@ -1,11 +1,11 @@
 {
   "/_not-found/page": "/_not-found",
-  "/(home)/services/[id]/[serviceId]/page": "/services/[id]/[serviceId]",
-  "/(home)/products/[id]/page": "/products/[id]",
-  "/(home)/services/page": "/services",
-  "/(home)/products/page": "/products",
-  "/(home)/services/[id]/page": "/services/[id]",
   "/(home)/page": "/",
-  "/(auth)/signup/page": "/signup",
-  "/(auth)/login/page": "/login"
+  "/(home)/products/[id]/page": "/products/[id]",
+  "/(home)/products/page": "/products",
+  "/(home)/services/[id]/[serviceId]/page": "/services/[id]/[serviceId]",
+  "/(home)/services/[id]/page": "/services/[id]",
+  "/(home)/services/page": "/services",
+  "/(auth)/login/page": "/login",
+  "/(auth)/signup/page": "/signup"
 }
