@@ -25,6 +25,10 @@ html, body {
     text-transform: capitalize;
 
 }
+.roboto{
+   font-family: Roboto Slab;
+   font-weight: 600;
+}
 
 .heading{
     font-family: Roboto Slab;
