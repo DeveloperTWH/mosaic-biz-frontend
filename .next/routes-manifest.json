@@ -29,6 +29,15 @@
         "nxtPid": "nxtPid"
       },
       "namedRegex": "^/services/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/services/[id]/[serviceId]",
+      "regex": "^/services/([^/]+?)/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid",
+        "nxtPserviceId": "nxtPserviceId"
+      },
+      "namedRegex": "^/services/(?<nxtPid>[^/]+?)/(?<nxtPserviceId>[^/]+?)(?:/)?$"
     }
   ],
   "staticRoutes": [
