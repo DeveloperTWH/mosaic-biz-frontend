@@ -1,11 +1,12 @@
 {
   "/_not-found/page": "/_not-found",
+  "/(auth)/login/page": "/login",
+  "/(auth)/signup/page": "/signup",
   "/(home)/page": "/",
   "/(home)/products/[id]/page": "/products/[id]",
   "/(home)/products/page": "/products",
   "/(home)/services/[id]/[serviceId]/page": "/services/[id]/[serviceId]",
+  "/(home)/vendors/page": "/vendors",
   "/(home)/services/[id]/page": "/services/[id]",
-  "/(home)/services/page": "/services",
-  "/(auth)/login/page": "/login",
-  "/(auth)/signup/page": "/signup"
+  "/(home)/services/page": "/services"
 }
