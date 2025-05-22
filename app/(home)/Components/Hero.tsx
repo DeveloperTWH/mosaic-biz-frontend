@@ -5,7 +5,7 @@ const Hero = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Search & Filters */}
-      <section className="bg-gray-50 py-4 px-20 flex flex-col md:flex-row items-start justify-between space-y-4 md:space-y-0 md:space-x-4">
+      <section className="bg-gray-50 py-4 md:px-20 p-5 flex flex-col md:flex-row items-start justify-between space-y-4 md:space-y-0 md:space-x-4">
         <div className="flex flex-col w-full md:w-1/3">
           <label htmlFor="search" className="text-sm font-medium mb-1">Search</label>
           <input
@@ -50,7 +50,7 @@ const Hero = () => {
           <p className="mb-6 max-w-2xl">
             Lorem Ipsum Dolor Sit Amet, Consectetur Adipiscing Elit. Nullam Laoreet, Diam Sit Amet Porta Eleifend, Turpis Justo Maximus Eros, Rhoncus Ullamcorper Mi Tortor Et Libero. Maecenas Lacinia Lorem Ultrices Ligulaeros.
           </p>
-          <div className="space-x-4">
+          <div className="flex flex-col md:flex-row gap-4">
             <Link href="/login?type=customer">
               <button className="border border-white text-white py-2 rounded px-7">Login As Customer</button>
             </Link>

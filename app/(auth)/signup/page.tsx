@@ -1,11 +1,13 @@
 'use client'
 export const dynamic = 'force-dynamic'
 
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter,usePathname  } from 'next/navigation'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Suspense } from 'react'
+import { X } from 'lucide-react';
+
 
 function SignupContent() {
   const searchParams = useSearchParams()
@@ -30,9 +32,23 @@ function SignupContent() {
 
   const isVendor = type === 'vendor'
   const title = isVendor ? 'Vendor Registration' : 'Customer Registration'
+    const router = useRouter();
+    const pathname = usePathname();
+    const handleClose = () => {
+    const isAuthPage = pathname.includes('/login') || pathname.includes('/signup');
+
+    if (isAuthPage) {
+      router.push('/'); // Replace with your landing page or dashboard route
+    } else {
+      router.back();
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-black bg-[url('/login/footer-bg.jpg')] bg-cover bg-center bg-fixed relative py-10">
+    <div className="min-h-screen bg-black bg-[url('/login/footer-bg.jpg')] bg-cover bg-center bg-fixed relative py-10 p-1">
+      <div className="fixed top-4 right-4 z-50 text-white bg-gray-700 rounded-lg p-2 cursor-pointer" onClick={handleClose}>
+        <X size={20} />
+      </div>
       <div className="bg-white rounded-xl shadow-xl max-w-md w-full mx-auto p-8 z-10">
         <Link href="/">
           <div className="text-center mb-6">

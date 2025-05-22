@@ -67,3 +67,48 @@ html, body {
 .swiper-pagination-bullets.swiper-pagination-horizontal{
   bottom: -5px !important;
 }
+
+
+
+
+.bg-gradient-blue {
+  background-image: 
+    linear-gradient(
+      216.65deg,
+      rgba(22, 161, 192, 0.36) -10.96%,
+      rgba(22, 161, 192, 0.87) 29.64%,
+      #16A1C0 70.76%
+    ),
+    url('/Footer/footer-bg.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.bg-gradient-orange {
+  background-image: 
+    linear-gradient(
+      216.65deg,
+      rgba(206, 95, 68, 0.36) -10.96%,
+      rgba(206, 95, 68, 0.87) 29.64%,
+      #CE5F44 70.76%
+    ),
+    url('/Footer/footer-bg.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.bg-gradient-yellow {
+  background-image: 
+    linear-gradient(
+      216.65deg,
+      rgba(249, 174, 83, 0.36) -10.96%,
+      rgba(249, 174, 83, 0.87) 29.64%,
+      #F9AE53 70.76%
+    ),
+    url('/Footer/footer-bg.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}

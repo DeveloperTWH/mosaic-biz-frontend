@@ -1,10 +1,11 @@
 'use client'
 export const dynamic = 'force-dynamic';
 
-import { useSearchParams, usePathname } from 'next/navigation'
+import { useSearchParams, usePathname, useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { useEffect, useState, Suspense } from 'react'
 import Link from 'next/link'
+import { X } from 'lucide-react';
 
 function LoginContent() {
   const searchParams = useSearchParams()
@@ -24,9 +25,14 @@ function LoginContent() {
   }
 
   const title = type === 'vendor' ? 'Vendor Login' : 'Customer Login'
+  const router = useRouter();
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center bg-[url('/login/footer-bg.jpg')] bg-cover bg-center relative">
+    <div className="min-h-screen bg-black flex items-center justify-center bg-[url('/login/footer-bg.jpg')] bg-cover bg-center relative p-1 py-10">
+      <div className="fixed top-4 right-4 z-50 text-white bg-gray-700 rounded-lg p-2 cursor-pointer" onClick={() => router.back()}>
+        <X size={20} />
+      </div>
+
       <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-8 z-10">
         <Link href="/">
           <div className="text-center mb-6">

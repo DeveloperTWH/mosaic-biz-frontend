@@ -115,11 +115,11 @@ const SimilarProduct = () => {
           slidesPerView={4}
           pagination={{ clickable: true }}
           breakpoints={{
-  0: { slidesPerView: 1 },      // Mobile: 1 card per slide
-  640: { slidesPerView: 2 },    // Small tablets
-  768: { slidesPerView: 3 },    // Tablets
-  1024: { slidesPerView: 4 },   // Laptops & up
-}}
+            0: { slidesPerView: 1 },      // Mobile: 1 card per slide
+            640: { slidesPerView: 2 },    // Small tablets
+            768: { slidesPerView: 3 },    // Tablets
+            1024: { slidesPerView: 4 },   // Laptops & up
+          }}
           className='pb-10'
         >
           {products.map((product) => {

@@ -46,37 +46,37 @@ export default function VendorGrid() {
         <>
             {/* Filters */}
             <div className="mb-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-4 items-stretch">
-  <div className="sm:col-span-2 md:col-span-3">
-    <CustomSelect category={category} setCategory={setCategory} />
-  </div>
+                <div className="sm:col-span-2 md:col-span-3">
+                    <CustomSelect category={category} setCategory={setCategory} />
+                </div>
 
-  <input
-    type="text"
-    className="border p-2 w-full sm:col-span-1 md:col-span-3"
-    placeholder="Enter City"
-    value={city}
-    onChange={(e) => setCity(e.target.value)}
-  />
+                <input
+                    type="text"
+                    className="border p-2 w-full sm:col-span-1 md:col-span-3"
+                    placeholder="Enter City"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                />
 
-  <input
-    type="text"
-    className="border p-2 w-full sm:col-span-1 md:col-span-4"
-    placeholder="Search Business Name"
-    value={search}
-    onChange={(e) => setSearch(e.target.value)}
-  />
+                <input
+                    type="text"
+                    className="border p-2 w-full sm:col-span-1 md:col-span-4"
+                    placeholder="Search Business Name"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                />
 
-  <button
-    onClick={() => {
-      setCategory('');
-      setCity('');
-      setSearch('');
-    }}
-    className="bg-red-500 text-white px-4 py-2 w-full sm:col-span-2 md:col-span-2"
-  >
-    Clear
-  </button>
-</div>
+                <button
+                    onClick={() => {
+                        setCategory('');
+                        setCity('');
+                        setSearch('');
+                    }}
+                    className="bg-red-500 text-white px-4 py-2 w-full sm:col-span-2 md:col-span-2"
+                >
+                    Clear
+                </button>
+            </div>
 
 
             {/* Vendor Grid */}
