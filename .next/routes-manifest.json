@@ -66,6 +66,12 @@
       "namedRegex": "^/contact(?:/)?$"
     },
     {
+      "page": "/foods",
+      "regex": "^/foods(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/foods(?:/)?$"
+    },
+    {
       "page": "/login",
       "regex": "^/login(?:/)?$",
       "routeKeys": {},

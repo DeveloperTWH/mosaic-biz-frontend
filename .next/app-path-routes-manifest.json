@@ -1,14 +1,15 @@
 {
   "/_not-found/page": "/_not-found",
-  "/(auth)/login/page": "/login",
-  "/(auth)/signup/page": "/signup",
+  "/(home)/foods/page": "/foods",
   "/(home)/about/page": "/about",
-  "/(home)/contact/page": "/contact",
   "/(home)/page": "/",
+  "/(home)/contact/page": "/contact",
   "/(home)/products/[id]/page": "/products/[id]",
   "/(home)/products/page": "/products",
-  "/(home)/services/[id]/[serviceId]/page": "/services/[id]/[serviceId]",
   "/(home)/services/[id]/page": "/services/[id]",
   "/(home)/services/page": "/services",
-  "/(home)/vendors/page": "/vendors"
+  "/(home)/services/[id]/[serviceId]/page": "/services/[id]/[serviceId]",
+  "/(home)/vendors/page": "/vendors",
+  "/(auth)/signup/page": "/signup",
+  "/(auth)/login/page": "/login"
 }
