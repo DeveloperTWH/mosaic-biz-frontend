@@ -38,7 +38,7 @@ export default function FeatureBlogs() {
   return (
     <section className="py-20 px-5 md:px-20 bg-custom-soil">
       <div className="text-center mb-10">
-        <h2 className="text-3xl font-semibold uppercase text-gray-800 mb-2">
+        <h2 className="text-3xl font-semibold uppercase text-gray-800 mb-2 heading">
           FEATURED BLOGS & STORIES
         </h2>
         <div className="flex justify-center flex-col items-center">

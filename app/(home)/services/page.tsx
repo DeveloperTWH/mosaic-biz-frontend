@@ -1,8 +1,6 @@
-// File: app/service/page.tsx
+"use client"
 
-import React from "react";
-import Link from "next/link";
-import Image from "next/image";
+import React, { useState } from "react";
 import FilterBar from "./components/FilterBar";
 import CategoryGrid from "./components/CategoryGrid";
 import HeroSection from "./components/HeroSection";
@@ -11,13 +9,33 @@ import FeatureBlogs from "../Components/FeatureBlogs";
 
 
 const ServicePage = () => {
+  const [searchText, setSearchText] = useState("");
+  const [minorityType, setMinorityType] = useState("");
+  const [searchLocation, setSearchLocation] = useState("");
+
+  const handleSearch = () => {
+    console.log({
+      searchText,
+      minorityType,
+      searchLocation,
+    });
+  }
   return (
     <main className="bg-white text-black">
-        <HeroSection/>
-        <FilterBar />
-        <CategoryGrid/>
-        <BookServices/>
-        <FeatureBlogs/>
+      <HeroSection />
+      <FilterBar
+        searchText={searchText}
+        setSearchText={setSearchText}
+        minorityType={minorityType}
+        setMinorityType={setMinorityType}
+        searchLocation={searchLocation}
+        setSearchLocation={setSearchLocation}
+        onSearch={handleSearch}
+      />
+
+      <CategoryGrid />
+      <BookServices />
+      <FeatureBlogs />
     </main>
   );
 };

@@ -12,7 +12,7 @@ const BookServices = () => {
           {[...Array(9)].map((_, i) => (
             <div key={i} className="border rounded-lg overflow-hidden shadow-sm">
               <Image
-                src={`/images/service-${i + 1}.jpg`}
+                src={`/Service/19099.png`}
                 alt="Service"
                 width={600}
                 height={400}

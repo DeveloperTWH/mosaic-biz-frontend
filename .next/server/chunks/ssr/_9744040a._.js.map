@@ -1,0 +1,8 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 6, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"","debugId":null}},
+    {"offset": {"line": 18, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/DAY/OneDrive/Desktop/mosaic-biz-hub/frontend/app/%28home%29/services/components/HeroSection.tsx"],"sourcesContent":["import Image from \"next/image\";\r\n\r\nconst HeroSection = () => {\r\n  return (\r\n    <section className=\"w-full relative\">\r\n      <Image\r\n        src=\"/about/banner_new 1.png\"\r\n        alt=\"Service Hero\"\r\n        width={1920}  // adjust to actual image width\r\n        height={500}  // adjust to actual image height\r\n        className=\"w-full h-auto\"\r\n      />\r\n    </section>\r\n  );\r\n};\r\n\r\nexport default HeroSection;\r\n"],"names":[],"mappings":";;;;AAAA;;;AAEA,MAAM,cAAc;IAClB,qBACE,8OAAC;QAAQ,WAAU;kBACjB,cAAA,8OAAC,6HAAA,CAAA,UAAK;YACJ,KAAI;YACJ,KAAI;YACJ,OAAO;YACP,QAAQ;YACR,WAAU;;;;;;;;;;;AAIlB;uCAEe","debugId":null}},
+    {"offset": {"line": 52, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/DAY/OneDrive/Desktop/mosaic-biz-hub/frontend/app/%28home%29/foods/page.tsx"],"sourcesContent":["import React from 'react'\r\nimport HeroSection from '../services/components/HeroSection';\r\n\r\nconst FoodSection = () => {\r\n  return (\r\n    <div>\r\n      <HeroSection/>\r\n    </div>\r\n  )\r\n}\r\n\r\nexport default FoodSection;"],"names":[],"mappings":";;;;AACA;;;AAEA,MAAM,cAAc;IAClB,qBACE,8OAAC;kBACC,cAAA,8OAAC,yJAAA,CAAA,UAAW;;;;;;;;;;AAGlB;uCAEe","debugId":null}}]
+}

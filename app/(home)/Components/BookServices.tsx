@@ -9,12 +9,20 @@ export default function BookServices() {
     ];
 
     return (
-        <section className="relative bg-black text-white pt-12 overflow-hidden" style={{
-            clipPath: "polygon(0px 0px, 100% 0px, 100% 100%, 26% 100%, 21.5% 92.5%, 0% 100%)",
-            WebkitClipPath: "polygon(0px 0px, 100% 0px, 100% 100%, 26% 100%, 21.5% 92.5%, 0% 100%)",
-        }}>
+        <section className="relative bg-black text-white pt-12 overflow-hidden min-h-[100vh] md:pb-24 pb-5">
+            {/* Background Image Positioned at Bottom */}
+            <div className="absolute inset-x-0 bottom-0 z-0">
+                <img
+                    src="/hserv-background.png"
+                    alt="Background"
+                    className="w-full object-contain"
+                />
+            </div>
+
             <div className="w-[90%] mx-auto relative z-10">
-                <h2 className="text-center text-3xl font-semibold mb-2 heading" style={{ "color": "white" }}>BOOK YOUR SERVICES</h2>
+                <h2 className="text-center text-2xl sm:text-3xl md:text-4xl font-semibold mb-2 heading" style={{ color: "white" }}>
+                    BOOK YOUR SERVICES
+                </h2>
                 <hr className="h-[2px] w-[100px] mx-auto" />
                 <hr className="h-[2px] w-[100px] mx-auto mt-[1px] mb-5" />
                 <div className="mx-auto w-1/2 text-[13px] text-center mb-10">
@@ -40,26 +48,13 @@ export default function BookServices() {
                             <Link href="/your-service-page" className="inline-flex items-center gap-1 mt-4 text-white hover:underline text-[12px]">
                                 Read More <MoveRight className="ml-1" size={14} />
                             </Link>
-
                         </div>
                     ))}
                 </div>
-                <div className="text-center mt-8">
+                <div className="text-center mt-8 mb-10">
                     <button className="px-10 py-2 mt-5 bg-custom-orange text-white">View All Services</button>
                 </div>
             </div>
-
-            <img
-                src="/Service Box.png"
-                alt="clip path"
-                className="w-full h-auto relative z-10"
-            // style={{
-            //     clipPath:
-            //         "polygon(20% 58%, 100% 0px, 100% 100%, 25% 100%, 20% 58%, 0px 100%, 0px 0px)",
-            //     WebkitClipPath:
-            //         "polygon(20% 58%, 100% 0px, 100% 100%, 25% 100%, 20% 58%, 0px 100%, 0px 0px)",
-            // }}
-            />
         </section>
     );
 }

@@ -59,8 +59,8 @@ export default function SearchPageContent() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {products.map((product) => (
                 <Link href={`/products/${product.id}`} key={product.id} className="block">
-  <ProductCard product={product} />
-</Link>
+                  <ProductCard product={product} />
+                </Link>
               ))}
             </div>
           )}

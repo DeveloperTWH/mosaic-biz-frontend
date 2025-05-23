@@ -33,18 +33,16 @@ export default function FAQSection() {
   };
 
   return (
-    <section className="relative md:h-[90vh] p-6 md:p-12 overflow-hidden">
+    <section className="relative p-6 md:p-12 overflow-hidden">
       {/* Background image */}
-      <div
-        className="absolute inset-0 -z-10"
-        style={{
-          backgroundImage: "url('/Subtract.png')",
-          backgroundRepeat: "no-repeat",
-          backgroundPosition: "right center",
-          backgroundSize: "contain",
-          transform: "scaleX(-1)",
-        }}
+      {/* Background image as fixed size */}
+      <img
+        src="/Subtract.png"
+        alt=""
+        className="absolute left-0 bottom-0 h-auto max-h-[100vh] w-auto object-contain z-0"
+        style={{ transform: "scaleX(-1)" }}
       />
+
 
       {/* Content */}
       <div className="md:w-[60%] mx-auto relative z-10">
@@ -57,9 +55,9 @@ export default function FAQSection() {
         </div>
         <div className="w-[60%] mx-auto text-center">
 
-        <p className="text-[13px] text-gray-600 mb-5">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Impedit adipisci doloremque amet recusandae nostrum voluptates rem suscipit dolores magni velit?
-        </p>
+          <p className="text-[13px] text-gray-600 mb-5">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Impedit adipisci doloremque amet recusandae nostrum voluptates rem suscipit dolores magni velit?
+          </p>
         </div>
         <div className="">
           {faqs.map((faq, index) => (

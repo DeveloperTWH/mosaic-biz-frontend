@@ -2,34 +2,39 @@
 
 import { useState } from "react";
 
-const FilterBar = () => {
-  const [searchText, setSearchText] = useState("");
-  const [minorityType, setMinorityType] = useState("");
-  const [priceRange, setPriceRange] = useState("");
+// Define the types for the props that FilterBar will receive
+interface FilterBarProps {
+  searchText: string;
+  setSearchText: (text: string) => void;
+  minorityType: string;
+  setMinorityType: (type: string) => void;
+  searchLocation: string;
+  setSearchLocation: (location: string) => void;
+  onSearch: () => void;
+}
 
-  const handleSearch = () => {
-    console.log({
-      searchText,
-      minorityType,
-      priceRange,
-    });
-
-    // Add navigation or filter logic here
-  };
-
+const FilterBar: React.FC<FilterBarProps> = ({
+  searchText,
+  setSearchText,
+  minorityType,
+  setMinorityType,
+  searchLocation,
+  setSearchLocation,
+  onSearch,
+}) => {
   return (
     <section className="py-10 px-6 max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
         <input
           type="text"
           placeholder="Search Here"
-          className="border px-4 py-2 rounded w-full md:w-1/4"
+          className="border px-4 py-2 w-full md:w-1/4"
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
         />
 
         <select
-          className="border px-4 py-2 rounded w-full md:w-1/4 text-gray-500"
+          className="border px-4 py-2 w-full md:w-1/4 text-gray-500"
           value={minorityType}
           onChange={(e) => setMinorityType(e.target.value)}
         >
@@ -42,14 +47,14 @@ const FilterBar = () => {
         <input
           type="text"
           placeholder="Search by Location"
-          className="border px-4 py-2 rounded w-full md:w-1/4"
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
+          className="border px-4 py-2 w-full md:w-1/4"
+          value={searchLocation}
+          onChange={(e) => setSearchLocation(e.target.value)}
         />
 
         <button
-          onClick={handleSearch}
-          className="bg-custom-orange text-white px-10 py-3 text-base md:text-lg rounded"
+          onClick={onSearch}
+          className="bg-custom-orange text-white px-10 py-2 text-base md:text-lg"
         >
           Search Here
         </button>

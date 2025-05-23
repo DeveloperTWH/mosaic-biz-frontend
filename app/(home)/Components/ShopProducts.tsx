@@ -35,7 +35,7 @@ export default function ShopProducts() {
     return (
         <section className="pt-16 pb-12 px-4 sm:px-6 lg:px-12 max-w-[1400px] mx-auto w-full">
             <div className="max-w-3xl mx-auto text-center">
-                <h2 className="text-3xl sm:text-4xl font-bold mb-3 uppercase heading">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 uppercase heading">
                     Shop Products
                 </h2>
                 <div className="flex flex-col justify-center items-center mb-4">

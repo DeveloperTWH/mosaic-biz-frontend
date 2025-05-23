@@ -2,13 +2,20 @@ export default function AboutMinority() {
   return (
     <section
       className="relative py-32"
-      style={{
-        backgroundImage: "url('/Subtract.png')",
-        backgroundRepeat: "no-repeat",
-        backgroundPosition: "right center",
-        backgroundSize: "contain",
-      }}
+    // style={{
+    //   backgroundImage: "url('/Subtract.png')",
+    //   backgroundRepeat: "no-repeat",
+    //   backgroundPosition: "right center",
+    //   backgroundSize: "contain",
+    // }}
     >
+      <img
+        src="/Subtract.png"
+        alt=""
+        className="absolute right-0 bottom-0 h-auto max-h-[100vh] w-auto object-contain z-0"
+        style={{ transform: "scaleX(1)" }} // no flip or flip as you want
+      />
+
       <div className="flex flex-col md:flex-row items-center gap-16 w-4/5 mx-auto z-10 relative">
         <img
           src="/about.png"
@@ -16,7 +23,7 @@ export default function AboutMinority() {
           className="w-full md:w-1/2 object-cover"
         />
         <div className="md:w-[40%]">
-          <h2 className="text-4xl font-semibold mb-4 uppercase heading">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-4 uppercase heading">
             About Minority Owned Business
           </h2>
           <hr className="h-[2px] w-[100px] bg-green-900" />

@@ -71,6 +71,17 @@ export default function ServiceCategoryPage({ params }: PageProps) {
 
     const [activeService, setActiveService] = useState<number | null>(null);
     const [isMobile, setIsMobile] = useState<boolean>(false);
+    const [searchText, setSearchText] = useState("");
+    const [minorityType, setMinorityType] = useState("");
+    const [searchLocation, setSearchLocation] = useState("");
+
+    const handleSearch = () => {
+        console.log({
+            searchText,
+            minorityType,
+            searchLocation,
+        });
+    }
 
     useEffect(() => {
         const checkMobile = () => {
@@ -100,7 +111,15 @@ export default function ServiceCategoryPage({ params }: PageProps) {
                         className="w-full object-cover"
                     />
                 </section>
-                <FilterBar />
+                <FilterBar
+                    searchText={searchText}
+                    setSearchText={setSearchText}
+                    minorityType={minorityType}
+                    setMinorityType={setMinorityType}
+                    searchLocation={searchLocation}
+                    setSearchLocation={setSearchLocation}
+                    onSearch={handleSearch}
+                />
 
                 {/* Filters and Listings */}
                 <section className="max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 lg:grid-cols-3 gap-8">
