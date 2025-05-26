@@ -15,6 +15,22 @@
   "headers": [],
   "dynamicRoutes": [
     {
+      "page": "/foods/resturant/[id]",
+      "regex": "^/foods/resturant/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/foods/resturant/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/foods/shop/[id]",
+      "regex": "^/foods/shop/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/foods/shop/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
       "page": "/products/[id]",
       "regex": "^/products/([^/]+?)(?:/)?$",
       "routeKeys": {

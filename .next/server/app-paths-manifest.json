@@ -1,15 +1,17 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
-  "/(home)/foods/page": "app/(home)/foods/page.js",
-  "/(home)/about/page": "app/(home)/about/page.js",
-  "/(home)/page": "app/(home)/page.js",
+  "/(auth)/signup/page": "app/(auth)/signup/page.js",
+  "/(auth)/login/page": "app/(auth)/login/page.js",
+  "/(home)/foods/shop/[id]/page": "app/(home)/foods/shop/[id]/page.js",
   "/(home)/contact/page": "app/(home)/contact/page.js",
+  "/(home)/foods/page": "app/(home)/foods/page.js",
+  "/(home)/foods/resturant/[id]/page": "app/(home)/foods/resturant/[id]/page.js",
+  "/(home)/page": "app/(home)/page.js",
   "/(home)/products/[id]/page": "app/(home)/products/[id]/page.js",
   "/(home)/products/page": "app/(home)/products/page.js",
-  "/(home)/services/[id]/page": "app/(home)/services/[id]/page.js",
-  "/(home)/services/page": "app/(home)/services/page.js",
   "/(home)/services/[id]/[serviceId]/page": "app/(home)/services/[id]/[serviceId]/page.js",
-  "/(home)/vendors/page": "app/(home)/vendors/page.js",
-  "/(auth)/signup/page": "app/(auth)/signup/page.js",
-  "/(auth)/login/page": "app/(auth)/login/page.js"
+  "/(home)/services/[id]/page": "app/(home)/services/[id]/page.js",
+  "/(home)/about/page": "app/(home)/about/page.js",
+  "/(home)/services/page": "app/(home)/services/page.js",
+  "/(home)/vendors/page": "app/(home)/vendors/page.js"
 }
