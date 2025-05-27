@@ -13,6 +13,7 @@ export const dummyVendors = Array.from({ length: 100 }, (_, i) => {
   const imageName = `image ${imageNumber}.png`;
 
   return {
+    id:i+1,
     name: `${companies[i % companies.length]} ${i + 1}`,
     logo: `/vendors/${imageName}`,
     category: categories[i % categories.length],

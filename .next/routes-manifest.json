@@ -54,6 +54,14 @@
         "nxtPserviceId": "nxtPserviceId"
       },
       "namedRegex": "^/services/(?<nxtPid>[^/]+?)/(?<nxtPserviceId>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/vendors/[vendor_id]",
+      "regex": "^/vendors/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPvendor_id": "nxtPvendor_id"
+      },
+      "namedRegex": "^/vendors/(?<nxtPvendor_id>[^/]+?)(?:/)?$"
     }
   ],
   "staticRoutes": [

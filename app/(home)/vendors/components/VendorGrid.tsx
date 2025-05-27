@@ -3,8 +3,10 @@
 import { useState, useEffect } from 'react';
 import { dummyVendors } from './dummyVendors';
 import CustomSelect from './CustomSelect';
+import Link from 'next/link';
 
 interface Vendor {
+    id: number,
     name: string;
     logo: string;
     category: string;
@@ -28,7 +30,7 @@ export default function VendorGrid() {
         const filtered = dummyVendors.filter(
             (v) =>
                 (!category || v.category === category) &&
-                (!city || v.city.toLowerCase().includes(city.toLowerCase())) &&
+                (!city || v.city.trim().toLowerCase().includes(city.trim().toLowerCase())) &&
                 (!search || v.name.toLowerCase().includes(search.toLowerCase()))
         );
         setFilteredVendors(filtered);
@@ -82,10 +84,12 @@ export default function VendorGrid() {
             {/* Vendor Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-6 mb-6">
                 {paginatedVendors.map((vendor, idx) => (
-                    <div key={idx} className="border p-4 text-center">
-                        <img src={vendor.logo} alt={vendor.name} className="mx-auto h-16 object-contain" />
-                        <p className="mt-2 text-sm font-medium">{vendor.name}</p>
-                    </div>
+                    <Link key={vendor.id} href={`/vendors/${vendor.id}`} >
+                        <div className="border p-4 text-center">
+                            <img src={vendor.logo} alt={vendor.name} className="mx-auto h-16 object-contain" />
+                            <p className="mt-2 text-sm font-medium">{vendor.name}</p>
+                        </div>
+                    </Link>
                 ))}
             </div>
 

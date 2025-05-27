@@ -1,17 +1,18 @@
 {
   "/_not-found/page": "/_not-found",
-  "/(auth)/signup/page": "/signup",
-  "/(auth)/login/page": "/login",
-  "/(home)/foods/shop/[id]/page": "/foods/shop/[id]",
+  "/(home)/foods/resturant/[id]/page": "/foods/resturant/[id]",
+  "/(home)/about/page": "/about",
   "/(home)/contact/page": "/contact",
   "/(home)/foods/page": "/foods",
-  "/(home)/foods/resturant/[id]/page": "/foods/resturant/[id]",
+  "/(home)/services/[id]/[serviceId]/page": "/services/[id]/[serviceId]",
   "/(home)/page": "/",
   "/(home)/products/[id]/page": "/products/[id]",
+  "/(home)/vendors/[vendor_id]/page": "/vendors/[vendor_id]",
   "/(home)/products/page": "/products",
-  "/(home)/services/[id]/[serviceId]/page": "/services/[id]/[serviceId]",
-  "/(home)/services/[id]/page": "/services/[id]",
-  "/(home)/about/page": "/about",
   "/(home)/services/page": "/services",
-  "/(home)/vendors/page": "/vendors"
+  "/(home)/services/[id]/page": "/services/[id]",
+  "/(home)/vendors/page": "/vendors",
+  "/(home)/foods/shop/[id]/page": "/foods/shop/[id]",
+  "/(auth)/signup/page": "/signup",
+  "/(auth)/login/page": "/login"
 }
