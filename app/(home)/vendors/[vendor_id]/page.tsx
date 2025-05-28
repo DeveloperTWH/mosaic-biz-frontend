@@ -1,7 +1,7 @@
 "use client"
 import React, { useState } from "react";
 import TopSellingProduct from "./component/TopSellingProduct";
-import { Forward, Mail, MapPin, MessageSquareMore, Send } from "lucide-react";
+import { Forward, Mail, MapPin, MessageSquareMore, Send, Star } from "lucide-react";
 import ShareButton from "./component/ShareButton";
 import TestShare from "./component/ShareButton";
 import Overview from "./component/Overview";
@@ -90,16 +90,16 @@ const VendorDetailPage = () => {
                             </div>
                             <h2 className="text-2xl font-bold mt-3 text-red-500 roboto text-center capitalize">{vendor.name}</h2>
                             {vendor.isTopVendor && (
-                                <span className="text-sm  font-semibold text-center mb-10 roboto capitalize">Top Vendor ⭐</span>
+                                <span className="text-sm  font-semibold text-center mb-10 roboto capitalize flex gap-2 justify-center items-center">Top Vendor <Star stroke="0" fill="yellow" size={20} /></span>
                             )}
                             <div className="flex justify-between">
                                 <p className="text-custom-blue roboto underline">trusted partner</p>
                                 <p className="text-custom-yellow roboto underline">trusted</p>
                             </div>
                             <p className="text-sm text-gray-600 mt-2">{vendor.description}</p>
-                            <div className="flex gap-4 my-4 text-sm justify-between">
+                            <div className="flex gap-4 my-4 text-sm justify-between items-center">
                                 <a href="mailto:vendor@example.com" className="text-gray-700">
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-2 justify-center">
                                         <Mail /> Email
                                     </div>
                                 </a>

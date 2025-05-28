@@ -1,18 +1,18 @@
 {
   "/_not-found/page": "/_not-found",
-  "/(home)/foods/resturant/[id]/page": "/foods/resturant/[id]",
   "/(home)/about/page": "/about",
   "/(home)/contact/page": "/contact",
   "/(home)/foods/page": "/foods",
-  "/(home)/services/[id]/[serviceId]/page": "/services/[id]/[serviceId]",
   "/(home)/page": "/",
+  "/(home)/foods/resturant/[id]/page": "/foods/resturant/[id]",
   "/(home)/products/[id]/page": "/products/[id]",
-  "/(home)/vendors/[vendor_id]/page": "/vendors/[vendor_id]",
   "/(home)/products/page": "/products",
-  "/(home)/services/page": "/services",
+  "/(home)/services/[id]/[serviceId]/page": "/services/[id]/[serviceId]",
   "/(home)/services/[id]/page": "/services/[id]",
+  "/(home)/vendors/[vendor_id]/page": "/vendors/[vendor_id]",
   "/(home)/vendors/page": "/vendors",
   "/(home)/foods/shop/[id]/page": "/foods/shop/[id]",
-  "/(auth)/signup/page": "/signup",
-  "/(auth)/login/page": "/login"
+  "/(home)/services/page": "/services",
+  "/(auth)/login/page": "/login",
+  "/(auth)/signup/page": "/signup"
 }

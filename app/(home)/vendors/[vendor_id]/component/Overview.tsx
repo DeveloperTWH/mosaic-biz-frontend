@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
+import MapComponent from "./MapComponent";
 
 type Service = {
     title: string;
@@ -84,32 +85,7 @@ const Overview: React.FC<OverviewProps> = ({ vendor }) => {
 
             {/* RESPONSIVE WORLD MAP */}
             <div className="mt-10">
-                <div
-                    ref={mapContainerRef}
-                    className="relative rounded overflow-hidden mx-auto border"
-                    style={{ aspectRatio: "440 / 233", width: "100%", maxWidth: "600px" }}
-                >
-                    <img
-                        src="/vendor/world.png"
-                        alt="World Map"
-                        className="absolute w-full h-full object-contain"
-                    />
-                    {vendor.mapDots.map((dot, idx) => {
-                        const pos = convertLatLngToPosition(dot.lat, dot.lng);
-                        return (
-                            <div
-                                key={idx}
-                                className="absolute w-2.5 h-2.5 bg-blue-600 rounded-full"
-                                style={{
-                                    top: `${pos.top}px`,
-                                    left: `${pos.left}px`,
-                                    transform: "translate(-50%, -50%)",
-                                }}
-                                title={dot.city}
-                            ></div>
-                        );
-                    })}
-                </div>
+                <MapComponent cities={vendor.mapDots}/>
             </div>
         </>
     );
