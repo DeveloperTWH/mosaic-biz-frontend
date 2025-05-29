@@ -20,7 +20,7 @@ export default function ShareButton() {
     <button
       type="button"
       onClick={handleCopy}
-      className="flex items-center gap-2 cursor-pointer px-3 py-2 rounded-md hover:bg-gray-100"
+      className="flex items-center gap-2 cursor-pointer py-2 rounded-md hover:bg-gray-100"
     >
       <Forward />
       Share

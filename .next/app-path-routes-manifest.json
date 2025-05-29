@@ -1,18 +1,18 @@
 {
   "/_not-found/page": "/_not-found",
-  "/(home)/about/page": "/about",
+  "/(auth)/login/page": "/login",
+  "/(auth)/signup/page": "/signup",
   "/(home)/contact/page": "/contact",
   "/(home)/foods/page": "/foods",
-  "/(home)/page": "/",
+  "/(home)/about/page": "/about",
   "/(home)/foods/resturant/[id]/page": "/foods/resturant/[id]",
+  "/(home)/foods/shop/[id]/page": "/foods/shop/[id]",
+  "/(home)/page": "/",
   "/(home)/products/[id]/page": "/products/[id]",
   "/(home)/products/page": "/products",
   "/(home)/services/[id]/[serviceId]/page": "/services/[id]/[serviceId]",
   "/(home)/services/[id]/page": "/services/[id]",
-  "/(home)/vendors/[vendor_id]/page": "/vendors/[vendor_id]",
-  "/(home)/vendors/page": "/vendors",
-  "/(home)/foods/shop/[id]/page": "/foods/shop/[id]",
   "/(home)/services/page": "/services",
-  "/(auth)/login/page": "/login",
-  "/(auth)/signup/page": "/signup"
+  "/(home)/vendors/[vendor_id]/page": "/vendors/[vendor_id]",
+  "/(home)/vendors/page": "/vendors"
 }
