@@ -1,7 +1,8 @@
 'use client'
 export const dynamic = 'force-dynamic'
+import React from 'react';
 
-import { useSearchParams, useRouter,usePathname  } from 'next/navigation'
+import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
@@ -32,9 +33,9 @@ function SignupContent() {
 
   const isVendor = type === 'vendor'
   const title = isVendor ? 'Vendor Registration' : 'Customer Registration'
-    const router = useRouter();
-    const pathname = usePathname();
-    const handleClose = () => {
+  const router = useRouter();
+  const pathname = usePathname();
+  const handleClose = () => {
     const isAuthPage = pathname.includes('/login') || pathname.includes('/signup');
 
     if (isAuthPage) {
@@ -43,6 +44,41 @@ function SignupContent() {
       router.back();
     }
   };
+
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.target as HTMLFormElement; // ✅ Fix here
+    const formData = new FormData(form);
+    const payload = {
+      name: formData.get("name"),
+      email: formData.get("email"),
+      password: formData.get("password"),
+      role: type === 'vendor' ? 'business_owner' : 'customer',
+      mobile: formData.get("mobile"),
+      gender: formData.get("gender"), // vendor can skip gender
+    };
+    console.log("api calls" , payload);
+    
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        router.push(`/verify-otp?email=${payload.email}&type=${type}`);
+      } else {
+        alert(data.message || "Registration failed");
+      }
+    } catch (err) {
+      console.error("Registration error:", err);
+      alert("Something went wrong. Please try again.");
+    }
+  };
+
 
   return (
     <div className="min-h-screen bg-black bg-[url('/login/footer-bg.jpg')] bg-cover bg-center bg-fixed relative py-10 p-1">
@@ -75,57 +111,31 @@ function SignupContent() {
         </div>
 
         {/* Full page scrollable form */}
-        <form>
+        <form onSubmit={handleSubmit}>
+          <label className="block text-gray-700 mb-2">Full Name</label>
+          <input name="name" type="text" required className="w-full border p-2 mb-4 rounded" />
+
+          <label className="block text-gray-700 mb-2">Mobile Number</label>
+          <input name="mobile" type="text" required className="w-full border p-2 mb-4 rounded" />
+
+          <label className="block text-gray-700 mb-2" htmlFor="gender">Gender</label>
+          <select id="gender" name="gender" required className="w-full border p-2 mb-4 rounded">
+            <option value="">Select Gender</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+          </select>
           <label className="block text-gray-700 mb-2">Email</label>
-          <input type="email" className="w-full border p-2 mb-4 rounded" />
+          <input name="email" type="email" required className="w-full border p-2 mb-4 rounded" />
 
           <label className="block text-gray-700 mb-2">Password</label>
-          <input type="password" className="w-full border p-2 mb-4 rounded" />
-
-          {isVendor && (
-            <>
-              <label className="block text-gray-700 mb-2">First Name</label>
-              <input type="text" className="w-full border p-2 mb-4 rounded" />
-              <label className="block text-gray-700 mb-2">Last Name</label>
-              <input type="text" className="w-full border p-2 mb-4 rounded" />
-
-              <div className="relative group w-full mb-4">
-                <label className="block text-gray-700 mb-2 relative">
-                  License Number
-                  <div className="absolute left-0 -top-6 bg-gray-800 text-white text-sm px-3 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                    This is your official business license or registration number.
-                  </div>
-                </label>
-                <input type="text" className="w-full border p-2 rounded" />
-              </div>
-
-              <label className="block text-gray-700 mb-2">Business Name</label>
-              <input type="text" className="w-full border p-2 mb-4 rounded" />
-
-              <label className="block text-gray-700 mb-2">Minority Type</label>
-              <select className="w-full border p-2 mb-4 rounded">
-                <option value="">CHOOSE ONE</option>
-                <option value="black">Black-Owned</option>
-                <option value="latino">Latino-Owned</option>
-                <option value="asian">Asian-Owned</option>
-                <option value="native">Native American-Owned</option>
-                <option value="other">Other</option>
-              </select>
-
-              <label className="block text-gray-700 mb-2">Mobile Number</label>
-              <input type="text" className="w-full border p-2 mb-4 rounded" />
-            </>
-          )}
-
-          <p className="text-xs text-gray-600 mb-4">
-            Your personal data will be used to support your experience throughout this website,
-            to manage access to your account, and for other purposes described in our Privacy Policy.
-          </p>
+          <input name="password" type="password" required className="w-full border p-2 mb-4 rounded" />
 
           <button type="submit" className="bg-[#10A3C9] text-white w-full py-2 font-semibold">
             Register
           </button>
         </form>
+
 
         <p className="text-center text-sm mt-4">
           Already a member?{' '}

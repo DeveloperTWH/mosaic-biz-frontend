@@ -8,6 +8,12 @@ import Link from 'next/link'
 import { X } from 'lucide-react';
 
 function LoginContent() {
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
   const searchParams = useSearchParams()
   const pathname = usePathname()
 
@@ -26,6 +32,37 @@ function LoginContent() {
 
   const title = type === 'vendor' ? 'Vendor Login' : 'Customer Login'
   const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        localStorage.setItem('token', data.token);
+        router.push(data.user.role === 'vendor' ? '/vendor/dashboard' : '/dashboard');
+      } else if (data.otpPending) {
+        router.push(`/verify-otp?email=${data.user.email}&type=${data.user.role}`);
+      } else {
+        setError(data.message || 'Login failed');
+      }
+    } catch (err) {
+      console.error('Login error:', err);
+      setError('Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center bg-[url('/login/footer-bg.jpg')] bg-cover bg-center relative p-1 py-10">
@@ -57,12 +94,29 @@ function LoginContent() {
           </Link>
         </div>
 
-        <form>
+        <form onSubmit={handleSubmit}>
           <label className="block text-gray-700 mb-2">Email</label>
-          <input type="email" className="w-full border p-2 mb-4 rounded" />
+          <input
+            type="email"
+            name="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full border p-2 mb-4 rounded"
+          />
 
           <label className="block text-gray-700 mb-2">Password</label>
-          <input type="password" className="w-full border p-2 mb-2 rounded" />
+          <input
+            type="password"
+            name="password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full border p-2 mb-2 rounded"
+            autoCapitalize="none"
+            autoComplete="email"
+            spellCheck="false" 
+          />
 
           <div className="flex items-center justify-between text-sm mb-4">
             <label className="flex items-center">
@@ -72,10 +126,17 @@ function LoginContent() {
             <a href="#" className="text-blue-600 font-medium">Forget Password</a>
           </div>
 
-          <button type="submit" className="bg-[#10A3C9] text-white w-full py-2 font-semibold">
-            Sign In
+          {error && <p className="text-red-600 text-sm mb-4">{error}</p>}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="bg-[#10A3C9] text-white w-full py-2 font-semibold disabled:opacity-60"
+          >
+            {loading ? 'Signing In...' : 'Sign In'}
           </button>
         </form>
+
 
         <div className="flex justify-center space-x-4 mt-4">
           <button className="bg-blue-600 text-white w-10 font-bold h-10 rounded-full">f</button>

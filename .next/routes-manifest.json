@@ -124,6 +124,12 @@
       "regex": "^/vendors(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/vendors(?:/)?$"
+    },
+    {
+      "page": "/verify-otp",
+      "regex": "^/verify\\-otp(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/verify\\-otp(?:/)?$"
     }
   ],
   "dataRoutes": [],
