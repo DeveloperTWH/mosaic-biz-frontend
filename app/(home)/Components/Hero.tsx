@@ -1,7 +1,34 @@
-import Link from 'next/link'
-import React from 'react'
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
+
+type MinorityType = {
+  _id: string;
+  name: string;
+};
+
 
 const Hero = () => {
+  const [minorityTypes, setMinorityTypes] = useState<MinorityType[]>([]);
+  const [loadingMinority, setLoadingMinority] = useState(true);
+
+  useEffect(() => {
+    const fetchMinorityTypes = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/minority-types`);
+        const data = await res.json();
+        setMinorityTypes(data);
+      } catch (err) {
+        console.error('Failed to load minority types', err);
+      } finally {
+        setLoadingMinority(false);
+      }
+    };
+
+    fetchMinorityTypes();
+  }, []);
+
   return (
     <div className="min-h-screen bg-white">
       {/* Search & Filters */}
@@ -18,17 +45,33 @@ const Hero = () => {
 
         <div className="flex flex-col w-full md:w-auto">
           <label htmlFor="minorityType" className="text-sm font-medium mb-1">Filter By Minority Type</label>
-          <select id="minorityType" className="px-4 py-2 border rounded"   defaultValue=" ">
-            <option value="black-owned">Black-Owned</option>
-            <option value="women-owned">Women-Owned</option>
-            <option value="latino-owned">Latino-Owned</option>
+          <select
+            id="minorityType"
+            className="px-4 py-2 border rounded min-w-[300px]"
+            defaultValue=""
+            disabled={loadingMinority}
+          >
+            {loadingMinority ? (
+              <option>Loading types...</option>
+            ) : minorityTypes.length > 0 ? (
+              <>
+                <option value="">All Types</option>
+                {minorityTypes.map((type) => (
+                  <option key={type._id} value={type.name}>
+                    {type.name}
+                  </option>
+                ))}
+              </>
+            ) : (
+              <option disabled>No types available</option>
+            )}
           </select>
         </div>
 
         <div className="flex flex-col w-full md:w-auto">
-          <label htmlFor="priceRange" className="text-sm font-medium mb-1">Filter By Loaction</label>
+          <label htmlFor="priceRange" className="text-sm font-medium mb-1">Filter By Location</label>
           <input
-            id="search"
+            id="location"
             type="text"
             placeholder="e.g. India, USA , Location..."
             className="px-4 py-2 border rounded"
@@ -36,11 +79,10 @@ const Hero = () => {
         </div>
 
         <div className="flex flex-col justify-end w-full md:w-auto">
-          <label className="text-sm font-medium mb-1 invisible">Search</label> {/* invisible just to maintain alignment */}
+          <label className="text-sm font-medium mb-1 invisible">Search</label>
           <button className="bg-custom-orange text-white px-20 py-2">Search Here</button>
         </div>
       </section>
-
 
       {/* Hero Section */}
       <section className="relative h-[650px] bg-cover bg-center" style={{ backgroundImage: 'url(/hero-image.png)' }}>
@@ -60,9 +102,8 @@ const Hero = () => {
           </div>
         </div>
       </section>
-
     </div>
-  )
-}
+  );
+};
 
-export default Hero
+export default Hero;

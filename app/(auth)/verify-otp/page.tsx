@@ -1,5 +1,7 @@
 'use client';
 export const dynamic = 'force-dynamic';
+import { toast } from 'react-toastify';
+
 
 import React, { Suspense, useRef, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -15,6 +17,9 @@ function VerifyOtpPage() {
 
     const [otp, setOtp] = useState<string[]>(Array(6).fill(''));
     const [error, setError] = useState('');
+    const [resendDisabled, setResendDisabled] = useState(false);
+    const [countdown, setCountdown] = useState(0);
+
     const inputRefs = useRef<HTMLInputElement[]>([]);
 
     const handleClose = () => {
@@ -64,7 +69,7 @@ function VerifyOtpPage() {
             });
 
             console.log(res);
-            
+
 
             const data = await res.json();
 
@@ -79,6 +84,45 @@ function VerifyOtpPage() {
             setError('Something went wrong. Please try again.');
         }
     };
+
+
+    const handleResendOtp = async () => {
+        if (!email || !type || resendDisabled) return;
+
+        setResendDisabled(true);
+        setCountdown(30); // 30 second countdown
+
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/resend-otp`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, type }),
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+                toast.success('OTP resent successfully!');
+            } else {
+                toast.error(data.message || 'Failed to resend OTP');
+            }
+        } catch (err) {
+            toast.error('Error while resending OTP');
+        }
+
+        // Start countdown timer
+        const interval = setInterval(() => {
+            setCountdown((prev) => {
+                if (prev <= 1) {
+                    clearInterval(interval);
+                    setResendDisabled(false);
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+    };
+
 
     return (
         <div className="min-h-screen bg-black bg-[url('/login/footer-bg.jpg')] bg-cover bg-center bg-fixed relative py-10 p-1">
@@ -132,10 +176,19 @@ function VerifyOtpPage() {
 
                 <p className="text-center text-sm mt-4">
                     Didn’t receive the code?{' '}
-                    <Link href={`/resend-otp?email=${email}&type=${type}`} className="font-bold underline">
-                        Resend OTP
-                    </Link>
+                    {resendDisabled ? (
+                        <span className="font-semibold text-gray-500">Resend in {countdown}s</span>
+                    ) : (
+                        <button
+                            onClick={handleResendOtp}
+                            className="font-bold underline text-blue-600 hover:text-blue-800"
+                        >
+                            Resend OTP
+                        </button>
+                    )}
                 </p>
+
+
             </div>
 
             <footer className="absolute bottom-2 w-full text-yellow-500 text-sm">
@@ -148,10 +201,10 @@ function VerifyOtpPage() {
 }
 
 
-export default function VerifyPage(){
-     return (
+export default function VerifyPage() {
+    return (
         <Suspense fallback={<div className="text-center p-8">Loading login page...</div>}>
             <VerifyOtpPage />
         </Suspense>
-      )
+    )
 }

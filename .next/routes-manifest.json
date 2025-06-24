@@ -90,6 +90,12 @@
       "namedRegex": "^/contact(?:/)?$"
     },
     {
+      "page": "/dashboard",
+      "regex": "^/dashboard(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard(?:/)?$"
+    },
+    {
       "page": "/foods",
       "regex": "^/foods(?:/)?$",
       "routeKeys": {},
