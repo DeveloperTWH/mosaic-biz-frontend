@@ -1,6 +1,11 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import React, { useEffect, useState } from 'react';
+
+type MinorityType = {
+  _id: string;
+  name: string;
+};
 
 // Define the types for the props that FilterBar will receive
 interface FilterBarProps {
@@ -22,6 +27,26 @@ const FilterBar: React.FC<FilterBarProps> = ({
   setSearchLocation,
   onSearch,
 }) => {
+
+  const [minorityTypes, setMinorityTypes] = useState<MinorityType[]>([]);
+  const [loadingMinority, setLoadingMinority] = useState(true);
+
+  useEffect(() => {
+    const fetchMinorityTypes = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/minority-types`);
+        const data = await res.json();
+        setMinorityTypes(data);
+      } catch (err) {
+        console.error('Failed to load minority types', err);
+      } finally {
+        setLoadingMinority(false);
+      }
+    };
+
+    fetchMinorityTypes();
+  }, []);
+
   return (
     <section className="py-10 px-6 max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
@@ -34,16 +59,26 @@ const FilterBar: React.FC<FilterBarProps> = ({
         />
 
         <select
-          className="border px-4 py-2 w-full md:w-1/4 text-gray-500"
+          className="border px-4 py-2 w-full md:w-1/4 "
           value={minorityType}
           onChange={(e) => setMinorityType(e.target.value)}
+          disabled={loadingMinority}
         >
-          <option value="">Choose Minority Type</option>
-          <option value="black-owned">Black-Owned</option>
-          <option value="latinx-owned">Latinx-Owned</option>
-          <option value="women-owned">Women-Owned</option>
+          {loadingMinority ? (
+            <option>Loading types...</option>
+          ) : minorityTypes.length > 0 ? (
+            <>
+              <option value="">All Types</option>
+              {minorityTypes.map((type) => (
+                <option key={type._id} value={type.name}>
+                  {type.name}
+                </option>
+              ))}
+            </>
+          ) : (
+            <option disabled>No types available</option>
+          )}
         </select>
-
         <input
           type="text"
           placeholder="Search by Location"
