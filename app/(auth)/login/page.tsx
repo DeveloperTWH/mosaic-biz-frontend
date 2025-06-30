@@ -22,9 +22,9 @@ function LoginContent() {
 
   if (!isValidType) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="bg-white p-8 rounded shadow text-center">
-          <p className="text-red-600 font-semibold">Invalid login type.</p>
+      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+        <div className="p-8 text-center bg-white rounded shadow">
+          <p className="font-semibold text-red-600">Invalid login type.</p>
         </div>
       </div>
     )
@@ -42,14 +42,18 @@ function LoginContent() {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({
+          email,
+          password,
+          role: type === 'vendor' ? 'business_owner' : 'customer',
+        }),
+        credentials: 'include'
       });
 
       const data = await res.json();
 
       if (data.success) {
-        localStorage.setItem('token', data.token);
-        router.push(data.user.role === 'vendor' ? '/vendor/dashboard' : '/dashboard');
+        router.push(data.user.role === 'business_owner' ? '/partners' : '/customer');
       } else if (data.otpPending) {
         router.push(`/verify-otp?email=${data.user.email}&type=${data.user.role}`);
       } else {
@@ -66,18 +70,18 @@ function LoginContent() {
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center bg-[url('/login/footer-bg.jpg')] bg-cover bg-center relative p-1 py-10">
-      <div className="fixed top-4 right-4 z-50 text-white bg-gray-700 rounded-lg p-2 cursor-pointer" onClick={() => router.back()}>
+      <div className="fixed z-50 p-2 text-white bg-gray-700 rounded-lg cursor-pointer top-4 right-4" onClick={() => router.back()}>
         <X size={20} />
       </div>
 
-      <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-8 z-10">
+      <div className="z-10 w-full max-w-md p-8 bg-white shadow-xl rounded-xl">
         <Link href="/">
-          <div className="text-center mb-6">
+          <div className="mb-6 text-center">
             <Image src="/logo.png" alt="Logo" width={350} height={100} className="mx-auto" />
           </div>
         </Link>
 
-        <div className="text-center font-bold text-lg mb-4">{title}</div>
+        <div className="mb-4 text-lg font-bold text-center">{title}</div>
 
         <div className="flex justify-center mb-6 border-b border-gray-300">
           <Link
@@ -95,38 +99,38 @@ function LoginContent() {
         </div>
 
         <form onSubmit={handleSubmit}>
-          <label className="block text-gray-700 mb-2">Email</label>
+          <label className="block mb-2 text-gray-700">Email</label>
           <input
             type="email"
             name="email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full border p-2 mb-4 rounded"
+            className="w-full p-2 mb-4 border rounded"
           />
 
-          <label className="block text-gray-700 mb-2">Password</label>
+          <label className="block mb-2 text-gray-700">Password</label>
           <input
             type="password"
             name="password"
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full border p-2 mb-2 rounded"
+            className="w-full p-2 mb-2 border rounded"
             autoCapitalize="none"
             autoComplete="email"
-            spellCheck="false" 
+            spellCheck="false"
           />
 
-          <div className="flex items-center justify-between text-sm mb-4">
+          <div className="flex items-center justify-between mb-4 text-sm">
             <label className="flex items-center">
               <input type="checkbox" className="mr-2" />
               Keep Me Signed In
             </label>
-            <a href="#" className="text-blue-600 font-medium">Forget Password</a>
+            <a href="#" className="font-medium text-blue-600">Forget Password</a>
           </div>
 
-          {error && <p className="text-red-600 text-sm mb-4">{error}</p>}
+          {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
 
           <button
             type="submit"
@@ -138,12 +142,12 @@ function LoginContent() {
         </form>
 
 
-        <div className="flex justify-center space-x-4 mt-4">
-          <button className="bg-blue-600 text-white w-10 font-bold h-10 rounded-full">f</button>
-          <button className="bg-gray-200 text-black w-10 h-10 rounded-full">G</button>
+        <div className="flex justify-center mt-4 space-x-4">
+          <button className="w-10 h-10 font-bold text-white bg-blue-600 rounded-full">f</button>
+          <button className="w-10 h-10 text-black bg-gray-200 rounded-full">G</button>
         </div>
 
-        <p className="text-center text-sm mt-4">
+        <p className="mt-4 text-sm text-center">
           New {type}?{' '}
           <Link href={`/signup?type=${type}`} className="font-bold underline">
             Create Account
@@ -151,7 +155,7 @@ function LoginContent() {
         </p>
       </div>
 
-      <footer className="absolute bottom-2 w-full text-yellow-500 text-sm">
+      <footer className="absolute w-full text-sm text-yellow-500 bottom-2">
         <div className="pr-5 w-[80%] mx-auto">
           <p>Copyright 2025. All Rights Reserved.</p>
         </div>
@@ -162,7 +166,7 @@ function LoginContent() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="text-center p-8">Loading login page...</div>}>
+    <Suspense fallback={<div className="p-8 text-center">Loading login page...</div>}>
       <LoginContent />
     </Suspense>
   )

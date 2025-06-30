@@ -66,6 +66,7 @@ function VerifyOtpPage() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, otp: joinedOtp }),
+                credentials: 'include',
             });
 
             console.log(res);
@@ -74,8 +75,7 @@ function VerifyOtpPage() {
             const data = await res.json();
 
             if (data.success) {
-                localStorage.setItem('token', data.token);
-                router.push(data.user.role === 'vendor' ? '/vendor/dashboard' : '/dashboard');
+                router.push(data.user.role === 'business_owner' ? '/partners' : '/customer');
             } else {
                 setError(data.message || 'Invalid OTP');
             }
@@ -97,6 +97,7 @@ function VerifyOtpPage() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, type }),
+                credentials: 'include',
             });
 
             const data = await res.json();
@@ -127,23 +128,23 @@ function VerifyOtpPage() {
     return (
         <div className="min-h-screen bg-black bg-[url('/login/footer-bg.jpg')] bg-cover bg-center bg-fixed relative py-10 p-1">
             <div
-                className="fixed top-4 right-4 z-50 text-white bg-gray-700 rounded-lg p-2 cursor-pointer"
+                className="fixed z-50 p-2 text-white bg-gray-700 rounded-lg cursor-pointer top-4 right-4"
                 onClick={handleClose}
             >
                 <X size={20} />
             </div>
 
-            <div className="bg-white rounded-xl shadow-xl max-w-md w-full mx-auto p-8 z-10">
+            <div className="z-10 w-full max-w-md p-8 mx-auto bg-white shadow-xl rounded-xl">
                 <Link href="/">
-                    <div className="text-center mb-6">
+                    <div className="mb-6 text-center">
                         <Image src="/logo.png" alt="Logo" width={350} height={100} className="mx-auto" />
                     </div>
                 </Link>
 
-                <div className="text-center font-bold text-lg mb-4">Verify OTP</div>
+                <div className="mb-4 text-lg font-bold text-center">Verify OTP</div>
 
                 {email && (
-                    <p className="text-center text-sm text-gray-600 mb-4">
+                    <p className="mb-4 text-sm text-center text-gray-600">
                         Enter the OTP sent to <span className="font-semibold">{email}</span>
                     </p>
                 )}
@@ -155,7 +156,7 @@ function VerifyOtpPage() {
                                 key={idx}
                                 type="text"
                                 maxLength={1}
-                                className="w-12 h-12 text-center text-xl border-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                className="w-12 h-12 text-xl text-center border-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                                 value={otp[idx] || ''}
                                 onChange={(e) => handleOtpChange(e, idx)}
                                 onKeyDown={(e) => handleKeyDown(e, idx)}
@@ -167,21 +168,21 @@ function VerifyOtpPage() {
                         ))}
                     </div>
 
-                    {error && <p className="text-red-600 text-sm mb-4">{error}</p>}
+                    {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
 
                     <button type="submit" className="bg-[#10A3C9] text-white w-full py-2 font-semibold">
                         Verify OTP
                     </button>
                 </form>
 
-                <p className="text-center text-sm mt-4">
+                <p className="mt-4 text-sm text-center">
                     Didn’t receive the code?{' '}
                     {resendDisabled ? (
                         <span className="font-semibold text-gray-500">Resend in {countdown}s</span>
                     ) : (
                         <button
                             onClick={handleResendOtp}
-                            className="font-bold underline text-blue-600 hover:text-blue-800"
+                            className="font-bold text-blue-600 underline hover:text-blue-800"
                         >
                             Resend OTP
                         </button>
@@ -191,7 +192,7 @@ function VerifyOtpPage() {
 
             </div>
 
-            <footer className="absolute bottom-2 w-full text-yellow-500 text-sm">
+            <footer className="absolute w-full text-sm text-yellow-500 bottom-2">
                 <div className="pr-5 w-[80%] mx-auto">
                     <p>Copyright 2025. All Rights Reserved.</p>
                 </div>
@@ -203,7 +204,7 @@ function VerifyOtpPage() {
 
 export default function VerifyPage() {
     return (
-        <Suspense fallback={<div className="text-center p-8">Loading login page...</div>}>
+        <Suspense fallback={<div className="p-8 text-center">Loading login page...</div>}>
             <VerifyOtpPage />
         </Suspense>
     )

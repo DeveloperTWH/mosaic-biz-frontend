@@ -23,9 +23,9 @@ function SignupContent() {
 
   if (!isValidType) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="bg-white p-8 rounded shadow text-center">
-          <p className="text-red-600 font-semibold">Invalid account type.</p>
+      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+        <div className="p-8 text-center bg-white rounded shadow">
+          <p className="font-semibold text-red-600">Invalid account type.</p>
         </div>
       </div>
     )
@@ -65,6 +65,7 @@ function SignupContent() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
+        credentials: 'include',        
       });
 
       const data = await res.json();
@@ -82,17 +83,17 @@ function SignupContent() {
 
   return (
     <div className="min-h-screen bg-black bg-[url('/login/footer-bg.jpg')] bg-cover bg-center bg-fixed relative py-10 p-1">
-      <div className="fixed top-4 right-4 z-50 text-white bg-gray-700 rounded-lg p-2 cursor-pointer" onClick={handleClose}>
+      <div className="fixed z-50 p-2 text-white bg-gray-700 rounded-lg cursor-pointer top-4 right-4" onClick={handleClose}>
         <X size={20} />
       </div>
-      <div className="bg-white rounded-xl shadow-xl max-w-md w-full mx-auto p-8 z-10">
+      <div className="z-10 w-full max-w-md p-8 mx-auto bg-white shadow-xl rounded-xl">
         <Link href="/">
-          <div className="text-center mb-6">
+          <div className="mb-6 text-center">
             <Image src="/logo.png" alt="Logo" width={350} height={100} className="mx-auto" />
           </div>
         </Link>
 
-        <div className="text-center font-bold text-lg mb-2">{title}</div>
+        <div className="mb-2 text-lg font-bold text-center">{title}</div>
 
         {/* Tabs */}
         <div className="flex justify-center mb-4 border-b border-gray-300">
@@ -112,24 +113,24 @@ function SignupContent() {
 
         {/* Full page scrollable form */}
         <form onSubmit={handleSubmit}>
-          <label className="block text-gray-700 mb-2">Full Name</label>
-          <input name="name" type="text" required className="w-full border p-2 mb-4 rounded" />
+          <label className="block mb-2 text-gray-700">Full Name</label>
+          <input name="name" type="text" required className="w-full p-2 mb-4 border rounded" />
 
-          <label className="block text-gray-700 mb-2">Mobile Number</label>
-          <input name="mobile" type="text" required className="w-full border p-2 mb-4 rounded" />
+          <label className="block mb-2 text-gray-700">Mobile Number</label>
+          <input name="mobile" type="text" required className="w-full p-2 mb-4 border rounded" />
 
-          <label className="block text-gray-700 mb-2" htmlFor="gender">Gender</label>
-          <select id="gender" name="gender" required className="w-full border p-2 mb-4 rounded">
+          <label className="block mb-2 text-gray-700" htmlFor="gender">Gender</label>
+          <select id="gender" name="gender" required className="w-full p-2 mb-4 border rounded">
             <option value="">Select Gender</option>
             <option value="male">Male</option>
             <option value="female">Female</option>
             <option value="other">Other</option>
           </select>
-          <label className="block text-gray-700 mb-2">Email</label>
-          <input name="email" type="email" required className="w-full border p-2 mb-4 rounded" />
+          <label className="block mb-2 text-gray-700">Email</label>
+          <input name="email" type="email" required className="w-full p-2 mb-4 border rounded" />
 
-          <label className="block text-gray-700 mb-2">Password</label>
-          <input name="password" type="password" required className="w-full border p-2 mb-4 rounded" />
+          <label className="block mb-2 text-gray-700">Password</label>
+          <input name="password" type="password" required className="w-full p-2 mb-4 border rounded" />
 
           <button type="submit" className="bg-[#10A3C9] text-white w-full py-2 font-semibold">
             Register
@@ -137,7 +138,7 @@ function SignupContent() {
         </form>
 
 
-        <p className="text-center text-sm mt-4">
+        <p className="mt-4 text-sm text-center">
           Already a member?{' '}
           <Link href={`/login?type=${type}`} className="font-bold underline">
             Sign In
@@ -145,7 +146,7 @@ function SignupContent() {
         </p>
       </div>
 
-      <footer className="absolute bottom-2 w-full text-yellow-500 text-sm">
+      <footer className="absolute w-full text-sm text-yellow-500 bottom-2">
         <div className="pr-5 w-[80%] mx-auto">
           <p>Copyright 2025. All Rights Reserved.</p>
         </div>

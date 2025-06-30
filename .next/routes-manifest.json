@@ -108,6 +108,18 @@
       "namedRegex": "^/login(?:/)?$"
     },
     {
+      "page": "/partners",
+      "regex": "^/partners(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/partners(?:/)?$"
+    },
+    {
+      "page": "/partners/business/new",
+      "regex": "^/partners/business/new(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/partners/business/new(?:/)?$"
+    },
+    {
       "page": "/products",
       "regex": "^/products(?:/)?$",
       "routeKeys": {},

@@ -30,7 +30,7 @@ const MinorityType = () => {
 
     return (
         <div className="flex flex-col w-full md:w-auto">
-            <label htmlFor="minorityType" className="text-sm font-medium mb-1">Filter By Minority Type</label>
+            <label htmlFor="minorityType" className="mb-1 text-sm font-medium">Filter By Minority Type</label>
             <select
                 id="minorityType"
                 className="px-4 py-2 border rounded min-w-[300px]"
