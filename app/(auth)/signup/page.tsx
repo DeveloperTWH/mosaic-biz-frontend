@@ -10,10 +10,37 @@ import { Suspense } from 'react'
 import { X } from 'lucide-react';
 
 
+type MinorityType = {
+  _id: string;
+  name: string;
+};
+
+
+
 function SignupContent() {
   const searchParams = useSearchParams()
   const type = searchParams.get('type') // "vendor" or "customer"
   const [isValidType, setIsValidType] = useState(true)
+  const [minorityTypes, setMinorityTypes] = useState<MinorityType[]>([]);
+  const [loadingMinority, setLoadingMinority] = useState(true);
+
+
+  useEffect(() => {
+    const fetchMinorityTypes = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/minority-types`);
+        const data = await res.json();
+        setMinorityTypes(data);
+      } catch (err) {
+        console.error('Failed to load minority types', err);
+      } finally {
+        setLoadingMinority(false); // ✅ Stop loading after fetch
+      }
+    };
+    fetchMinorityTypes();
+  }, []);
+
+
 
   useEffect(() => {
     if (type !== 'vendor' && type !== 'customer') {
@@ -57,15 +84,16 @@ function SignupContent() {
       role: type === 'vendor' ? 'business_owner' : 'customer',
       mobile: formData.get("mobile"),
       gender: formData.get("gender"), // vendor can skip gender
+      minorityType: formData.get("minorityType")
     };
-    console.log("api calls" , payload);
-    
+    console.log("api calls", payload);
+
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
-        credentials: 'include',        
+        credentials: 'include',
       });
 
       const data = await res.json();
@@ -118,6 +146,26 @@ function SignupContent() {
 
           <label className="block mb-2 text-gray-700">Mobile Number</label>
           <input name="mobile" type="text" required className="w-full p-2 mb-4 border rounded" />
+
+          <label className="block mb-2 text-gray-700" htmlFor="minorityType">Minority Type</label>
+          <select
+            id="minorityType"
+            name="minorityType"
+            required
+            className="w-full p-2 mb-4 border rounded"
+            disabled={loadingMinority}
+          >
+            {loadingMinority ? (
+              <option>Loading types...</option>
+            ) : (
+              <>
+                <option value="">Select Minority Type</option>
+                {minorityTypes.map((type) => (
+                  <option key={type._id} value={type._id}>{type.name}</option>
+                ))}
+              </>
+            )}
+          </select>
 
           <label className="block mb-2 text-gray-700" htmlFor="gender">Gender</label>
           <select id="gender" name="gender" required className="w-full p-2 mb-4 border rounded">

@@ -40,8 +40,12 @@ export async function middleware(req: NextRequest) {
 
     // 🔐 Block access if not logged in
     if (!token) {
-        return NextResponse.redirect(new URL('/', req.url));
+        const res = NextResponse.redirect(new URL('/', req.url));
+        res.cookies.set('user_gender', '', { maxAge: 0 });
+        res.cookies.set('user_session', '', { maxAge: 0 });
+        return res;
     }
+
 
     try {
         const secret = new TextEncoder().encode(process.env.JWT_SECRET);
@@ -51,7 +55,7 @@ export async function middleware(req: NextRequest) {
         if (path === '/dashboard') {
             return NextResponse.redirect(new URL(getRedirectPathByRole(role), req.url));
         }
-        
+
         // 🔐 Role-based route protection
         if (path.startsWith('/admin') && role !== 'admin') {
             return NextResponse.redirect(new URL(getRedirectPathByRole(role), req.url));
@@ -65,7 +69,11 @@ export async function middleware(req: NextRequest) {
 
         return NextResponse.next(); // ✅ Authorized
     } catch {
-        return NextResponse.redirect(new URL('/', req.url));
+        const res = NextResponse.redirect(new URL('/', req.url));
+        res.cookies.set('user_gender', '', { maxAge: 0 });
+        res.cookies.set('user_session', '', { maxAge: 0 });
+        return res;
+
     }
 }
 

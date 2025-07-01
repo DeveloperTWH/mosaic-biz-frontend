@@ -25,30 +25,6 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/about": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "Next-Action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/about",
-      "dataRoute": "/about.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
     "/foods": {
       "experimentalBypassFor": [
         {
@@ -88,30 +64,6 @@
       "initialRevalidateSeconds": false,
       "srcRoute": "/",
       "dataRoute": "/index.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
-    "/partners/business/new": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "Next-Action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/partners/business/new",
-      "dataRoute": "/partners/business/new.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -169,7 +121,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/contact": {
+    "/partners/business/new": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -182,8 +134,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/contact",
-      "dataRoute": "/contact.rsc",
+      "srcRoute": "/partners/business/new",
+      "dataRoute": "/partners/business/new.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -241,7 +193,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/verify-otp": {
+    "/about": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -254,8 +206,32 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/verify-otp",
-      "dataRoute": "/verify-otp.rsc",
+      "srcRoute": "/about",
+      "dataRoute": "/about.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/signup": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "Next-Action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/signup",
+      "dataRoute": "/signup.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -289,7 +265,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/signup": {
+    "/verify-otp": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -302,8 +278,32 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/signup",
-      "dataRoute": "/signup.rsc",
+      "srcRoute": "/verify-otp",
+      "dataRoute": "/verify-otp.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/contact": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "Next-Action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/contact",
+      "dataRoute": "/contact.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -317,8 +317,8 @@
   "dynamicRoutes": {},
   "notFoundRoutes": [],
   "preview": {
-    "previewModeId": "4ffd24f25dd7a38901cfd031803874ae",
-    "previewModeSigningKey": "e4821fca7320b78a873026a655b1112e8a2aee780bd09563371f9029aa01d8e3",
-    "previewModeEncryptionKey": "d5c82839bf186476c4b630c98231a6f49e65bf90afda572de856739945f92a23"
+    "previewModeId": "dc23522c5f7fc9c3885c9dc5f533b90f",
+    "previewModeSigningKey": "a3d4a65ad98ffe7fa09406cc65a8c9c118bb6ded8c9f77ce84b0eafd12077067",
+    "previewModeEncryptionKey": "269d50867c8cb6722919f0a6b802e56329f0bdaed1c1f7893ec3176edca36b0c"
   }
 }
