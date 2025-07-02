@@ -282,7 +282,7 @@ export default function CreateNewBusinessPage() {
                   <p className={`text-sm text-center mb-4 ${isSelected ? 'text-gray-300' : 'text-gray-600'}`}>
                     Access powerful features with this plan.
                   </p>
-                  <p className={`text-3xl font-extrabold mb-4 ${isSelected ? 'text-white' : 'text-black'}`}>
+                  <p className={`text-3xl text-center font-extrabold mb-4 ${isSelected ? 'text-white' : 'text-black'}`}>
                     ₹{plan.price}{' '}
                     <span className="text-base font-medium text-gray-400">
                       / {plan.durationInDays} Days
