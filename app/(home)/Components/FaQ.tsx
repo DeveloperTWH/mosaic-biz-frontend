@@ -33,7 +33,7 @@ export default function FAQSection() {
   };
 
   return (
-    <section className="relative p-6 md:p-12 overflow-hidden">
+    <section className="relative h-screen p-6 overflow-hidden md:p-12">
       {/* Background image */}
       {/* Background image as fixed size */}
       <img
@@ -46,10 +46,10 @@ export default function FAQSection() {
 
       {/* Content */}
       <div className="md:w-[60%] mx-auto relative z-10">
-        <h2 className="text-3xl font-semibold mb-1 text-center mt-4 heading">
+        <h2 className="mt-4 mb-1 text-3xl font-semibold text-center heading">
           Frequently Asked Questions
         </h2>
-        <div className="flex justify-center flex-col items-center">
+        <div className="flex flex-col items-center justify-center">
           <hr className="h-[2px] w-[100px] bg-green-900" />
           <hr className="h-[2px] w-[100px] mt-[2px] mb-4 bg-green-900" />
         </div>
@@ -64,7 +64,7 @@ export default function FAQSection() {
             <div
               key={index}
               onClick={() => toggleFAQ(index)}
-              className="border rounded-md p-4 cursor-pointer transition-colors duration-300"
+              className="p-4 transition-colors duration-300 border rounded-md cursor-pointer"
             >
               <div
                 className={`flex justify-between items-center p-3 ${openIndex === index ? "bg-custom-yellow" : "bg-custom-blue"
@@ -76,8 +76,8 @@ export default function FAQSection() {
                 </span>
               </div>
               {openIndex === index && (
-                <div className="shadow-md shadow-black/30 pb-10">
-                  <p className="mt-5 px-5 text-gray-700">{faq.answer}</p>
+                <div className="pb-10 shadow-md shadow-black/30">
+                  <p className="px-5 mt-5 text-gray-700">{faq.answer}</p>
                 </div>
               )}
             </div>
