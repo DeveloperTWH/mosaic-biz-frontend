@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 7, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/DAY/OneDrive/Desktop/mosaic-biz-hub/frontend/app/%28home%29/checkout/page.tsx"],"sourcesContent":["'use client';\r\n\r\nexport default function SubscriptionCheckoutButton() {\r\n  const handleSubscribe = async () => {\r\n    const res = await fetch('https://your-backend.com/api/payments/create-subscription', {\r\n      method: 'POST',\r\n      headers: { 'Content-Type': 'application/json' },\r\n      body: JSON.stringify({ email: 'user@example.com', planId: 'basic_plan_id' }),\r\n    });\r\n    const { sessionUrl } = await res.json();\r\n\r\n    // Redirect user to Stripe Checkout\r\n    window.location.href = sessionUrl;\r\n  };\r\n\r\n  return (\r\n    <button\r\n      onClick={handleSubscribe}\r\n      className=\"px-4 py-2 text-white bg-green-600 rounded hover:bg-green-700\"\r\n    >\r\n      Subscribe Now\r\n    </button>\r\n  );\r\n}\r\n"],"names":[],"mappings":";;;;AAAA;;AAEe,SAAS;IACtB,MAAM,kBAAkB;QACtB,MAAM,MAAM,MAAM,MAAM,6DAA6D;YACnF,QAAQ;YACR,SAAS;gBAAE,gBAAgB;YAAmB;YAC9C,MAAM,KAAK,SAAS,CAAC;gBAAE,OAAO;gBAAoB,QAAQ;YAAgB;QAC5E;QACA,MAAM,EAAE,UAAU,EAAE,GAAG,MAAM,IAAI,IAAI;QAErC,mCAAmC;QACnC,OAAO,QAAQ,CAAC,IAAI,GAAG;IACzB;IAEA,qBACE,8OAAC;QACC,SAAS;QACT,WAAU;kBACX;;;;;;AAIL","debugId":null}}]
-}
