@@ -122,39 +122,90 @@ export default function CreateNewBusinessPage() {
     }
   };
 
+  // const handleSubmit = async () => {
+  //   setLoading(true);
+  //   try {
+  //     const body = new FormData();
+  //     Object.entries(formData).forEach(([key, value]) => {
+  //       if (value) body.append(key, value);
+  //     });
+  //     body.append('subscriptionPlanId', selectedPlanId);
+  //     body.append('paymentId', 'TechwareHut12342');
+  //     body.append('paymentStatus', 'COMPLETED');
+  //     body.append('isApproved', 'true');
+  //     console.log(body);
+
+  //     const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/business`, {
+  //       method: 'POST',
+  //       body,
+  //       credentials: 'include',
+  //     });
+  //     const data = await res.json();
+  //     if (res.ok) {
+  //       toast.success('Business registered successfully!');
+  //       setTimeout(() => {
+  //         window.location.href = '/partners';
+  //       }, 2000);
+  //     } else {
+  //       toast.error(data.message || 'Something went wrong');
+  //     }
+  //   } catch {
+  //      toast.error('Network error');
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const body = new FormData();
-      Object.entries(formData).forEach(([key, value]) => {
-        if (value) body.append(key, value);
-      });
-      body.append('subscriptionPlanId', selectedPlanId);
-      body.append('paymentId', 'TechwareHut1234');
-      body.append('paymentStatus', 'COMPLETED');
-      body.append('isApproved', 'true');
-      console.log(body);
-
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/business`, {
+      // ➤ 1. Save Business Draft
+      const draftRes = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/business/draft`, {
         method: 'POST',
-        body,
+        headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
+        body: JSON.stringify({
+          businessName: formData.businessName,
+          email: formData.email,
+          subscriptionPlanId: selectedPlanId,
+          formData,  // send rest of the fields
+        }),
       });
-      const data = await res.json();
-      if (res.ok) {
-        toast.success('Business registered successfully!');
-        setTimeout(() => {
-          window.location.href = '/partners';
-        }, 2000);
-      } else {
-        toast.error(data.message || 'Something went wrong');
+
+      const draftData = await draftRes.json();
+      if (!draftRes.ok) {
+        toast.error(draftData.message || 'Draft creation failed');
+        setLoading(false);
+        return;
       }
-    } catch {
-       toast.error('Network error');
+
+      const draftId = draftData.draftId;
+
+      // ➤ 2. Create Stripe Checkout Session
+      const stripeRes = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/stripe/create-checkout-session`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ draftId }),
+      });
+
+      const stripeData = await stripeRes.json();
+      if (!stripeRes.ok) {
+        toast.error(stripeData.message || 'Failed to create payment session');
+        setLoading(false);
+        return;
+      }
+
+      // ➤ 3. Redirect to Stripe
+      window.location.href = stripeData.sessionUrl;
+
+    } catch (error) {
+      console.error(error);
+      toast.error('Something went wrong. Please try again.');
     } finally {
       setLoading(false);
     }
   };
+
 
   return (
     <>
