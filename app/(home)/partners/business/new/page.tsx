@@ -44,6 +44,19 @@ interface SubscriptionPlan {
   };
 }
 
+interface Subscription {
+  _id: string;
+  userId: string;
+  businessId: string | null; // Can be null initially
+  subscriptionPlanId: SubscriptionPlan; // This is the full subscription plan
+  paymentStatus: string;
+  startDate: string;
+  endDate: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 const initialForm: BusinessForm = {
   businessName: '',
   description: '',
@@ -63,20 +76,48 @@ export default function CreateNewBusinessPage() {
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
   const [selectedPlanId, setSelectedPlanId] = useState('');
   const [loading, setLoading] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true);
+  const [userSubscriptions, setUserSubscriptions] = useState<Subscription[]>([]);
+  const [selectedTab, setSelectedTab] = useState("new"); // "new" or "existing"
+
 
   useEffect(() => {
     const fetchPlans = async () => {
       try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/subscription-plans`);
         const data = await res.json();
-        if (res.ok && Array.isArray(data)) {
-          setPlans(data);
-          setSelectedPlanId(data.sort((a, b) => a.price - b.price)[0]._id);
+
+        // Check if the response is ok and the data is an array
+        if (res.ok && Array.isArray(data.data)) {
+          // Set the fetched plans and select the plan with the lowest price
+          setPlans(data.data);
+          setSelectedPlanId(
+            data.data.sort((a: SubscriptionPlan, b: SubscriptionPlan) => a.price - b.price)[0]._id
+          );
         } else {
-          throw new Error();
+          console.log('Error: Invalid response data');
+          throw new Error('Failed to fetch subscription plans');
         }
-      } catch {
-        const dummy: SubscriptionPlan[] = [
+
+        const userSubscriptionRes = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user/subscriptions`, {
+          method: 'GET',
+          credentials: 'include',
+        });
+
+        const userSubscriptionData = await userSubscriptionRes.json();
+
+        if (userSubscriptionRes.ok && Array.isArray(userSubscriptionData.subscriptions)) {
+          console.log(userSubscriptionData.subscriptions);
+
+          setUserSubscriptions(userSubscriptionData.subscriptions);
+        } else {
+          console.log('No subscriptions found for the user');
+        }
+      } catch (error) {
+        console.error('Error fetching subscription plans:', error);
+
+        // Fallback to dummy data
+        const dummy = [
           {
             _id: '685281f61e1de765d6b297c0',
             name: 'Basic',
@@ -86,7 +127,7 @@ export default function CreateNewBusinessPage() {
             features: { analyticsDashboard: false, supportLevel: 'basic' },
           },
           {
-            _id: '685281f61e1de765d6b297c01',
+            _id: '685281f61e1de765d6b297c1',
             name: 'Pro',
             price: 499,
             durationInDays: 90,
@@ -94,7 +135,7 @@ export default function CreateNewBusinessPage() {
             features: { analyticsDashboard: true, supportLevel: 'standard', marketingTools: true },
           },
           {
-            _id: '685281f61e1de765d6b297c02',
+            _id: '685281f61e1de765d6b297c2',
             name: 'Pro Plus',
             price: 999,
             durationInDays: 180,
@@ -102,8 +143,12 @@ export default function CreateNewBusinessPage() {
             features: { analyticsDashboard: true, supportLevel: 'priority', marketingTools: true, aiRecommendation: true },
           },
         ];
+
+        // Set the fallback dummy data and select the first plan as default
         setPlans(dummy);
         setSelectedPlanId(dummy[0]._id);
+      } finally {
+        setPageLoading(false);  // Set pageLoading to false after fetch
       }
     };
 
@@ -157,6 +202,7 @@ export default function CreateNewBusinessPage() {
   // };
   const handleSubmit = async () => {
     setLoading(true);
+    // setPageLoading(true);
     try {
       // ➤ 1. Save Business Draft
       const draftRes = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/business/draft`, {
@@ -205,6 +251,51 @@ export default function CreateNewBusinessPage() {
       setLoading(false);
     }
   };
+
+
+  const handleBusinessCreation = async () => {
+    if (selectedPlanId) {
+      setLoading(true);
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/business/retry-create`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include', 
+          body: JSON.stringify({
+            subscriptionId: selectedPlanId,
+            businessName: formData.businessName,
+            formData,
+          }),
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          toast.success('Business created successfully!');
+          // Redirect or show success message
+            window.location.href = 'http://localhost:3000/partners';
+        } else {
+          toast.error(data.message || 'Error creating business');
+        }
+      } catch (error) {
+        console.error(error);
+        toast.error('Network error, please try again.');
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+
+
+  const Loader = () => (
+    <div className="flex items-center justify-center w-full h-screen">
+      <div className="w-16 h-16 border-4 border-blue-500 rounded-full animate-spin border-t-transparent" />
+    </div>
+  );
+
+  if (pageLoading) {
+    return <Loader />; // Show loader until everything is loaded
+  }
 
 
   return (
@@ -310,88 +401,191 @@ export default function CreateNewBusinessPage() {
 
       {/* ✅ Full-width Plan Section */}
       <div className="w-full px-4 mt-5 mb-12 sm:px-6 md:px-10 lg:px-20">
-        <h2 className="mb-6 text-2xl font-semibold text-gray-800 uppercase">Choose a Plan</h2>
+        <div className="flex items-start mb-6">
+          {/* New Subscription Tab */}
+          <h2
+            className={`mb-6 font-semibold text-gray-800 uppercase cursor-pointer ${selectedTab === "new" ? "text-blue-600 font-bold text-2xl" : "text-gray-400 text-[10px]"}`}
+            onClick={() => setSelectedTab("new")}
+          >
+            Choose a Plan
+          </h2>
+          {userSubscriptions.length > 0 && (
+            <>
+              <span className="mx-3 text-2xl text-gray-600">/</span>
+
+
+              <h2
+                className={`mb-6 font-semibold text-gray-800 uppercase cursor-pointer ${selectedTab === "existing" ? "text-blue-600 font-bold text-2xl" : "text-gray-400 text-[10px]"}`}
+                onClick={() => setSelectedTab("existing")}
+              >
+                Existing Plan
+              </h2>
+            </>
+          )}
+        </div>
+
 
         <div className="flex flex-wrap justify-center w-full gap-6">
-          {plans.map((plan) => {
-            const isSelected = selectedPlanId === plan._id;
+          {selectedTab === "existing" ? (
+            // Display existing subscriptions
+            userSubscriptions.map((sub: Subscription) => {
+              const isSelected = selectedPlanId === sub._id;
 
-            return (
-              <div
-                key={plan._id}
-                className={`cursor-pointer flex flex-col justify-between rounded-lg border shadow-sm transition-all p-10 hover:shadow-md xl:w-[30%] ${isSelected
-                  ? 'bg-[#333333] text-white border-black'
-                  : 'bg-white text-gray-800 border-gray-200'
-                  }`}
-                onClick={() => setSelectedPlanId(plan._id)}
-              >
-                {/* Plan Header */}
-                <div>
-                  <h3 className={`text-2xl font-bold text-center uppercase mb-1 ${isSelected ? 'text-orange-400' : 'text-gray-800'}`}>
-                    {plan.name} Plan
-                  </h3>
-                  <p className={`text-sm text-center mb-4 ${isSelected ? 'text-gray-300' : 'text-gray-600'}`}>
-                    Access powerful features with this plan.
-                  </p>
-                  <p className={`text-3xl text-center font-extrabold mb-4 ${isSelected ? 'text-white' : 'text-black'}`}>
-                    ₹{plan.price}{' '}
-                    <span className="text-base font-medium text-gray-400">
-                      / {plan.durationInDays} Days
-                    </span>
-                  </p>
+              return (
+                <div
+                  key={sub._id}
+                  className={`cursor-pointer flex flex-col justify-between rounded-lg border shadow-sm transition-all p-10 hover:shadow-md xl:w-[30%] ${isSelected
+                    ? "bg-[#333333] text-white border-black"
+                    : "bg-white text-gray-800 border-gray-200"}`}
+                  onClick={() => setSelectedPlanId(sub._id)}
+                >
+                  <div>
+                    <h3 className={`text-2xl font-bold text-center uppercase mb-1 ${isSelected ? "text-orange-400" : "text-gray-800"}`}>
+                      {sub.subscriptionPlanId?.name} Plan
+                    </h3>
+                    <p className={`text-sm text-center mb-4 ${isSelected ? "text-gray-300" : "text-gray-600"}`}>
+                      Your existing plan
+                    </p>
+                    <p className={`text-3xl text-center font-extrabold mb-4 ${isSelected ? "text-white" : "text-black"}`}>
+                      ${sub.subscriptionPlanId?.price}{" "}
+                      <span className="text-base font-medium text-gray-400">
+                        / {sub.subscriptionPlanId?.durationInDays} Days
+                      </span>
+                    </p>
 
-                  {/* Limits Summary */}
-                  <ul className="mb-4 space-y-2 text-sm">
-                    <li className="flex items-start gap-2">
-                      <span className="text-green-500">✔</span>
-                      Products: {plan.limits.productListings}
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-green-500">✔</span>
-                      Services: {plan.limits.serviceListings}
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-green-500">✔</span>
-                      Foods: {plan.limits.foodListings}
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-green-500">✔</span>
-                      Media Limit: {plan.limits.imageLimit} images, {plan.limits.videoLimit} videos
-                    </li>
-                  </ul>
-
-                  {/* Features */}
-                  <div className="text-xs">
-                    <strong className={`${isSelected ? 'text-orange-300' : 'text-orange-600'}`}>
-                      Features:
-                    </strong>
-                    <ul className="mt-1 ml-5 space-y-1 list-disc">
-                      {Object.entries(plan.features).map(
-                        ([key, val]) =>
-                          val && (
-                            <li key={key}>
-                              {key.replace(/([A-Z])/g, ' $1')} {typeof val === 'string' ? `(${val})` : ''}
-                            </li>
-                          )
-                      )}
+                    {/* Limits Summary */}
+                    <ul className="mb-4 space-y-2 text-sm">
+                      <li className="flex items-start gap-2">
+                        <span className="text-green-500">✔</span>
+                        Products: {sub.subscriptionPlanId?.limits.productListings}
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-green-500">✔</span>
+                        Services: {sub.subscriptionPlanId?.limits.serviceListings}
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-green-500">✔</span>
+                        Foods: {sub.subscriptionPlanId?.limits.foodListings}
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-green-500">✔</span>
+                        Media Limit: {sub.subscriptionPlanId?.limits.imageLimit} images, {sub.subscriptionPlanId?.limits.videoLimit} videos
+                      </li>
                     </ul>
+
+                    {/* Features */}
+                    <div className="text-xs">
+                      <strong className={`${isSelected ? "text-orange-300" : "text-orange-600"}`}>
+                        Features:
+                      </strong>
+                      <ul className="mt-1 ml-5 space-y-1 list-disc">
+                        {Object.entries(sub.subscriptionPlanId?.features || {}).map(
+                          ([key, val]) =>
+                            val && (
+                              <li key={key}>
+                                {key.replace(/([A-Z])/g, " $1")} {typeof val === "string" ? `(${val})` : ""}
+                              </li>
+                            )
+                        )}
+                      </ul>
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })
+          ) : (
+            // Display new subscription plans
+            plans.map((plan) => {
+              const isSelected = selectedPlanId === plan._id;
+
+              return (
+                <div
+                  key={plan._id}
+                  className={`cursor-pointer flex flex-col justify-between rounded-lg border shadow-sm transition-all p-10 hover:shadow-md xl:w-[30%] ${isSelected
+                    ? "bg-[#333333] text-white border-black"
+                    : "bg-white text-gray-800 border-gray-200"}`}
+                  onClick={() => setSelectedPlanId(plan._id)}
+                >
+                  <div>
+                    <h3 className={`text-2xl font-bold text-center uppercase mb-1 ${isSelected ? "text-orange-400" : "text-gray-800"}`}>
+                      {plan.name} Plan
+                    </h3>
+                    <p className={`text-sm text-center mb-4 ${isSelected ? "text-gray-300" : "text-gray-600"}`}>
+                      Access powerful features with this plan.
+                    </p>
+                    <p className={`text-3xl text-center font-extrabold mb-4 ${isSelected ? "text-white" : "text-black"}`}>
+                      ${plan.price}{" "}
+                      <span className="text-base font-medium text-gray-400">
+                        / {plan.durationInDays} Days
+                      </span>
+                    </p>
+
+                    {/* Limits Summary */}
+                    <ul className="mb-4 space-y-2 text-sm">
+                      <li className="flex items-start gap-2">
+                        <span className="text-green-500">✔</span>
+                        Products: {plan.limits.productListings}
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-green-500">✔</span>
+                        Services: {plan.limits.serviceListings}
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-green-500">✔</span>
+                        Foods: {plan.limits.foodListings}
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-green-500">✔</span>
+                        Media Limit: {plan.limits.imageLimit} images, {plan.limits.videoLimit} videos
+                      </li>
+                    </ul>
+
+                    {/* Features */}
+                    <div className="text-xs">
+                      <strong className={`${isSelected ? "text-orange-300" : "text-orange-600"}`}>
+                        Features:
+                      </strong>
+                      <ul className="mt-1 ml-5 space-y-1 list-disc">
+                        {Object.entries(plan.features).map(
+                          ([key, val]) =>
+                            val && (
+                              <li key={key}>
+                                {key.replace(/([A-Z])/g, " $1")} {typeof val === "string" ? `(${val})` : ""}
+                              </li>
+                            )
+                        )}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
         </div>
+
+
 
         {/* Bottom Right Submit Button */}
         <div className="flex justify-end mt-10">
-          <button
-            onClick={handleSubmit}
-            disabled={loading}
-            className="px-6 py-2 font-medium text-white bg-orange-600 rounded hover:bg-orange-700"
-          >
-            {loading ? 'Submitting...' : 'Submit & Pay'}
-          </button>
+          {selectedTab === "existing" ? (
+            <button
+              onClick={handleBusinessCreation}
+              disabled={loading}
+              className="px-6 py-2 font-medium text-white bg-orange-600 rounded hover:bg-orange-700"
+            >
+              {loading ? 'Retrying...' : 'Retry Business Creation'}
+            </button>
+          ) : (
+            <button
+              onClick={handleSubmit}
+              disabled={loading}
+              className="px-6 py-2 font-medium text-white bg-orange-600 rounded hover:bg-orange-700"
+            >
+              {loading ? 'Submitting...' : 'Submit & Pay'}
+            </button>
+          )}
         </div>
+
       </div>
 
     </>
