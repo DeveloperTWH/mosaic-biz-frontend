@@ -17,7 +17,16 @@ interface BusinessForm {
   country: string;
   logo?: File | null;
   coverImage?: File | null;
+  productCategories?: string[];
+  serviceCategories?: string[];
+  foodCategories?: string[];
 }
+
+type Category = {
+  _id: string;
+  name: string;
+};
+
 
 interface SubscriptionPlan {
   _id: string;
@@ -79,6 +88,85 @@ export default function CreateNewBusinessPage() {
   const [pageLoading, setPageLoading] = useState(true);
   const [userSubscriptions, setUserSubscriptions] = useState<Subscription[]>([]);
   const [selectedTab, setSelectedTab] = useState("new"); // "new" or "existing"
+  const [selectedCategories, setSelectedCategories] = useState<{ _id: string; name: string }[]>([]);
+  const [categories, setCategories] = useState<{ _id: string; name: string }[]>([]);
+
+
+  const [productCategories, setProductCategories] = useState<Category[]>([]);
+  const [serviceCategories, setServiceCategories] = useState<Category[]>([]);
+  const [foodCategories, setFoodCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/categories`);
+        const data = await response.json();
+        console.log(data);
+
+        // Check if the API response contains valid data fields
+        if (response.ok && data?.success === true && data?.data) {
+          // Store categories based on listingType
+          setProductCategories(data.data.productCategories);
+          setServiceCategories(data.data.serviceCategories);
+          setFoodCategories(data.data.foodCategories);
+
+          // Default to one of the categories or empty
+          setCategories([]);
+        } else {
+          console.log('Error fetching categories: Invalid response structure');
+          throw new Error('Failed to fetch categories');
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      } finally {
+        setPageLoading(false); // Set pageLoading to false after fetch
+      }
+    };
+
+    if (formData.listingType) {
+      fetchCategories(); // Fetch categories only when listingType is selected
+    }
+  }, [formData.listingType]); // Dependency on listingType
+
+  const handleListingTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setFormData({ ...formData, listingType: e.target.value });
+  };
+
+  const getCategoriesForListingType = () => {
+    if (formData.listingType === 'product') {
+      return productCategories;
+    } else if (formData.listingType === 'service') {
+      return serviceCategories;
+    } else if (formData.listingType === 'food') {
+      return foodCategories;
+    } else {
+      return []; // Return empty if no valid listingType is selected
+    }
+  };
+  ;
+  // Only run once on component mount
+
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedOptionId = e.target.value;
+
+    // Find the category object from the available categories based on the selected ID
+    const selectedCategory = getCategoriesForListingType().find((category) => category._id === selectedOptionId);
+
+    if (selectedCategory && !selectedCategories.some((category) => category._id === selectedCategory._id) && selectedCategories.length < 5) {
+      setSelectedCategories([...selectedCategories, selectedCategory]);
+    }
+  };
+
+
+  const handleRemoveCategory = (category: { _id: string; name: string }) => {
+    setSelectedCategories(selectedCategories.filter((cat) => cat._id !== category._id));
+  };
+
+
+  // Filter categories to remove the ones that are already selected
+  const availableCategories = categories.filter(
+    (item) => !selectedCategories.some((selectedCategory) => selectedCategory._id === item._id)
+  );
 
 
   useEffect(() => {
@@ -204,6 +292,15 @@ export default function CreateNewBusinessPage() {
     setLoading(true);
     // setPageLoading(true);
     try {
+
+      if (formData.listingType === 'product') {
+        // Extract only the _id from selectedCategories for the backend
+        formData.productCategories = selectedCategories.map((category) => category._id);
+      } else if (formData.listingType === 'service') {
+        formData.serviceCategories = selectedCategories.map((category) => category._id);
+      } else if (formData.listingType === 'food') {
+        formData.foodCategories = selectedCategories.map((category) => category._id);
+      }
       // ➤ 1. Save Business Draft
       const draftRes = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/business/draft`, {
         method: 'POST',
@@ -257,10 +354,19 @@ export default function CreateNewBusinessPage() {
     if (selectedPlanId) {
       setLoading(true);
       try {
+        const categoryIds = selectedCategories.map((category) => category._id);
+
+        if (formData.listingType === 'product') {
+          formData.productCategories = categoryIds;
+        } else if (formData.listingType === 'service') {
+          formData.serviceCategories = categoryIds;
+        } else if (formData.listingType === 'food') {
+          formData.foodCategories = categoryIds;
+        }
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/business/retry-create`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          credentials: 'include', 
+          credentials: 'include',
           body: JSON.stringify({
             subscriptionId: selectedPlanId,
             businessName: formData.businessName,
@@ -272,7 +378,7 @@ export default function CreateNewBusinessPage() {
         if (res.ok) {
           toast.success('Business created successfully!');
           // Redirect or show success message
-            window.location.href = 'http://localhost:3000/partners';
+          window.location.href = 'http://localhost:3000/partners';
         } else {
           toast.error(data.message || 'Error creating business');
         }
@@ -303,16 +409,17 @@ export default function CreateNewBusinessPage() {
       <div className="min-h-screen px-4 py-10 bg-white sm:px-6 md:px-10 lg:px-20">
         <div className="flex flex-col gap-10 lg:flex-row">
           {/* Left Image Section */}
-          <div className="relative flex justify-center pt-2 sm:pt-10 lg:w-1/2">
-            <div className="absolute top-[-20px] left-[-20px] w-[60%] h-[60%] bg-custom-yellow z-0" />
+          <div className="relative flex justify-center h-auto sm:h-[500px] lg:h-[710px] pt-2 sm:pt-10 lg:w-1/2">
+            <div className="absolute top-[-10px] left-[-20px] w-[60%] sm:w-[70%] lg:w-[60%] h-[60%] sm:h-[70%] lg:h-[60%] bg-custom-yellow z-0" />
             <Image
               src="/partners/registration-image.png"
               alt="Business Registration"
               width={500}
               height={480}
-              className="relative z-10 object-contain rounded-lg shadow"
+              className="relative z-10 object-contain w-full h-auto rounded-lg shadow"
             />
           </div>
+
 
           {/* Right Form Section */}
           <div className="w-full lg:w-1/2">
@@ -345,7 +452,7 @@ export default function CreateNewBusinessPage() {
                 <select
                   name="listingType"
                   value={formData.listingType}
-                  onChange={handleChange}
+                  onChange={handleListingTypeChange}
                   className="w-full px-4 py-2 border rounded"
                 >
                   <option value="">Select</option>
@@ -368,30 +475,44 @@ export default function CreateNewBusinessPage() {
                 />
               </div>
 
-              <div className="flex flex-col w-full">
-                <label htmlFor="logo" className="text-sm font-medium text-gray-700">
-                  Logo
+              <div className="flex flex-col w-full md:col-span-2">
+                <label htmlFor="categories" className="mb-2 text-sm font-medium text-gray-700">
+                  Business Categories
                 </label>
-                <input
-                  type="file"
-                  name="logo"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  className="w-full px-4 py-2 border rounded"
-                />
-              </div>
 
-              <div className="flex flex-col w-full">
-                <label htmlFor="coverImage" className="text-sm font-medium text-gray-700">
-                  Cover Image
-                </label>
-                <input
-                  type="file"
-                  name="coverImage"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  className="w-full px-4 py-2 border rounded"
-                />
+                {/* Dropdown for selecting categories */}
+                <select
+                  id="selectCategory"
+                  onChange={handleCategoryChange}
+                  value=""
+                  disabled={(selectedCategories.length >= 5) || !formData.listingType || pageLoading}
+                  className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="" disabled>Select Category - Subcategory</option>
+                  {getCategoriesForListingType().map((category, index) => (
+                    <option key={index} value={category._id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+
+                {/* Display selected categories as tags */}
+                <div className="flex flex-row flex-wrap w-full gap-2 mt-4">
+                  {selectedCategories.map((category, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center px-4 py-2 text-gray-700 bg-gray-200 rounded-full"
+                    >
+                      <span>{category.name}</span>
+                      <button
+                        onClick={() => handleRemoveCategory(category)}
+                        className="ml-2 text-red-500 hover:text-red-700"
+                      >
+                        &times;
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>

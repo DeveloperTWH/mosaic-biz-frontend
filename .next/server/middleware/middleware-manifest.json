@@ -1,0 +1,55 @@
+{
+  "sorted_middleware": [],
+  "middleware": {
+    "/": {
+      "files": [
+        "server/edge/chunks/_65fe3fd6._.js",
+        "server/edge/chunks/[root-of-the-server]__de110ef0._.js",
+        "server/edge/chunks/edge-wrapper_12a3b8ee.js"
+      ],
+      "name": "middleware",
+      "page": "/",
+      "matchers": [
+        {
+          "regexp": "/:nextData(_next/data/[^/]{1,})?/admin/:path*{(\\\\.json)}?",
+          "originalSource": "/admin/:path*"
+        },
+        {
+          "regexp": "/:nextData(_next/data/[^/]{1,})?/partners/:path*{(\\\\.json)}?",
+          "originalSource": "/partners/:path*"
+        },
+        {
+          "regexp": "/:nextData(_next/data/[^/]{1,})?/customer/:path*{(\\\\.json)}?",
+          "originalSource": "/customer/:path*"
+        },
+        {
+          "regexp": "/:nextData(_next/data/[^/]{1,})?/login{(\\\\.json)}?",
+          "originalSource": "/login"
+        },
+        {
+          "regexp": "/:nextData(_next/data/[^/]{1,})?/signup{(\\\\.json)}?",
+          "originalSource": "/signup"
+        },
+        {
+          "regexp": "/:nextData(_next/data/[^/]{1,})?/verify-otp{(\\\\.json)}?",
+          "originalSource": "/verify-otp"
+        },
+        {
+          "regexp": "/:nextData(_next/data/[^/]{1,})?/dashboard{(\\\\.json)}?",
+          "originalSource": "/dashboard"
+        }
+      ],
+      "wasm": [],
+      "assets": [],
+      "env": {
+        "__NEXT_BUILD_ID": "development",
+        "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "qoycBp+x+lElIErkNCQIw+VkKf86frG72ecOgiLBWxE=",
+        "__NEXT_PREVIEW_MODE_ID": "b7b100129885505f7121f8a55265d880",
+        "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "8aa42bf1924318e6747ef88a89686421ce702e943db82820b2b407b764c83bfe",
+        "__NEXT_PREVIEW_MODE_SIGNING_KEY": "7ec4f734a1d714ca851f02ef4554f7276e7e0582170f4526ea02529d4fbfebc3"
+      }
+    }
+  },
+  "instrumentation": null,
+  "functions": {}
+}
