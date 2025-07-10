@@ -53,6 +53,8 @@ function LoginContent() {
       const data = await res.json();
 
       if (data.success) {
+        localStorage.setItem('user_session', 'true');
+        localStorage.setItem('user_gender', data.user.gender || '');
         router.push(data.user.role === 'business_owner' ? '/partners' : '/customer');
       } else if (data.otpPending) {
         router.push(`/verify-otp?email=${data.user.email}&type=${data.user.role}`);

@@ -47,6 +47,14 @@
       "namedRegex": "^/products/(?<nxtPid>[^/]+?)(?:/)?$"
     },
     {
+      "page": "/service/[slug]",
+      "regex": "^/service/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPslug": "nxtPslug"
+      },
+      "namedRegex": "^/service/(?<nxtPslug>[^/]+?)(?:/)?$"
+    },
+    {
       "page": "/services/[id]",
       "regex": "^/services/([^/]+?)(?:/)?$",
       "routeKeys": {

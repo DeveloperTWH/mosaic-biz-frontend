@@ -69,12 +69,13 @@ function VerifyOtpPage() {
                 credentials: 'include',
             });
 
-            console.log(res);
 
 
             const data = await res.json();
 
             if (data.success) {
+                localStorage.setItem('user_session', 'true');
+                localStorage.setItem('user_gender', data.user.gender || '');
                 router.push(data.user.role === 'business_owner' ? '/partners' : '/customer');
             } else {
                 setError(data.message || 'Invalid OTP');

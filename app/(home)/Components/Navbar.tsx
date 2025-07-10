@@ -2,19 +2,21 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { CircleUserRound } from "lucide-react";
-import Cookies from "js-cookie";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
-  const gender = Cookies.get("user_gender");
+  const [gender, setGender] = useState<string | null>(null);
 
   useEffect(() => {
-    const session = Cookies.get("user_session");
-    setIsLoggedIn(!!session);
+    const session = localStorage.getItem("user_session");
+    setIsLoggedIn(session === 'true');
+
+    const userGender = localStorage.getItem("user_gender");
+    setGender(userGender);
   }, []);
+
 
   return (
     <header className="w-full px-6 py-4 bg-white shadow md:px-10 lg:px-20">
@@ -71,13 +73,22 @@ const Navbar = () => {
                   </Link>
                   <button
                     onClick={async () => {
-                      Cookies.remove("user_session");
-                      Cookies.remove("user_gender");
-                      await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/logout`, {
-                        method: "POST",
-                        credentials: "include",
-                      });
-                      window.location.href = "/";
+                      try {
+                        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/logout`, {
+                          method: "POST",
+                          credentials: "include",
+                        });
+
+                        if (res.ok) {
+                          localStorage.removeItem("user_session");
+                          localStorage.removeItem("user_gender");
+                          window.location.href = "/";
+                        } else {
+                          console.error('Logout failed');
+                        }
+                      } catch (err) {
+                        console.error('Logout error', err);
+                      }
                     }}
                     className="w-full px-4 py-2 text-sm text-left text-red-500 rounded-b-lg hover:bg-red-50"
                   >

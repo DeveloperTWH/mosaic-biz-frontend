@@ -1,35 +1,48 @@
-import Image from "next/image";
 import React from "react";
+import { Service } from "@/types/service"; // adjust path if needed
+import Image from "next/image";
+import Link from "next/link";
 
-const BookServices = () => {
+
+interface BookServicesProps {
+  services: Service[];
+}
+
+const BookServices: React.FC<BookServicesProps> = ({ services }) => {
   return (
-     <section className="py-10 px-6 max-w-7xl mx-auto">
-        <h2 className="text-2xl font-bold mb-4">Book Your Services</h2>
-        <p className="text-gray-600 mb-6 max-w-2xl">
-          Lorem ipsum dolor sit amet consectetur adipiscing elit sed eiusmod tempor enim minim veniam quis nostrud.
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[...Array(9)].map((_, i) => (
-            <div key={i} className="border rounded-lg overflow-hidden shadow-sm">
+    <section className="px-6 py-10 mx-auto max-w-7xl">
+      <h2 className="mb-4 text-2xl font-bold">Book Your Services</h2>
+      {services.length === 0 ? (
+        <p className="text-gray-600">No services found.</p>
+      ) : (
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {services.map((service) => (
+            <div key={service._id} className="overflow-hidden border rounded-lg shadow-sm">
               <Image
-                src={`/Service/19099.png`}
-                alt="Service"
+                src={service.coverImage || "/Service/19099.png"}
+                alt={service.title}
                 width={600}
                 height={400}
                 className="object-cover"
               />
               <div className="p-4">
-                <h3 className="text-lg font-semibold">Lorem Ipsum</h3>
-                <p className="text-sm text-gray-500">Category</p>
+                <h3 className="text-lg font-semibold">{service.title}</h3>
+                <p className="text-sm text-gray-500">{service.contact?.address || 'No address'}</p>
                 <p className="mt-2 text-sm text-gray-700">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Present vitae libero venenatis tristique.
+                  {service.description.slice(0, 100) || 'No description'}
                 </p>
-                <button className="mt-3 text-primary hover:underline">Read More →</button>
+                <Link
+                  href={`/service/${service.slug}`}
+                  className="inline-block mt-3 text-primary hover:underline"
+                >
+                  Read More →
+                </Link>
               </div>
             </div>
           ))}
         </div>
-      </section>
+      )}
+    </section>
   );
 };
 

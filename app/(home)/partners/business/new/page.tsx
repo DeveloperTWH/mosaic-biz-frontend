@@ -143,7 +143,6 @@ export default function CreateNewBusinessPage() {
       return []; // Return empty if no valid listingType is selected
     }
   };
-  ;
   // Only run once on component mount
 
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -163,10 +162,11 @@ export default function CreateNewBusinessPage() {
   };
 
 
-  // Filter categories to remove the ones that are already selected
-  const availableCategories = categories.filter(
-    (item) => !selectedCategories.some((selectedCategory) => selectedCategory._id === item._id)
-  );
+
+  useEffect(() => {
+    setSelectedCategories([]);
+  }, [formData.listingType]);
+
 
 
   useEffect(() => {
@@ -489,11 +489,14 @@ export default function CreateNewBusinessPage() {
                   className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="" disabled>Select Category - Subcategory</option>
-                  {getCategoriesForListingType().map((category, index) => (
-                    <option key={index} value={category._id}>
-                      {category.name}
-                    </option>
-                  ))}
+                  {getCategoriesForListingType()
+                    .filter(category => !selectedCategories.some(selected => selected._id === category._id))
+                    .map((category, index) => (
+                      <option key={index} value={category._id}>
+                        {category.name}
+                      </option>
+                    ))}
+
                 </select>
 
                 {/* Display selected categories as tags */}
