@@ -1,132 +1,64 @@
 'use client';
 import FeatureBlogs from '@/app/(home)/Components/FeatureBlogs';
-import { Camera, CircleUserRound, Globe, Import, Mail, MapPin, PenTool, PhoneCall, Share2 } from 'lucide-react';
+import { Loader2, AlertTriangle, Camera, CircleUserRound, Globe, Import, Mail, MapPin, PenTool, PhoneCall, Share2 } from 'lucide-react';
 import Image from 'next/image';
-import React, { useState } from 'react';
+import { useParams } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { Service } from '@/types/service';
+import { Review } from '@/types/review';
 
-const service = {
-    id: 1,
-    title: "Lorem Ipsum Skin & Beauty Care",
-    category: "Skin & Beauty Treatment",
-    rating: 4.8,
-    tags: ["Skin Care", "Skin Treatment"],
-    description: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Recusandae harum temporibus dolore exercitationem delectus perspiciatis eos, saepe quo veniam similique ratione dicta repellendus tenetur voluptas tempora! Placeat ipsa, incidunt reiciendis nobis eveniet explicabo? Tempore eos omnis nulla minima aliquam temporibus numquam magni in blanditiis suscipit, ad ea quas obcaecati id.",
-    features: [
-        "Lorem Ipsum Dolor Sit Amet",
-        "Consectetur Adipisicing Elit",
-        "Sed Do Eiusmod Tempor Incididunt",
-    ],
-    services: [
-        { id: 1, name: "Skin Treatment" },
-        { id: 2, name: "Hair Spa" },
-        { id: 3, name: "Massage Therapy" },
-        { id: 4, name: "Laser Hair Removal" },
-    ],
-    bannerImage: "/Service/service_banner.png",
-    galleryImages: [
-        "/Service/service_banner.png",
-        "/Service/service_banner.png",
-        "/Service/service_banner.png",
-        "/Service/service_banner.png",
-        "/Service/service_banner.png",
-        "/Service/service_banner.png",
-    ],
-    amenities: [
-        { label: "Appointment Booking Only", available: true },
-        { label: "Wheelchair Accessible", available: true },
-        { label: "Accepts Credit Card", available: true },
-        { label: "Accessible Parking", available: true },
-        { label: "Accepts Insurance", available: false },
-        { label: "Free Wifi", available: true },
-    ],
-    businessHours: [
-        { day: "MONDAY", hours: "8:00 A.M - 6:00 P.M" },
-        { day: "TUESDAY", hours: "8:00 A.M - 6:00 P.M" },
-        { day: "WEDNESDAY", hours: "8:00 A.M - 6:00 P.M" },
-        { day: "THURSDAY", hours: "8:00 A.M - 6:00 P.M" },
-        { day: "FRIDAY", hours: "8:00 A.M - 6:00 P.M" },
-        { day: "SATURDAY", hours: "8:00 A.M - 6:00 P.M" },
-        { day: "SUNDAY", hours: "CLOSED" },
-    ],
-    locationMapEmbedUrl: "https://www.google.com/maps/embed?...",
-    contact: {
-        phone: "+123 456 7890",
-        email: "loremipsum@gmail.com",
-        address: "Lorem Ipsum",
-        website: "loremipsum.com"
-    },
-    faq: [
-        {
-            question: "Lorem Ipsum Dolor Sit Amet, Consectetur Adipisicing Elit",
-            answer: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-        },
-        {
-            question: "Do you accept walk-ins?",
-            answer: "Currently we offer services by appointment only for the best experience."
-        },
-        {
-            question: "Lorem Ipsum Dolor Sit Amet, Consectetur Adipisicing Elit",
-            answer: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-        }
-    ],
-    reviews: [
-        {
-            name: "John Doe",
-            role: "Businessman",
-            rating: 4,
-            comment: "Great service, very friendly staff!",
-            image: ""  // Example path or URL
-        },
-        {
-            name: "John Doe",
-            role: "Businessman",
-            rating: 4,
-            comment: "Great service, very friendly staff!",
-            image: ""  // Example path or URL
-        },
-        {
-            name: "John Doe",
-            role: "Businessman",
-            rating: 4,
-            comment: "Great service, very friendly staff!",
-            image: ""  // Example path or URL
-        },
-        {
-            name: "John Doe",
-            role: "Businessman",
-            rating: 4,
-            comment: "Great service, very friendly staff!",
-            image: ""  // Example path or URL
-        },
-        {
-            name: "John Doe",
-            role: "Businessman",
-            rating: 4,
-            comment: "Great service, very friendly staff!",
-            image: ""  // Example path or URL
-        },
-        {
-            name: "John Doe",
-            role: "Businessman",
-            rating: 4,
-            comment: "Great service, very friendly staff!",
-            image: ""  // Example path or URL
-        },
-        {
-            name: "Jane Smith",
-            role: "Freelancer",
-            rating: 5,
-            comment: "Absolutely loved the facial treatment.",
-            image: ""
-        }
-    ]
-
-};
+interface GetServiceBySlugResponse {
+    success: boolean;
+    data: {
+        service: Service;
+        reviews: Review[];
+    };
+}
 
 
 const ServiceDetailPage = () => {
+    const { slug } = useParams() as { slug: string };
+
+    const [service, setService] = useState<Service | null>(null);
+    const [reviews, setReviews] = useState<Review[]>([]);
+    const [loading, setLoading] = useState(true);
     const [showAll, setShowAll] = useState(false);
-    const visibleCount = showAll ? service.reviews.length : 4;
+    const visibleCount = showAll ? reviews.length : 4;
+    let mapSrc, address;
+
+    useEffect(() => {
+        const fetchService = async () => {
+            try {
+                const res = await axios.get<GetServiceBySlugResponse>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/services/${slug}`);
+                setService(res.data.data.service);
+                setReviews(res.data.data.reviews);
+            } catch (error) {
+                console.error('Error fetching service:', error);
+            } finally {
+                address = encodeURIComponent('MG Road, Pune');
+                mapSrc = `https://www.google.com/maps?q=${address}&output=embed`;
+                console.log(mapSrc);
+
+                setLoading(false);
+            }
+        };
+        if (slug) fetchService();
+    }, [slug]);
+
+    if (loading) return (
+        <div className="flex items-center justify-center p-5 text-custom-blue">
+            <Loader2 className="w-6 h-6 mr-2 animate-spin" />
+            <span>Loading...</span>
+        </div>
+    );
+
+    if (!service) return (
+        <div className="flex flex-col items-center justify-center p-5 text-red-600">
+            <AlertTriangle className="w-10 h-10 mb-2" />
+            <span>Service not found</span>
+        </div>
+    );
     return (
         <>
             <main className="px-4 py-8 mx-auto max-w-7xl">
@@ -140,22 +72,22 @@ const ServiceDetailPage = () => {
                     {/* Left - Banner */}
                     <div className="space-y-6 md:col-span-2">
                         <img
-                            src="/Service/service_banner.png"
+                            src={service.coverImage}
                             alt="Service"
                             className="object-cover w-full h-auto rounded-lg"
                         />
                         <div>
                             <div>
-                                <p className="text-xs font-semibold uppercase text-custom-blue">{service.category}</p>
+                                {/* <p className="text-xs font-semibold uppercase text-custom-blue">{service.category}</p> */}
                                 <h1 className="text-3xl font-bold heading">{service.title}</h1>
                                 <div className="flex items-center space-x-2">
                                     <span className="text-yellow-500">★★★★☆</span>
-                                    <span className="text-sm text-gray-600">({service.rating} rating)</span>
+                                    <span className="text-sm text-gray-600">({service.averageRating} rating)</span>
                                 </div>
                                 <div className="flex flex-wrap gap-2 my-2 text-xs">
-                                    {service.tags.map((tag, i) => (
+                                    {service.services.map((tag, i) => (
                                         <span key={i} className="px-2 py-1 text-gray-800 bg-green-100 rounded-full">
-                                            {tag}
+                                            {tag.name}
                                         </span>
                                     ))}
                                 </div>
@@ -210,7 +142,7 @@ const ServiceDetailPage = () => {
                                 <div className="space-y-1">
                                     <p>What type of service do you need?</p>
                                     {service.services.map((svc) => (
-                                        <label key={svc.id} className="block">
+                                        <label key={svc._id} className="block">
                                             <input type="radio" name="service" value={svc.name} /> {svc.name}
                                         </label>
                                     ))}
@@ -231,7 +163,13 @@ const ServiceDetailPage = () => {
                                 </div>
                                 <div className="flex flex-col text-sm text-gray-800">
                                     <span className="p-0 m-0 font-medium leading-tight text-custom-orange">Call Us:</span>
-                                    <span className="p-0 m-0 leading-tight">{service.contact.phone}</span>
+                                    <a
+                                        href={`tel:${service.contact.phone}`}
+                                        className="p-0 m-0 leading-tight text-gray-800 hover:underline"
+                                    >
+                                        {service.contact.phone}
+                                    </a>
+
                                 </div>
                             </div>
                             <div className="flex items-center gap-3 mb-5">
@@ -240,7 +178,13 @@ const ServiceDetailPage = () => {
                                 </div>
                                 <div className="flex flex-col text-sm text-gray-800">
                                     <span className="p-0 m-0 font-medium leading-tight text-custom-orange">Email Us:</span>
-                                    <span className="p-0 m-0 leading-tight">{service.contact.email}</span>
+                                    <a
+                                        href={`mailto:${service.contact.email}`}
+                                        className="p-0 m-0 leading-tight text-gray-800 hover:underline"
+                                    >
+                                        {service.contact.email}
+                                    </a>
+
                                 </div>
                             </div>
                             <div className="flex items-center gap-3 mb-5">
@@ -258,7 +202,14 @@ const ServiceDetailPage = () => {
                                 </div>
                                 <div className="flex flex-col text-sm text-gray-800">
                                     <span className="p-0 m-0 font-medium leading-tight text-custom-orange">Website:</span>
-                                    <span className="p-0 m-0 leading-tight">{service.contact.website}</span>
+                                    <a
+                                        href={service.contact.website}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="p-0 m-0 leading-tight text-gray-800 hover:underline"
+                                    >
+                                        {service.contact.website}
+                                    </a>
                                 </div>
                             </div>
 
@@ -275,7 +226,7 @@ const ServiceDetailPage = () => {
                         <div>
                             <h2 className="mb-2 text-xl font-semibold heading">Photo Gallery</h2>
                             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-                                {service.galleryImages.map((img, i) => (
+                                {service.images.map((img, i) => (
                                     <div key={i} className="relative w-full overflow-hidden rounded aspect-square">
                                         <img
                                             src={img}
@@ -305,10 +256,11 @@ const ServiceDetailPage = () => {
                                 </div>
 
                                 {/* Map */}
+
                                 <div className="mt-2 overflow-hidden rounded-lg shadow-sm md:mt-0">
                                     <iframe
                                         title="Service Location"
-                                        src={service.locationMapEmbedUrl}
+                                        src={`https://www.google.com/maps?q=${service.contact.address}&output=embed`}
                                         width="100%"
                                         height="260"
                                         style={{ border: 0 }}
@@ -351,48 +303,50 @@ const ServiceDetailPage = () => {
                         </div>
 
                         {/* Reviews */}
-                        <div>
-                            <h2 className="mb-2 text-xl font-semibold heading">Review Highlights</h2>
-                            {service.reviews.slice(0, visibleCount).map((review, i) => (
-                                <div key={i} className="p-4 mb-3 border rounded">
-                                    <div className="flex gap-3">
-                                        {review.image ? (
-                                            <div className="relative w-10 h-10 overflow-hidden rounded-full">
-                                                <Image
-                                                    src={review.image}
-                                                    alt={review.name}
-                                                    fill
-                                                    className="object-cover"
-                                                />
+                        {reviews.length > 0 && (
+                            <div>
+                                <h2 className="mb-2 text-xl font-semibold heading">Review Highlights</h2>
+                                {reviews.slice(0, visibleCount).map((review, i) => (
+                                    <div key={i} className="p-4 mb-3 border rounded">
+                                        <div className="flex gap-3">
+                                            {review.userId.profileImage ? (
+                                                <div className="relative w-10 h-10 overflow-hidden rounded-full">
+                                                    <Image
+                                                        src={review.userId.profileImage}
+                                                        alt={review.userId.name}
+                                                        fill
+                                                        className="object-cover"
+                                                    />
+                                                </div>
+                                            ) : (
+                                                <CircleUserRound className="w-10 h-10 text-gray-400" />
+                                            )}
+
+                                            <div className="flex flex-col justify-center">
+                                                <p className="font-bold leading-none roboto">{review.userId.name}</p>
+                                                {/* <p className="text-xs leading-tight text-gray-500">{review.role}</p> */}
+                                                <p className="text-sm leading-tight text-yellow-500">
+                                                    {"★".repeat(review.rating)}{"☆".repeat(5 - review.rating)}
+                                                </p>
                                             </div>
-                                        ) : (
-                                            <CircleUserRound className="w-10 h-10 text-gray-400" />
-                                        )}
-
-                                        <div className="flex flex-col justify-center">
-                                            <p className="font-bold leading-none roboto">{review.name}</p>
-                                            <p className="text-xs leading-tight text-gray-500">{review.role}</p>
-                                            <p className="text-sm leading-tight text-yellow-500">
-                                                {"★".repeat(review.rating)}{"☆".repeat(5 - review.rating)}
-                                            </p>
                                         </div>
+                                        <p className="mt-1 text-gray-700">{review.comment}</p>
                                     </div>
-                                    <p className="mt-1 text-gray-700">{review.comment}</p>
-                                </div>
-                            ))}
+                                ))}
 
-                            {/* Show button only if there are more than 4 reviews */}
-                            {service.reviews.length > 4 && (
-                                <div className="text-center">
-                                    <button
-                                        className="mt-2 font-bold text-custom-orange hover:underline"
-                                        onClick={() => setShowAll(!showAll)}
-                                    >
-                                        {showAll ? "Show Less" : "View More +"}
-                                    </button>
-                                </div>
-                            )}
-                        </div>
+                                {/* Show button only if there are more than 4 reviews */}
+                                {reviews.length > 4 && (
+                                    <div className="text-center">
+                                        <button
+                                            className="mt-2 font-bold text-custom-orange hover:underline"
+                                            onClick={() => setShowAll(!showAll)}
+                                        >
+                                            {showAll ? "Show Less" : "View More +"}
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </section>
 

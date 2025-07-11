@@ -5,7 +5,7 @@ export interface Service {
   description: string;
   price: number;
   duration: string;
-  services: { name: string }[];
+  services: { _id: string; name: string }[];
   categories: {
     categoryId: string;
     subcategoryIds: string[];

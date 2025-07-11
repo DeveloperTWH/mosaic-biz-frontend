@@ -44,7 +44,7 @@ const ServicePage = () => {
 
   useEffect(() => {
     fetchServices(); // load default services on page load
-  }, []);
+  }, [minorityType]);
 
   return (
     <main className="text-black bg-white">
@@ -59,7 +59,9 @@ const ServicePage = () => {
         onSearch={handleSearch}
       />
 
-      <CategoryGrid />
+      {(!searchText && !minorityType && !searchLocation) && (
+        <CategoryGrid />
+      )}
       <BookServices services={services} />
       <FeatureBlogs />
     </main>

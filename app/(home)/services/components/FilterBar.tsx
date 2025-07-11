@@ -48,18 +48,18 @@ const FilterBar: React.FC<FilterBarProps> = ({
   }, []);
 
   return (
-    <section className="py-10 px-6 max-w-7xl mx-auto">
-      <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+    <section className="px-6 py-10 mx-auto max-w-7xl">
+      <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
         <input
           type="text"
           placeholder="Search Here"
-          className="border px-4 py-2 w-full md:w-1/4"
+          className="w-full px-4 py-2 border md:w-1/4"
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
         />
 
         <select
-          className="border px-4 py-2 w-full md:w-1/4 "
+          className="w-full px-4 py-2 border md:w-1/4 "
           value={minorityType}
           onChange={(e) => setMinorityType(e.target.value)}
           disabled={loadingMinority}
@@ -70,7 +70,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
             <>
               <option value="">All Types</option>
               {minorityTypes.map((type) => (
-                <option key={type._id} value={type.name}>
+                <option key={type._id} value={type._id}>
                   {type.name}
                 </option>
               ))}
@@ -82,14 +82,14 @@ const FilterBar: React.FC<FilterBarProps> = ({
         <input
           type="text"
           placeholder="Search by Location"
-          className="border px-4 py-2 w-full md:w-1/4"
+          className="w-full px-4 py-2 border md:w-1/4"
           value={searchLocation}
           onChange={(e) => setSearchLocation(e.target.value)}
         />
 
         <button
           onClick={onSearch}
-          className="bg-custom-orange text-white px-10 py-2 text-base md:text-lg"
+          className="px-10 py-2 text-base text-white bg-custom-orange md:text-lg"
         >
           Search Here
         </button>

@@ -43,7 +43,7 @@ const MinorityType = () => {
                     <>
                         <option value="">All Types</option>
                         {minorityTypes.map((type) => (
-                            <option key={type._id} value={type.name}>
+                            <option key={type._id} value={type._id}>
                                 {type.name}
                             </option>
                         ))}
