@@ -24,6 +24,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-toastify": "^11.0.5",
+    "recharts": "^3.1.0",
     "swiper": "^11.2.6",
     "topojson-client": "^3.1.0"
   },

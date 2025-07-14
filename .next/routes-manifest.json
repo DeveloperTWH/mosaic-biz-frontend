@@ -39,12 +39,29 @@
       "namedRegex": "^/partners/business/(?<nxtPbusinessid>[^/]+?)/setup(?:/)?$"
     },
     {
-      "page": "/products/[id]",
+      "page": "/partners/[businessid]",
+      "regex": "^/partners/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPbusinessid": "nxtPbusinessid"
+      },
+      "namedRegex": "^/partners/(?<nxtPbusinessid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/products/[productid]",
       "regex": "^/products/([^/]+?)(?:/)?$",
       "routeKeys": {
+        "nxtPproductid": "nxtPproductid"
+      },
+      "namedRegex": "^/products/(?<nxtPproductid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/products/[productid]/[id]",
+      "regex": "^/products/([^/]+?)/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPproductid": "nxtPproductid",
         "nxtPid": "nxtPid"
       },
-      "namedRegex": "^/products/(?<nxtPid>[^/]+?)(?:/)?$"
+      "namedRegex": "^/products/(?<nxtPproductid>[^/]+?)/(?<nxtPid>[^/]+?)(?:/)?$"
     },
     {
       "page": "/service/[slug]",

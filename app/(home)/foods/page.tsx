@@ -5,7 +5,7 @@ import HeroSection from '../services/components/HeroSection';
 import FilterBar from '../services/components/FilterBar';
 import TabsHeadingSection from './components/TabsHeadingSection';
 import FoodsAndRestaurantsPage from './components/FoodsAndRestaurantsPage';
-import SimilarProduct from '../products/[id]/Component/SimilarProduct';
+import SimilarProduct from '../products/[productid]/[id]/Component/SimilarProduct';
 
 const FoodSection = () => {
 
@@ -33,7 +33,7 @@ const FoodSection = () => {
       />
       <HeroSection />
       <FoodsAndRestaurantsPage />
-      <div className="px-8 py-10 max-w-screen-xl mx-auto">
+      <div className="max-w-screen-xl px-8 py-10 mx-auto">
         <SimilarProduct />
       </div>
     </div>

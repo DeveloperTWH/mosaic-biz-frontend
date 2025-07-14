@@ -49,10 +49,7 @@
       "path": "/_next/image",
       "loader": "default",
       "loaderFile": "",
-      "domains": [
-        "res.cloudinary.com",
-        "my-bucket.s3.amazonaws.com"
-      ],
+      "domains": [],
       "disableStaticImages": false,
       "minimumCacheTTL": 60,
       "formats": [
@@ -61,7 +58,16 @@
       "dangerouslyAllowSVG": false,
       "contentSecurityPolicy": "script-src 'none'; frame-src 'none'; sandbox;",
       "contentDispositionType": "attachment",
-      "remotePatterns": [],
+      "remotePatterns": [
+        {
+          "protocol": "https",
+          "hostname": "res.cloudinary.com"
+        },
+        {
+          "protocol": "https",
+          "hostname": "my-bucket.s3.amazonaws.com"
+        }
+      ],
       "unoptimized": false
     },
     "devIndicators": {
