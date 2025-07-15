@@ -1,16 +1,30 @@
-// components/partners/Topbar.tsx
 'use client';
 
 import React from 'react';
-import { Bell, Globe, UserCircle2, Search } from 'lucide-react';
+import { Bell, Globe, Search, Menu } from 'lucide-react';
 
-const Topbar = () => {
+const Topbar = ({
+  setIsSidebarOpen,
+}: {
+  setIsSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
   return (
     <header className="flex items-center justify-between w-full px-6 py-4 bg-white shadow">
-      <h2 className="text-lg font-semibold">Welcome !</h2>
       <div className="flex items-center gap-4">
-        {/* Search bar */}
-        <div className="relative">
+        {/* ✅ Hamburger for Mobile */}
+        <button
+          className="p-2 bg-gray-100 rounded md:hidden"
+          onClick={() => setIsSidebarOpen((prev: boolean) => !prev)}
+        >
+          <Menu className="w-6 h-6 text-gray-700" />
+        </button>
+
+        <h2 className="text-lg font-semibold">Welcome !</h2>
+      </div>
+
+      <div className="flex items-center gap-4">
+        {/* Search Bar */}
+        <div className="relative hidden sm:block">
           <input
             type="text"
             placeholder="Search here ..."
@@ -22,8 +36,7 @@ const Topbar = () => {
         {/* Language and Country */}
         <div className="flex items-center gap-2">
           <Globe className="w-5 h-5 text-gray-500" />
-          <span className="text-sm">English</span>
-          {/* <img src="/flags/uk.png" alt="UK Flag" className="w-5 h-3 ml-1" /> */}
+          <span className="hidden text-sm sm:block">English</span>
         </div>
 
         {/* Notifications */}

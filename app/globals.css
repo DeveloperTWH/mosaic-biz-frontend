@@ -111,3 +111,15 @@ html, body {
   background-position: center;
   background-repeat: no-repeat;
 }
+
+
+/* Ensure content is scrollable but scrollbar is hidden */
+.custom-scrollbar {
+  overflow-y: auto; /* Enables vertical scrolling */
+  -ms-overflow-style: none;  /* Hides scrollbar in IE/Edge */
+  scrollbar-width: none; /* Hides scrollbar in Firefox */
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  display: none;  /* Hides scrollbar in Chrome, Safari, and newer versions of Edge */
+}

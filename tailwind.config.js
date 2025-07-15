@@ -6,14 +6,16 @@ module.exports = {
   ],
   theme: {
     extend: {
-       colors: {
+      colors: {
         'custom-orange': '#CE5F44',
         'custom-yellow': '#F9AE53',
         'custom-blue': '#16A1C0',
-        'custom-soil': '#FFF6E0', 
-        'custom-dark': '#333333', 
+        'custom-soil': '#FFF6E0',
+        'custom-dark': '#333333',
       },
     },
   },
-  plugins: [],
+  plugins: [
+    require('tailwind-scrollbar'),
+  ],
 };

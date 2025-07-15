@@ -34,8 +34,8 @@ const pieData = [
     { name: 'Cancelled', value: 15 },
 ];
 
-const pieColors = ['#22B5CE', '#004B53', '#D9D9D9', '#F4A940', '#D96348'];
-const lighterPieColors = ['#B8E9F1', '#7CA5A8', '#EFEFEF', '#FAE1B3', '#F5B6A9'];
+const pieColors = ['#22B5CE', '#004B53', '#bfbfbf', '#F4A940', '#D96348'];
+const lighterPieColors = ['#B8E9F1', '#7CA5A8', '#cccccc', '#FAE1B3', '#F5B6A9'];
 
 const lineData = [
     { month: 'Jan', value: 45 },
@@ -64,8 +64,8 @@ const SalesSection = () => {
     const memoizedLineChart = useMemo(() => (
         <ResponsiveContainer width="100%" height={250}>
             <LineChart data={lineData}>
-                <XAxis dataKey="month" />
-                <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} />
+                <XAxis dataKey="month" tick={{ fontSize: 12 }} style={{ paddingLeft: 0, paddingRight: 0 }}/>
+                <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} tick={{ fontSize: 12 }} />
                 <Tooltip
                     formatter={(value) => `${value}%`}
                     labelFormatter={(label) => `${label}`}
@@ -89,7 +89,7 @@ const SalesSection = () => {
             {/* Online Sales & Booking */}
             <div className="flex flex-col w-full gap-4 lg:flex-row">
                 {/* Left Section: Sales & Service */}
-                <div className="flex flex-col gap-4 w-full lg:w-[220px]">
+                <div className="flex flex-col gap-4 w-full lg:w-[200px]">
                     {/* Online Sales */}
                     <div className="flex items-center justify-between px-4 py-6 bg-white rounded shadow">
                         <div>
@@ -137,7 +137,7 @@ const SalesSection = () => {
                 </div>
 
                 {/* Right Section: Order Status */}
-                <div className="flex-1 min-w-[300px] p-4 bg-white rounded-[6px] shadow">
+                <div className="flex-1 lg:min-w-[280px] p-4 bg-white rounded-[6px] shadow">
                     <div className="flex items-center justify-end mb-2">
                         <button className="text-gray-400">
                             <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
@@ -149,76 +149,76 @@ const SalesSection = () => {
                     </div>
 
                     <div
-                        className="relative flex items-center"
+                        className="relative flex flex-col items-center gap-4 md:flex-row md:items-start"
                         onMouseLeave={() => setActiveIndex(null)}
-                        onMouseEnter={(e) => {
-                            // optional if needed to avoid flickering
-                            if (activeIndex === null) setActiveIndex(-1);
-                        }}
                     >
-
-                        {/* Custom Hover Label */}
+                        {/* ✅ Custom Hover Label - centered on mobile */}
                         {activeIndex !== null && pieData[activeIndex] && (
-                            <div className="absolute top-2 left-[80px] z-10 text-center bg-white px-2 py-1 rounded shadow text-sm font-semibold flex gap-2 justify-center items-center pointer-events-none">
+                            <div className="absolute top-2 left-1/2 md:left-[80px] -translate-x-1/2 md:translate-x-0 z-10 text-center bg-white px-2 py-1 rounded shadow text-sm font-semibold flex gap-2 items-center pointer-events-none">
                                 <div className="text-base text-black">{pieData[activeIndex].value}</div>
                                 <div className="text-xs text-gray-500">{pieData[activeIndex].name}</div>
                             </div>
                         )}
 
-                        <PieChart width={160} height={160}>
-                            {/* Outer Pie */}
-                            <Pie
-                                data={pieData}
-                                cx="50%"
-                                cy="50%"
-                                innerRadius={50}
-                                outerRadius={65}
-                                paddingAngle={2}
-                                dataKey="value"
-                                stroke="none"
-                                isAnimationActive
-                                onMouseEnter={handlePieEnter}
-                                onMouseLeave={handlePieLeave}
-                            >
-                                {pieData.map((entry, index) => (
-                                    <Cell
-                                        key={`outer-${index}`}
-                                        fill={pieColors[index % pieColors.length]}
-                                        style={{
-                                            transform: activeIndex === index ? 'scale(1.05)' : 'scale(1)',
-                                            transformOrigin: 'center',
-                                            transition: 'transform 0.3s ease',
-                                        }}
-                                    />
-                                ))}
-                            </Pie>
+                        {/* ✅ Pie Chart (centered on mobile) */}
+                        <div className="flex justify-center">
+                            <PieChart width={180} height={180}>
+                                {/* Outer Pie */}
+                                <Pie
+                                    data={pieData}
+                                    cx="50%"
+                                    cy="50%"
+                                    innerRadius={50}
+                                    outerRadius={65}
+                                    paddingAngle={2}
+                                    dataKey="value"
+                                    stroke="none"
+                                    onMouseEnter={handlePieEnter}
+                                    onMouseLeave={handlePieLeave}
+                                >
+                                    {pieData.map((entry, index) => (
+                                        <Cell
+                                            key={`outer-${index}`}
+                                            fill={pieColors[index % pieColors.length]}
+                                            style={{
+                                                transform: activeIndex === index ? 'scale(1.05)' : 'scale(1)',
+                                                transformOrigin: 'center',
+                                                transition: 'transform 0.3s ease',
+                                            }}
+                                        />
+                                    ))}
+                                </Pie>
 
-                            {/* Inner Ring */}
-                            <Pie
-                                data={pieData}
-                                cx="50%"
-                                cy="50%"
-                                innerRadius={40}
-                                outerRadius={49}
-                                paddingAngle={2}
-                                dataKey="value"
-                                stroke="none"
-                            >
-                                {pieData.map((entry, index) => (
-                                    <Cell
-                                        key={`inner-${index}`}
-                                        fill={lighterPieColors[index % lighterPieColors.length]}
-                                    />
-                                ))}
-                            </Pie>
-                        </PieChart>
+                                {/* Inner Ring */}
+                                <Pie
+                                    data={pieData}
+                                    cx="50%"
+                                    cy="50%"
+                                    innerRadius={40}
+                                    outerRadius={49}
+                                    paddingAngle={2}
+                                    dataKey="value"
+                                    stroke="none"
+                                >
+                                    {pieData.map((entry, index) => (
+                                        <Cell
+                                            key={`inner-${index}`}
+                                            fill={lighterPieColors[index % lighterPieColors.length]}
+                                        />
+                                    ))}
+                                </Pie>
+                            </PieChart>
+                        </div>
 
-                        {/* Legend */}
-                        <div className="ml-6">
-                            <h3 className="mb-3 text-xl font-bold text-black">Order Status</h3>
-                            <ul className="grid grid-cols-2 text-sm text-gray-800 gap-x-6 gap-y-2">
+                        {/* ✅ Legend (stacks below on mobile) */}
+                        <div className="text-center md:text-left">
+                            <h3 className="mb-3 text-lg font-bold text-black">Order Status</h3>
+                            <ul className="grid grid-cols-1 text-sm text-gray-800 sm:grid-cols-2 gap-x-4 gap-y-2 md:gap-x-6">
                                 {pieData.map((entry, index) => (
-                                    <li key={index} className="flex items-center gap-2">
+                                    <li
+                                        key={index}
+                                        className="flex items-center justify-center gap-2 md:justify-start"
+                                    >
                                         <span
                                             className="inline-block w-3.5 h-3.5 rounded-sm"
                                             style={{ backgroundColor: pieColors[index % pieColors.length] }}
@@ -231,11 +231,12 @@ const SalesSection = () => {
                     </div>
                 </div>
 
+
             </div>
 
 
             {/* Sales Line Chart */}
-            <div className="bg-white p-4 rounded shadow flex-1 min-w-[300px]">
+            <div className="bg-white p-4 rounded shadow flex-1 lg:min-w-[300px]">
                 <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold">Sales Details</h3>
                     <select className="px-2 py-1 text-sm border rounded">
