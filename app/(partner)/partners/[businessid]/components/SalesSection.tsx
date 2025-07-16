@@ -52,9 +52,13 @@ const lineData = [
     { month: 'Dec', value: 60 },
 ];
 
-// No dependencies, so won't rerun unless unmounted
+import { Business } from '@/types/business';
 
-const SalesSection = () => {
+interface SalesSectionProps {
+  business: Business;  // Add the prop type here
+}
+
+const SalesSection: React.FC<SalesSectionProps> = ({ business }) => {
     const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
     const handlePieEnter = (_: any, index: number) => setActiveIndex(index);

@@ -1,35 +1,64 @@
-// components/partners/SubscriptionPlan.tsx
 'use client';
 
 import React from 'react';
-import { BadgeCheck } from 'lucide-react';
+import { CheckCircle } from 'lucide-react';
+import { Business } from '@/types/business';  // Import your Business type
 
-const SubscriptionPlan = () => {
+interface SubscriptionPlanProps {
+  business: Business;  // Define business prop type here
+}
+
+const SubscriptionPlan: React.FC<SubscriptionPlanProps> = ({ business }) => {
   return (
     <div className="p-6 bg-white rounded shadow h-fit">
-      <h3 className="mb-4 text-lg font-semibold">Subscription Plan</h3>
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-gray-600">Current Plan</p>
-          <span className="px-2 py-1 text-xs font-semibold text-blue-600 bg-blue-100 rounded-full">
-            Pro Plan
-          </span>
+      {/* Title & Subtitle */}
+      <h3 className="text-xl font-bold">Subscription Plan</h3>
+      <p className="text-sm text-gray-400">
+        No hidden fees, deposit requirements, or exclusivity clauses
+      </p>
+
+      {/* Active Plan Badge */}
+      <div className="inline-block px-3 py-1 mt-3 text-sm font-medium text-white rounded-full bg-gradient-to-r from-green-400 to-orange-400">
+        Active Plan
+      </div>
+
+      {/* Plan Details */}
+      <div className="mt-4 space-y-1 text-sm">
+        <div className="flex justify-between">
+          <span className="text-gray-600">Plan :</span>
+          <span className="font-medium text-gray-800">Basic Plan</span>
         </div>
-        <div className="flex items-center gap-2 mt-2">
-          <BadgeCheck className="w-4 h-4 text-green-500" />
-          <p className="text-sm text-gray-600">20 Product Listings</p>
+        <div className="flex justify-between">
+          <span className="text-gray-600">Billing Amount :</span>
+          <span className="font-medium text-gray-800">$120.00 / Month</span>
         </div>
-        <div className="flex items-center gap-2">
-          <BadgeCheck className="w-4 h-4 text-green-500" />
-          <p className="text-sm text-gray-600">Advanced Analytics</p>
+        <div className="flex justify-between">
+          <span className="text-gray-600">Valid Upto :</span>
+          <span className="font-medium text-gray-800">12th July, 2026</span>
         </div>
-        <div className="flex items-center gap-2">
-          <BadgeCheck className="w-4 h-4 text-green-500" />
-          <p className="text-sm text-gray-600">Priority Support</p>
+        <div className="flex justify-between">
+          <span className="text-gray-600">Payment Method :</span>
+          <span className="font-medium text-gray-800">Credit Card</span>
         </div>
-        <button className="w-full py-2 mt-4 text-sm text-white bg-black rounded hover:opacity-90">
-          Upgrade Plan
-        </button>
+        <div className="flex justify-between">
+          <span className="text-gray-600">Joined :</span>
+          <span className="font-medium text-gray-800">12th July, 2025</span>
+        </div>
+      </div>
+
+      {/* Features List */}
+      <div className="mt-5 space-y-3">
+        {[
+          'Allowed Products – Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+          'Customer Support – Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+          'Business Plan – Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+          'Product Promotion – Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+        ].map((feature, index) => (
+          <div key={index} className="flex items-start gap-2">
+            <CheckCircle className="w-5 h-5 text-black" />
+            <p className="text-sm text-gray-700">{feature}</p>
+          </div>
+        ))}
       </div>
     </div>
   );

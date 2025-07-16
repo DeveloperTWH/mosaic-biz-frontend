@@ -9,6 +9,11 @@ import {
   PlusCircle,
 } from 'lucide-react';
 import Link from 'next/link';
+import { Business } from '@/types/business';
+
+interface OverviewCardsProps {
+  business: Business;  // Add the prop type here
+}
 
 const overviewData = [
   {
@@ -41,7 +46,7 @@ const overviewData = [
   },
 ];
 
-const OverviewCards = () => {
+const OverviewCards: React.FC<OverviewCardsProps> = ({ business }) => {
   return (
     <div className="space-y-4">
       <div className="flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center">

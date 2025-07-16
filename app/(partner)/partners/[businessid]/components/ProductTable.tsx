@@ -3,8 +3,13 @@
 import React, { useState, useMemo } from 'react';
 import { Eye, Pencil, Trash2, Plus } from 'lucide-react';
 import Image from 'next/image';
+import { Business } from '@/types/business';
 
-const ProductTable = () => {
+interface ProductTableProps {
+  business: Business;  // Add the prop type here
+}
+
+const ProductTable: React.FC<ProductTableProps> = ({ business }) => {
   const dummyProducts = useMemo(
     () =>
       Array.from({ length: 5 }).map((_, i) => ({
@@ -80,7 +85,7 @@ const ProductTable = () => {
     <div className="p-6 bg-white rounded shadow">
       <div className="flex flex-col items-start justify-between gap-2 mb-4 sm:flex-row sm:items-center">
         <h3 className="text-xl font-bold">Products</h3>
-        <button className="flex items-center w-full gap-1 px-3 py-1 text-white bg-orange-500 rounded hover:bg-orange-600 sm:w-auto">
+        <button className="flex items-center w-full gap-1 px-3 py-1 text-white rounded bg-custom-orange hover:opacity-90 sm:w-auto">
           <Plus className="w-4 h-4" /> Add Product
         </button>
       </div>
@@ -131,10 +136,10 @@ const ProductTable = () => {
                 <td className="px-4 py-3">{product.price}</td>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
-                    <button className="p-1 bg-orange-400 rounded hover:bg-orange-500">
+                    <button className="p-1 rounded bg-custom-orange hover:opacity-90 ">
                       <Eye className="w-4 h-4 text-white" />
                     </button>
-                    <button className="p-1 bg-yellow-400 rounded hover:bg-yellow-500">
+                    <button className="p-1 rounded bg-custom-yellow hover:opacity-90 ">
                       <Pencil className="w-4 h-4 text-white" />
                     </button>
                     <button className="p-1 bg-gray-400 rounded hover:bg-gray-500">
@@ -181,10 +186,10 @@ const ProductTable = () => {
               </div>
             </div>
             <div className="flex gap-2 mt-2">
-              <button className="flex-1 p-1 bg-orange-400 rounded hover:bg-orange-500">
+              <button className="flex-1 p-1 rounded bg-custom-orange hover:opacity-90 ">
                 <Eye className="w-4 h-4 text-white" />
               </button>
-              <button className="flex-1 p-1 bg-yellow-400 rounded hover:bg-yellow-500">
+              <button className="flex-1 p-1 rounded bg-custom-yellow hover:opacity-90 ">
                 <Pencil className="w-4 h-4 text-white" />
               </button>
               <button className="flex-1 p-1 bg-gray-400 rounded hover:bg-gray-500">
