@@ -11,6 +11,8 @@ import {
   LogOut,
   X
 } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname, useParams } from 'next/navigation';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -18,6 +20,10 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
+  const pathname = usePathname();
+  const params = useParams();
+  const businessId = params.businessid as string; // ✅ Get businessId from URL
+
   const navItems = [
     { label: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
     { label: 'Inventory', icon: <Boxes className="w-5 h-5" /> },
@@ -26,6 +32,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
     { label: 'Settings', icon: <Settings className="w-5 h-5" /> },
     { label: 'Support', icon: <LifeBuoy className="w-5 h-5" /> },
   ];
+
+  const getLink = (label: string) => {
+    return label === 'Dashboard'
+      ? `/partners/${businessId}`
+      : `/partners/${businessId}/${label.toLowerCase().replace(' ', '-')}`;
+  };
 
   return (
     <>
@@ -53,14 +65,21 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
         </div>
 
         <nav className="flex-1 py-6 space-y-2 overflow-y-auto custom-scrollbar">
-          {navItems.map((item, i) => (
-            <button
-              key={i}
-              className="flex items-center w-full gap-3 px-4 py-4 text-sm font-medium text-white transition-all duration-200 ease-in-out hover:bg-custom-blue"
-            >
-              {item.icon} {item.label}
-            </button>
-          ))}
+          {navItems.map((item, i) => {
+            const link = getLink(item.label);
+            const isActive = pathname === link;
+
+            return (
+              <Link
+                key={i}
+                href={link}
+                className={`flex items-center w-full gap-3 px-4 py-4 text-sm font-medium text-white transition-all duration-200 ease-in-out 
+                  ${isActive ? 'bg-custom-blue' : 'hover:bg-custom-blue'}`}
+              >
+                {item.icon} {item.label}
+              </Link>
+            );
+          })}
         </nav>
 
         <div>

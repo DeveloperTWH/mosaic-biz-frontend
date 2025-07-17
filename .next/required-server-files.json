@@ -66,6 +66,10 @@
         {
           "protocol": "https",
           "hostname": "my-bucket.s3.amazonaws.com"
+        },
+        {
+          "protocol": "https",
+          "hostname": "example.com"
         }
       ],
       "unoptimized": false

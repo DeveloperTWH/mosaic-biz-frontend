@@ -9,44 +9,62 @@ import {
   PlusCircle,
 } from 'lucide-react';
 import Link from 'next/link';
-import { Business } from '@/types/business';
 
 interface OverviewCardsProps {
-  business: Business;  // Add the prop type here
+  listingType: "product" | "service" | "food";
+  total: number;
+  totalReviews: number;
+  totalOrdersOrBookings: number;
+  outOfStockOrUnpublished: number;
 }
 
-const overviewData = [
-  {
-    label: 'Total Products',
-    value: 2025,
-    icon: <PackageSearch className="w-5 h-5 text-white" />,
-    bg: 'bg-custom-yellow',
-    border: 'border-l-4 border-custom-yellow',
-  },
-  {
-    label: 'Total Reviews',
-    value: 42,
-    icon: <Star className="w-5 h-5 text-white" />,
-    bg: 'bg-custom-blue',
-    border: 'border-l-4 border-custom-blue',
-  },
-  {
-    label: 'Total Orders',
-    value: 4789,
-    icon: <ShoppingBag className="w-5 h-5 text-white" />,
-    bg: 'bg-custom-orange',
-    border: 'border-l-4 border-custom-orange',
-  },
-  {
-    label: 'Out Of Stock',
-    value: 12,
-    icon: <AlertTriangle className="w-5 h-5 text-white" />,
-    bg: 'bg-gray-400',
-    border: 'border-l-4 border-gray-400',
-  },
-];
+const OverviewCards: React.FC<OverviewCardsProps> = ({
+  listingType,
+  total,
+  totalReviews,
+  totalOrdersOrBookings,
+  outOfStockOrUnpublished,
+}) => {
+  // ✅ Conditionally update labels based on listingType
+  const overviewData = [
+    {
+      label:
+        listingType === "product"
+          ? "Total Products"
+          : listingType === "service"
+          ? "Total Services"
+          : "Total Food",
+      value: total,
+      icon: <PackageSearch className="w-5 h-5 text-white" />,
+      bg: "bg-custom-yellow",
+      border: "border-l-4 border-custom-yellow",
+    },
+    {
+      label: "Total Reviews",
+      value: totalReviews,
+      icon: <Star className="w-5 h-5 text-white" />,
+      bg: "bg-custom-blue",
+      border: "border-l-4 border-custom-blue",
+    },
+    {
+      label: listingType === "service" ? "Total Bookings" : "Total Orders",
+      value: totalOrdersOrBookings,
+      icon: <ShoppingBag className="w-5 h-5 text-white" />,
+      bg: "bg-custom-orange",
+      border: "border-l-4 border-custom-orange",
+    },
+    {
+      label:
+        listingType === "service"
+          ? "Unpublished Services"
+          : "Out Of Stock",
+      value: outOfStockOrUnpublished,
+      icon: <AlertTriangle className="w-5 h-5 text-white" />,
+      bg: "bg-gray-400",
+      border: "border-l-4 border-gray-400",
+    },
+  ];
 
-const OverviewCards: React.FC<OverviewCardsProps> = ({ business }) => {
   return (
     <div className="space-y-4">
       <div className="flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center">
@@ -59,7 +77,7 @@ const OverviewCards: React.FC<OverviewCardsProps> = ({ business }) => {
         </Link>
       </div>
 
-      {/* ✅ Fully Responsive Grid */}
+      {/* ✅ Responsive Grid */}
       <div className="grid grid-cols-1 gap-4 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {overviewData.map((item, index) => (
           <div

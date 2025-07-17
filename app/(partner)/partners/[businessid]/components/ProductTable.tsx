@@ -1,41 +1,29 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React from 'react';
 import { Eye, Pencil, Trash2, Plus } from 'lucide-react';
 import Image from 'next/image';
-import { Business } from '@/types/business';
+import { ProductListingItem } from '@/types/product';
 
 interface ProductTableProps {
-  business: Business;  // Add the prop type here
+  products: ProductListingItem[];
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+  isLoading?: boolean;
+  error?: string | null;
 }
 
-const ProductTable: React.FC<ProductTableProps> = ({ business }) => {
-  const dummyProducts = useMemo(
-    () =>
-      Array.from({ length: 5 }).map((_, i) => ({
-        id: i + 1,
-        name: `Feature Product Title ${i + 1}`,
-        details:
-          'Lorem Ipsum Dolor Sit Amet, Consectetur Adipiscing Elit. Praesent Vitae Libero Venenatis, Tristique Justo.',
-        sku: `0${(i % 10) + 1}`,
-        stock: i % 7 === 0 ? 0 : 1000 + i,
-        price: '$499.00',
-        image: '/ShopProduct/Aria-SK6-Helmet 1 (3).png',
-      })),
-    []
-  );
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 4;
-  const totalPages = Math.ceil(dummyProducts.length / itemsPerPage);
-
-  const currentProducts = dummyProducts.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
+const ProductTable: React.FC<ProductTableProps> = ({
+  products,
+  currentPage,
+  totalPages,
+  onPageChange,
+  isLoading = false,
+  error
+}) => {
   const changePage = (page: number) => {
-    if (page >= 1 && page <= totalPages) setCurrentPage(page);
+    if (page >= 1 && page <= totalPages) onPageChange(page);
   };
 
   const renderPagination = () => {
@@ -51,8 +39,8 @@ const ProductTable: React.FC<ProductTableProps> = ({ business }) => {
           key={i}
           onClick={() => changePage(i)}
           className={`px-3 py-1 border rounded ${currentPage === i
-              ? 'bg-black text-white'
-              : 'bg-white text-black hover:bg-gray-100'
+            ? 'bg-black text-white'
+            : 'bg-white text-black hover:bg-gray-100'
             }`}
         >
           {i}
@@ -81,6 +69,115 @@ const ProductTable: React.FC<ProductTableProps> = ({ business }) => {
     );
   };
 
+  const getDisplayPrice = (product: ProductListingItem) => {
+    const today = new Date();
+    const discountEnd = new Date(product.discountEndDate || '');
+
+    if (discountEnd > today && (product as any).salePrice) {
+      return `$${(product as any).salePrice} (Sale)`;
+    }
+
+    return `$${product.price}`;
+  };
+
+  if (isLoading) {
+    return (
+      <div className="p-6 bg-white rounded shadow">
+        <h3 className="mb-4 text-xl font-bold">Products</h3>
+        <div className="hidden overflow-x-auto lg:block">
+          <table className="w-full text-sm text-left border-collapse">
+            <thead className="bg-[#333333] text-white">
+              <tr>
+                <th className="px-4 py-2"></th>
+                <th className="px-4 py-2">Product Image</th>
+                <th className="px-4 py-2">Product Title</th>
+                <th className="px-4 py-2">Product Description</th>
+                <th className="px-4 py-2">Size</th>
+                <th className="px-4 py-2">SKU</th>
+                <th className="px-4 py-2">Stock</th>
+                <th className="px-4 py-2">Price</th>
+                <th className="px-4 py-2">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[...Array(5)].map((_, index) => (
+                <tr key={index} className="border-b">
+                  <td className="px-4 py-3">
+                    <div className="w-4 h-4 bg-gray-200 rounded animate-pulse"></div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="w-20 h-20 bg-gray-200 rounded animate-pulse"></div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="w-32 h-4 bg-gray-200 rounded animate-pulse"></div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="w-48 h-4 bg-gray-200 rounded animate-pulse"></div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="w-12 h-4 bg-gray-200 rounded animate-pulse"></div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="w-16 h-4 bg-gray-200 rounded animate-pulse"></div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="w-12 h-4 bg-gray-200 rounded animate-pulse"></div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="w-16 h-4 bg-gray-200 rounded animate-pulse"></div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex gap-2">
+                      <div className="w-6 h-6 bg-gray-200 rounded animate-pulse"></div>
+                      <div className="w-6 h-6 bg-gray-200 rounded animate-pulse"></div>
+                      <div className="w-6 h-6 bg-gray-200 rounded animate-pulse"></div>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* ✅ Mobile View Skeleton */}
+        <div className="grid gap-4 lg:hidden">
+          {[...Array(3)].map((_, index) => (
+            <div key={index} className="p-4 border rounded shadow">
+              <div className="flex flex-col items-center gap-4">
+                <div className="w-20 h-20 bg-gray-200 rounded animate-pulse"></div>
+                <div className="w-full space-y-2">
+                  <div className="w-3/4 h-4 bg-gray-200 rounded animate-pulse"></div>
+                  <div className="w-full h-4 bg-gray-200 rounded animate-pulse"></div>
+                  <div className="w-1/2 h-4 bg-gray-200 rounded animate-pulse"></div>
+                </div>
+              </div>
+              <div className="flex gap-2 mt-2">
+                <div className="flex-1 h-6 bg-gray-200 rounded animate-pulse"></div>
+                <div className="flex-1 h-6 bg-gray-200 rounded animate-pulse"></div>
+                <div className="flex-1 h-6 bg-gray-200 rounded animate-pulse"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <div className="p-6 bg-white rounded shadow">
+        <h3 className="mb-4 text-xl font-bold text-red-600">Failed to Load Products</h3>
+        <p className="text-sm text-gray-600">{error || "Something went wrong. Please try again."}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="px-4 py-2 mt-4 text-white rounded bg-custom-orange hover:opacity-90"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
+
+
   return (
     <div className="p-6 bg-white rounded shadow">
       <div className="flex flex-col items-start justify-between gap-2 mb-4 sm:flex-row sm:items-center">
@@ -90,15 +187,16 @@ const ProductTable: React.FC<ProductTableProps> = ({ business }) => {
         </button>
       </div>
 
-      {/* ✅ Desktop/Table View */}
+      {/* ✅ Desktop Table View */}
       <div className="hidden overflow-x-auto lg:block">
         <table className="w-full text-sm text-left border-collapse">
           <thead className="bg-[#333333] text-white">
             <tr>
               <th className="px-4 py-2"></th>
               <th className="px-4 py-2">Product Image</th>
-              <th className="px-4 py-2">Product Name</th>
-              <th className="px-4 py-2">Product Details</th>
+              <th className="px-4 py-2">Product Title</th>
+              <th className="px-4 py-2">Product Description</th>
+              <th className="px-4 py-2">Size</th>
               <th className="px-4 py-2">SKU</th>
               <th className="px-4 py-2">Stock</th>
               <th className="px-4 py-2">Price</th>
@@ -106,25 +204,30 @@ const ProductTable: React.FC<ProductTableProps> = ({ business }) => {
             </tr>
           </thead>
           <tbody>
-            {currentProducts.map((product) => (
+            {products.map((product) => (
               <tr
-                key={product.id}
+                key={`${product._id}-${product.sizeId}`}
                 className="border-b hover:bg-gray-50 text-[14px]"
               >
                 <td className="px-4 py-3">
-                  <input type="checkbox" />
+                  <input type="checkbox" value={`${product._id}-${product.sizeId}`} />
                 </td>
                 <td className="px-4 py-3">
                   <Image
-                    src={product.image}
-                    alt={product.name}
-                    width={120}
-                    height={120}
+                    src={product.images[0]}
+                    alt={product.color}
+                    width={80}
+                    height={80}
                     className="rounded"
                   />
                 </td>
-                <td className="px-4 py-3 font-semibold">{product.name}</td>
-                <td className="px-4 py-3 text-gray-600">{product.details}</td>
+                <td className="px-4 py-3 font-semibold">
+                  {product.productId?.title || '-'}
+                </td>
+                <td className="px-4 py-3 text-gray-600">
+                  {product.productId?.description || '-'}
+                </td>
+                <td className="px-4 py-3">{product.size}</td>
                 <td className="px-4 py-3">{product.sku}</td>
                 <td className="px-4 py-3">
                   {product.stock === 0 ? (
@@ -133,7 +236,9 @@ const ProductTable: React.FC<ProductTableProps> = ({ business }) => {
                     product.stock
                   )}
                 </td>
-                <td className="px-4 py-3">{product.price}</td>
+                <td className="px-4 py-3">
+                  {product.price ? getDisplayPrice(product) : <span>-</span>}
+                </td>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
                     <button className="p-1 rounded bg-custom-orange hover:opacity-90 ">
@@ -148,56 +253,61 @@ const ProductTable: React.FC<ProductTableProps> = ({ business }) => {
                   </div>
                 </td>
               </tr>
-            ))}
+            ))
+            }
           </tbody>
         </table>
       </div>
 
       {/* ✅ Mobile View */}
       <div className="grid gap-4 lg:hidden">
-        {currentProducts.map((product) => (
+        {products.map((product) => (
           <div
-            key={product.id}
+            key={`${product._id}-${product.sizeId}`}
             className="p-4 border rounded shadow hover:bg-gray-50"
           >
             <div className="flex flex-col items-center gap-4">
               <Image
-                src={product.image}
-                alt={product.name}
+                src={product.images[0]}
+                alt={product.color}
                 width={80}
                 height={80}
                 className="rounded"
               />
-              <div>
-                <p className="font-semibold">{product.name}</p>
-                <p className="text-xs text-gray-600">{product.details}</p>
+              <div className="w-full">
+                <p className="text-sm font-semibold">
+                  {product.productId?.title || '-'}
+                </p>
+                <p className="text-xs text-gray-600">
+                  {product.productId?.description || '-'}
+                </p>
+                <p className="text-xs">Size: {product.size}</p>
                 <p className="text-xs">SKU: {product.sku}</p>
                 <p className="text-xs">
                   Stock:{' '}
                   {product.stock === 0 ? (
-                    <span className="font-bold text-red-600">
-                      Out Of Stock
-                    </span>
+                    <span className="font-bold text-red-600">Out Of Stock</span>
                   ) : (
                     product.stock
                   )}
                 </p>
-                <p className="font-bold">{product.price}</p>
+                <p className="text-xs">Price: {getDisplayPrice(product)}</p>
               </div>
             </div>
             <div className="flex gap-2 mt-2">
               <button className="flex-1 p-1 rounded bg-custom-orange hover:opacity-90 ">
-                <Eye className="w-4 h-4 text-white" />
+                <Eye className="w-4 h-4 mx-auto text-white" />
               </button>
               <button className="flex-1 p-1 rounded bg-custom-yellow hover:opacity-90 ">
-                <Pencil className="w-4 h-4 text-white" />
+                <Pencil className="w-4 h-4 mx-auto text-white" />
               </button>
               <button className="flex-1 p-1 bg-gray-400 rounded hover:bg-gray-500">
-                <Trash2 className="w-4 h-4 text-white" />
+                <Trash2 className="w-4 h-4 mx-auto text-white" />
               </button>
             </div>
           </div>
-        ))}
+        ))
+        }
       </div>
 
       {renderPagination()}

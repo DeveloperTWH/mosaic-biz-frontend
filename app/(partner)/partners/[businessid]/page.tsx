@@ -17,12 +17,27 @@ import axios from 'axios';
 
 // Import the Business type
 import { Business } from '@/types/business';
+import { ProductListingItem } from "@/types/product";
+import { Subscription, SubscriptionPlantype } from '@/types/subscription';
 
 const DashboardPage = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [businessData, setBusinessData] = useState<Business | null>(null);
+  const [products, setProducts] = useState<ProductListingItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [outOfStockOrUnpublished, setOutOfStockOrUnpublished] = useState(0);
+  const [foodItems, setFoodItems] = useState<any[]>([]);
+  const [services, setServices] = useState<any[]>([]);
+  const [subscription, setSubscription] = useState<Subscription | null>(null);
+  const [subscriptionPlan, setSubscriptionPlan] = useState<SubscriptionPlantype | null>(null);
+
+  const [isLoading, setIsLoading] = useState(false);
+
+
 
   const { businessid } = useParams();  // Here `businessid` corresponds to [businessid] in the route
 
@@ -35,91 +50,120 @@ const DashboardPage = () => {
     // Fetch business data first
     const fetchBusinessData = async () => {
       try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/business/${businessid}`, {
-          withCredentials: true,
-        });
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/business/${businessid}`,
+          { withCredentials: true }
+        );
 
         if (response.status === 200) {
-          setBusinessData(response.data.data);
-          console.log('Business Data:', response.data.data);
+          const { business, subscription, subscriptionPlan } = response.data.data;
 
-          const listingType = response.data.data.listingType; // Assuming this field exists in your response
-          console.log('Business Listing Type:', listingType);
+          setBusinessData(business);
+          setSubscription(subscription);
+          setSubscriptionPlan(subscriptionPlan);
 
-          // Fetch the listing data based on business listing type
-          if (listingType === 'food') {
-            fetchFoodData(response.data.data._id);
-          } else if (listingType === 'service') {
-            fetchServiceData(response.data.data._id);
-          } else if (listingType === 'product') {
-            fetchProductData(response.data.data._id);
+          console.log("Business Data:", business);
+          console.log("Subscription:", subscription);
+          console.log("Subscription Plan:", subscriptionPlan);
+
+          const listingType = business.listingType;
+          console.log("Business Listing Type:", listingType);
+
+          if (listingType === "food") {
+            fetchFoodData(business._id);
+          } else if (listingType === "service") {
+            fetchServiceData(business._id);
+          } else if (listingType === "product") {
+            fetchProductData(business._id);
           }
-
         } else {
-          throw new Error('Failed to fetch business data');
+          throw new Error("Failed to fetch business data");
         }
-
-      } catch (err:any) {
-        console.log('Error fetching business data:', err);
+      } catch (err: any) {
+        console.log("Error fetching business data:", err);
         setError(err.message);
+        setLoading(false);
       } finally {
         setLoading(false);
       }
     };
 
-    const fetchFoodData = async (businessId : string) => {
-      try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/private/food/list`, {
-          params: {
-            businessId: businessId,
-            page: 1,
-            limit: 10,
-          },
-        });
-        console.log('Food Data:', response.data.data);  // Log food data
-      } catch (err) {
-        console.log('Error fetching food data:', err);
-        setError('Error fetching food items.');
-      }
-    };
 
-    const fetchServiceData = async (businessId : string) => {
-      try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/private/services/list`, {
-          params: {
-            businessId: businessId,
-            page: 1,
-            limit: 10,
-          },
-        });
-        console.log('Service Data:', response.data.data);  // Log service data
-      } catch (err) {
-        console.log('Error fetching service data:', err);
-        setError('Error fetching services.');
-      }
-    };
-
-    const fetchProductData = async (businessId : string) => {
-      try {
-        console.log(businessId, 'Business ID for product fetch');
-        
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/private/products/list`, {
-          withCredentials: true,
-          params: {
-            businessId: businessId,
-            page: 1,
-            limit: 10,
-          },
-        });
-        console.log('Product Data:', response.data.data);  // Log product data
-      } catch (err:any) {
-        console.log('Error fetching product data:', err);
-        setError('Error fetching products.');
-      }
-    };
 
     fetchBusinessData();  // Fetch the business data first
   }, [businessid]);  // Trigger effect when `businessid` changes
+
+
+
+
+
+  const fetchFoodData = async (businessId: string, page: number = 1, limit: number = 4) => {
+    try {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/private/food/list`, {
+        params: { businessId, page, limit },
+      });
+
+      const { data, total, totalPages } = response.data;
+      setFoodItems(data);
+      setTotal(total)
+      setTotalPages(totalPages || Math.ceil(total / limit));
+    } catch (err) {
+      console.log('Error fetching food data:', err);
+      setError('Error fetching food items.');
+    }
+  };
+
+  const fetchServiceData = async (businessId: string, page: number = 1, limit: number = 4) => {
+    try {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/private/services/list`, {
+        params: { businessId, page, limit },
+      });
+
+      const { data, total, totalPages } = response.data;
+      setServices(data);
+      setTotal(total);
+      setTotalPages(totalPages || Math.ceil(total / limit));
+    } catch (err) {
+      console.log('Error fetching service data:', err);
+      setError('Error fetching services.');
+    }
+  };
+
+
+  const fetchProductData = async (businessId: string, page: number = 1, limit: number = 4) => {
+    try {
+      setIsLoading(true);
+
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/private/products/list`,
+        {
+          withCredentials: true,
+          params: {
+            businessId,
+            page,
+            limit,
+          },
+        }
+      );
+
+      const { data, total, totalPages, sellableCount } = response.data; // ✅ Ensure backend returns these
+      setProducts(data as ProductListingItem[]);
+      setTotal(total);
+      setTotalPages(totalPages || Math.ceil(total / limit)); // Save totalPages in state
+      setOutOfStockOrUnpublished(total - sellableCount);
+
+
+    } catch (err: any) {
+      console.log('Error fetching product data:', err);
+      setError('Error fetching products.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+
+
+
 
 
   if (loading) {
@@ -139,17 +183,28 @@ const DashboardPage = () => {
           <Suspense fallback={<div>Loading Business Data...</div>}>
             {businessData && (
               <>
-                <OverviewCards business={businessData} />
+                <OverviewCards listingType={businessData.listingType} total={total} totalReviews={0} totalOrdersOrBookings={0} outOfStockOrUnpublished={outOfStockOrUnpublished} />
                 <div className="flex flex-col gap-6 lg:flex-row">
                   <div className="w-full lg:w-3/4">
                     <SalesSection business={businessData} />
                   </div>
                   <div className="w-full lg:w-1/4">
-                    <SubscriptionPlan business={businessData} />
+                    <SubscriptionPlan subscriptionPlan={subscriptionPlan} subscription={subscription} />
                   </div>
                 </div>
 
-                <ProductTable business={businessData} />
+                <ProductTable
+                  products={products}
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={(page) => {
+                    setCurrentPage(page);
+                    fetchProductData(businessData._id, page); // call API with new page
+                  }}
+                  isLoading={isLoading}
+                  error={error}
+                />
+
                 <ReviewSummary business={businessData} />
               </>
             )}

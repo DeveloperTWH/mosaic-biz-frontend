@@ -11,6 +11,11 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'my-bucket.s3.amazonaws.com',
       },
+      {
+        protocol: "https", // ✅ Add this
+        hostname: "example.com",
+      },
+
     ],
   },
 };
