@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useParams } from 'next/navigation';
+import { logoutUser } from "@/utils/logoutUser";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -83,7 +84,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
         </nav>
 
         <div>
-          <button className="flex items-center w-full gap-3 px-4 py-2 text-sm font-medium text-white hover:bg-red-600">
+          <button
+            onClick={async () => await logoutUser()}
+            className="flex items-center w-full gap-3 px-4 py-2 text-sm font-medium text-white hover:bg-red-600">
             <LogOut className="w-5 h-5" /> Logout
           </button>
         </div>

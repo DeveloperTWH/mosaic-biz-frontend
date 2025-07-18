@@ -3,7 +3,9 @@
 import React from 'react';
 import { Eye, Pencil, Trash2, Plus } from 'lucide-react';
 import Image from 'next/image';
+import Link from "next/link";
 import { ProductListingItem } from '@/types/product';
+import { useParams } from "next/navigation";
 
 interface ProductTableProps {
   products: ProductListingItem[];
@@ -22,6 +24,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
   isLoading = false,
   error
 }) => {
+  const { businessid } = useParams();
   const changePage = (page: number) => {
     if (page >= 1 && page <= totalPages) onPageChange(page);
   };
@@ -182,9 +185,12 @@ const ProductTable: React.FC<ProductTableProps> = ({
     <div className="p-6 bg-white rounded shadow">
       <div className="flex flex-col items-start justify-between gap-2 mb-4 sm:flex-row sm:items-center">
         <h3 className="text-xl font-bold">Products</h3>
-        <button className="flex items-center w-full gap-1 px-3 py-1 text-white rounded bg-custom-orange hover:opacity-90 sm:w-auto">
+        <Link
+          href={`/partners/${businessid}/inventory/add-product`} // ✅ Change to your actual route
+          className="flex items-center w-full gap-1 px-3 py-1 text-white rounded bg-custom-orange hover:opacity-90 sm:w-auto"
+        >
           <Plus className="w-4 h-4" /> Add Product
-        </button>
+        </Link>
       </div>
 
       {/* ✅ Desktop Table View */}

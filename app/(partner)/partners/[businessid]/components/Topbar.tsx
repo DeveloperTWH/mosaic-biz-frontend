@@ -1,13 +1,26 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Bell, Globe, Search, Menu } from 'lucide-react';
+import Image from 'next/image';
 
 const Topbar = ({
   setIsSidebarOpen,
 }: {
   setIsSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
+
+  const [gender, setGender] = useState<string | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const session = localStorage.getItem("user_session");
+    setIsLoggedIn(session === 'true');
+
+    const userGender = localStorage.getItem("user_gender");
+    setGender(userGender);
+  }, []);
+
   return (
     <header className="flex items-center justify-between w-full px-6 py-4 bg-white shadow">
       <div className="flex items-center gap-4">
@@ -46,9 +59,13 @@ const Topbar = ({
         </button>
 
         {/* Profile */}
-        <div className="flex items-center justify-center w-8 h-8 font-semibold text-white rounded-full bg-sky-500">
-          M
-        </div>
+        <Image
+          src={gender === "female" ? "/female-avatar.png" : "/male-avatar.png"}
+          width={40}
+          height={40}
+          alt="Profile"
+          className="border border-gray-300 rounded-full"
+        />
       </div>
     </header>
   );

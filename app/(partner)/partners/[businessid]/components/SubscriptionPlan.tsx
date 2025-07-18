@@ -62,8 +62,7 @@ const SubscriptionPlan: React.FC<SubscriptionPlanProps> = ({
         <div className="flex justify-between">
           <span className="text-gray-600">Billing Amount :</span>
           <span className="font-medium text-gray-800">
-            ${subscriptionPlan.price} /{' '}
-            {subscriptionPlan.durationInDays >= 30 ? 'Month' : 'Day(s)'}
+            ${subscriptionPlan.price} / Year
           </span>
         </div>
         <div className="flex justify-between">

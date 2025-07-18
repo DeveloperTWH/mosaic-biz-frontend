@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import { useParams } from 'next/navigation';  // Get `params` from Next.js
+import { useBusinessStore } from '@/app/store/businessStore'; // ✅ Import store
 import Sidebar from './components/Sidebar';
 import Topbar from './components/Topbar';
 import OverviewCards from './components/OverviewCards';
@@ -21,6 +22,7 @@ import { ProductListingItem } from "@/types/product";
 import { Subscription, SubscriptionPlantype } from '@/types/subscription';
 
 const DashboardPage = () => {
+  const setBusiness = useBusinessStore((state) => state.setBusiness);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [businessData, setBusinessData] = useState<Business | null>(null);
   const [products, setProducts] = useState<ProductListingItem[]>([]);
@@ -61,13 +63,9 @@ const DashboardPage = () => {
           setBusinessData(business);
           setSubscription(subscription);
           setSubscriptionPlan(subscriptionPlan);
-
-          console.log("Business Data:", business);
-          console.log("Subscription:", subscription);
-          console.log("Subscription Plan:", subscriptionPlan);
+          setBusiness(business);
 
           const listingType = business.listingType;
-          console.log("Business Listing Type:", listingType);
 
           if (listingType === "food") {
             fetchFoodData(business._id);
@@ -162,24 +160,22 @@ const DashboardPage = () => {
   };
 
 
-
-
-
-
-  if (loading) {
-    return <LoadingPage />;  // Show loading component
-  }
-
-  if (error) {
-    return <NotFoundPage />;  // Show 404 Not Found component
-  }
-
   return (
     <div className="flex h-screen bg-[#EBEAE2]">
       <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
       <div className="flex flex-col flex-1 overflow-hidden">
         <Topbar setIsSidebarOpen={setIsSidebarOpen} />
         <main className="flex-1 p-2 space-y-6 overflow-y-auto lg:p-6">
+          {
+            loading && (
+              <LoadingPage />
+            )
+          }
+          {
+            error && (
+              <NotFoundPage />
+            )
+          }
           <Suspense fallback={<div>Loading Business Data...</div>}>
             {businessData && (
               <>
