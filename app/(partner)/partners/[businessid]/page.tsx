@@ -162,7 +162,7 @@ const DashboardPage = () => {
 
   return (
     <div className="flex h-screen bg-[#EBEAE2]">
-      <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
+      <Sidebar businessName={businessData?.businessName} isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
       <div className="flex flex-col flex-1 overflow-hidden">
         <Topbar setIsSidebarOpen={setIsSidebarOpen} />
         <main className="flex-1 p-2 space-y-6 overflow-y-auto lg:p-6">

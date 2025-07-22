@@ -18,9 +18,10 @@ import { logoutUser } from "@/utils/logoutUser";
 interface SidebarProps {
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  businessName?: string;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
+const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, businessName  }) => {
   const pathname = usePathname();
   const params = useParams();
   const businessId = params.businessid as string; // ✅ Get businessId from URL
@@ -59,10 +60,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
         <div className="flex flex-col items-center p-6">
           <div className="p-1 border-2 border-white rounded-full">
             <div className="flex items-center justify-center w-12 h-12 text-lg font-bold text-white bg-red-600 rounded-full">
-              R
+              {businessName ? businessName.charAt(0).toUpperCase() : 'B'}
             </div>
           </div>
-          <h2 className="mt-2 text-lg font-semibold text-white">Ray Ban</h2>
+          <h2 className="mt-2 text-lg font-semibold text-white capitalize">{businessName}</h2>
         </div>
 
         <nav className="flex-1 py-6 space-y-2 overflow-y-auto custom-scrollbar">

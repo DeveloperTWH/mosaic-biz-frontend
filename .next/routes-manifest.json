@@ -55,6 +55,14 @@
       "namedRegex": "^/partners/(?<nxtPbusinessid>[^/]+?)/inventory(?:/)?$"
     },
     {
+      "page": "/partners/[businessid]/my-account",
+      "regex": "^/partners/([^/]+?)/my\\-account(?:/)?$",
+      "routeKeys": {
+        "nxtPbusinessid": "nxtPbusinessid"
+      },
+      "namedRegex": "^/partners/(?<nxtPbusinessid>[^/]+?)/my\\-account(?:/)?$"
+    },
+    {
       "page": "/products/[productid]",
       "regex": "^/products/([^/]+?)(?:/)?$",
       "routeKeys": {
