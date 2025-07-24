@@ -24,7 +24,7 @@ export async function middleware(req: NextRequest) {
     // 🔐 Redirect authenticated users away from login/signup
     if (token && (path === '/login' || path === '/signup')) {
         try {
-            const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+            const secret = new TextEncoder().encode("your_secret_key");
             const { payload } = await jwtVerify(token, secret) as { payload: { role: string } };
 
             return NextResponse.redirect(new URL(getRedirectPathByRole(payload.role), req.url));
