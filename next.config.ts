@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'my-bucket.s3.amazonaws.com',
+        hostname: 'mosiac-biz-hub.s3.us-east-1.amazonaws.com',
       },
       {
         protocol: "https", // ✅ Add this

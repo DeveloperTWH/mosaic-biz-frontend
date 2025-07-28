@@ -98,6 +98,7 @@ const DashboardPage = () => {
   const fetchFoodData = async (businessId: string, page: number = 1, limit: number = 4) => {
     try {
       const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/private/food/list`, {
+        withCredentials: true,
         params: { businessId, page, limit },
       });
 
@@ -114,6 +115,7 @@ const DashboardPage = () => {
   const fetchServiceData = async (businessId: string, page: number = 1, limit: number = 4) => {
     try {
       const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/private/services/list`, {
+        withCredentials: true,
         params: { businessId, page, limit },
       });
 
@@ -144,11 +146,13 @@ const DashboardPage = () => {
         }
       );
 
-      const { data, total, totalPages, sellableCount } = response.data; // ✅ Ensure backend returns these
+      const { data, total, totalPages, sellableCount,totalVariants } = response.data; // ✅ Ensure backend returns these
       setProducts(data as ProductListingItem[]);
-      setTotal(total);
+      setTotal(totalVariants);
       setTotalPages(totalPages || Math.ceil(total / limit)); // Save totalPages in state
-      setOutOfStockOrUnpublished(total - sellableCount);
+      console.log(sellableCount, total);
+      
+      setOutOfStockOrUnpublished(totalVariants - sellableCount);
 
 
     } catch (err: any) {

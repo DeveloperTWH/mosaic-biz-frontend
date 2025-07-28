@@ -71,10 +71,10 @@ const Page = () => {
                     params: { businessId, page, limit },
                 }
             );
-            const { data, total, totalPages,sellableCount } = response.data;
+            const { data, total, totalPages,sellableCount,totalVariants } = response.data;
             setProducts(data);
-            setTotal(total);
-            setOutofStockOrUnpublised(total - sellableCount);
+            setTotal(totalVariants);
+            setOutofStockOrUnpublised(totalVariants - sellableCount);
             setTotalPages(totalPages || Math.ceil(total / limit));
         } catch (err) {
             console.error("Error fetching products:", err);

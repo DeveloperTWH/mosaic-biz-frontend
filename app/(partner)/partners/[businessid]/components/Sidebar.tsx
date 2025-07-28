@@ -21,7 +21,7 @@ interface SidebarProps {
   businessName?: string;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, businessName  }) => {
+const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, businessName }) => {
   const pathname = usePathname();
   const params = useParams();
   const businessId = params.businessid as string; // ✅ Get businessId from URL
@@ -69,7 +69,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, businessName  }) =
         <nav className="flex-1 py-6 space-y-2 overflow-y-auto custom-scrollbar">
           {navItems.map((item, i) => {
             const link = getLink(item.label);
-            const isActive = pathname === link;
+            const isActive =
+              item.label === "Dashboard"
+                ? pathname === link // ✅ Dashboard only active on exact path
+                : pathname.startsWith(link); // ✅ Others active for subpaths too
+
 
             return (
               <Link
