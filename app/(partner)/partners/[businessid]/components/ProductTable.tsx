@@ -8,6 +8,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useBusinessStore } from '@/app/store/businessStore';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import DeleteConfirmationModal from '@/app/components/DeleteConfirmationModal';
 
 
 
@@ -56,7 +57,12 @@ const ProductTable: React.FC<ProductTableProps> = ({
   const { business } = useBusinessStore();
   const [expanded, setExpanded] = useState<string[]>([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{
+    type: 'product' | 'variant';
+    productId: string;
+    variantId?: string;
+  }>({ type: 'product', productId: '' });
+
 
 
 
@@ -120,20 +126,28 @@ const ProductTable: React.FC<ProductTableProps> = ({
     );
   };
 
-  const handleDeleteProduct = async () => {
+  const handleDelete = async () => {
     try {
-      await axios.delete(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/product/delete-product/${selectedProductId}`, {
-        withCredentials: true,
-      });
-      toast.success('Product deleted successfully');
-      router.refresh();
-    } catch (error) {
-      console.error('Failed to delete product', error);
-      toast.error('Failed to delete product');
+      if (deleteTarget.type === 'product') {
+        await axios.delete(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/product/delete-product/${deleteTarget.productId}`, {
+          withCredentials: true,
+        });
+        toast.success('Product deleted successfully');
+      } else {
+        await axios.delete(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/product/delete-variant/${deleteTarget.productId}/${deleteTarget.variantId}`, {
+          withCredentials: true,
+        });
+        toast.success('Variant deleted successfully');
+      }
+
+      changePage(currentPage)
+    } catch (err) {
+      toast.error('Delete failed');
     } finally {
       setShowDeleteModal(false);
     }
   };
+
 
 
 
@@ -149,8 +163,8 @@ const ProductTable: React.FC<ProductTableProps> = ({
         </Link>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm text-left border-collapse">
+      <div className="hidden overflow-x-auto md:block">
+        <table className="w-full min-w-[800px text-sm text-left border-collapse">
           <thead className="bg-[#333333] text-white">
             <tr>
               <th className="px-4 py-2">Toggle</th>
@@ -190,7 +204,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                   <td className="px-4 py-3 text-gray-600 align-top">{product.description}</td>
                   <td className="px-4 py-3 text-sm align-top">{product.variants.length} Variants</td>
                   <td className="px-4 py-3 align-top">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-start gap-2">
                       <Link href={`/products/view/${product._id}`}>
                         <button className="p-1 rounded bg-custom-orange hover:opacity-90">
                           <Eye className="w-4 h-4 text-white" />
@@ -204,9 +218,10 @@ const ProductTable: React.FC<ProductTableProps> = ({
                       <button
                         type="button"
                         onClick={() => {
-                          setSelectedProductId(product._id);  // Pass the ID
-                          setShowDeleteModal(true);          // Show modal
+                          setDeleteTarget({ type: 'product', productId: product._id });
+                          setShowDeleteModal(true);
                         }}
+
                         className="p-1 bg-gray-400 rounded hover:bg-gray-500">
                         <Trash2 className="w-4 h-4 text-white" />
                       </button>
@@ -229,7 +244,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                                   Variant Color: <span className="text-black">{variant.color}</span>
                                 </p>
                                 <div className="flex gap-2">
-                                  {variant.images.slice(0, 2).map((img, i) => (
+                                  {variant.images.slice(0, 3).map((img, i) => (
                                     <div key={i} className="w-16 h-16 overflow-hidden border rounded">
                                       <Image
                                         src={img}
@@ -255,19 +270,44 @@ const ProductTable: React.FC<ProductTableProps> = ({
                                     <p><strong>Size:</strong> {size.size}</p>
                                     <p><strong>SKU:</strong> {size.sku}</p>
                                     <p><strong>Stock:</strong> {size.stock}</p>
-                                    <p><strong>Price:</strong> ₹{size.price}</p>
-                                    {size.salePrice && (
-                                      <p className="text-green-600"><strong>Sale:</strong> ₹{size.salePrice}</p>
+                                    {variant.isPublished ? (
+                                      <span className="text-xs font-medium text-green-600">Published</span>
+                                    ) : (
+                                      <span className="text-xs font-medium text-yellow-600">Unpublished</span>
                                     )}
+
+                                    {size.salePrice && size.discountEndDate && new Date() < new Date(size.discountEndDate) ? (
+                                      <>
+                                        <p>
+                                          <strong>Price:</strong>{' '}
+                                          <span className="text-gray-500 line-through">₹{size.price}</span>{' '}
+                                          <span className="font-semibold text-green-600">₹{size.salePrice}</span>
+                                        </p>
+                                        <p className="text-sm text-gray-600">
+                                          <strong>Offer valid till:</strong> {new Date(size.discountEndDate).toLocaleDateString()}
+                                        </p>
+                                      </>
+                                    ) : (
+                                      <p><strong>Price:</strong> ₹{size.price}</p>
+                                    )}
+
 
                                     <div className="absolute flex gap-1 top-2 right-2">
                                       <button className="p-1 bg-blue-500 rounded hover:bg-blue-600" title="View">
                                         <Eye className="w-4 h-4 text-white" />
                                       </button>
-                                      <button className="p-1 bg-yellow-500 rounded hover:bg-yellow-600" title="Edit">
-                                        <Pencil className="w-4 h-4 text-white" />
-                                      </button>
-                                      <button className="p-1 bg-gray-500 rounded hover:bg-gray-600" title="Delete">
+                                      <Link href={`/partners/${businessid}/inventory/edit/${product._id}/${variant.variantId}`}>
+                                        <button className="h-full p-1 bg-yellow-500 rounded hover:bg-yellow-600" title="Edit">
+                                          <Pencil className="w-4 h-4 text-white" />
+                                        </button>
+                                      </Link>
+                                      <button
+                                        onClick={() => {
+                                          setDeleteTarget({ type: 'variant', productId: product._id, variantId: variant.variantId });
+                                          setShowDeleteModal(true);
+                                        }}
+
+                                        className="p-1 bg-gray-500 rounded hover:bg-gray-600" title="Delete">
                                         <Trash2 className="w-4 h-4 text-white" />
                                       </button>
                                     </div>
@@ -279,12 +319,14 @@ const ProductTable: React.FC<ProductTableProps> = ({
                         ))}
 
                         {/* Add Variant Block */}
-                        <div className="flex items-center justify-center h-full p-4 text-center bg-gray-100 border border-dashed rounded-md cursor-pointer hover:border-gray-500">
-                          <button className="flex flex-col items-center justify-center gap-2 text-gray-600 hover:text-black">
-                            <Plus className="w-6 h-6" />
-                            <span className="text-sm font-medium">Add Variant</span>
-                          </button>
-                        </div>
+                        <Link href={`/partners/${businessid}/inventory/edit/${product._id}/add-variant`}>
+                          <div className="flex items-center justify-center h-full p-4 text-center bg-gray-100 border border-dashed rounded-md cursor-pointer hover:border-gray-500">
+                            <button className="flex flex-col items-center justify-center gap-2 text-gray-600 hover:text-black">
+                              <Plus className="w-6 h-6" />
+                              <span className="text-sm font-medium">Add Variant</span>
+                            </button>
+                          </div>
+                        </Link>
                       </div>
                     </td>
                   </tr>
@@ -296,33 +338,118 @@ const ProductTable: React.FC<ProductTableProps> = ({
           </tbody>
         </table>
       </div>
+      {/* Mobile Cards */}
+      <div className="space-y-4 md:hidden">
+        {products.map(product => (
+          <div key={product._id} className="p-4 bg-white border rounded shadow-sm">
+            <div className="flex items-start gap-4">
+              {product.coverImage && (
+                <Image
+                  src={product.coverImage}
+                  alt="cover"
+                  width={56}
+                  height={56}
+                  className="object-cover rounded w-14 h-14"
+                />
+              )}
+              <div>
+                <h4 className="text-base font-semibold">{product.title}</h4>
+                <p className="text-sm text-gray-600 line-clamp-2">{product.description}</p>
+                <p className="mt-1 text-xs text-gray-500">{product.variants.length} Variants</p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2 mt-3">
+              <Link href={`/products/view/${product._id}`}>
+                <button className="p-1 rounded bg-custom-orange hover:opacity-90">
+                  <Eye className="w-4 h-4 text-white" />
+                </button>
+              </Link>
+              <Link href={`/partners/${businessid}/inventory/edit/${product._id}`}>
+                <button className="p-1 rounded bg-custom-yellow hover:opacity-90">
+                  <Pencil className="w-4 h-4 text-white" />
+                </button>
+              </Link>
+              <button
+                type="button"
+                onClick={() => {
+                  setDeleteTarget({ type: 'product', productId: product._id });
+                  setShowDeleteModal(true);
+                }}
+                className="p-1 bg-gray-400 rounded hover:bg-gray-500"
+              >
+                <Trash2 className="w-4 h-4 text-white" />
+              </button>
+            </div>
+
+            {/* Expand variants */}
+            {expanded.includes(product._id) && (
+              <div className="mt-4 space-y-4">
+                {product.variants.map(variant => (
+                  <div key={variant.variantId} className="p-4 border rounded bg-gray-50">
+                    <p className="text-sm font-semibold">
+                      Color: <span className="text-black">{variant.color}</span>
+                    </p>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {variant.images.slice(0, 3).map((img, i) => (
+                        <Image
+                          key={i}
+                          src={img}
+                          alt={`variant-${i}`}
+                          width={48}
+                          height={48}
+                          className="object-cover w-12 h-12 border rounded"
+                        />
+                      ))}
+                    </div>
+                    <div className="mt-3 space-y-2">
+                      {variant.sizes.map(size => (
+                        <div
+                          key={size.sizeId}
+                          className={`p-2 rounded-md border ${size.stock === 0
+                            ? 'bg-red-100 text-red-700'
+                            : 'bg-white'
+                            }`}
+                        >
+                          <p className="text-sm"><strong>Size:</strong> {size.size}</p>
+                          <p className="text-sm"><strong>Stock:</strong> {size.stock}</p>
+                          <p className="text-sm"><strong>SKU:</strong> {size.sku}</p>
+                          {variant.isPublished ? (
+                            <span className="text-xs font-medium text-green-600">Published</span>
+                          ) : (
+                            <span className="text-xs font-medium text-yellow-600">Unpublished</span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <button onClick={() => toggleExpand(product._id)} className="mt-3 text-sm text-blue-600 underline">
+              {expanded.includes(product._id) ? 'Hide Variants' : 'Show Variants'}
+            </button>
+          </div>
+        ))}
+      </div>
+
 
       {renderPagination()}
 
       {showDeleteModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="w-full max-w-md p-6 bg-white rounded-md shadow-lg">
-            <h3 className="mb-2 text-lg font-semibold text-red-600">Confirm Delete</h3>
-            <p className="mb-4 text-sm text-gray-700">
-              Are you sure you want to delete this product? This action will also delete all its variants.
-            </p>
-            <div className="flex justify-end gap-4">
-              <button
-                onClick={() => setShowDeleteModal(false)}
-                className="px-4 py-1 text-sm text-gray-600 bg-gray-200 rounded"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDeleteProduct}
-                className="px-4 py-1 text-sm text-white bg-red-600 rounded"
-              >
-                Confirm Delete
-              </button>
-            </div>
-          </div>
-        </div>
+        <DeleteConfirmationModal
+          onCancel={() => setShowDeleteModal(false)}
+          onConfirm={handleDelete}
+          title="Confirm Delete"
+          message={
+            deleteTarget.type === 'product'
+              ? 'Are you sure you want to delete this product? This action will also delete all its variants.'
+              : 'Are you sure you want to delete this variant?'
+          }
+        />
       )}
+
 
     </div>
   );

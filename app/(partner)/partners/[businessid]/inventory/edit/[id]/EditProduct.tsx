@@ -6,6 +6,7 @@ import axios from 'axios';
 import type { ProductPayload } from '@/types/product';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
+import { uploadToS3 } from '@/utils/s3Uploader';
 
 
 const EditProductPage = () => {
@@ -73,9 +74,10 @@ const EditProductPage = () => {
 
     const handleSpecChange = (index: number, key: 'key' | 'value', value: string) => {
         const specs = [...(productData.specifications || [])];
-        specs[index][key] = value;
+        specs[index] = { ...specs[index], [key]: value }; // ✅ immutability fix
         setProductData((prev) => ({ ...prev, specifications: specs }));
     };
+
 
     const addSpecification = () => {
         setProductData((prev) => ({
@@ -115,9 +117,24 @@ const EditProductPage = () => {
         if (!productid) return;
         setIsSubmitting(true);
         try {
+            let coverImageUrl = productData.coverImage;
+
+            // 🖼️ Upload to S3 if it's a blob URL
+            if (coverImageUrl.startsWith("blob:")) {
+                const blob = await fetch(coverImageUrl).then((r) => r.blob());
+                const fileObj = new File([blob], `cover-${Date.now()}.jpg`, {
+                    type: blob.type || "image/jpeg",
+                });
+                coverImageUrl = await uploadToS3(fileObj); // make sure you have this function
+            }
+
+            const updatedPayload = {
+                ...productData,
+                coverImage: coverImageUrl,
+            };
             await axios.put(
                 `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/product/${productid}`,
-                productData,
+                updatedPayload,
                 { withCredentials: true }
             );
             setInitialData(productData);

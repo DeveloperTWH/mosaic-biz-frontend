@@ -72,6 +72,25 @@
       "namedRegex": "^/partners/(?<nxtPbusinessid>[^/]+?)/inventory/edit/(?<nxtPid>[^/]+?)(?:/)?$"
     },
     {
+      "page": "/partners/[businessid]/inventory/edit/[id]/add-variant",
+      "regex": "^/partners/([^/]+?)/inventory/edit/([^/]+?)/add\\-variant(?:/)?$",
+      "routeKeys": {
+        "nxtPbusinessid": "nxtPbusinessid",
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/partners/(?<nxtPbusinessid>[^/]+?)/inventory/edit/(?<nxtPid>[^/]+?)/add\\-variant(?:/)?$"
+    },
+    {
+      "page": "/partners/[businessid]/inventory/edit/[id]/[variantId]",
+      "regex": "^/partners/([^/]+?)/inventory/edit/([^/]+?)/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPbusinessid": "nxtPbusinessid",
+        "nxtPid": "nxtPid",
+        "nxtPvariantId": "nxtPvariantId"
+      },
+      "namedRegex": "^/partners/(?<nxtPbusinessid>[^/]+?)/inventory/edit/(?<nxtPid>[^/]+?)/(?<nxtPvariantId>[^/]+?)(?:/)?$"
+    },
+    {
       "page": "/partners/[businessid]/my-account",
       "regex": "^/partners/([^/]+?)/my\\-account(?:/)?$",
       "routeKeys": {
