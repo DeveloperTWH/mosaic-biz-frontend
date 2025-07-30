@@ -20,9 +20,10 @@ import axios from 'axios';
 import { Business } from '@/types/business';
 import { ProductListingItem } from "@/types/product";
 import { Subscription, SubscriptionPlantype } from '@/types/subscription';
+import ServiceTable from './components/ServiceTable';
 
 const DashboardPage = () => {
-  const setBusiness = useBusinessStore((state) => state.setBusiness);
+  const { business, setBusiness, clearBusiness } = useBusinessStore();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [businessData, setBusinessData] = useState<Business | null>(null);
   const [products, setProducts] = useState<ProductListingItem[]>([]);
@@ -146,12 +147,12 @@ const DashboardPage = () => {
         }
       );
 
-      const { data, total, totalPages, sellableCount,totalVariants } = response.data; // ✅ Ensure backend returns these
+      const { data, total, totalPages, sellableCount, totalVariants } = response.data; // ✅ Ensure backend returns these
       setProducts(data as ProductListingItem[]);
       setTotal(totalVariants);
       setTotalPages(totalPages || Math.ceil(total / limit)); // Save totalPages in state
       console.log(sellableCount, total);
-      
+
       setOutOfStockOrUnpublished(totalVariants - sellableCount);
 
 
@@ -193,17 +194,33 @@ const DashboardPage = () => {
                   </div>
                 </div>
 
-                <ProductTable
-                  products={products}
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={(page) => {
-                    setCurrentPage(page);
-                    fetchProductData(businessData._id, page); // call API with new page
-                  }}
-                  isLoading={isLoading}
-                  error={error}
-                />
+                {business?.listingType === 'product' && (
+                  <ProductTable
+                    products={products}
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={(page) => {
+                      setCurrentPage(page);
+                      fetchProductData(businessData._id, page); // call API with new page
+                    }}
+                    isLoading={isLoading}
+                    error={error}
+                  />
+                )}
+
+                {business?.listingType === 'service' && (
+                  <ServiceTable
+                    services={services}
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={(page) => {
+                      setCurrentPage(page);
+                      fetchServiceData(business._id, page); // call API with new page
+                    }}
+                    isLoading={isLoading}
+                    error={error}
+                  />
+                )}
 
                 <ReviewSummary business={businessData} />
               </>

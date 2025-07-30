@@ -10,6 +10,7 @@ import axios from 'axios';
 import LoadingPage from '../../components/LoadingPage';
 import NotFoundPage from '../../components/NotFoundPage';
 import AddProductPage from './AddProductPage';
+import Link from 'next/link';
 
 const page = () => {
     const { businessid } = useParams();
@@ -33,7 +34,7 @@ const page = () => {
                 setBusiness(fetchedBusiness);
             } catch (error) {
                 console.error("Error loading business:", error);
-            } finally{
+            } finally {
                 setIsLoading(false);
             }
         };
@@ -41,6 +42,26 @@ const page = () => {
         loadBusiness();
     }, [businessid]);
 
+
+    if (!business || isLoading) return null;
+
+    if (business.listingType !== 'product') {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[100vh] text-center px-4">
+                <div className="max-w-md p-6 bg-white border border-red-200 rounded-lg shadow">
+                    <h1 className="mb-2 text-3xl font-bold text-red-600">403 - Not Authorized</h1>
+                    <p className="mb-4 text-gray-700">
+                        You don’t have permission to access this page. This section is only available for service-based businesses.
+                    </p>
+                    <Link href={`/partners/${business.slug}`}>
+                        <button className="px-4 py-2 text-white transition bg-red-600 rounded hover:bg-red-700">
+                            Go Back to Dashboard
+                        </button>
+                    </Link>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex h-screen bg-[#EBEAE2]">

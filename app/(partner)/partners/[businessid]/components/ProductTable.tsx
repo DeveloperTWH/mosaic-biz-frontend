@@ -149,7 +149,18 @@ const ProductTable: React.FC<ProductTableProps> = ({
   };
 
 
-
+  if (products.length === 0) {
+    return (
+      <div className="p-6 text-center bg-white border rounded shadow-sm">
+        <p className="mb-4 text-gray-700 text-md">No products found for this business.</p>
+        <Link href={`/partners/${businessid}/inventory/add-product`}>
+          <button className="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700">
+            + Add Product
+          </button>
+        </Link>
+      </div>
+    )
+  }
 
   return (
     <div className="p-4 bg-white rounded shadow md:p-6">

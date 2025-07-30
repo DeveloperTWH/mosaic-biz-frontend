@@ -11,6 +11,7 @@ import axios from 'axios';
 import { PackageSearch, Star, AlertTriangle } from "lucide-react";
 import LoadingPage from '../components/LoadingPage';
 import NotFoundPage from '../components/NotFoundPage';
+import ServiceTable from '../components/ServiceTable';
 
 
 
@@ -71,7 +72,7 @@ const Page = () => {
                     params: { businessId, page, limit },
                 }
             );
-            const { data, total, totalPages,sellableCount,totalVariants } = response.data;
+            const { data, total, totalPages, sellableCount, totalVariants } = response.data;
             setProducts(data);
             setTotal(totalVariants);
             setOutofStockOrUnpublised(totalVariants - sellableCount);
@@ -85,6 +86,8 @@ const Page = () => {
     };
 
     const fetchServices = async (businessId: string, page = 1, limit = 10) => {
+        console.log("here i am");
+        
         try {
             setIsLoading(true);
             const response = await axios.get(
@@ -95,6 +98,8 @@ const Page = () => {
                 }
             );
             const { data, total, totalPages } = response.data;
+            console.log(response.data);
+            
             setServices(data);
             setTotal(total);
             setTotalPages(totalPages || Math.ceil(total / limit));
@@ -143,7 +148,7 @@ const Page = () => {
         },
         {
             label: "Available",
-            value: total-OutofStockOrUnpublised, // ✅ (total - outOfStockOrUnpublished)
+            value: total - OutofStockOrUnpublised, // ✅ (total - outOfStockOrUnpublished)
             icon: <Star className="w-5 h-5 text-white" />,
             bg: "bg-green-500",
             border: "border-l-4 border-green-500",
@@ -199,17 +204,33 @@ const Page = () => {
                                 ))}
                             </div>
 
-                            <ProductTable
-                                products={products}
-                                currentPage={currentPage}
-                                totalPages={totalPages}
-                                onPageChange={(page) => {
-                                    setCurrentPage(page);
-                                    fetchProducts(business._id, page); // call API with new page
-                                }}
-                                isLoading={isLoading}
-                                error={error}
-                            />
+                            {business.listingType === 'product' && (
+                                <ProductTable
+                                    products={products}
+                                    currentPage={currentPage}
+                                    totalPages={totalPages}
+                                    onPageChange={(page) => {
+                                        setCurrentPage(page);
+                                        fetchProducts(business._id, page); // call API with new page
+                                    }}
+                                    isLoading={isLoading}
+                                    error={error}
+                                />
+                            )}
+
+                            {business.listingType === 'service' && (
+                                <ServiceTable
+                                    services={services}
+                                    currentPage={currentPage}
+                                    totalPages={totalPages}
+                                    onPageChange={(page) => {
+                                        setCurrentPage(page);
+                                        fetchServices(business._id, page); // call API with new page
+                                    }}
+                                    isLoading={isLoading}
+                                    error={error}
+                                />
+                            )}
                         </>
                     )}
                 </main>
