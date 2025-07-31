@@ -1,63 +1,40 @@
 "use client"
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import axios from "axios"
 import FilterBar from "./components/FilterBar";
 import HeroSection from "./components/HeroSection";
 import CategoryGrid from './components/CategoryGrid';
 import FeaturedProducts from './components/FeaturedProducts';
 
-
-const productImages = [
-  '/ShopProduct/Aria-SK6-Helmet 1 (3).png',
-  '/ShopProduct/Aria-SK6-Helmet 1 (2).png',
-  '/ShopProduct/Aria-SK6-Helmet 1 (1).png',
-  '/ShopProduct/Aria-SK6-Helmet 1.png',
-]
-
-const dummyProducts = [
-    {
-        id: 1,
-        title: 'Feature Product 1',
-        price: 29.99,
-        rating: 4.5,
-        image: '/ShopProduct/Aria-SK6-Helmet 1 (3).png',
-    },
-    {
-        id: 2,
-        title: 'Feature Product 2',
-        price: 19.99,
-        rating: 5,
-        image: '/ShopProduct/Aria-SK6-Helmet 1 (2).png',
-    },
-    {
-        id: 3,
-        title: 'Feature Product 3',
-        price: 15.99,
-        rating: 3.2,
-        image: '/ShopProduct/Aria-SK6-Helmet 1 (1).png',
-    },
-    {
-        id: 4,
-        title: 'Feature Product 4',
-        price: 45.0,
-        rating: 2.7,
-        image: '/ShopProduct/Aria-SK6-Helmet 1.png',
-    },
-    // Repeat to simulate more pages
-    ...Array(56).fill(0).map((_, i) => ({
-        id: i + 5,
-        title: `Feature Product ${i + 5}`,
-        price: 49.99,
-        rating: 4.2,
-        image: productImages[i % productImages.length],
-    }))
-
-];
-
 const page = () => {
     const [searchText, setSearchText] = useState("");
     const [minorityType, setMinorityType] = useState("");
     const [searchLocation, setSearchLocation] = useState("");
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
 
+
+    const fetchProducts = async () => {
+        try {
+            const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/products/list`, {
+                params: {
+                    search: searchText,
+                    city: searchLocation,
+                    minorityType,
+                    categorySlug: "", // Add category filter if needed
+                    page: 1,
+                    limit: 10,
+                },
+            });
+            console.log(res.data.data);
+            
+            setProducts(res.data.data); // useState for products must be declared
+        } catch (err) {
+            console.error("Error fetching products", err);
+        }finally{
+            setLoading(false);
+        }
+    };
 
     const handleSearch = () => {
         console.log({
@@ -65,7 +42,12 @@ const page = () => {
             minorityType,
             searchLocation,
         });
+        fetchProducts();
     };
+
+    useEffect(() => {
+        fetchProducts(); // load default products on initial render
+    }, [minorityType]);
 
     return (
         <div>
@@ -82,7 +64,7 @@ const page = () => {
             {(!searchText && !minorityType && !searchLocation) && (
                 <CategoryGrid />
             )}
-            <FeaturedProducts products={dummyProducts} />
+            <FeaturedProducts products={products} loading={loading} />
         </div>
     )
 }

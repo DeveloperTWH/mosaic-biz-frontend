@@ -48,7 +48,7 @@ export default function SearchPageContent() {
   return (
     <>
       <BannerSection />
-      <div className="flex gap-6 px-6 py-8 md:flex-row flex-col mx-auto">
+      <div className="flex flex-col gap-6 px-6 py-8 mx-auto md:flex-row">
         <FilterSidebar filters={filters} setFilters={setFilters} />
         <main className="flex-1">
           {loading ? (
@@ -56,7 +56,7 @@ export default function SearchPageContent() {
           ) : products.length === 0 ? (
             <p>No products found</p>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {products.map((product) => (
                 <Link href={`/products/${product.id}`} key={product.id} className="block">
                   <ProductCard product={product} />
@@ -66,7 +66,7 @@ export default function SearchPageContent() {
           )}
         </main>
       </div>
-      <div className="px-8 py-10 max-w-screen-xl mx-auto">
+      <div className="max-w-screen-xl px-8 py-10 mx-auto">
         <SimilarProduct />
       </div>
     </>

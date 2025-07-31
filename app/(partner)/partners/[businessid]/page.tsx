@@ -120,7 +120,8 @@ const DashboardPage = () => {
         params: { businessId, page, limit },
       });
 
-      const { data, total, totalPages } = response.data;
+      const { data, total, totalPages, unpublishedCount } = response.data;
+      setOutOfStockOrUnpublished(unpublishedCount);
       setServices(data);
       setTotal(total);
       setTotalPages(totalPages || Math.ceil(total / limit));

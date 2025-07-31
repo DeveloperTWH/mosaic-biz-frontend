@@ -86,7 +86,6 @@ const Page = () => {
     };
 
     const fetchServices = async (businessId: string, page = 1, limit = 10) => {
-        console.log("here i am");
         
         try {
             setIsLoading(true);
@@ -97,12 +96,13 @@ const Page = () => {
                     params: { businessId, page, limit }
                 }
             );
-            const { data, total, totalPages } = response.data;
-            console.log(response.data);
+            const { data, total, totalPages, unpublishedCount } = response.data;
+
             
             setServices(data);
             setTotal(total);
             setTotalPages(totalPages || Math.ceil(total / limit));
+            setOutofStockOrUnpublised(unpublishedCount);
         } catch (err) {
             console.error("Error fetching services:", err);
             setError("Error fetching services.");

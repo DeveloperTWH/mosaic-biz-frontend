@@ -27,8 +27,18 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
             Cancel
           </button>
           <button
-            onClick={onConfirm}
-            className="px-4 py-1 text-sm text-white bg-red-600 rounded"
+            onClick={(e) => {
+              const btn = e.currentTarget;
+              btn.disabled = true;
+              btn.innerHTML = `
+      <svg class="w-4 h-4 mr-2 animate-spin inline-block" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
+      </svg>
+      Deleting...`;
+              onConfirm();
+            }}
+            className="px-4 py-1 text-sm text-white bg-red-600 rounded flex items-center justify-center min-w-[120px]"
           >
             Confirm Delete
           </button>

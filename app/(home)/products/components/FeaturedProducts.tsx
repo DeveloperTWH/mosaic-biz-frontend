@@ -1,28 +1,31 @@
 // components/FeaturedProducts.tsx
 import React, { useState } from 'react';
 import Image from 'next/image';
-
-
+import { ProductListingItem } from "@/types/product";
 
 const itemsPerPage = 12;
-type Product = {
-    id: number;
-    title: string;
-    price: number;
-    rating: number;
-    image: string;
-};
 
 type Props = {
-    products: Product[];
+    products: ProductListingItem[];
+    loading: boolean
 };
 
 
-const FeaturedProducts: React.FC<Props> = ({ products }) => {
+const FeaturedProducts: React.FC<Props> = ({ products, loading }) => {
     const [page, setPage] = useState(1);
     const totalPages = Math.ceil(products.length / itemsPerPage);
     const startIndex = (page - 1) * itemsPerPage;
     const paginatedProducts = products.slice(startIndex, startIndex + itemsPerPage);
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center w-screen h-screen">
+                <div className='text-gray-400'>
+                    Loading..
+                </div>
+            </div>
+        )
+    }
 
     return (
         <section className="px-6 py-16 mx-auto max-w-7xl">
@@ -30,40 +33,90 @@ const FeaturedProducts: React.FC<Props> = ({ products }) => {
             <p className="max-w-xl mx-auto mt-2 text-center text-gray-600">
                 Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor enim minim veniam quis.
             </p>
-
             <div className="grid grid-cols-1 gap-6 mt-12 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                {paginatedProducts.map((product) => (
-                    <div
-                        key={product.id}
-                        className="flex flex-col justify-between p-4 bg-white border rounded-lg hover:shadow-md"
-                    >
-                        <div className="relative flex items-center justify-center w-full h-48">
-                            <Image
-                                src={product.image}
-                                alt={product.title}
-                                layout="fill"
-                                objectFit="contain"
-                            />
-                        </div>
-                        <div className="mt-4">
-                            <h3 className="text-sm font-medium text-gray-800">{product.title}</h3>
-                            <div className="flex items-center mt-1">
-                                <div className="text-yellow-400">{'★'.repeat(Math.round(Number(product.rating)))}</div>
-                                <span className="ml-1 text-xs text-gray-500">({product.rating})</span>
+                {paginatedProducts.map((product) => {
+                    const variant = product.variants?.[0];
+                    const size = variant?.sizes?.[0];
+                    const now = new Date();
+                    const hasDiscount =
+                        size?.salePrice &&
+                        size?.salePrice < size?.price &&
+                        size?.discountEndDate &&
+                        new Date(size.discountEndDate) > now;
+
+
+                    return (
+                        <div
+                            key={product._id}
+                            className="flex flex-col  p-4 bg-white border rounded-lg hover:shadow-lg transition-shadow duration-200 min-h-[420px]"
+                        >
+                            {/* Image */}
+                            <div className="relative w-full h-48">
+                                <Image
+                                    src={product.coverImage}
+                                    alt={product.title}
+                                    fill
+                                    className="object-contain"
+                                />
                             </div>
-                            <p className="mt-1 font-bold text-gray-900">${product.price}</p>
+
+                            {/* Text */}
+                            <div className="mt-4">
+                                <h3 className="text-base font-semibold text-gray-800 truncate">{product.title}</h3>
+
+                                <p
+                                    className="overflow-hidden text-sm text-gray-600 text-ellipsis"
+                                    style={{
+                                        display: '-webkit-box',
+                                        WebkitLineClamp: 2,
+                                        WebkitBoxOrient: 'vertical',
+                                        lineHeight: '1.2rem',
+                                        maxHeight: '2.4rem',
+                                    }}
+                                >
+                                    {product.description}
+                                </p>
+
+                                <div className="flex items-center mt-1">
+                                    <div className="text-yellow-400">
+                                        {'★'.repeat(Math.round(Number(variant?.averageRating || 0)))}
+                                    </div>
+                                    <span className="ml-1 text-xs text-gray-500">
+                                        ({variant?.totalReviews || 0})
+                                    </span>
+                                </div>
+
+                                {/* Price Section */}
+                                <div className="mt-1 font-bold text-gray-900">
+                                    {hasDiscount ? (
+                                        <>
+                                            <span className="text-red-600">
+                                                ${Number(size.salePrice).toFixed(2)}
+                                            </span>{' '}
+                                            <span className="ml-1 text-sm text-gray-500 line-through">
+                                                ${Number(size.price).toFixed(2)}
+                                            </span>
+                                        </>
+                                    ) : (
+                                        <span>${Number(size?.price || 0).toFixed(2)}</span>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Cart Icon */}
+                            <div className="flex justify-end mt-4">
+                                <Image
+                                    src="/ShopProduct/Mask group.png"
+                                    alt="Cart Icon"
+                                    width={32}
+                                    height={32}
+                                />
+                            </div>
                         </div>
-                        <div className="flex justify-end mt-4">
-                            <Image
-                                src="/ShopProduct/Mask group.png"
-                                alt="Cart Icon"
-                                width={32}
-                                height={32}
-                            />
-                        </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
+
 
             {/* Pagination */}
             <div className="flex items-center justify-center mt-10 space-x-2">

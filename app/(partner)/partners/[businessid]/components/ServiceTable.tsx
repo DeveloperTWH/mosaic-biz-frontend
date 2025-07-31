@@ -41,14 +41,7 @@ const ServiceTable: React.FC<ServiceTableProps> = ({
 
 
 
-    const router = useRouter();
-
-
-    const toggleExpand = (id: string) => {
-        setExpanded(prev =>
-            prev.includes(id) ? prev.filter(e => e !== id) : [...prev, id]
-        );
-    };
+    const router = useRouter();;
 
     const changePage = (page: number) => {
         if (page >= 1 && page <= totalPages) onPageChange(page);
@@ -99,7 +92,7 @@ const ServiceTable: React.FC<ServiceTableProps> = ({
 
     const handleDelete = async () => {
         try {
-            await axios.delete(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/service/delete/${deleteTarget}`, {
+            await axios.delete(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/service/delete-service/${deleteTarget}`, {
                 withCredentials: true,
             });
             toast.success('Service deleted successfully');
@@ -137,7 +130,130 @@ const ServiceTable: React.FC<ServiceTableProps> = ({
                 </Link>
             </div>
 
-        {/* code here */}
+            {/* ✅ Desktop Table */}
+            <div className="hidden w-full overflow-x-auto md:block">
+                <table className="min-w-full text-sm text-left text-gray-700">
+                    <thead className="text-xs uppercase bg-[#333333] text-white">
+                        <tr>
+                            <th className="px-4 py-3">Service</th>
+                            <th className="px-4 py-3">Rating</th>
+                            <th className="px-4 py-3">Address</th>
+                            <th className="px-4 py-3">Status</th>
+                            <th className="px-4 py-3 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {services.map(service => (
+                            <tr key={service._id} className="border-b hover:bg-gray-50">
+                                <td className="flex items-center gap-3 px-4 py-3">
+                                    <div className="relative w-16 h-16 sm:w-20 sm:h-20 min-w-[64px] sm:min-w-[80px] overflow-hidden border rounded">
+                                        <Image
+                                            src={service.coverImage}
+                                            alt={service.title}
+                                            fill
+                                            className="object-cover"
+                                            sizes="(max-width: 640px) 64px, 80px"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <p className="font-medium">{service.title}</p>
+                                        <p className="text-xs text-gray-500">{service.slug}</p>
+                                    </div>
+                                </td>
+                                <td className="px-4 py-3">{service.averageRating?.toFixed(1) || 'N/A'}</td>
+                                <td className="px-4 py-3">{service.contact?.address || 'N/A'}</td>
+                                <td className="px-4 py-3">
+                                    <span className={`px-2 py-1 text-xs rounded-full ${service.isPublished ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                                        {service.isPublished ? 'Published' : 'Unpublished'}
+                                    </span>
+                                </td>
+                                <td className="px-4 py-3 space-x-2 text-right">
+                                    {service.isPublished && (
+                                        <Link href={`/service/${service.slug}`}>
+                                            <button className="p-1 text-blue-600 hover:text-blue-800" title="View Public Page">
+                                                <Eye size={16} />
+                                            </button>
+                                        </Link>
+                                    )}
+
+                                    <Link href={`/partners/${businessid}/inventory/edit-service/${service._id}`}>
+                                        <button className="p-1 text-green-600 hover:text-green-800">
+                                            <Pencil size={16} />
+                                        </button>
+                                    </Link>
+                                    <button
+                                        className="p-1 text-red-600 hover:text-red-800"
+                                        onClick={() => {
+                                            setDeleteTarget(service._id);
+                                            setShowDeleteModal(true);
+                                        }}
+                                    >
+                                        <Trash2 size={16} />
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+
+            {/* ✅ Mobile Card View */}
+            <div className="block space-y-4 md:hidden">
+                {services.map(service => (
+                    <div key={service._id} className="p-4 space-y-2 bg-white border rounded shadow-sm">
+                        <div className="flex items-center gap-3">
+                            <div className="relative w-16 h-16 sm:w-20 sm:h-20 min-w-[64px] sm:min-w-[80px] overflow-hidden border rounded">
+                                <Image
+                                    src={service.coverImage}
+                                    alt={service.title}
+                                    fill
+                                    className="object-cover"
+                                    sizes="(max-width: 640px) 64px, 80px"
+                                />
+                            </div>
+
+                            <div>
+                                <p className="font-medium">{service.title}</p>
+                                <p className="text-xs text-gray-500">{service.slug}</p>
+                            </div>
+                        </div>
+                        <p className="text-sm"><strong>Rating:</strong> {service.averageRating?.toFixed(1) || 'N/A'}</p>
+                        <p className="text-sm"><strong>Address:</strong> {service.contact?.address || 'N/A'}</p>
+                        <p className="text-sm">
+                            <strong>Status:</strong>{' '}
+                            <span className={`px-2 py-1 text-xs rounded-full ${service.isPublished ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                                {service.isPublished ? 'Published' : 'Unpublished'}
+                            </span>
+                        </p>
+                        <div className="flex justify-end gap-2 pt-2">
+                            {service.isPublished && (
+                                <Link href={`/service/${service.slug}`}>
+                                    <button className="p-1 text-blue-600 hover:text-blue-800" title="View Public Page">
+                                        <Eye size={16} />
+                                    </button>
+                                </Link>
+                            )}
+                            <Link href={`/partners/${businessid}/inventory/edit-service/${service._id}`}>
+                                <button className="p-1 text-green-600 hover:text-green-800">
+                                    <Pencil size={16} />
+                                </button>
+                            </Link>
+                            <button
+                                className="p-1 text-red-600 hover:text-red-800"
+                                onClick={() => {
+                                    setDeleteTarget(service._id);
+                                    setShowDeleteModal(true);
+                                }}
+                            >
+                                <Trash2 size={16} />
+                            </button>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+
 
             {renderPagination()}
 

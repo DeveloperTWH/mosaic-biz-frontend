@@ -99,6 +99,15 @@
       "namedRegex": "^/partners/(?<nxtPbusinessid>[^/]+?)/inventory/edit/(?<nxtPid>[^/]+?)/(?<nxtPvariantId>[^/]+?)(?:/)?$"
     },
     {
+      "page": "/partners/[businessid]/inventory/edit-service/[serviceId]",
+      "regex": "^/partners/([^/]+?)/inventory/edit\\-service/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPbusinessid": "nxtPbusinessid",
+        "nxtPserviceId": "nxtPserviceId"
+      },
+      "namedRegex": "^/partners/(?<nxtPbusinessid>[^/]+?)/inventory/edit\\-service/(?<nxtPserviceId>[^/]+?)(?:/)?$"
+    },
+    {
       "page": "/partners/[businessid]/my-account",
       "regex": "^/partners/([^/]+?)/my\\-account(?:/)?$",
       "routeKeys": {
