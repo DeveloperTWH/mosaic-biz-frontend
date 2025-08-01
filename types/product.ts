@@ -101,3 +101,34 @@ export interface ProductVariantPayload {
 export interface CreateProductWithVariantsPayload extends ProductPayload {
   variants: ProductVariantPayload[];
 }
+
+
+
+export interface ProductDetailItem {
+  _id: string;
+  title: string;
+  description: string;
+  brand?: string;
+  categoryId: string;
+  subcategoryId: string;
+  businessId: string;
+  coverImage: string;
+  specifications?: { key: string; value: string }[];
+  isPublished?: boolean;
+  variants: {
+    variantId: string;
+    color: string;
+    images: string[];
+    averageRating: number;
+    totalReviews: number;
+    sizes: {
+      sizeId: string;
+      size: string;
+      sku: string;
+      stock: number;
+      price: number;
+      salePrice?: number | null;
+      discountEndDate?: string | null;
+    }[];
+  }[];
+}

@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { ProductListingItem } from "@/types/product";
+import { useRouter } from 'next/navigation';
 
 const itemsPerPage = 12;
 
@@ -16,6 +17,8 @@ const FeaturedProducts: React.FC<Props> = ({ products, loading }) => {
     const totalPages = Math.ceil(products.length / itemsPerPage);
     const startIndex = (page - 1) * itemsPerPage;
     const paginatedProducts = products.slice(startIndex, startIndex + itemsPerPage);
+
+    const router = useRouter();
 
     if (loading) {
         return (
@@ -48,71 +51,80 @@ const FeaturedProducts: React.FC<Props> = ({ products, loading }) => {
                     return (
                         <div
                             key={product._id}
-                            className="flex flex-col  p-4 bg-white border rounded-lg hover:shadow-lg transition-shadow duration-200 min-h-[420px]"
+                            className="flex flex-col p-4 bg-white border rounded-lg hover:shadow-lg transition-shadow duration-200 min-h-[420px]"
                         >
-                            {/* Image */}
-                            <div className="relative w-full h-48">
-                                <Image
-                                    src={product.coverImage}
-                                    alt={product.title}
-                                    fill
-                                    className="object-contain"
-                                />
-                            </div>
+                            {/* Clickable area (redirects to product detail) */}
+                            <div
+                                onClick={() => router.push(`/product/${product._id}`)}
+                                className="cursor-pointer"
+                            >
+                                <div className="relative w-full h-48">
+                                    <Image
+                                        src={product.coverImage}
+                                        alt={product.title}
+                                        fill
+                                        className="object-contain"
+                                    />
+                                </div>
 
-                            {/* Text */}
-                            <div className="mt-4">
-                                <h3 className="text-base font-semibold text-gray-800 truncate">{product.title}</h3>
+                                <div className="mt-4">
+                                    <h3 className="text-base font-semibold text-gray-800 truncate">
+                                        {product.title}
+                                    </h3>
 
-                                <p
-                                    className="overflow-hidden text-sm text-gray-600 text-ellipsis"
-                                    style={{
-                                        display: '-webkit-box',
-                                        WebkitLineClamp: 2,
-                                        WebkitBoxOrient: 'vertical',
-                                        lineHeight: '1.2rem',
-                                        maxHeight: '2.4rem',
-                                    }}
-                                >
-                                    {product.description}
-                                </p>
+                                    <p
+                                        className="overflow-hidden text-sm text-gray-600 text-ellipsis"
+                                        style={{
+                                            display: '-webkit-box',
+                                            WebkitLineClamp: 2,
+                                            WebkitBoxOrient: 'vertical',
+                                            lineHeight: '1.2rem',
+                                            maxHeight: '2.4rem',
+                                        }}
+                                    >
+                                        {product.description}
+                                    </p>
 
-                                <div className="flex items-center mt-1">
-                                    <div className="text-yellow-400">
-                                        {'★'.repeat(Math.round(Number(variant?.averageRating || 0)))}
+                                    <div className="flex items-center mt-1">
+                                        <div className="text-yellow-400">
+                                            {'★'.repeat(Math.round(Number(variant?.averageRating || 0)))}
+                                        </div>
+                                        <span className="ml-1 text-xs text-gray-500">
+                                            ({variant?.totalReviews || 0})
+                                        </span>
                                     </div>
-                                    <span className="ml-1 text-xs text-gray-500">
-                                        ({variant?.totalReviews || 0})
-                                    </span>
-                                </div>
 
-                                {/* Price Section */}
-                                <div className="mt-1 font-bold text-gray-900">
-                                    {hasDiscount ? (
-                                        <>
-                                            <span className="text-red-600">
-                                                ${Number(size.salePrice).toFixed(2)}
-                                            </span>{' '}
-                                            <span className="ml-1 text-sm text-gray-500 line-through">
-                                                ${Number(size.price).toFixed(2)}
-                                            </span>
-                                        </>
-                                    ) : (
-                                        <span>${Number(size?.price || 0).toFixed(2)}</span>
-                                    )}
+                                    <div className="mt-1 font-bold text-gray-900">
+                                        {hasDiscount ? (
+                                            <>
+                                                <span className="text-red-600">
+                                                    ${Number(size.salePrice).toFixed(2)}
+                                                </span>{' '}
+                                                <span className="ml-1 text-sm text-gray-500 line-through">
+                                                    ${Number(size.price).toFixed(2)}
+                                                </span>
+                                            </>
+                                        ) : (
+                                            <span>${Number(size?.price || 0).toFixed(2)}</span>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
 
-                            {/* Cart Icon */}
+                            {/* Cart Icon - stays outside the click zone */}
                             <div className="flex justify-end mt-4">
-                                <Image
-                                    src="/ShopProduct/Mask group.png"
-                                    alt="Cart Icon"
-                                    width={32}
-                                    height={32}
-                                />
+                                <button onClick={() =>{console.log(product._id);
+                                }}>
+                                    <Image
+                                        src="/ShopProduct/Mask group.png"
+                                        alt="Cart Icon"
+                                        width={32}
+                                        height={32}
+                                    />
+                                </button>
                             </div>
                         </div>
+
                     );
                 })}
             </div>

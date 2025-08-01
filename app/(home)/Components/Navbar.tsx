@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { logoutUser } from "@/utils/logoutUser";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -72,24 +73,7 @@ const Navbar = () => {
                     Profile
                   </Link>
                   <button
-                    onClick={async () => {
-                      try {
-                        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/logout`, {
-                          method: "POST",
-                          credentials: "include",
-                        });
-
-                        if (res.ok) {
-                          localStorage.removeItem("user_session");
-                          localStorage.removeItem("user_gender");
-                          window.location.href = "/";
-                        } else {
-                          console.error('Logout failed');
-                        }
-                      } catch (err) {
-                        console.error('Logout error', err);
-                      }
-                    }}
+                    onClick={async () => await logoutUser()}
                     className="w-full px-4 py-2 text-sm text-left text-red-500 rounded-b-lg hover:bg-red-50"
                   >
                     Logout

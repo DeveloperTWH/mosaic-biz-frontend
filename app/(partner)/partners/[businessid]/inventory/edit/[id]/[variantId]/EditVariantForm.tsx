@@ -84,6 +84,30 @@ const EditVariantForm: React.FC<EditVariantFormProps> = ({ productId, variantId,
     const submitVariant = async () => {
         if (!variant) return;
         setIsSubmitting(true);
+
+        const seenSkus = new Set<string>();
+        for (const s of variant.sizes) {
+            if (
+                !s.size?.trim() ||
+                !s.sku?.trim() ||
+                s.price == null ||
+                isNaN(Number(s.price)) ||
+                isNaN(Number(s.stock))
+            ) {
+                toast.error('Please fill all required fields for each size (size, sku, price, stock)');
+                setIsSubmitting(false);
+                return;
+            }
+
+            if (seenSkus.has(s.sku)) {
+                toast.error(`Duplicate SKU found: ${s.sku}`);
+                setIsSubmitting(false);
+                return;
+            }
+
+            seenSkus.add(s.sku);
+        }
+
         try {
             // upload all images if needed
             const uploadedImages = await Promise.all(
@@ -166,53 +190,98 @@ const EditVariantForm: React.FC<EditVariantFormProps> = ({ productId, variantId,
                         <div className="space-y-2">
                             <label className="font-medium">Sizes</label>
                             {variant.sizes.map((sizeObj: any, index: number) => (
-                                <div key={index} className="grid grid-cols-2 gap-2 p-3 border rounded">
-                                    <input
-                                        type="text"
-                                        placeholder="Size"
-                                        value={sizeObj.size}
-                                        required
-                                        onChange={(e) => handleSizeChange(index, 'size', e.target.value)}
-                                        className="p-2 border rounded"
-                                    />
-                                    <input
-                                        type="text"
-                                        placeholder="SKU"
-                                        value={sizeObj.sku}
-                                        required
-                                        onChange={(e) => handleSizeChange(index, 'sku', e.target.value)}
-                                        className="p-2 border rounded"
-                                    />
-                                    <input
-                                        type="number"
-                                        placeholder="Stock"
-                                        value={isNaN(sizeObj.stock) ? '' : sizeObj.stock}
-                                        onChange={(e) => handleSizeChange(index, 'stock', parseInt(e.target.value))}
-                                        className="p-2 border rounded"
-                                    />
-                                    <input
-                                        type="number"
-                                        placeholder="Price"
-                                        value={isNaN(sizeObj.price) ? '' : sizeObj.price}
-                                        onChange={(e) => handleSizeChange(index, 'price', parseFloat(e.target.value))}
-                                        required
-                                        className="p-2 border rounded"
-                                    />
-                                    <input
-                                        type="number"
-                                        placeholder="Sale Price"
-                                        value={isNaN(sizeObj.salePrice) ? '' : sizeObj.salePrice}
-                                        onChange={(e) => handleSizeChange(index, 'salePrice', parseFloat(e.target.value))}
-                                        className="p-2 border rounded"
-                                    />
-                                    <input
-                                        type="date"
-                                        value={sizeObj.discountEndDate ? sizeObj.discountEndDate.substring(0, 10) : ''}
-                                        onChange={(e) => handleSizeChange(index, 'discountEndDate', e.target.value)}
-                                        className="p-2 border rounded"
-                                    />
+                                <div key={index}>
+                                    <div key={index} className="grid grid-cols-2 gap-2 p-3 border rounded">
+                                        <input
+                                            type="text"
+                                            placeholder="Size"
+                                            value={sizeObj.size}
+                                            required
+                                            onChange={(e) => handleSizeChange(index, 'size', e.target.value)}
+                                            className="p-2 border rounded"
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="SKU"
+                                            value={sizeObj.sku}
+                                            required
+                                            onChange={(e) => handleSizeChange(index, 'sku', e.target.value)}
+                                            className="p-2 border rounded"
+                                        />
+                                        <input
+                                            type="number"
+                                            placeholder="Stock"
+                                            value={isNaN(sizeObj.stock) ? '' : sizeObj.stock}
+                                            onChange={(e) => handleSizeChange(index, 'stock', parseInt(e.target.value))}
+                                            className="p-2 border rounded"
+                                        />
+                                        <input
+                                            type="number"
+                                            placeholder="Price"
+                                            value={isNaN(sizeObj.price) ? '' : sizeObj.price}
+                                            onChange={(e) => handleSizeChange(index, 'price', parseFloat(e.target.value))}
+                                            required
+                                            className="p-2 border rounded"
+                                        />
+                                        <input
+                                            type="number"
+                                            placeholder="Sale Price"
+                                            value={isNaN(sizeObj.salePrice) ? '' : sizeObj.salePrice}
+                                            onChange={(e) => handleSizeChange(index, 'salePrice', parseFloat(e.target.value))}
+                                            className="p-2 border rounded"
+                                        />
+                                        <input
+                                            type="date"
+                                            value={sizeObj.discountEndDate ? sizeObj.discountEndDate.substring(0, 10) : ''}
+                                            onChange={(e) => handleSizeChange(index, 'discountEndDate', e.target.value)}
+                                            className="p-2 border rounded"
+                                        />
+                                    </div>
+                                    <div className="flex justify-end">
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                const newSizes = variant.sizes.filter((_, i) => i !== index);
+                                                setVariant(prev => (prev ? { ...prev, sizes: newSizes } : prev));
+                                            }}
+                                            className="px-2 py-1 text-sm text-white bg-red-500 rounded hover:bg-red-600"
+                                        >
+                                            Remove
+                                        </button>
+                                    </div>
+
                                 </div>
                             ))}
+
+                            <div className="flex justify-start">
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        setVariant(prev =>
+                                            prev
+                                                ? {
+                                                    ...prev,
+                                                    sizes: [
+                                                        ...prev.sizes,
+                                                        {
+                                                            size: '',
+                                                            stock: 0,
+                                                            price: 0,
+                                                            salePrice: 0,
+                                                            sku: '',
+                                                            discountEndDate: '',
+                                                        },
+                                                    ],
+                                                }
+                                                : prev
+                                        )
+                                    }
+                                    className="px-5 py-2 text-sm text-blue-600 transition bg-blue-300 rounded hover:bg-blue-600 hover:text-white hover:scale-105"
+                                >
+                                    + Add Size
+                                </button>
+                            </div>
+
                         </div>
 
                         <div className="flex gap-4">

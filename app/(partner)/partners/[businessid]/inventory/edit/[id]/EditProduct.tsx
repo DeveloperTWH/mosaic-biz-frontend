@@ -43,10 +43,11 @@ const EditProductPage = () => {
                 const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/product/${productid}`, {
                     withCredentials: true,
                 });
-                const product = res.data.product;
+                const product = res.data.data;
+                console.log(res.data.data);
                 setProductData(product);
                 setInitialData(product);
-
+                
                 // 2. Load categories and subcategories (based on product.categoryId)
                 const [catRes, subRes] = await Promise.all([
                     axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/getProductCategories`),
