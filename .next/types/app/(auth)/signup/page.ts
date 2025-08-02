@@ -1,4 +1,4 @@
-// File: C:\Users\DAY\OneDrive\Desktop\mosaic-biz-hub\frontend\app\(auth)\signup\page.tsx
+// File: C:\Users\Lenovo\OneDrive\Desktop\Techware hut\mosaic-biz-frontend\app\(auth)\signup\page.tsx
 import * as entry from '../../../../../app/(auth)/signup/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
