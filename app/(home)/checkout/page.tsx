@@ -1,9 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Elements, useStripe, useElements, PaymentElement } from '@stripe/react-stripe-js';
-import { stripePromise } from '../../../utils/stripe';
+import { useSearchParams } from 'next/navigation';
+import {
+  Elements,
+  useStripe,
+  useElements,
+  PaymentElement,
+} from '@stripe/react-stripe-js';
+import { stripePromise } from '@/utils/stripe';
 import type { StripeError, PaymentIntent } from '@stripe/stripe-js';
+import { Suspense } from 'react';
 
 function CheckoutForm() {
   const stripe = useStripe();
@@ -14,12 +21,11 @@ function CheckoutForm() {
     e.preventDefault();
     if (!stripe || !elements) return;
 
-
     const { error, paymentIntent }: { error?: StripeError; paymentIntent?: PaymentIntent } =
       await stripe.confirmPayment({
         elements,
         confirmParams: {
-          return_url: 'https://yourdomain.com/payment-success', // Required for redirect-based flows
+          return_url: `${process.env.NEXT_PUBLIC_CLIENT_BASE_URL}/payment-success`,
         },
       });
 
@@ -28,11 +34,10 @@ function CheckoutForm() {
       return;
     }
 
-    // Only check paymentIntent if it's present (for non-redirect payment methods)
     if (paymentIntent?.status === 'succeeded') {
       setStatus('✅ Payment successful!');
     } else {
-      setStatus('➡️ Redirecting to complete payment...'); // For UPI, wallets, etc.
+      setStatus('➡️ Redirecting to complete payment...');
     }
   };
 
@@ -51,37 +56,11 @@ function CheckoutForm() {
   );
 }
 
-export default function CheckoutPage() {
-  const [clientSecret, setClientSecret] = useState<string>('');
+function CheckoutClient() {
+  const searchParams = useSearchParams();
+  const clientSecret = searchParams.get('clientSecret') || '';
 
-  // Create PaymentIntent on mount
-  useEffect(() => {
-    const createPaymentIntent = async () => {
-      try {
-        console.log("inside");
-        
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/payments/create-payment-intent`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            amount: 100,
-            currency: 'usd',
-            orderId: '64f3b2c7e91a4d86e93d82a1',
-          }),
-        });
-        const data = await response.json();
-        console.log(data);
-        
-        setClientSecret(data.clientSecret);
-      } catch (err) {
-        console.error('Error creating PaymentIntent:', err);
-      }
-    };
-
-    createPaymentIntent();
-  }, []);
-
-  if (!clientSecret) return <p className="text-center">Initializing payment...</p>;
+  if (!clientSecret) return <p className="text-center">Missing client secret</p>;
 
   return (
     <div className="p-8">
@@ -90,5 +69,16 @@ export default function CheckoutPage() {
         <CheckoutForm />
       </Elements>
     </div>
+  );
+}
+
+// app/(home)/checkout/page.tsx
+
+
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={<p className="text-center">Loading checkout...</p>}>
+      <CheckoutClient />
+    </Suspense>
   );
 }

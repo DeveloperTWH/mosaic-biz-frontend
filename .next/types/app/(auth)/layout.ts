@@ -1,4 +1,4 @@
-// File: C:\Users\Lenovo\OneDrive\Desktop\Techware hut\mosaic-biz-frontend\app\(auth)\layout.tsx
+// File: C:\Users\DAY\OneDrive\Desktop\mosaic-biz-hub\frontend\app\(auth)\layout.tsx
 import * as entry from '../../../../app/(auth)/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

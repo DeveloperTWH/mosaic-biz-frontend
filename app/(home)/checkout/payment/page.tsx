@@ -1,0 +1,102 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
+import {
+  Elements,
+  useStripe,
+  useElements,
+  PaymentElement,
+} from '@stripe/react-stripe-js';
+import { stripePromise } from '@/utils/stripe';
+import type { StripeError, PaymentIntentResult, PaymentIntent } from '@stripe/stripe-js';
+
+function CheckoutForm({ clientSecret }: { clientSecret: string }) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [status, setStatus] = useState<string>('');
+  const [amount, setAmount] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchIntent = async () => {
+      if (!stripe || !clientSecret) return;
+      const result: PaymentIntentResult = await stripe.retrievePaymentIntent(clientSecret);
+      if (result.paymentIntent) {
+        setAmount(result.paymentIntent.amount || 0);
+      }
+    };
+    fetchIntent();
+  }, [stripe, clientSecret]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!stripe || !elements) return;
+
+    const { error, paymentIntent }: { error?: StripeError; paymentIntent?: PaymentIntent } =
+      await stripe.confirmPayment({
+        elements,
+        confirmParams: {
+          return_url: `${process.env.NEXT_PUBLIC_CLIENT_BASE_URL}/payment-success`,
+        },
+      });
+
+    if (error) {
+      setStatus(`❌ Payment failed: ${error.message}`);
+      return;
+    }
+
+    if (paymentIntent?.status === 'succeeded') {
+      setStatus('✅ Payment successful!');
+    } else {
+      setStatus('➡️ Redirecting to complete payment...');
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="max-w-md mx-auto space-y-4">
+      {amount !== null && (
+        <div className="mb-2 text-lg font-semibold text-center">
+          Total: ₹{(amount / 100).toFixed(2)}
+        </div>
+      )}
+      <PaymentElement />
+      <button
+        type="submit"
+        className="w-full px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700"
+        disabled={!stripe}
+      >
+        Pay
+      </button>
+      <p className="text-sm text-gray-600">{status}</p>
+    </form>
+  );
+}
+
+function CheckoutClient() {
+  const searchParams = useSearchParams();
+  const clientSecret = searchParams.get('clientSecret') || '';
+
+  if (!clientSecret) return <p className="text-center">Missing client secret</p>;
+
+  return (
+    <div className="p-8">
+      <h1 className="mb-4 text-xl font-bold">Checkout</h1>
+      <Elements stripe={stripePromise} options={{ clientSecret }}>
+        <CheckoutForm clientSecret={clientSecret} />
+      </Elements>
+    </div>
+  );
+}
+
+
+// app/(home)/checkout/page.tsx
+
+
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={<p className="text-center">Loading checkout...</p>}>
+      <CheckoutClient />
+    </Suspense>
+  );
+}

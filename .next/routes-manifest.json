@@ -116,6 +116,14 @@
       "namedRegex": "^/partners/(?<nxtPbusinessid>[^/]+?)/my\\-account(?:/)?$"
     },
     {
+      "page": "/partners/[businessid]/orders",
+      "regex": "^/partners/([^/]+?)/orders(?:/)?$",
+      "routeKeys": {
+        "nxtPbusinessid": "nxtPbusinessid"
+      },
+      "namedRegex": "^/partners/(?<nxtPbusinessid>[^/]+?)/orders(?:/)?$"
+    },
+    {
       "page": "/product/[id]",
       "regex": "^/product/([^/]+?)(?:/)?$",
       "routeKeys": {
@@ -206,6 +214,18 @@
       "namedRegex": "^/checkout(?:/)?$"
     },
     {
+      "page": "/checkout/address",
+      "regex": "^/checkout/address(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/checkout/address(?:/)?$"
+    },
+    {
+      "page": "/checkout/payment",
+      "regex": "^/checkout/payment(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/checkout/payment(?:/)?$"
+    },
+    {
       "page": "/contact",
       "regex": "^/contact(?:/)?$",
       "routeKeys": {},
@@ -240,6 +260,12 @@
       "regex": "^/partners/business/new(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/partners/business/new(?:/)?$"
+    },
+    {
+      "page": "/payment-success",
+      "regex": "^/payment\\-success(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/payment\\-success(?:/)?$"
     },
     {
       "page": "/products",

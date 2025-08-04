@@ -250,9 +250,35 @@ export default function ProductDetailPage() {
               </button>
             )}
 
-            <button className="px-6 py-2 font-bold text-white bg-black rounded hover:bg-gray-900">
+            <button
+              className="px-6 py-2 font-bold text-white bg-black rounded hover:bg-gray-900"
+              onClick={() => {
+                if (!selectedVariant?.variantId || !selectedSize || !selectedPrice) {
+                  toast.error('Please select both variant and size.');
+                  return;
+                }
+
+                const price = selectedPrice?.salePrice &&
+                  selectedPrice?.discountEndDate &&
+                  new Date(selectedPrice.discountEndDate) > new Date()
+                  ? selectedPrice.salePrice
+                  : selectedPrice.price;
+
+                const queryParams = new URLSearchParams({
+                  type: 'buy',
+                  productId: product._id,
+                  variantId: selectedVariant.variantId,
+                  size: selectedSize,
+                  quantity: '1',
+                  price: String(price),
+                });
+
+                window.location.href = `/checkout/address?${queryParams.toString()}`;
+              }}
+            >
               BUY NOW
             </button>
+
           </div>
 
         </div>
