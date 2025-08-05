@@ -1,30 +1,47 @@
-import Link from "next/link";
+'use client';
 
-const categories = [
-  { name: "Home Care Service", slug: "home-care-service", icon: "🏠" },
-  { name: "Fashion", slug: "fashion", icon: "👗" },
-  { name: "Skin & Beauty Treatment", slug: "skincare-service", icon: "💆" },
-  { name: "Pet Care", slug: "pet-care", icon: "🐶" },
-  { name: "Professional Services", slug: "professional", icon: "📋" },
-  { name: "Automotive", slug: "automotive", icon: "🚗" },
-  { name: "Tour & Travel", slug: "tour-travel", icon: "✈️" },
-  { name: "Construction", slug: "construction", icon: "🏗️" },
-  { name: "Finance Services", slug: "finance", icon: "💰" },
-  { name: "More", slug: "more", icon: "➕" }, // Added icon
-];
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import Image from "next/image";
+import { Category } from "@/types/Category";
 
 const CategoryGrid = () => {
+
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/category/product`);
+
+        setCategories(res.data.data); // Adjust if API shape is different
+      } catch (err) {
+        console.error("Failed to fetch product categories", err);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+
   return (
     <section className="px-6 mx-auto max-w-7xl">
       <h2 className="mt-6 mb-6 text-xl font-bold text-center md:text-2xl heading">Browse by Category</h2>
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
         {categories.map((cat) => (
           <Link
-            key={cat.slug}
-            href={`/products/${cat.slug}`}
+            key={cat._id}
+            href={`/products/${cat.slug}`} // or `/service/${cat.slug}` depending on your route
             className="p-4 text-center transition border rounded hover:shadow"
           >
-            <div className="mb-2 text-3xl">{cat.icon}</div>
+            <Image
+              src={cat.img || "/placeholder.png"}
+              alt={cat.name}
+              width={60}
+              height={60}
+              className="mx-auto mb-2"
+            />
             <div className="text-sm font-medium md:text-base">{cat.name}</div>
           </Link>
         ))}

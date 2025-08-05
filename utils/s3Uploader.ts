@@ -25,6 +25,8 @@ export const uploadToS3 = async (file: File): Promise<string> => {
     console.log(`📤 Uploading File: ${file.name}, Type: ${fileType}`);
 
     // ✅ 2. Get Pre-Signed URL from backend
+    console.log(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/s3-presigned-url`);
+    
     const { data } = await axios.get(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/s3-presigned-url`,
       {

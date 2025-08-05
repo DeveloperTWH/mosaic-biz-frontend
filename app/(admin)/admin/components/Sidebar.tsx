@@ -1,7 +1,19 @@
 "use client";
 
 import React from "react";
-import { LayoutDashboard, Box, Users, Settings, LifeBuoy, LogOut, X } from "lucide-react"; // Lucide icons
+import {
+  LayoutDashboard,
+  Building2,
+  Package,
+  Users,
+  CreditCard,
+  ListTree ,
+  MessageSquareQuote,
+  Newspaper,
+  HelpCircle,
+  LogOut,
+  X
+} from "lucide-react";// Lucide icons
 import Link from "next/link";
 import { usePathname, useParams } from "next/navigation";
 import { logoutUser } from "@/utils/logoutUser";
@@ -19,17 +31,21 @@ const AdminSidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
 
   const navItems = [
     { label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5" /> },
-    { label: "Inventory", icon: <Box className="w-5 h-5" /> },
-    { label: "Orders", icon: <Box className="w-5 h-5" /> },
+    { label: "Businesses", icon: <Building2 className="w-5 h-5" /> },
+    { label: "Orders", icon: <Package className="w-5 h-5" /> },
     { label: "Users", icon: <Users className="w-5 h-5" /> },
-    { label: "Settings", icon: <Settings className="w-5 h-5" /> },
-    { label: "Support", icon: <LifeBuoy className="w-5 h-5" /> },
+    { label: "Subscription", icon: <CreditCard className="w-5 h-5" /> },
+    { label: "Categories Management", icon: <ListTree  className="w-5 h-5" /> },
+    { label: "Testimonial", icon: <MessageSquareQuote className="w-5 h-5" /> },
+    { label: "Blog", icon: <Newspaper className="w-5 h-5" /> },
+    { label: "FAQ", icon: <HelpCircle className="w-5 h-5" /> },
+    // { label: "Support", icon: <LifeBuoy className="w-5 h-5" /> },
   ];
 
   const getLink = (label: string) => {
     return label === "Dashboard"
-      ? `/admin/${businessId}`
-      : `/admin/${businessId}/${label.toLowerCase().replace(" ", "-")}`;
+      ? `/admin`
+      : `/admin/${label.toLowerCase().replace(" ", "-")}`;
   };
 
   return (

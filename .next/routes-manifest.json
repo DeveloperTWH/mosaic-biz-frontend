@@ -208,6 +208,18 @@
       "namedRegex": "^/admin(?:/)?$"
     },
     {
+      "page": "/admin/businesses",
+      "regex": "^/admin/businesses(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/businesses(?:/)?$"
+    },
+    {
+      "page": "/admin/categories-management",
+      "regex": "^/admin/categories\\-management(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/categories\\-management(?:/)?$"
+    },
+    {
       "page": "/checkout",
       "regex": "^/checkout(?:/)?$",
       "routeKeys": {},

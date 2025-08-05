@@ -20,7 +20,8 @@ const Dashboard = () => {
   const fetchBusinesses = async () => {
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/api/business/`,
+        // Example with limit and page:
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/api/business?limit=4&page=1`,
         {
           withCredentials: true, // Ensures that credentials (cookies) are sent with the request
         }
@@ -102,15 +103,15 @@ const Dashboard = () => {
       <Sidebar isOpen={isSidebarOpen} setIsOpen={setSidebarOpen} />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex flex-col flex-1 overflow-hidden">
         {/* Topbar Component */}
         <Topbar setIsSidebarOpen={setSidebarOpen} />
 
-        <main className="flex-1 overflow-y-auto py-6 px-8">
+        <main className="flex-1 px-8 py-6 overflow-y-auto">
           {/* Stats Section */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
+          <div className="grid grid-cols-1 gap-8 mb-8 sm:grid-cols-2 lg:grid-cols-3">
             {/* Stats Card 1 */}
-            <div className="bg-white p-8 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+            <div className="p-8 transition-all duration-300 transform bg-white rounded-lg shadow-lg hover:shadow-2xl hover:scale-105">
               <h3 className="text-lg font-semibold text-gray-800">
                 Businesses
               </h3>
@@ -120,7 +121,7 @@ const Dashboard = () => {
             </div>
 
             {/* Stats Card 2 */}
-            <div className="bg-white p-8 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+            <div className="p-8 transition-all duration-300 transform bg-white rounded-lg shadow-lg hover:shadow-2xl hover:scale-105">
               <h3 className="text-lg font-semibold text-gray-800">
                 Pending Approvals
               </h3>
@@ -130,13 +131,13 @@ const Dashboard = () => {
             </div>
 
             {/* Stats Card 3 */}
-            <div className="bg-white p-8 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+            <div className="p-8 transition-all duration-300 transform bg-white rounded-lg shadow-lg hover:shadow-2xl hover:scale-105">
               <h3 className="text-lg font-semibold text-gray-800">Customers</h3>
               <p className="text-3xl font-bold text-green-600">120</p>
             </div>
 
             {/* Stats Card 4 (Revenue) */}
-            <div className="bg-white p-8 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+            <div className="p-8 transition-all duration-300 transform bg-white rounded-lg shadow-lg hover:shadow-2xl hover:scale-105">
               <h3 className="text-lg font-semibold text-gray-800">Revenue</h3>
               <p className="text-3xl font-bold text-teal-600">$15000</p>
             </div>
@@ -144,18 +145,18 @@ const Dashboard = () => {
 
           {/* No Businesses Found Message */}
           {noBusinesses && (
-            <div className="text-center text-gray-700 font-semibold text-xl mt-10">
+            <div className="mt-10 text-xl font-semibold text-center text-gray-700">
               <p>No businesses available at the moment.</p>
             </div>
           )}
 
           {/* Table for Business List */}
           {!noBusinesses && (
-            <div className="bg-white p-8 rounded-lg shadow-lg">
+            <div className="p-8 bg-white rounded-lg shadow-lg">
               <h3 className="text-lg font-semibold text-gray-800">
                 Businesses List
               </h3>
-              <div className="overflow-x-auto mt-4">
+              <div className="mt-4 overflow-x-auto">
                 <table className="min-w-full table-auto">
                   <thead>
                     <tr className="text-gray-600 border-b">
@@ -169,7 +170,7 @@ const Dashboard = () => {
                     {businesses.map((business, index) => (
                       <tr
                         key={business._id}
-                        className="hover:bg-gray-100 transition-all duration-300"
+                        className="transition-all duration-300 hover:bg-gray-100"
                       >
                         <td className="px-6 py-4">{business.businessName}</td>
                         <td className="px-6 py-4 text-gray-700">
@@ -189,11 +190,10 @@ const Dashboard = () => {
 
                         <td className="px-6 py-4">
                           <button
-                            className={`${
-                              business.isApproved
+                            className={`${business.isApproved
                                 ? "bg-red-500 hover:bg-red-600"
                                 : "bg-green-500 hover:bg-green-600"
-                            } text-white px-4 py-2 rounded-lg shadow-md transition-all duration-300`}
+                              } text-white px-4 py-2 rounded-lg shadow-md transition-all duration-300`}
                             onClick={() => toggleApproval(index)}
                           >
                             {business.isApproved ? "Disapprove" : "Approve"}
@@ -208,7 +208,7 @@ const Dashboard = () => {
               {/* View More Button */}
               <div className="mt-6 text-right">
                 <Link href="/admin/business">
-                  <span className="bg-indigo-600 text-white px-6 py-2 rounded-lg shadow-md hover:bg-indigo-700 transition-all duration-300 cursor-pointer">
+                  <span className="px-6 py-2 text-white transition-all duration-300 bg-indigo-600 rounded-lg shadow-md cursor-pointer hover:bg-indigo-700">
                     View More
                   </span>
                 </Link>
