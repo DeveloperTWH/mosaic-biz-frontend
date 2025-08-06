@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { getLoggedInCustomer } from '@/utils/authUtils';
+import BannerSection from '../../products/[productid]/Component/BannerSection';
+import { Minus, Plus } from 'lucide-react';
 
 export default function CheckoutAddressPage() {
   const router = useRouter();
@@ -100,8 +102,14 @@ export default function CheckoutAddressPage() {
     loadItems();
   }, [type]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setAddress({ ...address, [e.target.name]: e.target.value });
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setAddress((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = async () => {
@@ -130,75 +138,175 @@ export default function CheckoutAddressPage() {
   };
 
   return (
-    <div className="max-w-2xl p-6 mx-auto my-10 bg-white rounded shadow">
-      <h2 className="mb-4 text-2xl font-semibold">Shipping Address</h2>
+    <>
+      <BannerSection />
+      <div className="relative z-10 -mt-[15%]">
+        <div className="max-w-4xl p-8 mx-auto my-10 bg-white rounded-lg shadow-md">
+          <h2 className="text-2xl font-bold tracking-wide uppercase heading">
+            Shipping Address
+          </h2>
+          <hr className="h-[2px] w-[120px] bg-green-900" />
+          <hr className="h-[2px] w-[120px] bg-green-900 mt-[1px] mb-5" />
+          <p className="mb-6 text-sm text-gray-600">
+            Lorem Ipsum Dolor Sit Amet, Consectetur Adipisicing Elit. Praesent Vitae Libero
+            Venenatis, Tristique Justo.
+          </p>
 
-
-      {Object.keys(address).map((field) => (
-        <div key={field} className="mb-4">
-          <label className="block mb-1 capitalize">{field}</label>
-          <input
-            type="text"
-            name={field}
-            value={address[field as keyof typeof address]}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border rounded"
-          />
-        </div>
-      ))}
-
-      <div className="mt-8">
-        <h3 className="mb-3 text-lg font-semibold">Order Summary</h3>
-        <ul className="space-y-4">
-          {cartItems.map((item, idx) => (
-            <li key={idx} className="flex items-start gap-4 pb-4 border-b">
-              <img
-                src={item.image}
-                alt="Product"
-                className="object-cover w-16 h-16 rounded"
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div>
+              <label className="block mb-1 text-sm font-medium">Full Name</label>
+              <input
+                type="text"
+                name="fullName"
+                value={address.fullName}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded"
               />
-              <div className="flex-1">
-                <p className="font-medium">{item.title || `Product ID: ${item.productId}`}</p>
-                <p className="text-sm text-gray-500">Size: {item.size}</p>
-                <div className="flex items-center gap-2 mt-2">
-                  <button
-                    onClick={() => {
-                      const updated = [...cartItems];
-                      if (updated[idx].quantity > 1) {
-                        updated[idx].quantity -= 1;
-                        setCartItems(updated);
-                      }
-                    }}
-                    className="px-2 py-1 text-sm font-bold text-white bg-red-500 rounded"
-                  >
-                    -
-                  </button>
-                  <span>{item.quantity}</span>
-                  <button
-                    onClick={() => {
-                      const updated = [...cartItems];
-                      updated[idx].quantity += 1;
-                      setCartItems(updated);
-                    }}
-                    className="px-2 py-1 text-sm font-bold text-white bg-green-600 rounded"
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
-              <p className="font-semibold">₹{item.price * item.quantity}</p>
-            </li>
-          ))}
-        </ul>
-      </div>
+            </div>
+            <div>
+              <label className="block mb-1 text-sm font-medium">Phone Number</label>
+              <input
+                type="text"
+                name="phone"
+                value={address.phone}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded"
+              />
+            </div>
 
-      <button
-        onClick={handleSubmit}
-        disabled={isLoading}
-        className="w-full px-6 py-3 mt-6 text-white bg-indigo-600 rounded hover:bg-indigo-700"
-      >
-        {isLoading ? 'Submitting...' : 'Continue to Payment'}
-      </button>
-    </div>
+            <div className="md:col-span-2">
+              <label className="block mb-1 text-sm font-medium">Address Line 1</label>
+              <input
+                type="text"
+                name="addressLine1"
+                value={address.addressLine1}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded"
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block mb-1 text-sm font-medium">Address Line 2</label>
+              <input
+                type="text"
+                name="addressLine2"
+                value={address.addressLine2}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded"
+              />
+            </div>
+
+            <div>
+              <label className="block mb-1 text-sm font-medium">City</label>
+              <select
+                name="city"
+                value={address.city}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded"
+              >
+                <option value="">-- Choose City --</option>
+                <option value="Kolkata">-- Kolkata --</option>
+                {/* Your city options here */}
+              </select>
+            </div>
+
+            <div>
+              <label className="block mb-1 text-sm font-medium">State</label>
+              <select
+                name="state"
+                value={address.state}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded"
+              >
+                <option value="">-- Choose State --</option>
+                <option value="West Bengal">-- West Bengla --</option>
+                {/* Your state options here */}
+              </select>
+            </div>
+
+            <div>
+              <label className="block mb-1 text-sm font-medium">Country</label>
+              <select
+                name="country"
+                value={address.country}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded"
+              >
+                <option value="">-- Choose Country --</option>
+                <option value="India">India</option>
+                {/* Your country options here */}
+              </select>
+            </div>
+
+            <div>
+              <label className="block mb-1 text-sm font-medium">Pincode</label>
+              <input
+                type="text"
+                name="pincode"
+                value={address.pincode}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded"
+              />
+            </div>
+          </div>
+
+          {/* Order Summary */}
+          <div className="pt-6 mt-10 border-t">
+            <h3 className="mb-4 text-lg font-bold">Order Summery</h3>
+
+            {cartItems.map((item, idx) => (
+              <div key={idx} className="flex items-start justify-between gap-4 mb-6">
+                <div className="flex gap-4">
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    className="object-cover w-20 h-24 rounded"
+                  />
+                  <div>
+                    <p className="font-semibold">{item.title || `Product ID: ${item.productId}`}</p>
+                    <p className="text-sm text-gray-500">Color: {item.color}</p>
+                    <div className="flex items-center gap-2 px-2 py-1 mt-2 border rounded w-fit">
+                      <button
+                        onClick={() => {
+                          const updated = [...cartItems];
+                          if (updated[idx].quantity > 1) {
+                            updated[idx].quantity -= 1;
+                            setCartItems(updated);
+                          }
+                        }}
+                        className="text-lg font-bold"
+                      >
+                        <Minus size={16} className='transition hover:scale-150' />
+                      </button>
+                      <span className="px-2">{item.quantity}</span>
+                      <button
+                        onClick={() => {
+                          const updated = [...cartItems];
+                          updated[idx].quantity += 1;
+                          setCartItems(updated);
+                        }}
+                        className="text-lg font-bold"
+                      >
+                        <Plus size={16} className='hover:scale-150' />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="text-lg font-semibold">${item.price * item.quantity}</div>
+              </div>
+            ))}
+          </div>
+
+          <button
+            onClick={handleSubmit}
+            disabled={isLoading}
+            className="w-full px-6 py-3 mt-4 font-semibold text-white bg-[#03989e] rounded hover:bg-[#027b82] transition-all duration-300"
+          >
+            {isLoading ? 'Submitting...' : 'Continue To Payment'}
+          </button>
+        </div>
+      </div>
+    </>
   );
 }

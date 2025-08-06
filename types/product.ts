@@ -21,6 +21,7 @@ export type ProductVariant = {
   productId: ProductInfo; // ✅ Updated: now an object, not a string
   businessId: string;
   color: string;
+  label: string;
   size: ProductSize;
   isPublished: boolean;
   images: string[];
@@ -41,6 +42,7 @@ export type ProductListingItem = {
   variants: {
     variantId: string;
     color: string;
+    label: string;
     isPublished: boolean;
     images: string[];
     averageRating: number;
@@ -74,8 +76,8 @@ export interface ProductPayload {
 // ---------- Product Variant Size ----------
 export interface ProductVariantSize {
   size: string;
-  stock: number;
-  price: number;
+  stock?: number;
+  price?: number;
   salePrice?: number;
   sku: string;
   discountEndDate?: string;                   // ISO string (YYYY-MM-DD)
@@ -84,6 +86,7 @@ export interface ProductVariantSize {
 // ---------- Product Variant ----------
 export interface ProductVariantPayload {
   color: string;
+  label: string;
   images: string[];                           // URLs after upload
   videos?: string[];                          // Optional videos
   allowBackorder?: boolean;
@@ -118,6 +121,7 @@ export interface ProductDetailItem {
   variants: {
     variantId: string;
     color: string;
+    label: string;
     images: string[];
     averageRating: number;
     totalReviews: number;

@@ -94,7 +94,7 @@ const Product = () => {
                 alt={cat.name}
                 width={60}
                 height={60}
-                className="object-contain"
+                className="object-contain grayscale hover:grayscale-0"
               />
               <div className="px-2 mt-3 text-xs font-medium text-center sm:text-sm text-zinc-700">
                 {cat.name}

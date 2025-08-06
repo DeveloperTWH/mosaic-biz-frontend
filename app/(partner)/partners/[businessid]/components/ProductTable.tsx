@@ -20,6 +20,7 @@ export type ProductListingItem = {
   variants: {
     variantId: string;
     color: string;
+    label: string;
     isPublished: boolean;
     images: string[];
     averageRating: number;
@@ -56,6 +57,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
   const { businessid } = useParams();
   const { business } = useBusinessStore();
   const [expanded, setExpanded] = useState<string[]>([]);
+  const [expandedVariants, setExpandedVariants] = useState<string[]>([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<{
     type: 'product' | 'variant';
@@ -148,6 +150,15 @@ const ProductTable: React.FC<ProductTableProps> = ({
     }
   };
 
+  const toggleVariantExpand = (variantId: string) => {
+    setExpandedVariants(prev =>
+      prev.includes(variantId)
+        ? prev.filter(id => id !== variantId)
+        : [...prev, variantId]
+    );
+  };
+
+
 
   if (products.length === 0) {
     return (
@@ -189,7 +200,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
             {products.map(product => (
               <React.Fragment key={product._id}>
                 <tr
-                  className={`border-b hover:bg-gray-50 ${hasOutOfStockVariant(product) ? 'bg-yellow-100' : ''}`}
+                  className={`border-b hover:bg-gray-50 ${hasOutOfStockVariant(product) ? 'bg-red-200' : ''}`}
                 >
                   <td className="px-4 py-3 align-top">
                     <button onClick={() => toggleExpand(product._id)}>
@@ -243,91 +254,106 @@ const ProductTable: React.FC<ProductTableProps> = ({
                 {expanded.includes(product._id) && (
                   <tr>
                     <td colSpan={5} className="p-4 bg-gray-50">
-                      <div className="grid gap-6 sm:grid-cols-2">
-                        {product.variants.map(variant => (
-                          <div
-                            key={variant.variantId}
-                            className="flex flex-col justify-between h-full p-4 space-y-4 bg-white border rounded-md shadow"
-                          >
-                            <div className="flex flex-col gap-4">
-                              <div className="flex flex-col gap-2">
+                      <div className="flex flex-col">
+                        {product.variants.map((variant, idx) => {
+                          const isOutOfStock = variant.sizes.some(size => size.stock === 0);
+                          const isExpanded = expandedVariants.includes(variant.variantId);
+                          return (
+                            <div
+                              key={variant.variantId}
+                              className={`flex flex-col justify-between h-full p-4 space-y-4 bg-white border rounded-md shadow ${isOutOfStock ? 'bg-red-200' : ''}`}  // Add highlight here
+                            >
+                              {/* Header */}
+                              <div className="flex items-center justify-between cursor-pointer" onClick={() => toggleVariantExpand(variant.variantId)}>
                                 <p className="text-sm font-semibold text-gray-700">
-                                  Variant Color: <span className="text-black">{variant.color}</span>
+                                  {idx + 1}. Variant Color: <span className="text-black">{variant.color}</span>
                                 </p>
-                                <div className="flex gap-2">
-                                  {variant.images.slice(0, 3).map((img, i) => (
-                                    <div key={i} className="w-16 h-16 overflow-hidden border rounded">
-                                      <Image
-                                        src={img}
-                                        alt={`variant-img-${i}`}
-                                        width={64}
-                                        height={64}
-                                        className="object-cover w-full h-full"
-                                      />
-                                    </div>
-                                  ))}
-                                </div>
+                                <button>
+                                  {isExpanded ? <ChevronUp /> : <ChevronDown />}
+                                </button>
                               </div>
 
-                              <div className="grid gap-4 sm:grid-cols-1">
-                                {variant.sizes.map(size => (
-                                  <div
-                                    key={size.sizeId}
-                                    className={`relative border rounded-md p-4 space-y-1 text-sm shadow-sm transition ${size.stock === 0
-                                      ? 'bg-red-100 text-red-700 font-semibold'
-                                      : 'bg-gray-50'
-                                      }`}
-                                  >
-                                    <p><strong>Size:</strong> {size.size}</p>
-                                    <p><strong>SKU:</strong> {size.sku}</p>
-                                    <p><strong>Stock:</strong> {size.stock}</p>
-                                    {variant.isPublished ? (
-                                      <span className="text-xs font-medium text-green-600">Published</span>
-                                    ) : (
-                                      <span className="text-xs font-medium text-yellow-600">Unpublished</span>
-                                    )}
-
-                                    {size.salePrice && size.discountEndDate && new Date() < new Date(size.discountEndDate) ? (
-                                      <>
-                                        <p>
-                                          <strong>Price:</strong>{' '}
-                                          <span className="text-gray-500 line-through">₹{size.price}</span>{' '}
-                                          <span className="font-semibold text-green-600">₹{size.salePrice}</span>
-                                        </p>
-                                        <p className="text-sm text-gray-600">
-                                          <strong>Offer valid till:</strong> {new Date(size.discountEndDate).toLocaleDateString()}
-                                        </p>
-                                      </>
-                                    ) : (
-                                      <p><strong>Price:</strong> ₹{size.price}</p>
-                                    )}
-
-
-                                    <div className="absolute flex gap-1 top-2 right-2">
-                                      <button className="p-1 bg-blue-500 rounded hover:bg-blue-600" title="View">
-                                        <Eye className="w-4 h-4 text-white" />
-                                      </button>
-                                      <Link href={`/partners/${businessid}/inventory/edit/${product._id}/${variant.variantId}`}>
-                                        <button className="h-full p-1 bg-yellow-500 rounded hover:bg-yellow-600" title="Edit">
-                                          <Pencil className="w-4 h-4 text-white" />
-                                        </button>
-                                      </Link>
-                                      <button
-                                        onClick={() => {
-                                          setDeleteTarget({ type: 'variant', productId: product._id, variantId: variant.variantId });
-                                          setShowDeleteModal(true);
-                                        }}
-
-                                        className="p-1 bg-gray-500 rounded hover:bg-gray-600" title="Delete">
-                                        <Trash2 className="w-4 h-4 text-white" />
-                                      </button>
-                                    </div>
+                              {/* Images */}
+                              <div className="flex gap-2">
+                                {variant.images.slice(0, 3).map((img, i) => (
+                                  <div key={i} className="w-16 h-16 overflow-hidden border rounded">
+                                    <Image
+                                      src={img}
+                                      alt={`variant-img-${i}`}
+                                      width={64}
+                                      height={64}
+                                      className="object-cover w-full h-full rounded"
+                                    />
                                   </div>
                                 ))}
                               </div>
+
+                              {/* Collapsible Content */}
+                              {isExpanded && (
+                                <div
+                                  className={`flex flex-col gap-4 pl-10 ${variant.sizes.some(size => size.stock === 0) ? 'bg-red-200' : ''}`}
+                                >
+                                  {variant.sizes.map(size => (
+                                    <div
+                                      key={size.sizeId}
+                                      className={`relative border rounded-md p-4 space-y-1 text-sm shadow-sm transition ${size.stock === 0
+                                        ? 'bg-red-100 text-red-700 font-semibold' // Individual size is out of stock
+                                        : 'bg-gray-50'
+                                        }`}
+                                    >
+                                      <p><strong>{variant.label} :</strong> {size.size}</p>
+                                      <p><strong>SKU:</strong> {size.sku}</p>
+                                      <p><strong>Stock:</strong> {size.stock}</p>
+                                      {variant.isPublished ? (
+                                        <span className="text-xs font-medium text-green-600">Published</span>
+                                      ) : (
+                                        <span className="text-xs font-medium text-yellow-600">Unpublished</span>
+                                      )}
+
+                                      {size.salePrice && size.discountEndDate && new Date() < new Date(size.discountEndDate) ? (
+                                        <>
+                                          <p>
+                                            <strong>Price:</strong>{' '}
+                                            <span className="text-gray-500 line-through">₹{size.price}</span>{' '}
+                                            <span className="font-semibold text-green-600">₹{size.salePrice}</span>
+                                          </p>
+                                          <p className="text-sm text-gray-600">
+                                            <strong>Offer valid till:</strong>{' '}
+                                            {new Date(size.discountEndDate).toLocaleDateString()}
+                                          </p>
+                                        </>
+                                      ) : (
+                                        <p><strong>Price:</strong> ₹{size.price}</p>
+                                      )}
+
+                                      {/* Actions */}
+                                      <div className="absolute flex gap-1 top-2 right-2">
+                                        <button className="p-1 bg-blue-500 rounded hover:bg-blue-600" title="View">
+                                          <Eye className="w-4 h-4 text-white" />
+                                        </button>
+                                        <Link href={`/partners/${businessid}/inventory/edit/${product._id}/${variant.variantId}`}>
+                                          <button className="h-full p-1 bg-yellow-500 rounded hover:bg-yellow-600" title="Edit">
+                                            <Pencil className="w-4 h-4 text-white" />
+                                          </button>
+                                        </Link>
+                                        <button
+                                          onClick={() => {
+                                            setDeleteTarget({ type: 'variant', productId: product._id, variantId: variant.variantId });
+                                            setShowDeleteModal(true);
+                                          }}
+                                          className="p-1 bg-gray-500 rounded hover:bg-gray-600"
+                                          title="Delete"
+                                        >
+                                          <Trash2 className="w-4 h-4 text-white" />
+                                        </button>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
 
                         {/* Add Variant Block */}
                         <Link href={`/partners/${businessid}/inventory/edit/${product._id}/add-variant`}>
@@ -422,7 +448,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                             : 'bg-white'
                             }`}
                         >
-                          <p className="text-sm"><strong>Size:</strong> {size.size}</p>
+                          <p className="text-sm"><strong>{variant.label}:</strong> {size.size}</p>
                           <p className="text-sm"><strong>Stock:</strong> {size.stock}</p>
                           <p className="text-sm"><strong>SKU:</strong> {size.sku}</p>
                           {variant.isPublished ? (

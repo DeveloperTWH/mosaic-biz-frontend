@@ -40,7 +40,7 @@ const CategoryGrid = () => {
               alt={cat.name}
               width={60}
               height={60}
-              className="mx-auto mb-2"
+              className="mx-auto mb-2 grayscale hover:grayscale-0"
             />
             <div className="text-sm font-medium md:text-base">{cat.name}</div>
           </Link>

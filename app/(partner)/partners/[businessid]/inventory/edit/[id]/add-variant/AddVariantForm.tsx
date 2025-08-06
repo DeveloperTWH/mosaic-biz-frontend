@@ -8,27 +8,26 @@ import type { ProductVariantPayload, ProductVariantSize } from '@/types/product'
 import { uploadToS3 } from '@/utils/s3Uploader';
 
 const defaultVariant: ProductVariantPayload = {
-  color: '',
-  images: [],
-  sizes: [{
-    size: '',
-    sku: '',
-    stock: 0,
-    price: 0,
-    salePrice: undefined,
-    discountEndDate: '',
-  }],
-  weightInKg: undefined,
-  allowBackorder: false,
-  isPublished: false,
-  dimensions: {
-    length: undefined,
-    width: undefined,
-    height: undefined,
-  },
+    color: '',
+    label: 'Size',
+    images: [],
+    sizes: [{
+        size: '',
+        sku: '',
+        stock: 0,
+        price: 0,
+        salePrice: undefined,
+        discountEndDate: '',
+    }],
+    weightInKg: undefined,
+    allowBackorder: false,
+    isPublished: false,
+    dimensions: {
+        length: undefined,
+        width: undefined,
+        height: undefined,
+    },
 };
-
-
 
 const AddVariantForm = () => {
     const router = useRouter();
@@ -47,6 +46,23 @@ const AddVariantForm = () => {
     ) => {
         const updatedSizes = [...variant.sizes];
         updatedSizes[index] = { ...updatedSizes[index], [field]: value };
+        setVariant(prev => ({ ...prev, sizes: updatedSizes }));
+    };
+
+    const handleAddSize = () => {
+        const newSize = {
+            size: '',
+            sku: '',
+            stock: 0,
+            price: 0,
+            salePrice: undefined,
+            discountEndDate: '',
+        };
+        setVariant(prev => ({ ...prev, sizes: [...prev.sizes, newSize] }));
+    };
+
+    const handleRemoveSize = (index: number) => {
+        const updatedSizes = variant.sizes.filter((_, i) => i !== index);
         setVariant(prev => ({ ...prev, sizes: updatedSizes }));
     };
 
@@ -79,7 +95,6 @@ const AddVariantForm = () => {
                 ]
             };
 
-
             await axios.post(
                 `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/product/add-variants/${productId}`,
                 payload,
@@ -96,7 +111,6 @@ const AddVariantForm = () => {
         }
     };
 
-
     return (
         <div className="space-y-6">
             <h1 className="text-xl font-semibold roboto">Add Variant</h1>
@@ -105,21 +119,44 @@ const AddVariantForm = () => {
                 {/* Form */}
                 <div className="flex-1 space-y-4">
                     <div className="p-5 space-y-4 bg-white rounded-md shadow">
+                        <label htmlFor={`color-picker`} className="cursor-pointer">
+                            Color:
+                        </label>
                         <input
-                            type="text"
-                            placeholder="Color"
-                            value={variant.color || ''}
-                            required
-                            onChange={(e) => handleChange('color', e.target.value)}
-                            className="w-full p-2 border rounded"
+                            type="color"
+                            value={variant.color || "#ffffff"}
+                            id={`color-picker`}
+                            onChange={(e) => handleChange("color", e.target.value)}
+                            className="w-8 h-8 rounded-full"
                         />
 
                         <div className="space-y-2">
-                            <label className="font-medium">Sizes</label>
+                            <input
+                                type="text"
+                                placeholder="Label (e.g., 'Summer Edition')"
+                                value={variant.label || ''}
+                                onChange={(e) => handleChange('label', e.target.value)}
+                                className="w-full p-2 border rounded"
+                            />
+
                             {variant.sizes.map((sizeObj: any, index: number) => (
                                 <div key={index} className="grid grid-cols-2 gap-2 p-3 border rounded">
-                                    <input type="text" placeholder="Size" value={sizeObj.size} required onChange={(e) => handleSizeChange(index, 'size', e.target.value)} className="p-2 border rounded" />
-                                    <input type="text" placeholder="SKU" value={sizeObj.sku} required onChange={(e) => handleSizeChange(index, 'sku', e.target.value)} className="p-2 border rounded" />
+                                    <input
+                                        type="text"
+                                        placeholder={variant.label || ''}
+                                        value={sizeObj.size}
+                                        required
+                                        onChange={(e) => handleSizeChange(index, 'size', e.target.value)}
+                                        className="p-2 border rounded"
+                                    />
+                                    <input
+                                        type="text"
+                                        placeholder="SKU"
+                                        value={sizeObj.sku}
+                                        required
+                                        onChange={(e) => handleSizeChange(index, 'sku', e.target.value)}
+                                        className="p-2 border rounded"
+                                    />
                                     <input
                                         type="number"
                                         placeholder="Stock"
@@ -127,7 +164,6 @@ const AddVariantForm = () => {
                                         onChange={(e) => handleSizeChange(index, 'stock', parseInt(e.target.value))}
                                         className="p-2 border rounded"
                                     />
-
                                     <input
                                         type="number"
                                         placeholder="Price"
@@ -136,7 +172,6 @@ const AddVariantForm = () => {
                                         required
                                         className="p-2 border rounded"
                                     />
-
                                     <input
                                         type="number"
                                         placeholder="Sale Price"
@@ -144,11 +179,33 @@ const AddVariantForm = () => {
                                         onChange={(e) => handleSizeChange(index, 'salePrice', parseFloat(e.target.value))}
                                         className="p-2 border rounded"
                                     />
+                                    <input
+                                        type="date"
+                                        value={sizeObj.discountEndDate ? sizeObj.discountEndDate.substring(0, 10) : ''}
+                                        onChange={(e) => handleSizeChange(index, 'discountEndDate', e.target.value)}
+                                        className="p-2 border rounded"
+                                    />
 
-                                    <input type="date" value={sizeObj.discountEndDate ? sizeObj.discountEndDate.substring(0, 10) : ''} onChange={(e) => handleSizeChange(index, 'discountEndDate', e.target.value)} className="p-2 border rounded" />
+                                    {/* Remove Size Button */}
+                                    <button
+                                        type="button"
+                                        onClick={() => handleRemoveSize(index)}
+                                        className="px-3 py-1 text-xs text-white bg-red-500 rounded"
+                                    >
+                                        Delete Size
+                                    </button>
                                 </div>
                             ))}
                         </div>
+
+                        {/* Add Size Button */}
+                        <button
+                            type="button"
+                            onClick={handleAddSize}
+                            className="px-4 py-2 text-white bg-blue-600 rounded"
+                        >
+                            + Add Size
+                        </button>
 
                         <div className="flex gap-4">
                             <input
@@ -168,6 +225,7 @@ const AddVariantForm = () => {
                             </label>
                         </div>
 
+                        {/* Dimensions */}
                         <div className="grid grid-cols-3 gap-2">
                             <input
                                 type="number"
@@ -193,6 +251,7 @@ const AddVariantForm = () => {
                         </div>
                     </div>
 
+                    {/* Action Buttons */}
                     <div className="flex gap-4">
                         <button
                             type="button"
@@ -211,7 +270,6 @@ const AddVariantForm = () => {
                             {isSubmitting ? 'Publishing...' : 'Publish'}
                         </button>
                     </div>
-
                 </div>
 
                 {/* Image */}

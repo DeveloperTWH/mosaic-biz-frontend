@@ -123,7 +123,7 @@ export default function ProductDetailPage() {
           </div>
 
           <div className="text-2xl font-bold text-[#c79b44]">
-            ₹
+            $
             {selectedPrice?.salePrice &&
               selectedPrice?.discountEndDate &&
               new Date(selectedPrice.discountEndDate) > new Date()
@@ -135,7 +135,7 @@ export default function ProductDetailPage() {
               new Date(selectedPrice.discountEndDate) > new Date() && (
                 <>
                   <span className="ml-2 text-base text-gray-400 line-through">
-                    ₹{selectedPrice.price}
+                    ${selectedPrice.price}
                   </span>
                   <span className="ml-2 text-sm text-green-600">
                     {Math.round(((selectedPrice.price - selectedPrice.salePrice) / selectedPrice.price) * 100)}% OFF
@@ -156,6 +156,8 @@ export default function ProductDetailPage() {
                     setSelectedColor(variant.color);
                     const firstSize = variant.sizes?.[0]?.size;
                     if (firstSize) setSelectedSize(firstSize);
+                    console.log(selectedVariant);
+                    
                   }}
                   className={`w-6 h-6 rounded-full cursor-pointer border-2 ${selectedColor === variant.color ? "border-black" : "border-gray-300"}`}
                   style={{ backgroundColor: variant.color }}
@@ -167,7 +169,7 @@ export default function ProductDetailPage() {
 
           {/* Size Selection */}
           <div>
-            <p className="mb-1 font-semibold">SIZE CHART</p>
+            <p className="mb-1 font-semibold">{selectedVariant?.label}</p>
             <div className="flex gap-3">
               {selectedVariant?.sizes?.map((size) => (
                 <button
@@ -182,16 +184,16 @@ export default function ProductDetailPage() {
           </div>
 
           {/* Offers */}
-          <div>
+          {/* <div>
             <p className="font-semibold">AVAILABLE OFFERS</p>
             <ul className="ml-6 text-sm text-gray-600 list-disc">
               <li>5% cashback on Axis Bank Credit Card – T&C apply</li>
-              <li>10% off on orders above ₹1,000 using SBI Credit Card – T&C apply</li>
+              <li>10% off on orders above $1,000 using SBI Credit Card – T&C apply</li>
             </ul>
-          </div>
+          </div> */}
 
           {/* Buttons */}
-          <div className="flex gap-4 mt-4">
+          <div className="flex gap-4 pt-10 mt-4">
             {cartQty > 0 ? (
               <div className="flex items-center gap-2">
                 <button

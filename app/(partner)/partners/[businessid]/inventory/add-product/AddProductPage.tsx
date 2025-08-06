@@ -98,6 +98,7 @@ const AddProductPage: React.FC<AddProductPageProps> = ({ businessId, businessSlu
     const addVariant = () => {
         const newVariant: ProductVariantPayload = {
             color: "",
+            label: "Size",
             images: [],
             videos: [],
             allowBackorder: false,
@@ -107,8 +108,8 @@ const AddProductPage: React.FC<AddProductPageProps> = ({ businessId, businessSlu
             sizes: [
                 {
                     size: "",
-                    stock: 0,
-                    price: 0,
+                    stock: undefined,
+                    price: undefined,
                     salePrice: undefined,
                     sku: "",
                     discountEndDate: "",
@@ -138,8 +139,8 @@ const AddProductPage: React.FC<AddProductPageProps> = ({ businessId, businessSlu
         const updatedVariants = [...productData.variants];
         updatedVariants[variantIndex].sizes.push({
             size: "",
-            stock: 0,
-            price: 0,
+            stock: undefined,
+            price: undefined,
             salePrice: undefined,
             sku: "",
             discountEndDate: "",
@@ -478,19 +479,38 @@ const AddProductPage: React.FC<AddProductPageProps> = ({ businessId, businessSlu
 
                 {/* Variants */}
                 <div className="p-5 space-y-4 bg-white rounded-md shadow">
-                <h1 className="text-base font-semibold roboto">Product Variantions</h1>
+                    <h1 className="text-base font-semibold roboto">Product Variantions</h1>
                     {productData.variants.map((variant, vIndex) => (
                         <div
                             key={vIndex}
                             className="p-4 mb-4 space-y-3 border border-gray-300 rounded"
                         >
-                            <input
-                                type="text"
-                                placeholder="Color (e.g., red)"
-                                value={variant.color}
-                                onChange={(e) => updateVariant(vIndex, "color", e.target.value)}
-                                className="w-full p-2 border rounded"
-                            />
+                            <div className="flex items-center gap-2">
+                                {/* Color Picker */}
+                                <label htmlFor={`color-picker-${vIndex}`} className="cursor-pointer">
+                                    Color :
+                                </label>
+                                <input
+                                    type="color"
+                                    value={variant.color || "#ffffff"}  // Default color is white if there's no color selected
+                                    id={`color-picker-${vIndex}`}
+                                    onChange={(e) => updateVariant(vIndex, "color", e.target.value)}
+                                    className="w-8 h-8 rounded-full"
+                                    title="Pick a color"  // Tooltip when hovering over the color input
+                                />
+
+                                {/* Hex Code Input */}
+                                <input
+                                    type="text"
+                                    value={variant.color || ""}  // Default color is white if there's no color selected
+                                    onChange={(e) => updateVariant(vIndex, "color", e.target.value)}
+                                    className="w-24 p-2 border rounded"
+                                    placeholder="Enter Hex"
+                                    title="Enter a hex color code"
+                                />
+                            </div>
+
+
                             <label className="flex items-center gap-2">
                                 <input
                                     type="checkbox"
@@ -505,23 +525,27 @@ const AddProductPage: React.FC<AddProductPageProps> = ({ businessId, businessSlu
                             {/* Sizes */}
                             <div className="space-y-2">
                                 <div className="flex items-center justify-between">
-                                    <p className="font-medium">Sizes</p>
+                                    <input
+                                        type="text"
+                                        value={variant.label ?? "Size"}
+                                        onChange={(e) => updateVariant(vIndex, "label", e.target.value)}
+                                        placeholder="Label (e.g., Size, Quantity, Edition)"
+                                        className="p-2 text-sm border rounded w-[70%]"
+                                    />
                                     <button
                                         type="button"
                                         onClick={() => addSizeToVariant(vIndex)}
                                         className="text-sm text-blue-600"
                                     >
-                                        + Add Size
+                                        + Add {variant.label || "Size"}
                                     </button>
                                 </div>
+
                                 {variant.sizes.map((size, sIndex) => (
-                                    <div
-                                        key={sIndex}
-                                        className="grid grid-cols-2 gap-2 sm:grid-cols-6"
-                                    >
+                                    <div key={sIndex} className="grid grid-cols-2 gap-2 sm:grid-cols-6">
                                         <input
                                             type="text"
-                                            placeholder="Size"
+                                            placeholder={variant.label || "Size"}
                                             value={size.size}
                                             onChange={(e) =>
                                                 updateVariantSize(vIndex, sIndex, "size", e.target.value)
@@ -529,34 +553,29 @@ const AddProductPage: React.FC<AddProductPageProps> = ({ businessId, businessSlu
                                             className="p-2 border rounded"
                                         />
                                         <input
-                                            type="number"
+                                            type="text"
                                             placeholder="Stock"
-                                            value={size.stock}
+                                            value={size.stock || ""}
                                             onChange={(e) =>
                                                 updateVariantSize(vIndex, sIndex, "stock", Number(e.target.value))
                                             }
                                             className="p-2 border rounded"
                                         />
                                         <input
-                                            type="number"
+                                            type="text"
                                             placeholder="Price"
-                                            value={size.price}
+                                            value={size.price || ""}
                                             onChange={(e) =>
                                                 updateVariantSize(vIndex, sIndex, "price", Number(e.target.value))
                                             }
                                             className="p-2 border rounded"
                                         />
                                         <input
-                                            type="number"
+                                            type="text"
                                             placeholder="Sale Price"
                                             value={size.salePrice || ""}
                                             onChange={(e) =>
-                                                updateVariantSize(
-                                                    vIndex,
-                                                    sIndex,
-                                                    "salePrice",
-                                                    Number(e.target.value)
-                                                )
+                                                updateVariantSize(vIndex, sIndex, "salePrice", Number(e.target.value))
                                             }
                                             className="p-2 border rounded"
                                         />
@@ -569,19 +588,38 @@ const AddProductPage: React.FC<AddProductPageProps> = ({ businessId, businessSlu
                                             }
                                             className="p-2 border rounded"
                                         />
-                                        <input
-                                            type="date"
-                                            value={size.discountEndDate || ""}
-                                            onChange={(e) =>
-                                                updateVariantSize(
-                                                    vIndex,
-                                                    sIndex,
-                                                    "discountEndDate",
-                                                    e.target.value
-                                                )
-                                            }
-                                            className="p-2 border rounded"
-                                        />
+
+                                        {/* Sale End Date */}
+                                        <div className="col-span-2 sm:col-span-6">
+                                            <label className="block text-sm font-medium">Sale End Date</label>
+                                            <input
+                                                type="date"
+                                                value={size.discountEndDate || ""}
+                                                onChange={(e) =>
+                                                    updateVariantSize(
+                                                        vIndex,
+                                                        sIndex,
+                                                        "discountEndDate",
+                                                        e.target.value
+                                                    )
+                                                }
+                                                className="w-full p-2 border rounded"
+                                            />
+                                            {/* Delete Size Button */}
+                                            <div className="flex justify-end w-full">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        alert("dbhie")
+                                                        const updatedSizes = variant.sizes.filter((_, i) => i !== sIndex);
+                                                        updateVariant(vIndex, "sizes", updatedSizes);
+                                                    }}
+                                                    className="px-3 py-1 mt-2 text-xs text-white bg-red-500 rounded"
+                                                >
+                                                    Delete Size
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                 ))}
                             </div>

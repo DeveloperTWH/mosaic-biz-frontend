@@ -188,7 +188,13 @@ const EditVariantForm: React.FC<EditVariantFormProps> = ({ productId, variantId,
                         />
 
                         <div className="space-y-2">
-                            <label className="font-medium">Sizes</label>
+                            <input
+                                type="text"
+                                placeholder="Label (e.g., Size, Weight, Volume)"
+                                value={variant.label || ''}
+                                onChange={(e) => handleChange('label', e.target.value)}
+                                className="w-full p-2 border rounded"
+                            />
                             {variant.sizes.map((sizeObj: any, index: number) => (
                                 <div key={index}>
                                     <div key={index} className="grid grid-cols-2 gap-2 p-3 border rounded">
@@ -278,7 +284,7 @@ const EditVariantForm: React.FC<EditVariantFormProps> = ({ productId, variantId,
                                     }
                                     className="px-5 py-2 text-sm text-blue-600 transition bg-blue-300 rounded hover:bg-blue-600 hover:text-white hover:scale-105"
                                 >
-                                    + Add Size
+                                    + Add {variant.label || 'Size'}
                                 </button>
                             </div>
 
