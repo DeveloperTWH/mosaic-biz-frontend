@@ -2,7 +2,7 @@
 
 import { useBusinessStore } from '@/app/store/businessStore';
 import { fetchBusinessBySlug } from '../utils/fetchBusiness';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import Sidebar from '../components/Sidebar';
 import Topbar from '../components/Topbar';
@@ -28,40 +28,40 @@ interface OrderItem {
 }
 
 interface Order {
-  _id: string;
-  userId: {
-    name: string;
-    email: string;
-  };
-  vendorId: string;
-  items: Array<{
-    productId: {
-      title: string;
-      coverImage: string;
+    _id: string;
+    userId: {
+        name: string;
+        email: string;
     };
-    variantId: {
-      color: string;
+    vendorId: string;
+    items: Array<{
+        productId: {
+            title: string;
+            coverImage: string;
+        };
+        variantId: {
+            color: string;
+        };
+        size: string;
+        quantity: number;
+        price: number;
+        sku: string;
+    }>;
+    totalAmount: number;
+    currency: string;
+    status: string;
+    paymentStatus: "pending" | "paid" | "failed" | "refunded"; // ✅ Fix 1
+    shippingAddress: { // ✅ Fix 2
+        fullName: string;
+        phone: string;
+        addressLine1: string;
+        addressLine2?: string;
+        city: string;
+        state: string;
+        country: string;
+        pincode: string;
     };
-    size: string;
-    quantity: number;
-    price: number;
-    sku:string;
-  }>;
-  totalAmount: number;
-  currency: string;
-  status: string;
-  paymentStatus: "pending" | "paid" | "failed" | "refunded"; // ✅ Fix 1
-  shippingAddress: { // ✅ Fix 2
-    fullName: string;
-    phone: string;
-    addressLine1: string;
-    addressLine2?: string;
-    city: string;
-    state: string;
-    country: string;
-    pincode: string;
-  };
-  createdAt: string;
+    createdAt: string;
 }
 
 
@@ -74,6 +74,8 @@ const page = () => {
     const [error, setError] = useState<string | null>(null);
     const [orders, setOrders] = useState<Order[]>([]);
     const [statusFilter, setStatusFilter] = useState('');
+
+    const router = useRouter();
 
     // ✅ Load Business
     useEffect(() => {
@@ -98,25 +100,31 @@ const page = () => {
 
     // ✅ Load Orders
     useEffect(() => {
-    const fetchOrders = async () => {
-        if (!business?._id) return;
+        const fetchOrders = async () => {
+            if (!business?._id) return;
 
-        setIsLoading(true); // ✅ start loading
-        try {
-            const res = await axios.get(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/orders/vendor?businessId=${business._id}&status=${statusFilter}`,
-                { withCredentials: true }
-            );
-            setOrders(res.data.orders || []);
-        } catch (err) {
-            toast.error("Failed to fetch orders");
-        } finally {
-            setIsLoading(false); // ✅ stop loading
-        }
-    };
+            if (business?.listingType !== "product") {
+                toast.error("Not Authorized to be in the page")
+                router.push("/partners")
+                return;
+            }
 
-    fetchOrders();
-}, [business?._id, statusFilter]);
+            setIsLoading(true); // ✅ start loading
+            try {
+                const res = await axios.get(
+                    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/orders/vendor?businessId=${business._id}&status=${statusFilter}`,
+                    { withCredentials: true }
+                );
+                setOrders(res.data.orders || []);
+            } catch (err) {
+                toast.error("Failed to fetch orders");
+            } finally {
+                setIsLoading(false); // ✅ stop loading
+            }
+        };
+
+        fetchOrders();
+    }, [business?._id, statusFilter]);
 
     const handleAction = async (orderId: string, action: 'accept' | 'reject') => {
         try {

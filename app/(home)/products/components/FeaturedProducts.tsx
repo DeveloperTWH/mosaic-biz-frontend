@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { ProductListingItem } from "@/types/product";
 import { useRouter } from 'next/navigation';
+import { PackageX } from 'lucide-react';
 
 const itemsPerPage = 12;
 
@@ -28,6 +29,20 @@ const FeaturedProducts: React.FC<Props> = ({ products, loading }) => {
                 </div>
             </div>
         )
+    }
+
+    if (paginatedProducts.length === 0) {
+        return (
+            <section className="px-6 py-16 mx-auto text-center max-w-7xl">
+                <div className="flex justify-center mb-4">
+                    <PackageX className="w-12 h-12 text-gray-400" />
+                </div>
+                <h2 className="text-xl font-semibold text-gray-700 uppercase">No Products Found</h2>
+                <p className="max-w-xl mx-auto mt-2 text-gray-500">
+                    Please try again later or adjust your filters.
+                </p>
+            </section>
+        );
     }
 
     return (
@@ -113,7 +128,8 @@ const FeaturedProducts: React.FC<Props> = ({ products, loading }) => {
 
                             {/* Cart Icon - stays outside the click zone */}
                             <div className="flex justify-end mt-4">
-                                <button onClick={() =>{console.log(product._id);
+                                <button onClick={() => {
+                                    console.log(product._id);
                                 }}>
                                     <Image
                                         src="/ShopProduct/Mask group.png"

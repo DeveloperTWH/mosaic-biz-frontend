@@ -7,6 +7,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Service } from '@/types/service';
 import { Review } from '@/types/review';
+import { toast } from "react-toastify"
 
 interface GetServiceBySlugResponse {
     success: boolean;
@@ -14,6 +15,15 @@ interface GetServiceBySlugResponse {
         service: Service;
         reviews: Review[];
     };
+}
+
+interface BookingFormData {
+    name: string;
+    email: string;
+    phone: string;
+    selectedServices: string[];
+    date: string;
+    time: string;
 }
 
 
@@ -24,6 +34,14 @@ const ServiceDetailPage = () => {
     const [reviews, setReviews] = useState<Review[]>([]);
     const [loading, setLoading] = useState(true);
     const [showAll, setShowAll] = useState(false);
+    const [form, setForm] = useState<BookingFormData>({
+        name: '',
+        email: '',
+        phone: '',
+        selectedServices: [],
+        date: '',
+        time: '',
+    });
     const visibleCount = showAll ? reviews.length : 4;
     let mapSrc, address;
 
@@ -45,6 +63,74 @@ const ServiceDetailPage = () => {
         };
         if (slug) fetchService();
     }, [slug]);
+
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setForm((prev) => ({
+            ...prev,
+            [e.target.name]: e.target.value,
+        }));
+    };
+
+    const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        const checked = e.target.checked;
+
+        setForm((prev) => {
+            const updatedServices = checked
+                ? [...prev.selectedServices, value]
+                : prev.selectedServices.filter((item) => item !== value);
+
+            return { ...prev, selectedServices: updatedServices };
+        });
+    };
+
+
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!form.selectedServices.length || !form.date || !form.time) {
+            toast.error("Please fill in all required fields");
+            return;
+        }
+
+        try {
+            const res = await axios.post(
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/bookings/create`,
+                {
+                    serviceId: service?._id,
+                    serviceItems: form.selectedServices,
+                    date: form.date,
+                    time: form.time,
+                    notes: `Customer: ${form.name}, Phone: ${form.phone}`,
+                    amountPaid: 0,
+                    paymentStatus: 'pending',
+                    name: form.name,
+                    email: form.email,
+                    phone: form.phone,
+                },
+                { withCredentials: true }
+            );
+
+            if (res.data.success) {
+                toast.success("Appointment request submitted!");
+                setForm({
+                    name: '',
+                    email: '',
+                    phone: '',
+                    selectedServices: [],
+                    date: '',
+                    time: '',
+                });
+            }
+        } catch (err) {
+            console.error(err);
+            toast.error("Failed to submit appointment");
+        }
+    };
+
+
 
     if (loading) return (
         <div className="flex items-center justify-center p-5 text-custom-blue">
@@ -134,21 +220,83 @@ const ServiceDetailPage = () => {
                     <aside className="space-y-6">
                         <div className="p-4 pt-0 border rounded-lg shadow-sm">
                             <h3 className="mb-4 text-lg font-semibold heading">Schedule a Booking</h3>
-                            <form className="space-y-3">
-                                <input type="text" placeholder="Name" className="w-full p-2 border rounded" />
-                                <input type="email" placeholder="Email" className="w-full p-2 border rounded" />
-                                <input type="tel" placeholder="Phone" className="w-full p-2 border rounded" />
+                            <form className="space-y-3" onSubmit={handleSubmit}>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    placeholder="Name"
+                                    value={form.name}
+                                    onChange={handleChange}
+                                    className="w-full p-2 border rounded"
+                                    required
+                                />
+                                <input
+                                    type="email"
+                                    name="email"
+                                    placeholder="Email"
+                                    value={form.email}
+                                    onChange={handleChange}
+                                    className="w-full p-2 border rounded"
+                                    required
+                                />
+                                <input
+                                    type="tel"
+                                    name="phone"
+                                    placeholder="Phone"
+                                    value={form.phone}
+                                    onChange={handleChange}
+                                    className="w-full p-2 border rounded"
+                                    required
+                                />
 
+                                {/* ✅ Service Selection */}
                                 <div className="space-y-1">
-                                    <p>What type of service do you need?</p>
-                                    {service.services.map((svc) => (
-                                        <label key={svc._id} className="block">
-                                            <input type="radio" name="service" value={svc.name} /> {svc.name}
+                                    <p className="font-medium">What type of service do you need?</p>
+                                    {service.services.map((svc: any) => (
+                                        <label key={svc.name} className="block">
+                                            <input
+                                                type="checkbox"
+                                                name="selectedService"
+                                                value={svc.name}
+                                                checked={form.selectedServices.includes(svc.name)}
+                                                onChange={handleCheckboxChange}
+                                            />{' '}
+                                            {svc.name}
                                         </label>
                                     ))}
                                 </div>
 
-                                <button className="w-full p-2 text-white rounded bg-custom-blue hover:bg-teal-700">
+
+                                {/* ✅ Date Picker */}
+                                <div>
+                                    <label className="block mb-1 font-medium">Select Date</label>
+                                    <input
+                                        type="date"
+                                        name="date"
+                                        value={form.date}
+                                        onChange={handleChange}
+                                        className="w-full p-2 border rounded"
+                                        required
+                                    />
+                                </div>
+
+                                {/* ✅ Time Picker */}
+                                <div>
+                                    <label className="block mb-1 font-medium">Select Time</label>
+                                    <input
+                                        type="time"
+                                        name="time"
+                                        value={form.time}
+                                        onChange={handleChange}
+                                        className="w-full p-2 border rounded"
+                                        required
+                                    />
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    className="w-full p-2 text-white rounded bg-custom-blue hover:bg-teal-700"
+                                >
                                     Request an Appointment
                                 </button>
                             </form>

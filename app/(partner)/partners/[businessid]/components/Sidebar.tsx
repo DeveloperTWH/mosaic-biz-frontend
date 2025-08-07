@@ -14,6 +14,7 @@ import {
 import Link from 'next/link';
 import { usePathname, useParams } from 'next/navigation';
 import { logoutUser } from "@/utils/logoutUser";
+import { useBusinessStore } from '@/app/store/businessStore'
 
 interface SidebarProps {
   isOpen: boolean;
@@ -25,15 +26,24 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, businessName }) =>
   const pathname = usePathname();
   const params = useParams();
   const businessId = params.businessid as string; // ✅ Get businessId from URL
+  const { business } = useBusinessStore(); // ✅ get business from store
+
 
   const navItems = [
     { label: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
     { label: 'Inventory', icon: <Boxes className="w-5 h-5" /> },
-    { label: 'Orders', icon: <ShoppingCart className="w-5 h-5" /> },
+    ...(business?.listingType !== 'service'
+      ? [{ label: 'Orders', icon: <ShoppingCart className="w-5 h-5" /> }]
+      : []),
+    ...(business?.listingType === 'service'
+      ? [{ label: 'Bookings', icon: <UserCircle className="w-5 h-5" /> }]
+      : []),
     { label: 'My Account', icon: <UserCircle className="w-5 h-5" /> },
     { label: 'Settings', icon: <Settings className="w-5 h-5" /> },
     { label: 'Support', icon: <LifeBuoy className="w-5 h-5" /> },
   ];
+
+
 
   const getLink = (label: string) => {
     return label === 'Dashboard'

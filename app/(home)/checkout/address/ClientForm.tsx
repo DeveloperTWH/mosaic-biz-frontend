@@ -69,9 +69,8 @@ export default function CheckoutAddressPage() {
         const variantId = searchParams.get('variantId');
         const size = searchParams.get('size');
         const quantity = Number(searchParams.get('quantity') || '1');
-        const price = Number(searchParams.get('price') || '0');
 
-        if (!productId || !variantId || !size || !quantity || !price) {
+        if (!productId || !variantId || !size || !quantity) {
           toast.error('Invalid buy now parameters');
           return;
         }
@@ -79,8 +78,23 @@ export default function CheckoutAddressPage() {
         try {
           const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/product/${productId}`);
           const product = res.data?.data;
+
           const variant = product.variants.find((v: any) => v.variantId === variantId);
-          const img = variant?.images?.[0] || product.coverImage;
+          if (!variant) return toast.error("Variant not found");
+
+          const sizeObj = variant.sizes.find((s: any) => s.size === size);
+          if (!sizeObj) return toast.error("Selected size not found");
+          
+          const stock = variant.sizes.find((s: any) => s.size===size);
+          console.log(stock);
+          
+          if (stock.stock<=0) return toast.error("Not in Stock");
+
+          const now = new Date();
+          const validDiscount = sizeObj.salePrice && sizeObj.discountEndDate && new Date(sizeObj.discountEndDate) > now;
+          const finalPrice = validDiscount ? Number(sizeObj.salePrice) : Number(sizeObj.price);
+
+          const img = variant.images?.[0] || product.coverImage;
 
           setCartItems([
             {
@@ -88,9 +102,11 @@ export default function CheckoutAddressPage() {
               variantId,
               size,
               quantity,
-              price,
+              price: finalPrice, // ✅ fetched from DB
               image: img,
               title: product.title,
+              color: variant.color, // ✅ optional: show color in summary
+              label: variant.label 
             },
           ]);
         } catch (err) {
@@ -264,7 +280,13 @@ export default function CheckoutAddressPage() {
                   />
                   <div>
                     <p className="font-semibold">{item.title || `Product ID: ${item.productId}`}</p>
-                    <p className="text-sm text-gray-500">Color: {item.color}</p>
+                    <p className="flex items-center gap-2 text-sm text-gray-500">Color : 
+                      <span
+                        className="inline-block w-4 h-4 border border-gray-300 rounded-full"
+                        style={{ backgroundColor: item.color }}
+                      ></span> | 
+                      <span>{item.label}: {item.size}</span>
+                    </p>
                     <div className="flex items-center gap-2 px-2 py-1 mt-2 border rounded w-fit">
                       <button
                         onClick={() => {
