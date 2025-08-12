@@ -2,58 +2,67 @@
 
 import React, { useEffect, useState } from 'react';
 
-type MinorityType = {
-    _id: string;
-    name: string;
+type MinorityTypeItem = {
+  _id: string;
+  name: string;
 };
 
-const MinorityType = () => {
+type Props = {
+  value: string;                   // selected minority type id ('' for All)
+  onChange: (val: string) => void; // change handler
+};
 
-    const [minorityTypes, setMinorityTypes] = useState<MinorityType[]>([]);
-    const [loadingMinority, setLoadingMinority] = useState(true);
+const MinorityType: React.FC<Props> = ({ value, onChange }) => {
+  const [minorityTypes, setMinorityTypes] = useState<MinorityTypeItem[]>([]);
+  const [loadingMinority, setLoadingMinority] = useState(true);
 
-    useEffect(() => {
-        const fetchMinorityTypes = async () => {
-            try {
-                const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/minority-types`);
-                const data = await res.json();
-                setMinorityTypes(data);
-            } catch (err) {
-                console.error('Failed to load minority types', err);
-            } finally {
-                setLoadingMinority(false);
-            }
-        };
+  useEffect(() => {
+    const fetchMinorityTypes = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/minority-types`, {
+          credentials: 'include',
+        });
+        const data = await res.json();
+        setMinorityTypes(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error('Failed to load minority types', err);
+        setMinorityTypes([]);
+      } finally {
+        setLoadingMinority(false);
+      }
+    };
 
-        fetchMinorityTypes();
-    }, []);
+    fetchMinorityTypes();
+  }, []);
 
-    return (
-        <div className="flex flex-col w-full md:w-auto">
-            <label htmlFor="minorityType" className="mb-1 text-sm font-medium">Filter By Minority Type</label>
-            <select
-                id="minorityType"
-                className="px-4 py-2 border rounded min-w-[300px]"
-                defaultValue=""
-                disabled={loadingMinority}
-            >
-                {loadingMinority ? (
-                    <option>Loading types...</option>
-                ) : minorityTypes.length > 0 ? (
-                    <>
-                        <option value="">All Types</option>
-                        {minorityTypes.map((type) => (
-                            <option key={type._id} value={type._id}>
-                                {type.name}
-                            </option>
-                        ))}
-                    </>
-                ) : (
-                    <option disabled>No types available</option>
-                )}
-            </select>
-        </div>
-    )
-}
+  return (
+    <div className="flex flex-col w-full md:w-auto">
+      <label htmlFor="minorityType" className="mb-1 text-sm font-medium">
+        Filter By Minority Type
+      </label>
 
-export default MinorityType
+      <select
+        id="minorityType"
+        className="px-4 py-2 border rounded min-w-[300px]"
+        value={loadingMinority ? '' : value}     // keep controlled; empty while loading
+        onChange={(e) => onChange(e.target.value)}
+        disabled={loadingMinority}
+      >
+        {loadingMinority ? (
+          <option value="">Loading types...</option>
+        ) : (
+          <>
+            <option value="">All Types</option>
+            {minorityTypes.map((type) => (
+              <option key={type._id} value={type._id}>
+                {type.name}
+              </option>
+            ))}
+          </>
+        )}
+      </select>
+    </div>
+  );
+};
+
+export default MinorityType;
