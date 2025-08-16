@@ -6,7 +6,6 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import Sidebar from "../components/Sidebar"; // Import Sidebar component
 import Topbar from "../components/Topbar"; // Import Topbar component
-import Link from "next/link";
 
 const BusinessPage = () => {
     const [isSidebarOpen, setSidebarOpen] = useState(true);

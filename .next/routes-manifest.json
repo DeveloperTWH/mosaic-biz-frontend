@@ -228,6 +228,24 @@
       "namedRegex": "^/admin/categories\\-management(?:/)?$"
     },
     {
+      "page": "/admin/orders",
+      "regex": "^/admin/orders(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/orders(?:/)?$"
+    },
+    {
+      "page": "/admin/subscription",
+      "regex": "^/admin/subscription(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/subscription(?:/)?$"
+    },
+    {
+      "page": "/admin/users",
+      "regex": "^/admin/users(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/users(?:/)?$"
+    },
+    {
       "page": "/checkout",
       "regex": "^/checkout(?:/)?$",
       "routeKeys": {},

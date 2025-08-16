@@ -207,7 +207,7 @@ const Dashboard = () => {
 
               {/* View More Button */}
               <div className="mt-6 text-right">
-                <Link href="/admin/business">
+                <Link href="/admin/businesses">
                   <span className="px-6 py-2 text-white transition-all duration-300 bg-indigo-600 rounded-lg shadow-md cursor-pointer hover:bg-indigo-700">
                     View More
                   </span>
