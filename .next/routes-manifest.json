@@ -15,6 +15,14 @@
   "headers": [],
   "dynamicRoutes": [
     {
+      "page": "/admin/subscription/[id]/edit",
+      "regex": "^/admin/subscription/([^/]+?)/edit(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/admin/subscription/(?<nxtPid>[^/]+?)/edit(?:/)?$"
+    },
+    {
       "page": "/foods/resturant/[id]",
       "regex": "^/foods/resturant/([^/]+?)(?:/)?$",
       "routeKeys": {
@@ -238,6 +246,12 @@
       "regex": "^/admin/subscription(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/admin/subscription(?:/)?$"
+    },
+    {
+      "page": "/admin/subscription/new",
+      "regex": "^/admin/subscription/new(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/subscription/new(?:/)?$"
     },
     {
       "page": "/admin/users",

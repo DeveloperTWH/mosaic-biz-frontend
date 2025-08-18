@@ -41,3 +41,36 @@ export type Subscription = {
   createdAt?: string;
   updatedAt?: string;
 };
+
+export interface SubscriptionPlan {
+  _id: string;
+  name: string;
+  price: number;
+  currency: 'usd' | string;
+  interval: 'day' | 'week' | 'month' | 'year';
+  intervalCount: number;
+  trialPeriodDays: number;
+  durationInDays: number;
+  stripeProductId?: string;
+  stripePriceId?: string;
+  limits: {
+    productListings: number;
+    serviceListings: number;
+    foodListings: number;
+    imageLimit: number;
+    videoLimit: number;
+  };
+  features: {
+    analyticsDashboard: boolean;
+    marketingTools: boolean;
+    featuredPlacement: boolean;
+    supportLevel: 'none' | 'community' | 'email' | 'priority';
+    communityEventsAccess: boolean;
+    searchPriority: boolean;
+    listingPriority: boolean;
+    pushNotifications: boolean;
+    aiRecommendation: boolean;
+  };
+  createdAt: string;
+  updatedAt: string;
+}

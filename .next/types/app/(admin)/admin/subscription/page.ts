@@ -1,4 +1,4 @@
-// File: C:\Users\Lenovo\OneDrive\Desktop\Techware hut\mosaic-biz-frontend\app\(admin)\admin\subscription\page.tsx
+// File: C:\Users\DAY\OneDrive\Desktop\mosaic-biz-hub\frontend\app\(admin)\admin\subscription\page.tsx
 import * as entry from '../../../../../../app/(admin)/admin/subscription/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

@@ -109,7 +109,7 @@
         "transform": "lodash/{{member}}"
       }
     },
-    "outputFileTracingRoot": "C:\\Users\\Lenovo\\OneDrive\\Desktop\\Techware hut\\mosaic-biz-frontend",
+    "outputFileTracingRoot": "C:\\Users\\DAY\\OneDrive\\Desktop\\mosaic-biz-hub\\frontend",
     "experimental": {
       "nodeMiddleware": false,
       "cacheLife": {
@@ -167,7 +167,7 @@
       "middlewarePrefetch": "flexible",
       "optimisticClientCache": true,
       "manualClientBasePath": false,
-      "cpus": 11,
+      "cpus": 3,
       "memoryBasedWorkersCount": false,
       "imgOptConcurrency": null,
       "imgOptTimeoutInSeconds": 7,
@@ -292,10 +292,10 @@
     "bundlePagesRouterDependencies": false,
     "configFileName": "next.config.ts",
     "turbopack": {
-      "root": "C:\\Users\\Lenovo\\OneDrive\\Desktop\\Techware hut\\mosaic-biz-frontend"
+      "root": "C:\\Users\\DAY\\OneDrive\\Desktop\\mosaic-biz-hub\\frontend"
     }
   },
-  "appDir": "C:\\Users\\Lenovo\\OneDrive\\Desktop\\Techware hut\\mosaic-biz-frontend",
+  "appDir": "C:\\Users\\DAY\\OneDrive\\Desktop\\mosaic-biz-hub\\frontend",
   "relativeAppDir": "",
   "files": [
     ".next\\routes-manifest.json",
