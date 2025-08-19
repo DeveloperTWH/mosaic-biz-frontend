@@ -125,6 +125,7 @@ export interface ProductDetailItem {
     images: string[];
     averageRating: number;
     totalReviews: number;
+    allowBackorder: boolean;
     sizes: {
       sizeId: string;
       size: string;

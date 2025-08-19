@@ -88,7 +88,7 @@ export default function CheckoutAddressPage() {
           const stock = variant.sizes.find((s: any) => s.size===size);
           console.log(stock);
           
-          if (stock.stock<=0) return toast.error("Not in Stock");
+          if (stock.stock<=0 && !variant.allowBackorder) return toast.error("Not in Stock");
 
           const now = new Date();
           const validDiscount = sizeObj.salePrice && sizeObj.discountEndDate && new Date(sizeObj.discountEndDate) > now;

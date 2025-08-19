@@ -314,8 +314,8 @@ const ProductTable: React.FC<ProductTableProps> = ({
                                         <>
                                           <p>
                                             <strong>Price:</strong>{' '}
-                                            <span className="text-gray-500 line-through">₹{size.price}</span>{' '}
-                                            <span className="font-semibold text-green-600">₹{size.salePrice}</span>
+                                            <span className="text-gray-500 line-through">${size.price}</span>{' '}
+                                            <span className="font-semibold text-green-600">${size.salePrice}</span>
                                           </p>
                                           <p className="text-sm text-gray-600">
                                             <strong>Offer valid till:</strong>{' '}
@@ -323,7 +323,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                                           </p>
                                         </>
                                       ) : (
-                                        <p><strong>Price:</strong> ₹{size.price}</p>
+                                        <p><strong>Price:</strong> ${size.price}</p>
                                       )}
 
                                       {/* Actions */}

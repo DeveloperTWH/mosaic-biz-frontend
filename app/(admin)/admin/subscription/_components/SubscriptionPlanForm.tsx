@@ -237,7 +237,7 @@ export default function SubscriptionPlanForm({ mode, initial, submitPath, method
             </select>
           </div>
 
-          <div>
+          {/* <div>
             <label className="block mb-1 text-sm font-medium">Interval Count</label>
             <input
               type="text"
@@ -261,7 +261,7 @@ export default function SubscriptionPlanForm({ mode, initial, submitPath, method
               placeholder="≥ 0"
             />
             {errors.trialPeriodDays && <p className="mt-1 text-xs text-red-600">{errors.trialPeriodDays}</p>}
-          </div>
+          </div> */}
 
           <div>
             <label className="block mb-1 text-sm font-medium">Duration (days)</label>

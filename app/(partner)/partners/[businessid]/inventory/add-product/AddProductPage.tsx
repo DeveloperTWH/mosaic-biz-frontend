@@ -348,9 +348,9 @@ const AddProductPage: React.FC<AddProductPageProps> = ({ businessId, businessSlu
 
             toast.success(isPublished ? "✅ Product Published!" : "✅ Draft Saved!");
             router.push(`/partners/${businessSlug}/inventory`);
-        } catch (error) {
+        } catch (error:any) {
             console.error("Error submitting product:", error);
-            toast.error("Failed to submit product.");
+            toast.error(error?.response.data.error || "An error occurred while submitting the product.");
         } finally {
             setIsSubmitting(false);
         }

@@ -55,8 +55,8 @@ export default function ProductDetailPage() {
   const [selectedSize, setSelectedSize] = useState(product.sizes[0]);
 
   return (
-    <div className="px-8 py-10 max-w-screen-xl mx-auto">
-      <div className="flex flex-col lg:flex-row gap-12">
+    <div className="max-w-screen-xl px-8 py-10 mx-auto">
+      <div className="flex flex-col gap-12 lg:flex-row">
         {/* Image Section */}
         <div className="flex-1">
           <div className="relative">
@@ -79,7 +79,7 @@ export default function ProductDetailPage() {
           </div>
           <div className="flex gap-2 mt-4">
             {[1, 2, 3, 4].map((_, i) => (
-              <div key={i} className="w-16 h-16 border rounded bg-gray-300"></div>
+              <div key={i} className="w-16 h-16 bg-gray-300 border rounded"></div>
             ))}
           </div>
         </div>
@@ -89,11 +89,11 @@ export default function ProductDetailPage() {
           <h2 className="text-sm text-gray-400 uppercase">{product.brand}</h2>
           <h1 className="text-xl font-bold leading-tight">{product.title}</h1>
           <div className="text-2xl font-bold text-[#c79b44]">
-            ₹{product.price}
-            <span className="line-through text-gray-400 text-base ml-2">
-              ₹{product.actualPrice}
+            ${product.price}
+            <span className="ml-2 text-base text-gray-400 line-through">
+              ${product.actualPrice}
             </span>
-            <span className="text-green-600 text-sm ml-2">
+            <span className="ml-2 text-sm text-green-600">
               {Math.round(
                 ((product.actualPrice - product.price) / product.actualPrice) * 100
               )}
@@ -102,7 +102,7 @@ export default function ProductDetailPage() {
           </div>
 
           <div>
-            <p className="font-semibold mb-1">COLOR</p>
+            <p className="mb-1 font-semibold">COLOR</p>
             <div className="flex gap-3">
               {product.colors.map((color) => (
                 <div
@@ -118,7 +118,7 @@ export default function ProductDetailPage() {
           </div>
 
           <div>
-            <p className="font-semibold mb-1">SIZE CHART</p>
+            <p className="mb-1 font-semibold">SIZE CHART</p>
             <div className="flex gap-3">
               {product.sizes.map((size) => (
                 <button
@@ -138,17 +138,17 @@ export default function ProductDetailPage() {
 
           <div>
             <p className="font-semibold">AVAILABLE OFFERS</p>
-            <ul className="list-disc ml-6 text-sm text-gray-600">
+            <ul className="ml-6 text-sm text-gray-600 list-disc">
               <li>5% cashback on Axis Bank Credit Card – T&C apply</li>
-              <li>10% off on orders above ₹1,000 using SBI Credit Card – T&C apply</li>
+              <li>10% off on orders above $1,000 using SBI Credit Card – T&C apply</li>
             </ul>
           </div>
 
           <div className="flex gap-4 mt-4">
-            <button className="bg-yellow-400 text-black px-6 py-2 font-bold rounded">
+            <button className="px-6 py-2 font-bold text-black bg-yellow-400 rounded">
               🛒 ADD TO CART
             </button>
-            <button className="bg-black text-white px-6 py-2 font-bold rounded">
+            <button className="px-6 py-2 font-bold text-white bg-black rounded">
               BUY NOW
             </button>
           </div>
@@ -157,8 +157,8 @@ export default function ProductDetailPage() {
 
       {/* Product Details */}
       <div className="mt-12">
-        <h3 className="text-lg font-bold mb-2">PRODUCT DETAILS</h3>
-        <ul className="grid grid-cols-1 md:grid-cols-2 gap-y-2 text-sm text-gray-700">
+        <h3 className="mb-2 text-lg font-bold">PRODUCT DETAILS</h3>
+        <ul className="grid grid-cols-1 text-sm text-gray-700 md:grid-cols-2 gap-y-2">
           <li><b>Pack Of:</b> 4 (Special Pack)</li>
           <li><b>Style Code:</b> MLYCRA_16_BEIGE</li>
           <li><b>Closure:</b> Button</li>
@@ -180,12 +180,12 @@ export default function ProductDetailPage() {
       {/* Ratings */}
       <div className="mt-10">
         <h3 className="text-lg font-bold">RATINGS & REVIEWS</h3>
-        <div className="flex items-center gap-2 text-yellow-600 mt-2">
+        <div className="flex items-center gap-2 mt-2 text-yellow-600">
           ⭐ {product.rating}{" "}
           <span className="text-gray-700">({product.ratingCount} ratings)</span>
         </div>
-        <p className="text-sm mt-2">ITS SO GOOD</p>
-        <button className="mt-4 bg-yellow-400 px-4 py-2 font-bold rounded">
+        <p className="mt-2 text-sm">ITS SO GOOD</p>
+        <button className="px-4 py-2 mt-4 font-bold bg-yellow-400 rounded">
           RATE PRODUCT
         </button>
       </div>

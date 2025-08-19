@@ -57,7 +57,7 @@ function CheckoutForm({ clientSecret }: { clientSecret: string }) {
     <form onSubmit={handleSubmit} className="max-w-md mx-auto space-y-4">
       {amount !== null && (
         <div className="mb-2 text-lg font-semibold text-center">
-          Total: ₹{(amount / 100).toFixed(2)}
+          Total: ${(amount / 100).toFixed(2)}
         </div>
       )}
       <PaymentElement />

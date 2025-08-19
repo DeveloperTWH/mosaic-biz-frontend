@@ -28,23 +28,23 @@ const ProductCard = ({ product }: ProductCardProps) => {
           sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
           priority={false}
         />
-        <button className="absolute top-3 right-3 bg-white bg-opacity-70 rounded-full p-1 hover:bg-red-100 transition-colors">
+        <button className="absolute p-1 transition-colors bg-white rounded-full top-3 right-3 bg-opacity-70 hover:bg-red-100">
           <Heart size={18} className="stroke-[2.2] text-gray-400 hover:text-red-500" />
         </button>
       </div>
 
       {/* Product Info */}
-      <div className="mt-3 px-1">
-        <h4 className="text-sm font-semibold text-gray-900 truncate uppercase">
+      <div className="px-1 mt-3">
+        <h4 className="text-sm font-semibold text-gray-900 uppercase truncate">
           {product.brand}
         </h4>
-        <p className="text-xs text-gray-600 line-clamp-2 mt-1 leading-snug">
+        <p className="mt-1 text-xs leading-snug text-gray-600 line-clamp-2">
           {product.title}
         </p>
-        <p className="text-base font-bold text-black mt-2">₹{product.price}</p>
+        <p className="mt-2 text-base font-bold text-black">${product.price}</p>
 
         {/* Rating */}
-        <div className="flex items-center text-yellow-500 space-x-1 mt-1 text-xs">
+        <div className="flex items-center mt-1 space-x-1 text-xs text-yellow-500">
           <Star size={14} fill="currentColor" className="text-yellow-500" />
           <span className="font-semibold text-yellow-600">{product.rating.toFixed(1)}</span>
           <span className="text-gray-400">({product.ratingCount})</span>

@@ -74,6 +74,9 @@ const page = () => {
     const [error, setError] = useState<string | null>(null);
     const [orders, setOrders] = useState<Order[]>([]);
     const [statusFilter, setStatusFilter] = useState('');
+    // State to store tracking info for each order
+    const [trackingInfo, setTrackingInfo] = useState<Record<string, { trackingId: string; trackingUrl: string; vendorNote: string }>>({});
+
 
     const router = useRouter();
 
@@ -126,15 +129,51 @@ const page = () => {
         fetchOrders();
     }, [business?._id, statusFilter]);
 
-    const handleAction = async (orderId: string, action: 'accept' | 'reject') => {
+    const handleShipAction = async (orderId: string) => {
+        const orderTracking = trackingInfo[orderId];
+
+        if (!orderTracking?.trackingId || !orderTracking?.trackingUrl || !orderTracking?.vendorNote) {
+            toast.error('Tracking ID, URL, and Vendor Note are required');
+            return;
+        }
+
+        // Call the handleAction with tracking details for this specific order, including vendorNote
+        await handleAction(orderId, 'ship', orderTracking);
+
+        // Clear the tracking info after the action is completed
+        setTrackingInfo(prev => ({ ...prev, [orderId]: { trackingId: '', trackingUrl: '', vendorNote: '' } }));
+    };
+
+
+    // Handle form submit for tracking info
+    // Handle form submit for tracking info
+    const handleFormSubmit = (e: React.FormEvent, orderId: string) => {
+        e.preventDefault();
+        handleShipAction(orderId);
+    };
+
+
+    const handleAction = async (
+        orderId: string,
+        action: 'accept' | 'reject' | 'ship' | 'deliver' | 'return',
+        trackingInfo?: { trackingId: string, trackingUrl: string, vendorNote: string } // Accept trackingInfo as optional
+    ) => {
         try {
+            // Include tracking info only if available
+            const payload = trackingInfo ? {
+                trackingId: trackingInfo.trackingId,
+                trackingUrl: trackingInfo.trackingUrl,
+                vendorNote: trackingInfo.vendorNote
+            } : {};
+
             await axios.put(
                 `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/orders/${action}/${orderId}`,
-                {},
+                payload, // Include payload here
                 { withCredentials: true }
             );
             toast.success(`Order ${action}ed`);
-            // Refresh orders
+
+            // Refresh orders after action
             const res = await axios.get(
                 `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/orders/vendor?businessId=${business?._id}&status=${statusFilter}`,
                 { withCredentials: true }
@@ -244,7 +283,7 @@ const page = () => {
                                                 <p>Size: {item.size}</p>
                                                 <p>Qty: {item.quantity}</p>
                                                 <p className="font-medium text-gray-900">
-                                                    ₹{(item.price * item.quantity).toFixed(2)}
+                                                    ${(item.price * item.quantity).toFixed(2)}
                                                 </p>
                                             </div>
                                         </div>
@@ -254,26 +293,115 @@ const page = () => {
                                 {/* Total & Action Buttons */}
                                 <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
                                     <span className="text-lg font-bold text-gray-900">
-                                        Total: ₹{order.totalAmount.toFixed(2)}
+                                        Total: ${order.totalAmount.toFixed(2)}
                                     </span>
 
-                                    {order.status === 'ordered' && (
-                                        <div className="flex space-x-3">
+                                </div>
+
+                                {order.status === 'ordered' && (
+                                    <div className="flex space-x-3">
+                                        <button
+                                            className="px-5 py-2 text-white bg-green-600 rounded hover:bg-green-700"
+                                            onClick={() => handleAction(order._id, 'accept')}
+                                        >
+                                            Accept
+                                        </button>
+                                        <button
+                                            className="px-5 py-2 text-white bg-red-600 rounded hover:bg-red-700"
+                                            onClick={() => handleAction(order._id, 'reject')}
+                                        >
+                                            Reject
+                                        </button>
+                                    </div>
+                                )}
+
+                                {order.status === 'accepted' && (
+                                    <form
+                                        onSubmit={(e) => handleFormSubmit(e, order._id)}
+                                        className="flex-col gap-5 space-y-6 lg:space-y-0 lg:gap-6"
+                                    >
+                                        <div className="w-full sm:w-1/2 lg:w-1/3">
+                                            <label htmlFor={`trackingId-${order._id}`} className="block text-sm font-medium text-gray-700">
+                                                Tracking ID
+                                            </label>
+                                            <input
+                                                type="text"
+                                                id={`trackingId-${order._id}`}
+                                                value={trackingInfo[order._id]?.trackingId || ''}
+                                                onChange={(e) =>
+                                                    setTrackingInfo(prev => ({
+                                                        ...prev,
+                                                        [order._id]: { ...prev[order._id], trackingId: e.target.value }
+                                                    }))
+                                                }
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                placeholder="Enter tracking ID"
+                                            />
+                                        </div>
+                                        <div className="w-full sm:w-1/2 lg:w-1/3">
+                                            <label htmlFor={`trackingUrl-${order._id}`} className="block text-sm font-medium text-gray-700">
+                                                Tracking URL
+                                            </label>
+                                            <input
+                                                type="url"
+                                                id={`trackingUrl-${order._id}`}
+                                                value={trackingInfo[order._id]?.trackingUrl || ''}
+                                                onChange={(e) =>
+                                                    setTrackingInfo(prev => ({
+                                                        ...prev,
+                                                        [order._id]: { ...prev[order._id], trackingUrl: e.target.value }
+                                                    }))
+                                                }
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                placeholder="Enter tracking URL"
+                                            />
+                                        </div>
+                                        <div className="w-full sm:w-1/2 lg:w-1/3">
+                                            <label htmlFor={`vendorNote-${order._id}`} className="block text-sm font-medium text-gray-700">
+                                                Vendor Note
+                                            </label>
+                                            <textarea
+                                                id={`vendorNote-${order._id}`}
+                                                value={trackingInfo[order._id]?.vendorNote || ''}
+                                                onChange={(e) =>
+                                                    setTrackingInfo(prev => ({
+                                                        ...prev,
+                                                        [order._id]: { ...prev[order._id], vendorNote: e.target.value }
+                                                    }))
+                                                }
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                placeholder="Enter vendor note"
+                                            />
+                                        </div>
+                                        <div className="w-full mt-4 sm:w-auto lg:w-auto sm:mt-0">
                                             <button
-                                                className="px-5 py-2 text-white bg-green-600 rounded hover:bg-green-700"
-                                                onClick={() => handleAction(order._id, 'accept')}
+                                                type="submit"
+                                                className="w-full px-5 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 sm:w-auto"
                                             >
-                                                Accept
-                                            </button>
-                                            <button
-                                                className="px-5 py-2 text-white bg-red-600 rounded hover:bg-red-700"
-                                                onClick={() => handleAction(order._id, 'reject')}
-                                            >
-                                                Reject
+                                                Mark as Shipped
                                             </button>
                                         </div>
-                                    )}
-                                </div>
+                                    </form>
+                                )}
+
+
+                                {order.status === 'shipped' && (
+                                    <div className="flex space-x-3">
+                                        <button className="px-5 py-2 text-white bg-yellow-600 rounded hover:bg-yellow-700" onClick={() => handleAction(order._id, 'deliver')}>
+                                            Mark as Delivered
+                                        </button>
+                                    </div>
+                                )}
+
+                                {order.status === 'returned' && (
+                                    <div className="flex space-x-3">
+                                        <button className="px-5 py-2 text-white bg-orange-600 rounded hover:bg-orange-700" onClick={() => handleAction(order._id, 'return')}>
+                                            Accept Return
+                                        </button>
+                                    </div>
+                                )}
+
+
                             </div>
                         ))
                     )}

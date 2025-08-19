@@ -132,7 +132,7 @@ const OrderPage = () => {
                       <div>
                         <h4 className="text-lg font-semibold">{order.items[0].productId.title}</h4>
                         <p className="text-sm text-gray-500">Color: {order.items[0].variantId.color}</p>
-                        <p className="text-gray-700">₹{order.items[0].price}</p>
+                        <p className="text-gray-700">${order.items[0].price}</p>
                         <p className="text-sm text-gray-500">Quantity: {order.items[0].quantity}</p>
                       </div>
                     </div>

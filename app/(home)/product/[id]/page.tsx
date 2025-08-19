@@ -157,7 +157,7 @@ export default function ProductDetailPage() {
                     const firstSize = variant.sizes?.[0]?.size;
                     if (firstSize) setSelectedSize(firstSize);
                     console.log(selectedVariant);
-                    
+
                   }}
                   className={`w-6 h-6 rounded-full cursor-pointer border-2 ${selectedColor === variant.color ? "border-black" : "border-gray-300"}`}
                   style={{ backgroundColor: variant.color }}
@@ -203,6 +203,15 @@ export default function ProductDetailPage() {
                         toast.error('Please select both variant and size.');
                         return;
                       }
+                      // Check if the selected size is in stock or backordering is allowed
+                      const selectedVariantSize = selectedVariant?.sizes.find(s => s.size === selectedSize);
+                      if (!selectedVariantSize || selectedVariantSize.stock <= 0) {
+                        if (!selectedVariant.allowBackorder) {
+                          toast.error('This size is out of stock and backordering is not allowed.');
+                          return;
+                        }
+                      }
+
                       await removeFromCart(product._id, selectedVariant?.variantId, selectedSize);
                       setCartQty(0);
                     } else {
@@ -210,6 +219,14 @@ export default function ProductDetailPage() {
                         toast.error('Please select both variant and size.');
                         return;
                       }
+                      const selectedVariantSize = selectedVariant?.sizes.find(s => s.size === selectedSize);
+                      if (!selectedVariantSize || selectedVariantSize.stock <= 0) {
+                        if (!selectedVariant.allowBackorder) {
+                          toast.error('This size is out of stock and backordering is not allowed.');
+                          return;
+                        }
+                      }
+
                       await updateCartQuantity(product._id, selectedVariant?.variantId, selectedSize, cartQty - 1);
                       setCartQty((prev) => prev - 1);
                     }
@@ -225,6 +242,14 @@ export default function ProductDetailPage() {
                       toast.error('Please select both variant and size.');
                       return;
                     }
+                    const selectedVariantSize = selectedVariant?.sizes.find(s => s.size === selectedSize);
+                    if (!selectedVariantSize || selectedVariantSize.stock <= 0) {
+                      if (!selectedVariant.allowBackorder) {
+                        toast.error('This size is out of stock and backordering is not allowed.');
+                        return;
+                      }
+                    }
+
                     await updateCartQuantity(product._id, selectedVariant?.variantId, selectedSize, cartQty + 1);
                     setCartQty((prev) => prev + 1);
                   }}
@@ -242,9 +267,16 @@ export default function ProductDetailPage() {
                     return;
                   }
 
-                  await addToCart(product._id, selectedVariant.variantId, selectedSize, 1);
+                  const selectedVariantSize = selectedVariant?.sizes.find(s => s.size === selectedSize);
+                  
+                  if (!selectedVariantSize || selectedVariantSize.stock <= 0) {
+                    if (!selectedVariant.allowBackorder) {
+                      toast.error('This size is out of stock and backordering is not allowed.');
+                      return;
+                    }
+                  }
 
-                  await addToCart(product._id, selectedVariant?.variantId, selectedSize, 1);
+                  await addToCart(product._id, selectedVariant.variantId, selectedSize, 1);
                   setCartQty(1);
                 }}
               >
@@ -258,6 +290,14 @@ export default function ProductDetailPage() {
                 if (!selectedVariant?.variantId || !selectedSize || !selectedPrice) {
                   toast.error('Please select both variant and size.');
                   return;
+                }
+
+                const selectedVariantSize = selectedVariant?.sizes.find(s => s.size === selectedSize);
+                if (!selectedVariantSize || selectedVariantSize.stock <= 0) {
+                  if (!selectedVariant.allowBackorder) {
+                    toast.error('This size is out of stock and backordering is not allowed.');
+                    return;
+                  }
                 }
 
                 const price = selectedPrice?.salePrice &&
@@ -280,7 +320,6 @@ export default function ProductDetailPage() {
             >
               BUY NOW
             </button>
-
           </div>
 
         </div>

@@ -89,7 +89,7 @@ function PaymentSuccessPage() {
         <p><strong>Payment ID:</strong> {paymentData.id}</p>
         <p><strong>Status:</strong> {paymentData.status}</p>
         <p><strong>Date:</strong> {date}</p>
-        <p><strong>Amount Paid:</strong> ₹{formattedAmount} {paymentData.currency.toUpperCase()}</p>
+        <p><strong>Amount Paid:</strong> ${formattedAmount} {paymentData.currency.toUpperCase()}</p>
         {paymentData.receipt_email && <p><strong>Receipt Email:</strong> {paymentData.receipt_email}</p>}
       </div>
 
@@ -130,14 +130,14 @@ function PaymentSuccessPage() {
                   </div>
                 </div>
                 <div className="w-full font-semibold text-right text-gray-700 sm:w-1/3">
-                  ₹{(item.price * item.quantity).toFixed(2)}
+                  ${(item.price * item.quantity).toFixed(2)}
                 </div>
               </div>
             ))}
           </div>
 
           <div className="flex justify-end mt-4 font-semibold text-gray-900">
-            <span>Total: ₹{order.totalAmount.toFixed(2)}</span>
+            <span>Total: ${order.totalAmount.toFixed(2)}</span>
           </div>
         </div>
       ))}
