@@ -11,6 +11,7 @@ import Link from "next/link";
 const Dashboard = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [businesses, setBusinesses] = useState<any[]>([]);
+  const [businessCount, setbusinessCount] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [noBusinesses, setNoBusinesses] = useState<boolean>(false); // State to check if there are no businesses
   const [notApprovedCount, setNotApprovedCount] = useState<number>(0); // Track count of not approved businesses
@@ -32,6 +33,7 @@ const Dashboard = () => {
         setNoBusinesses(true); // If no businesses are found
       } else {
         setBusinesses(response.data.data); // Assuming the response structure has `data`
+        setbusinessCount(response.data.totalBusinesses)
         setNotApprovedCount(response.data.notApprovedCount); // Set count of not approved businesses
         setNoBusinesses(false); // Businesses found, reset state
       }
@@ -116,7 +118,7 @@ const Dashboard = () => {
                 Businesses
               </h3>
               <p className="text-3xl font-bold text-indigo-600">
-                {noBusinesses ? "N/A" : businesses.length}
+                {noBusinesses ? "N/A" : businessCount}
               </p>
             </div>
 
