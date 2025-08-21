@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "next/navigation";
 import { Heart } from "lucide-react";
@@ -26,6 +26,8 @@ export default function ProductDetailPage() {
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [mainImage, setMainImage] = useState<string | null>(null);
   const [cartQty, setCartQty] = useState<number>(0);
+  const [loadingQty, setLoadingQty] = useState<boolean>(false);
+
 
 
 
@@ -56,6 +58,35 @@ export default function ProductDetailPage() {
     loadProduct();
   }, [id]);
 
+  const selectedVariant = product?.variants.find(v => v.color === selectedColor);
+  const selectedPrice = selectedVariant?.sizes?.find(s => s.size === selectedSize);
+
+  const refreshCartQty = useCallback(async () => {
+    if (!product?._id || !selectedVariant?.variantId || !selectedSize) return;
+
+    setLoadingQty(true);
+    try {
+      const items = await getCart(); // <- must resolve to CartItem[]
+      const line = items.find(
+        (it) =>
+          it.productId === product._id &&
+          it.variantId === selectedVariant.variantId &&
+          it.size === selectedSize
+      );
+      setCartQty(line?.quantity ?? 0);
+    } catch (e) {
+      console.error('Failed to refresh cart qty', e);
+      setCartQty(0);
+    } finally {
+      setLoadingQty(false);
+    }
+  }, [product?._id, selectedVariant?.variantId, selectedSize]);
+
+
+  useEffect(() => {
+    refreshCartQty();
+  }, [refreshCartQty]);
+
   if (!product) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -67,9 +98,6 @@ export default function ProductDetailPage() {
     );
   }
 
-
-  const selectedVariant = product.variants.find(v => v.color === selectedColor);
-  const selectedPrice = selectedVariant?.sizes?.find(s => s.size === selectedSize);
 
   return (
     <div className="max-w-screen-xl px-4 py-10 mx-auto lg:px-8">
@@ -268,7 +296,7 @@ export default function ProductDetailPage() {
                   }
 
                   const selectedVariantSize = selectedVariant?.sizes.find(s => s.size === selectedSize);
-                  
+
                   if (!selectedVariantSize || selectedVariantSize.stock <= 0) {
                     if (!selectedVariant.allowBackorder) {
                       toast.error('This size is out of stock and backordering is not allowed.');
@@ -276,7 +304,7 @@ export default function ProductDetailPage() {
                     }
                   }
 
-                  await addToCart(product._id, selectedVariant.variantId, selectedSize, 1);
+                  await addToCart(product._id, selectedVariant.variantId, selectedSize, 1, product.businessId);
                   setCartQty(1);
                 }}
               >
