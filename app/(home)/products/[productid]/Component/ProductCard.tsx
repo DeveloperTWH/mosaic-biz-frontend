@@ -8,7 +8,7 @@ export default function ProductCard({ product }: { product: Product }) {
   return (
     <div className="relative p-4 transition border rounded shadow-sm hover:shadow-md">
       {/* Wishlist Icon */}
-      <button
+      {/* <button
         onClick={() => setWishlisted(!isWishlisted)}
         className="absolute top-3 right-3"
       >
@@ -17,12 +17,12 @@ export default function ProductCard({ product }: { product: Product }) {
         ) : (
           <HeartIcon className="text-gray-400 transition-all duration-300 hover:text-red-400" />
         )}
-      </button>
+      </button> */}
 
       <img
         src={product.image}
         alt={product.title}
-        className="object-cover w-full h-48 rounded"
+        className="object-contain w-full h-48 rounded"
       />
       <h3 className="mt-2 font-semibold text-md">{product.title}</h3>
       <p className="mt-1 text-sm text-gray-700">${product.price}</p>

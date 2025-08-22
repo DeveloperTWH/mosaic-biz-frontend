@@ -143,57 +143,64 @@ export default function ProductDetailPage() {
         </div>
 
         {/* Info Section */}
-        <div className="flex-1 space-y-4">
+        <div className="justify-between flex-1 space-y-4">
           <h2 className="text-sm text-gray-400 uppercase">{product.brand || "Unknown Brand"}</h2>
           <div>
             <h1 className="text-xl font-bold leading-tight">{product.title}</h1>
             <p className="text-sm text-gray-600" >{product.description}</p>
           </div>
 
-          <div className="text-2xl font-bold text-[#c79b44]">
-            $
-            {selectedPrice?.salePrice &&
+          {(() => {
+            const onSale =
+              selectedPrice?.salePrice != null &&
               selectedPrice?.discountEndDate &&
-              new Date(selectedPrice.discountEndDate) > new Date()
-              ? selectedPrice.salePrice
-              : selectedPrice?.price ?? 0}
+              new Date(selectedPrice.discountEndDate) > new Date();
 
-            {selectedPrice?.salePrice &&
-              selectedPrice?.discountEndDate &&
-              new Date(selectedPrice.discountEndDate) > new Date() && (
-                <>
-                  <span className="ml-2 text-base text-gray-400 line-through">
-                    ${selectedPrice.price}
-                  </span>
-                  <span className="ml-2 text-sm text-green-600">
-                    {Math.round(((selectedPrice.price - selectedPrice.salePrice) / selectedPrice.price) * 100)}% OFF
-                  </span>
-                </>
-              )}
-          </div>
+            const base = Number(selectedPrice?.price) || 0;
+            const sale = selectedPrice?.salePrice != null ? Number(selectedPrice.salePrice) : null;
+
+            return (
+              <div className="text-2xl font-bold text-[#c79b44]">
+                ${onSale ? sale : base}
+
+                {onSale && (
+                  <>
+                    <span className="ml-2 text-base text-gray-400 line-through">
+                      ${base}
+                    </span>
+                    <span className="ml-2 text-sm text-green-600">
+                      {Math.round(((base - (sale ?? 0)) / base) * 100)}% OFF
+                    </span>
+                  </>
+                )}
+              </div>
+            );
+          })()}
+
 
 
           {/* Color Selection */}
-          <div>
-            <p className="mb-1 font-semibold">COLOR</p>
-            <div className="flex gap-3">
-              {product.variants.map((variant) => (
-                <div
-                  key={variant.color}
-                  onClick={() => {
-                    setSelectedColor(variant.color);
-                    const firstSize = variant.sizes?.[0]?.size;
-                    if (firstSize) setSelectedSize(firstSize);
-                    console.log(selectedVariant);
-
-                  }}
-                  className={`w-6 h-6 rounded-full cursor-pointer border-2 ${selectedColor === variant.color ? "border-black" : "border-gray-300"}`}
-                  style={{ backgroundColor: variant.color }}
-                ></div>
-              ))}
+          {product.variants.length > 1 && (
+            <div>
+              <p className="mb-1 font-semibold">COLOR</p>
+              <div className="flex gap-3">
+                {product.variants.map((variant) => (
+                  <div
+                    key={variant.color}
+                    onClick={() => {
+                      setSelectedColor(variant.color);
+                      const firstSize = variant.sizes?.[0]?.size;
+                      if (firstSize) setSelectedSize(firstSize);
+                      console.log(selectedVariant);
+                    }}
+                    className={`w-6 h-6 rounded-full cursor-pointer border-2 ${selectedColor === variant.color ? "border-black" : "border-gray-300"
+                      }`}
+                    style={{ backgroundColor: variant.color }}
+                  ></div>
+                ))}
+              </div>
             </div>
-
-          </div>
+          )}
 
           {/* Size Selection */}
           <div>

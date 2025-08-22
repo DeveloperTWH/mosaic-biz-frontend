@@ -386,6 +386,157 @@ const toNumber = (v: any): number =>
 
 const toId = (v: any) => (typeof v === "string" ? v : v?._id);
 
+
+
+
+
+
+
+const GUEST_CART_KEY = "guest_cart";
+
+const PLACEHOLDER_IMG =
+  "data:image/svg+xml;utf8," +
+  encodeURIComponent(
+    `<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'>
+      <rect width='100%' height='100%' fill='#f3f4f6'/>
+      <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='#9ca3af' font-size='14'>No image</text>
+    </svg>`
+  );
+
+// ---------- localStorage ----------
+function readGuestCart(): { businessId?: string; items: any[] } | null {
+  try {
+    const raw = localStorage.getItem(GUEST_CART_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+// ---------- API fetchers (batch) ----------
+type ProductMini = {
+  _id: string;
+  title?: string;
+  coverImage?: string | null;
+  price?: number;
+  salePrice?: number | null;
+  discountEndDate?: string | null;
+};
+
+type SizeMini = {
+  size: string;
+  stock?: number;
+  price?: number;                     // already flattened by backend toJSON
+  salePrice?: number | null;
+  discountEndDate?: string | null;
+  sku?: string;
+};
+
+// Replace your VariantMini with this:
+type VariantMini = {
+  _id: string;
+  productId?: string;
+  label?: string;
+  color?: string;
+  allowBackorder?: boolean;
+  images?: string[];                  // <-- exists on response
+  sizes?: SizeMini[];                 // <-- exists on response (filtered to the requested size)
+};
+
+// --- API fetchers (batch) ---
+async function getProductsMini(ids: string[]): Promise<Record<string, ProductMini>> {
+  if (!ids.length) return {};
+  const res = await fetch(`${BASE}/api/cart/products/mini?ids=${encodeURIComponent(ids.join(","))}`);
+  if (!res.ok) return {};
+  const list: ProductMini[] = await res.json();
+  return Object.fromEntries(list.map((p) => [p._id, p]));
+}
+
+async function getVariantsMini(
+  ids: string[],
+  filters?: { variantId: string; size: string }[]
+): Promise<Record<string, VariantMini>> {
+  if (!ids.length) return {};
+  const res = await fetch(`${BASE}/api/cart/variants/mini`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ids, filters }),
+  });
+  if (!res.ok) return {};
+  const list: VariantMini[] = await res.json();
+  return Object.fromEntries(list.map((v) => [v._id, v]));
+}
+
+// --- buildGuestCartDetailed (key change: no fallback to sizes[0]) ---
+async function buildGuestCartDetailed(): Promise<CartItemDetailed[]> {
+  const stored = readGuestCart();
+  const items = stored?.items ?? [];
+  if (!items.length) return [];
+
+  const productIds = items.map((i) => i.productId).filter(Boolean) as string[];
+  const variantIds = items.map((i) => i.variantId).filter(Boolean) as string[];
+
+  const sizeFilters = items
+    .filter((i) => i.variantId && i.size)
+    .map((i) => ({ variantId: i.variantId, size: String(i.size).toUpperCase() }));
+
+  const [productMap, variantMap] = await Promise.all([
+    getProductsMini(productIds),
+    getVariantsMini(variantIds, sizeFilters),
+  ]);
+
+  const now = Date.now();
+  const toNum = (x: any) => (x == null ? undefined : Number(x));
+
+  return items.map((it): CartItemDetailed => {
+    const p = productMap[it.productId];
+    const v = it.variantId ? variantMap[it.variantId] : undefined;
+
+    const sizeKey = it.size ? String(it.size).toUpperCase() : undefined;
+    const sizeObj = v?.sizes?.find((s) => s.size === sizeKey); // <- no fallback
+
+    const price = toNum(sizeObj?.price) ?? 0;
+    const salePrice = toNum(sizeObj?.salePrice) ?? null;
+    const discountEndISO = sizeObj?.discountEndDate ?? null;
+
+    const isSaleActive =
+      salePrice != null && discountEndISO != null && new Date(discountEndISO).getTime() > now;
+
+    return {
+      productId: it.productId,
+      variantId: it.variantId,
+      size: it.size,
+      quantity: it.quantity ?? 1,
+
+      businessId: stored?.businessId,
+      title: p?.title ?? "Untitled",
+      imageUrl: (v?.images?.[0] as string) || p?.coverImage || PLACEHOLDER_IMG,
+      label: v?.label ?? undefined,
+      color: v?.color ?? undefined,
+      sku: sizeObj?.sku ?? undefined,
+      stock: toNum(sizeObj?.stock),
+      allowBackorder: v?.allowBackorder ?? false,
+
+      price,
+      salePrice,
+      discountEndDate: discountEndISO,
+      selectedSizePrice: price,
+
+      isSaleActive,
+    };
+  });
+}
+
+
+
+
+
+
+
+
+
 // --- detailed getter (preserves all price fields) ---
 export const getCartDetailed = async (): Promise<CartItemDetailed[]> => {
   const loggedIn = await isUserLoggedIn();
@@ -439,12 +590,115 @@ export const getCartDetailed = async (): Promise<CartItemDetailed[]> => {
 
   // Guest: return whatever is stored; (optional) enrich at add time
   try {
-    const raw = localStorage.getItem("guest_cart");
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    const items = Array.isArray(parsed) ? parsed : parsed?.items ?? [];
-    return items as CartItemDetailed[];
+    // const raw = localStorage.getItem("guest_cart");
+    // if (!raw) return [];
+    // const parsed = JSON.parse(raw);
+    // const items = Array.isArray(parsed) ? parsed : parsed?.items ?? [];
+    // return items as CartItemDetailed[];
+    return buildGuestCartDetailed();
   } catch {
     return [];
   }
 };
+
+
+
+
+
+
+
+
+
+
+type ShippingAddress = {
+  fullName: string;
+  phone: string;
+  addressLine1: string;
+  addressLine2?: string;
+  city?: string;
+  state?: string;
+  postalCode?: string;
+  country?: string;
+};
+
+
+function toLineItem(it: CartItemDetailed) {
+  // choose effective price for the size/line
+  const base = Number(it.price ?? it.selectedSizePrice ?? 0);
+  const sale = it.salePrice != null ? Number(it.salePrice) : null;
+  const onSale =
+    sale != null &&
+    it.discountEndDate != null &&
+    new Date(it.discountEndDate).getTime() > Date.now();
+
+  return {
+    productId: String(it.productId),
+    variantId: String(it.variantId),
+    size: String(it.size),
+    quantity: Number(it.quantity ?? 1),
+    price: onSale ? Number(sale) : Number(base),
+  };
+}
+
+/**
+ * Orchestrates Place Order:
+ * - Requires login (redirects to /login?redirect=/checkout/payment)
+ * - Builds items from cart
+ * - Calls initiateOrder
+ * - Redirects to /checkout/payment with orderId (you can also use clientSecret if you render Stripe there)
+ */
+export async function handlePlaceOrderFlow(address: ShippingAddress, userNote?: string) {
+  const loggedIn = await isUserLoggedIn();
+  const paymentPage = "/checkout/payment";
+
+  if (!loggedIn) {
+    window.location.href = `/login?redirect=${encodeURIComponent(paymentPage)}`;
+    return;
+  }
+
+  // Build items from the current cart
+  const cart: CartItemDetailed[] = await getCartDetailed();
+  if (!cart.length) {
+    alert("Your cart is empty.");
+    return;
+  }
+
+  // (Optional) Quick client-side sanity: ensure each line has variant & size
+  for (const it of cart) {
+    if (!it.productId || !it.variantId || !it.size) {
+      alert("One or more items are missing variant/size. Please re-add them.");
+      return;
+    }
+  }
+
+  const items = cart.map(toLineItem);
+
+  // Call initiateOrder
+  const res = await fetch(`${BASE}/api/orders/initiate`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      items,
+      shippingAddress: address,
+      userNote: userNote ?? "",
+    }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    const msg = err?.message || "Failed to initiate order";
+    alert(msg);
+    return;
+  }
+
+  const data = await res.json();
+  const { orderId, groupOrderId, clientSecret } = data;
+
+  // Redirect to payment page; pass what you need there
+  const url = new URL(paymentPage, window.location.origin);
+  url.searchParams.set("orderId", String(orderId));
+  if (groupOrderId) url.searchParams.set("groupOrderId", String(groupOrderId));
+  if (clientSecret) url.searchParams.set("clientSecret", String(clientSecret));
+  window.location.href = url.toString();
+}

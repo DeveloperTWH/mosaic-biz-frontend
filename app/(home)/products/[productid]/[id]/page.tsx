@@ -44,6 +44,30 @@ const products: Product[] = [
     colors: ["#1d4ed8", "#f97316", "#6b7280"],
     sizes: ["M", "L", "XL"],
   },
+  {
+    id: "4",
+    brand: "S.M.",
+    title: "Men Slim Fit Checked Spread Collar Casual T-Shirt",
+    price: 745,
+    actualPrice: 1199,
+    image: "/products/image 2.png",
+    rating: 4.0,
+    ratingCount: 180,
+    colors: ["#1d4ed8", "#f97316", "#6b7280"],
+    sizes: ["M", "L", "XL"],
+  },
+  {
+    id: "5",
+    brand: "S.M.",
+    title: "Men Slim Fit Checked Spread Collar Casual T-Shirt",
+    price: 745,
+    actualPrice: 1199,
+    image: "/products/image 2.png",
+    rating: 4.0,
+    ratingCount: 180,
+    colors: ["#1d4ed8", "#f97316", "#6b7280"],
+    sizes: ["M", "L", "XL"],
+  },
 ];
 
 export default function ProductDetailPage() {

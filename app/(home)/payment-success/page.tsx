@@ -4,6 +4,7 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Suspense } from 'react';
+import { ShoppingCart } from 'lucide-react';
 
 interface PaymentData {
   amount: number;
@@ -97,8 +98,8 @@ function PaymentSuccessPage() {
 
       {orders.map((order, orderIndex) => (
         <div key={order._id} className="mb-10">
-          <h2 className="mb-3 text-xl font-semibold text-gray-800">
-            🧺 Order #{orderIndex + 1} <span className="ml-4 text-sm font-normal text-blue-600">Status: {order.status}</span>
+          <h2 className="flex items-center gap-2 mb-3 text-xl font-semibold text-gray-800">
+            <ShoppingCart/> Order #{orderIndex + 1} <span className="ml-4 text-sm font-normal text-blue-600">Status: {order.status}</span>
           </h2>
 
           <div className="border divide-y rounded-md bg-gray-50">

@@ -4,7 +4,7 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { toast } from "react-toastify";
 import AddressComponent from "./Component/AddressComponent";
-import { getCartDetailed, updateCartQuantity, removeFromCart } from "@/utils/cartUtils";
+import { getCartDetailed, updateCartQuantity, removeFromCart, handlePlaceOrderFlow } from "@/utils/cartUtils";
 
 type CartItem = {
     productId: string;
@@ -25,11 +25,52 @@ type CartItem = {
 
 };
 
+export type ShippingAddress = {
+    fullName: string;
+    phone: string;
+    addressLine1: string;
+    addressLine2?: string;
+    city?: string;
+    state?: string;
+    postalCode?: string;
+    country?: string;
+};
+
+export type Address = {
+    id: string;
+    fullName: string;
+    phone: string;
+    addressLine1: string;
+    addressLine2?: string;
+    city?: string;
+    state?: string;
+    postalCode?: string;
+    country?: string;
+    isDefault?: boolean;
+};
+
 export default function CartPage() {
     const [selectedTab, setSelectedTab] = useState<"product" | "food">("product");
     const [itemsProduct, setItemsProduct] = useState<CartItem[]>([]);
     const [itemsFood, setItemsFood] = useState<CartItem[]>([]); // keep for future Grocery integration
     const [loading, setLoading] = useState<boolean>(true);
+    const [addresses, setAddresses] = useState<Address[]>([
+        {
+            id: "addr_1",
+            fullName: "John Doe",
+            phone: "9999999999",
+            addressLine1: "123 Street",
+            city: "City",
+            postalCode: "123456",
+            country: "IN",
+            isDefault: true,
+        },
+    ]);
+
+    const [selectedAddressId, setSelectedAddressId] = useState<string | undefined>(
+        addresses.find(a => a.isDefault)?.id
+    );
+    const [userNote, setUserNote] = useState<string>("");
 
     const loadCart = useCallback(async () => {
         setLoading(true);
@@ -136,6 +177,8 @@ export default function CartPage() {
         }, 0);
     }, [itemsProduct]);
 
+    const selectedAddress = addresses.find(a => a.id === selectedAddressId);
+
 
     if (loading) {
         return (
@@ -171,7 +214,15 @@ export default function CartPage() {
                     </div>
 
                     {/* Delivery Address */}
-                    <AddressComponent />
+                    <AddressComponent
+                        addresses={addresses}
+                        selectedAddressId={selectedAddressId}
+                        onSelect={setSelectedAddressId}
+                        onAdd={(addr) => {
+                            setAddresses(prev => [...prev, addr]);
+                            setSelectedAddressId(addr.id);
+                        }}
+                    />
 
                     {/* Cart Items */}
                     {selectedTab === "product" ? (
@@ -336,15 +387,35 @@ export default function CartPage() {
                                     <div>${subtotalProduct.toFixed(2)}</div>
                                 </div>
 
-                                <div className="mt-2 text-sm font-medium text-green-600">
-                                    You will save ${totalSavingsProduct.toFixed(2)} on this order
-                                </div>
+                                {totalSavingsProduct > 0 && (
+                                    <div className="mt-2 text-sm font-medium text-green-600">
+                                        You will save ${totalSavingsProduct.toFixed(2)} on this order
+                                    </div>
+                                )}
 
 
                                 <div className="flex items-center justify-end mt-5 space-x-2">
                                     <button
                                         className="px-4 py-2 text-white bg-blue-500"
-                                        onClick={() => (window.location.href = "/checkout/address")}
+                                        onClick={() => {
+                                            if (!selectedAddress) {
+                                                alert("Please select an address");
+                                                return;
+                                            }
+                                            handlePlaceOrderFlow(
+                                                {
+                                                    fullName: selectedAddress.fullName,
+                                                    phone: selectedAddress.phone,
+                                                    addressLine1: selectedAddress.addressLine1,
+                                                    addressLine2: selectedAddress.addressLine2 ?? "",
+                                                    city: selectedAddress.city ?? "",
+                                                    state: selectedAddress.state ?? "",
+                                                    country: selectedAddress.country ?? "",
+                                                    postalCode: selectedAddress.postalCode ?? "", // map postalCode → pincode
+                                                },
+                                                userNote
+                                            );
+                                        }}
                                     >
                                         Place Order
                                     </button>

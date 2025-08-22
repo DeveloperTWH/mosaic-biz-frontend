@@ -43,6 +43,24 @@ const OrderPage = () => {
     }));
   };
 
+
+  const handleCancelOrder = async (orderId: string) => {
+    if (!confirm("Are you sure you want to cancel this order?")) return;
+
+    try {
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/orders/${orderId}/cancel`,
+        {},
+        { withCredentials: true }
+      );
+      toast.success("Order cancelled successfully.");
+      fetchOrders(); // refresh the list
+    } catch (error) {
+      toast.error("Failed to cancel order.");
+    }
+  };
+
+
   return (
     <div className="bg-[#ebeae2]">
       <div className="container px-4 pt-5 pb-5 mx-auto">
@@ -118,56 +136,97 @@ const OrderPage = () => {
               )}
 
               {orders.map((order) => (
-                <div key={order._id} className="p-4 bg-white border rounded-lg shadow-md">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      {/* Image */}
-                      {order.items[0].productId.coverImage && (
-                        <img
-                          src={order.items[0].productId.coverImage} // Assuming the image URL is in the product data
-                          alt={order.items[0].productId.title}
-                          className="object-cover w-16 h-full mr-4 rounded-md"
-                        />
-                      )}
-                      <div>
-                        <h4 className="text-lg font-semibold">{order.items[0].productId.title}</h4>
-                        <p className="text-sm text-gray-500">Color: {order.items[0].variantId.color}</p>
-                        <p className="text-gray-700">${order.items[0].price}</p>
-                        <p className="text-sm text-gray-500">Quantity: {order.items[0].quantity}</p>
+                <div
+                  key={order._id}
+                  className="p-4 mb-4 bg-white border rounded-lg shadow-md"
+                >
+                  {/* Loop through each item in the order */}
+                  {order.items.map((item, idx) => (
+                    <div
+                      key={item._id || idx}
+                      className="flex items-center justify-between mb-3 last:mb-0"
+                    >
+                      <div className="flex items-center">
+                        {/* Product Image */}
+                        {item.productId?.coverImage && (
+                          <img
+                            src={item.productId.coverImage}
+                            alt={item.productId.title}
+                            className="object-cover w-16 h-16 mr-4 rounded-md"
+                          />
+                        )}
+                        <div>
+                          <h4 className="text-lg font-semibold">{item.productId?.title}</h4>
+                          <p className="text-sm text-gray-500">
+                            Color: {item.variantId?.color}
+                          </p>
+                          <p className="text-gray-700">${item.price}</p>
+                          <p className="text-sm text-gray-500">
+                            Quantity: {item.quantity}
+                          </p>
+                        </div>
                       </div>
                     </div>
-                    <div className="flex flex-col items-end">
-                      <p
-                        className={`text-base capitalize ${order.status === "delivered" || order.status === "refunded"
-                          ? "text-green-600"
-                          : order.status === "created"
-                            ? "text-blue-600"
-                            : order.status === "ordered"
-                              ? "text-yellow-600"
-                              : order.status === "accepted"
-                                ? "text-indigo-600"
-                                : order.status === "rejected"
-                                  ? "text-red-600"
-                                  : order.status === "shipped"
-                                    ? "text-orange-600"
-                                    : order.status === "cancelled"
-                                      ? "text-gray-600"
-                                      : order.status === "returned"
-                                        ? "text-purple-600"
-                                        : "text-gray-500" // Default color
-                          }`}
-                      >
-                        {order.status === "created" ? "Ordered" : order.status}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {new Date(order.createdAt).toLocaleDateString()}
-                      </p>
-                    </div>
+                  ))}
+
+                  {/* Order Meta (status, date, etc.) */}
+                  <div className="flex flex-col items-end mt-2">
+                    <p
+                      className={`text-base capitalize ${order.status === "delivered" || order.status === "refunded"
+                        ? "text-green-600"
+                        : order.status === "created"
+                          ? "text-blue-600"
+                          : order.status === "ordered"
+                            ? "text-yellow-600"
+                            : order.status === "accepted"
+                              ? "text-indigo-600"
+                              : order.status === "rejected"
+                                ? "text-red-600"
+                                : order.status === "shipped"
+                                  ? "text-orange-600"
+                                  : order.status === "cancelled"
+                                    ? "text-gray-600"
+                                    : order.status === "returned"
+                                      ? "text-purple-600"
+                                      : "text-gray-500"
+                        }`}
+                    >
+                      {order.status}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {new Date(order.createdAt).toLocaleDateString()}
+                    </p>
                   </div>
-                  <div className="flex justify-end mt-2">
-                    {order.status === "delivered" && (
-                      <button className="text-blue-500 hover:underline">Rate & Review Product</button>
-                    )}
+
+                  {/* Tracking / Review / Cancel */}
+                  <div className="flex items-center justify-between w-full mt-2">
+                    <div className="flex gap-4">
+                      {order.status === "shipped" && order.trackingInfo?.trackingUrl && (
+                        <a
+                          href={order.trackingInfo.trackingUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-blue-600 hover:underline"
+                        >
+                          Track Package
+                        </a>
+                      )}
+
+                      {order.status === "delivered" && (
+                        <button className="text-sm text-blue-500 hover:underline">
+                          Rate & Review Product
+                        </button>
+                      )}
+
+                      {(order.status === "ordered" || order.status === "accepted") && (
+                        <button
+                          onClick={() => handleCancelOrder(order._id)}
+                          className="text-sm text-red-600 hover:underline"
+                        >
+                          Cancel Order
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
