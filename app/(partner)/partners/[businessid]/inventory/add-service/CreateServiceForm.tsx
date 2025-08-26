@@ -35,6 +35,105 @@ type NamedService = {
 
 
 
+
+
+
+// ---- Types (optional but recommended) ----
+type GeocodeAddressComponent = { long_name: string; short_name: string; types: string[] };
+type GeocodeLocation = { lat: number | (() => number); lng: number | (() => number) };
+type GeocodeResult = {
+    address_components: GeocodeAddressComponent[];
+    formatted_address?: string;
+    geometry: {
+        location: GeocodeLocation;
+        location_type?: 'ROOFTOP' | 'RANGE_INTERPOLATED' | 'GEOMETRIC_CENTER' | 'APPROXIMATE';
+    };
+    types?: string[];
+};
+
+type AddressParts = {
+    // Keep BOTH new and old names to avoid TS2339 errors
+    line1: string;
+    line2: string;
+    addressLine1: string;   // alias of line1
+    addressLine2: string;   // alias of line2
+    city: string;
+    state: string;
+    zip: string;
+    country: string;
+    fullFormatted: string;
+    formattedAddress: string; // alias of fullFormatted
+    shortFormatted: string;
+    latitude: number;
+    longitude: number;
+};
+
+// ---- Best-result picker (same as before or your improved scorer) ----
+const LT_PRIORITY = ['ROOFTOP', 'RANGE_INTERPOLATED', 'GEOMETRIC_CENTER', 'APPROXIMATE'] as const;
+
+function pickBestResult(results: GeocodeResult[], _srcLat?: number, _srcLng?: number): GeocodeResult | null {
+    if (!results?.length) return null;
+    return [...results].sort(
+        (a, b) => LT_PRIORITY.indexOf(a?.geometry?.location_type as any) - LT_PRIORITY.indexOf(b?.geometry?.location_type as any)
+    )[0];
+}
+
+// ---- Helpers (fixed 't' implicit any) ----
+const getComponent = (components: GeocodeAddressComponent[], types: string[]): string =>
+    components?.find((c) => types.every((t: string) => c.types?.includes(t)))?.long_name || '';
+
+// ---- Extractor (adds aliases so your existing code compiles) ----
+function extractAddressParts(result: GeocodeResult): AddressParts {
+    const comps = result?.address_components || [];
+    const get = (t: string[]) => getComponent(comps, t);
+
+    const line1 =
+        ((get(['street_number']) && get(['route'])) ? `${get(['street_number'])} ${get(['route'])}` : '') ||
+        get(['premise']) ||
+        get(['subpremise']) ||
+        get(['route']) ||
+        get(['sublocality', 'sublocality_level_3']) ||
+        '';
+
+    const line2 = get(['neighborhood']) || get(['sublocality', 'sublocality_level_2']) || get(['sublocality']) || '';
+
+    const city = get(['locality']) || get(['administrative_area_level_3']) || '';
+    const state = get(['administrative_area_level_1']) || '';
+    const zip = get(['postal_code']) || '';
+    const country = get(['country']) || '';
+
+    const fullFormatted =
+        result?.formatted_address || [line1, line2, city, state, zip, country].filter(Boolean).join(', ');
+
+    const { lat, lng } = result?.geometry?.location || {};
+    const latitude = typeof lat === 'function' ? lat() : (lat as number);
+    const longitude = typeof lng === 'function' ? lng() : (lng as number);
+
+    return {
+        line1,
+        line2,
+        addressLine1: line1,          // alias for backward compatibility
+        addressLine2: line2,          // alias
+        city,
+        state,
+        zip,
+        country,
+        fullFormatted,
+        formattedAddress: fullFormatted, // alias
+        shortFormatted: [line1, line2 || city, state].filter(Boolean).join(', '),
+        latitude,
+        longitude,
+    };
+}
+
+
+
+
+
+
+
+
+
 const CreateServiceForm: React.FC<CreateServiceFormProps> = ({ businessId, businessSlug }) => {
 
     const router = useRouter()
@@ -176,35 +275,40 @@ const CreateServiceForm: React.FC<CreateServiceFormProps> = ({ businessId, busin
                 const { latitude, longitude } = position.coords;
 
                 try {
-                    const response = await fetch(
-                        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=YOUR_GOOGLE_API_KEY`
-                    );
+                    const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY; // <-- set in .env.local
+                    if (!API_KEY) {
+                        console.error('Missing NEXT_PUBLIC_GOOGLE_MAPS_KEY');
+                        alert('Google Maps key is missing. Please configure your env variable.');
+                        return;
+                    }
+
+                    const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${API_KEY}`;
+                    const response = await fetch(url);
                     const data = await response.json();
 
-                    const result = data.results?.[0];
-                    const components = result?.address_components || [];
+                    if (data.status !== 'OK' || !data.results?.length) {
+                        console.error('Reverse geocoding failed:', data);
+                        alert(
+                            data.error_message
+                                ? `Reverse geocoding failed: ${data.error_message}`
+                                : 'No address found for this location.'
+                        );
+                        return;
+                    }
 
-                    const getComponent = (types: string[]) =>
-                        components.find((c: any) => types.every(t => c.types.includes(t)))?.long_name || '';
+                    const best = pickBestResult(data.results as GeocodeResult[], latitude, longitude);
 
-                    const addressLine1 = getComponent(['sublocality']) || getComponent(['route']) || '';
-                    const addressLine2 = getComponent(['premise']) || getComponent(['neighborhood']) || '';
-                    const city = getComponent(['locality']) || '';
-                    const state = getComponent(['administrative_area_level_1']) || '';
-                    const zip = getComponent(['postal_code']) || '';
+                    if (!best) {
+                        console.error('No geocoding candidate from API', data);
+                        alert('No address found for this location.');
+                        return; // ⬅️ stop here if null
+                    }
 
-                    const fullAddress = [
-                        addressLine1,
-                        addressLine2,
-                        city,
-                        state,
-                        zip,
-                    ].filter(Boolean).join(', ');
+                    const parts = extractAddressParts(best); // now types are happy
 
-                    // Fallback if no address
-                    if (!fullAddress) {
-                        alert('Failed to retrieve address. Dummy data is entered');
-
+                    if (!parts.formattedAddress) {
+                        console.warn('No formatted address. Data:', data);
+                        alert('Failed to retrieve address. Filling with dummy data.');
                         setAddressFields({
                             addressLine1: 'EP Block, Bidhannagar',
                             addressLine2: 'Arch Square',
@@ -212,38 +316,48 @@ const CreateServiceForm: React.FC<CreateServiceFormProps> = ({ businessId, busin
                             state: 'West Bengal',
                             zip: '72001',
                         });
-
-                        setServiceData((prev) => ({
+                        setServiceData((prev: any) => ({
                             ...prev,
-                            contact: { ...prev.contact, address: 'EP Block, Bidhannagar, Arch Square, Kolkata, West Bengal, 72001' },
+                            contact: {
+                                ...prev.contact,
+                                address: 'EP Block, Bidhannagar, Arch Square, Kolkata, West Bengal, 72001',
+                            },
                             location: {
                                 type: 'Point',
-                                coordinates: [88.43846940063182, 22.57463569699314], // dummy
+                                coordinates: [88.43846940063182, 22.57463569699314], // dummy [lng, lat]
                             },
                         }));
                         return;
                     }
 
-                    // Set state
-                    setAddressFields({ addressLine1, addressLine2, city, state, zip });
+                    // Fill UI fields
+                    setAddressFields({
+                        addressLine1: parts.addressLine1,
+                        addressLine2: parts.addressLine2,
+                        city: parts.city,
+                        state: parts.state,
+                        zip: parts.zip,
+                    });
 
+                    // Persist in service form (GeoJSON MUST be [lng, lat])
                     setServiceData((prev: any) => ({
                         ...prev,
-                        contact: { ...prev.contact, address: fullAddress },
+                        contact: { ...prev.contact, address: parts.formattedAddress },
                         location: {
                             type: 'Point',
-                            coordinates: [longitude, latitude],
+                            coordinates: [parts.longitude ?? longitude, parts.latitude ?? latitude],
                         },
                     }));
                 } catch (error) {
                     console.error('Google reverse geocoding failed:', error);
-                    alert('Reverse geocoding failed.');
+                    alert('Reverse geocoding failed. Check API key & billing.');
                 }
             },
             (error) => {
                 console.error('Geolocation error:', error);
                 alert('Failed to get current location.');
-            }
+            },
+            { enableHighAccuracy: true, timeout: 15000 }
         );
     };
 

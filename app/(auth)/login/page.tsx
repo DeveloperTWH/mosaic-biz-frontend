@@ -55,7 +55,8 @@ function LoginContent() {
       if (data.success) {
         localStorage.setItem('user_session', 'true');
         localStorage.setItem('user_gender', data.user.gender || '');
-        router.push(data.user.role === 'business_owner' ? '/partners' : '/customer');
+        window.dispatchEvent(new Event("auth:login"));
+        router.push(data.user.role === 'business_owner' ? '/partners' : '/');
       } else if (data.otpPending) {
         router.push(`/verify-otp?email=${data.user.email}&type=${data.user.role}`);
       } else {

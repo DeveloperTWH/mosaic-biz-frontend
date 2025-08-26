@@ -12,6 +12,8 @@ export const logoutUser = async (): Promise<boolean> => {
       // ✅ Clear local storage
       localStorage.removeItem("user_session");
       localStorage.removeItem("user_gender");
+      sessionStorage.removeItem("cart_sync_checked"); // allow re-prompt next time
+      window.dispatchEvent(new Event("auth:logout"));
 
       // ✅ Redirect to home
       window.location.href = "/";

@@ -70,6 +70,11 @@ export const addToCart = async (
       throw new Error(message);
     }
 
+    // 🔔 Notify navbar to refetch server cart count (no reload)
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('cart:server:update'));
+    }
+
     return {
       success: true,
       reset: !!data.reset,
@@ -128,6 +133,8 @@ export const addToCart = async (
   }
 
   localStorage.setItem('guest_cart', JSON.stringify(store));
+  // 🔔 Notify navbar to recompute guest cart count immediately
+  window.dispatchEvent(new Event('cart:update'));
 
   const totalItems = store.items.reduce((sum, it) => sum + (it.quantity || 0), 0);
 
@@ -211,6 +218,10 @@ export const updateCartItemQuantityById = async (cartItemId: string, newQuantity
     const data = await res.json().catch(() => ({}));
     throw new Error(data?.message || 'Failed to update cart quantity');
   }
+  // 🔔 notify navbar to refetch server count
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event('cart:server:update'));
+  }
 };
 
 export const removeCartItemById = async (cartItemId: string) => {
@@ -221,6 +232,10 @@ export const removeCartItemById = async (cartItemId: string) => {
   if (!res.ok) {
     const data = await res.json().catch(() => ({}));
     throw new Error(data?.message || 'Failed to remove cart item');
+  }
+  // 🔔 notify navbar to refetch server count
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event('cart:server:update'));
   }
 };
 
@@ -266,6 +281,7 @@ export const updateCartQuantity = async (
     }
 
     localStorage.setItem('guest_cart', JSON.stringify(store));
+    window.dispatchEvent(new Event('cart:update'));
     return;
   }
 
@@ -289,6 +305,10 @@ export const updateCartQuantity = async (
     const data = await res.json().catch(() => ({}));
     throw new Error(data?.message || 'Failed to update cart quantity');
   }
+  // 🔔 notify navbar to refetch server count
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event('cart:server:update'));
+  }
 };
 
 
@@ -300,9 +320,27 @@ export const removeFromCart = async (
   const loggedIn = await isUserLoggedIn();
 
   if (!loggedIn) {
-    const guestCart: CartItem[] = JSON.parse(localStorage.getItem('guest_cart') || '[]');
-    const updated = guestCart.filter(it => !(it.productId === productId && it.variantId === variantId && it.size === size));
-    localStorage.setItem('guest_cart', JSON.stringify(updated));
+    type GuestCartStore = { businessId: string | null; items: CartItem[] };
+    const raw = localStorage.getItem('guest_cart');
+    let store: GuestCartStore;
+    try {
+      const parsed = raw ? JSON.parse(raw) : null;
+      if (Array.isArray(parsed)) {
+        store = { businessId: null, items: parsed as CartItem[] };
+      } else if (parsed && typeof parsed === 'object' && Array.isArray(parsed.items)) {
+        store = { businessId: parsed.businessId ?? null, items: parsed.items as CartItem[] };
+      } else {
+        store = { businessId: null, items: [] };
+      }
+    } catch {
+      store = { businessId: null, items: [] };
+    }
+    store.items = store.items.filter(
+      it => !(it.productId === productId && it.variantId === variantId && it.size === size)
+    );
+    localStorage.setItem('guest_cart', JSON.stringify(store));
+    // 🔔 update navbar immediately for guest cart
+    window.dispatchEvent(new Event('cart:update'));
     return;
   }
 
@@ -321,6 +359,10 @@ export const removeFromCart = async (
   if (!res.ok) {
     const data = await res.json().catch(() => ({}));
     throw new Error(data?.message || 'Failed to remove item from cart');
+  }
+  // 🔔 notify navbar to refetch server count
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event('cart:server:update'));
   }
 };
 
@@ -652,7 +694,7 @@ export async function handlePlaceOrderFlow(address: ShippingAddress, userNote?: 
   const paymentPage = "/checkout/payment";
 
   if (!loggedIn) {
-    window.location.href = `/login?redirect=${encodeURIComponent(paymentPage)}`;
+    window.location.href = `/login?type=customer`;
     return;
   }
 

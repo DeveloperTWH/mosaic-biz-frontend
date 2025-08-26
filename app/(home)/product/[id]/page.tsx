@@ -27,6 +27,8 @@ export default function ProductDetailPage() {
   const [mainImage, setMainImage] = useState<string | null>(null);
   const [cartQty, setCartQty] = useState<number>(0);
   const [loadingQty, setLoadingQty] = useState<boolean>(false);
+  const [isBlocking, setIsBlocking] = useState(false);
+
 
 
 
@@ -101,6 +103,15 @@ export default function ProductDetailPage() {
 
   return (
     <div className="max-w-screen-xl px-4 py-10 mx-auto lg:px-8">
+      {(isBlocking || loadingQty) && (
+        <div className="fixed inset-0 z-[1000] bg-black/30 backdrop-blur-[1px] flex items-center justify-center">
+          <div className="flex items-center gap-3 px-4 py-3 bg-white rounded-lg shadow">
+            <span className="w-5 h-5 border-2 border-yellow-500 rounded-full border-t-transparent animate-spin" />
+            <span className="text-sm font-medium text-gray-700">Loading…</span>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col gap-12 lg:flex-row">
         {/* Image Section */}
         <div className="flex-1">
@@ -188,10 +199,11 @@ export default function ProductDetailPage() {
                   <div
                     key={variant.color}
                     onClick={() => {
+                      setLoadingQty(true);
                       setSelectedColor(variant.color);
                       const firstSize = variant.sizes?.[0]?.size;
                       if (firstSize) setSelectedSize(firstSize);
-                      console.log(selectedVariant);
+                      setLoadingQty(false);
                     }}
                     className={`w-6 h-6 rounded-full cursor-pointer border-2 ${selectedColor === variant.color ? "border-black" : "border-gray-300"
                       }`}
@@ -209,7 +221,11 @@ export default function ProductDetailPage() {
               {selectedVariant?.sizes?.map((size) => (
                 <button
                   key={size.size}
-                  onClick={() => setSelectedSize(size.size)}
+                  onClick={() => {
+                    setIsBlocking(true);
+                    setSelectedSize(size.size)
+                    setIsBlocking(false);
+                  }}
                   className={`border px-3 py-1 rounded ${selectedSize === size.size ? "bg-black text-white" : "bg-white text-black"}`}
                 >
                   {size.size}
@@ -233,8 +249,10 @@ export default function ProductDetailPage() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={async () => {
+                    setIsBlocking(true);
                     if (cartQty === 1) {
                       if (!selectedVariant?.variantId || !selectedSize) {
+                        setIsBlocking(false);
                         toast.error('Please select both variant and size.');
                         return;
                       }
@@ -242,6 +260,7 @@ export default function ProductDetailPage() {
                       const selectedVariantSize = selectedVariant?.sizes.find(s => s.size === selectedSize);
                       if (!selectedVariantSize || selectedVariantSize.stock <= 0) {
                         if (!selectedVariant.allowBackorder) {
+                          setIsBlocking(false);
                           toast.error('This size is out of stock and backordering is not allowed.');
                           return;
                         }
@@ -249,14 +268,17 @@ export default function ProductDetailPage() {
 
                       await removeFromCart(product._id, selectedVariant?.variantId, selectedSize);
                       setCartQty(0);
+                      setIsBlocking(false);
                     } else {
                       if (!selectedVariant?.variantId || !selectedSize) {
+                        setIsBlocking(false);
                         toast.error('Please select both variant and size.');
                         return;
                       }
                       const selectedVariantSize = selectedVariant?.sizes.find(s => s.size === selectedSize);
                       if (!selectedVariantSize || selectedVariantSize.stock <= 0) {
                         if (!selectedVariant.allowBackorder) {
+                          setIsBlocking(false);
                           toast.error('This size is out of stock and backordering is not allowed.');
                           return;
                         }
@@ -264,6 +286,7 @@ export default function ProductDetailPage() {
 
                       await updateCartQuantity(product._id, selectedVariant?.variantId, selectedSize, cartQty - 1);
                       setCartQty((prev) => prev - 1);
+                      setIsBlocking(false);
                     }
                   }}
                   className="w-10 h-10 text-lg font-bold text-white bg-red-500 rounded hover:bg-red-600"
@@ -273,13 +296,16 @@ export default function ProductDetailPage() {
                 <span className="min-w-[32px] text-center text-lg font-medium">{cartQty}</span>
                 <button
                   onClick={async () => {
+                    setIsBlocking(true);
                     if (!selectedVariant?.variantId || !selectedSize) {
+                      setIsBlocking(false);
                       toast.error('Please select both variant and size.');
                       return;
                     }
                     const selectedVariantSize = selectedVariant?.sizes.find(s => s.size === selectedSize);
                     if (!selectedVariantSize || selectedVariantSize.stock <= 0) {
                       if (!selectedVariant.allowBackorder) {
+                        setIsBlocking(false);
                         toast.error('This size is out of stock and backordering is not allowed.');
                         return;
                       }
@@ -287,6 +313,7 @@ export default function ProductDetailPage() {
 
                     await updateCartQuantity(product._id, selectedVariant?.variantId, selectedSize, cartQty + 1);
                     setCartQty((prev) => prev + 1);
+                    setIsBlocking(false);
                   }}
                   className="w-10 h-10 text-lg font-bold text-white bg-green-600 rounded hover:bg-green-700"
                 >
@@ -295,34 +322,56 @@ export default function ProductDetailPage() {
               </div>
             ) : (
               <button
-                className="px-6 py-2 font-bold text-black bg-yellow-400 rounded hover:bg-yellow-500"
+                className="px-6 py-2 font-bold text-black bg-yellow-400 rounded hover:bg-yellow-500 disabled:opacity-60 disabled:cursor-not-allowed"
+                disabled={isBlocking || loadingQty}
                 onClick={async () => {
-                  if (!selectedVariant?.variantId || !selectedSize) {
-                    toast.error('Please select both variant and size.');
-                    return;
-                  }
+                  if (isBlocking) return;
+                  setIsBlocking(true);
+                  try {
+                    if (!selectedVariant?.variantId || !selectedSize) {
+                      toast.error('Please select both variant and size.');
+                      return;
+                    }
 
-                  const selectedVariantSize = selectedVariant?.sizes.find(s => s.size === selectedSize);
-
-                  if (!selectedVariantSize || selectedVariantSize.stock <= 0) {
-                    if (!selectedVariant.allowBackorder) {
+                    const selectedVariantSize = selectedVariant?.sizes.find(s => s.size === selectedSize);
+                    if ((!selectedVariantSize || selectedVariantSize.stock <= 0) && !selectedVariant.allowBackorder) {
                       toast.error('This size is out of stock and backordering is not allowed.');
                       return;
                     }
-                  }
 
-                  await addToCart(product._id, selectedVariant.variantId, selectedSize, 1, product.businessId);
-                  setCartQty(1);
+                    const res = await addToCart(
+                      product._id,
+                      selectedVariant.variantId,
+                      selectedSize,
+                      1,
+                      product.businessId
+                    );
+
+                    // optional: if backend forced a business switch
+                    if (res?.reset) {
+                      toast.info('Your cart was switched to this store.');
+                    }
+
+                    setCartQty(1);
+                  } catch (err: any) {
+                    // show backend error (e.g., wrong role / 403 / 401 / stock issues)
+                    toast.error(err?.message || 'Failed to add to cart.');
+                  } finally {
+                    setIsBlocking(false);
+                  }
                 }}
               >
                 🛒 ADD TO CART
               </button>
+
             )}
 
             <button
               className="px-6 py-2 font-bold text-white bg-black rounded hover:bg-gray-900"
               onClick={() => {
+                setIsBlocking(true);
                 if (!selectedVariant?.variantId || !selectedSize || !selectedPrice) {
+                  setIsBlocking(false);
                   toast.error('Please select both variant and size.');
                   return;
                 }
@@ -330,6 +379,7 @@ export default function ProductDetailPage() {
                 const selectedVariantSize = selectedVariant?.sizes.find(s => s.size === selectedSize);
                 if (!selectedVariantSize || selectedVariantSize.stock <= 0) {
                   if (!selectedVariant.allowBackorder) {
+                    setIsBlocking(false);
                     toast.error('This size is out of stock and backordering is not allowed.');
                     return;
                   }
