@@ -59,9 +59,9 @@ const ServicePage = () => {
         onSearch={handleSearch}
       />
 
-      {/* {(!searchText && !minorityType && !searchLocation) && (
+      {(!searchText && !minorityType && !searchLocation) && (
         <CategoryGrid />
-      )} */}
+      )}
       <BookServices services={services} />
       <FeatureBlogs />
     </main>

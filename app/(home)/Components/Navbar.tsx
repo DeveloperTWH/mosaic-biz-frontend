@@ -47,9 +47,25 @@ const Navbar = () => {
     prevCountRef.current = cartCount;
   }, [cartCount]);
 
+  useEffect(() => {
+    const header = document.getElementById("site-header");
+    const setH = () => {
+      const h = header?.offsetHeight ?? 0;
+      document.documentElement.style.setProperty("--header-h", `${h}px`);
+    };
+    setH();
+    const ro = new ResizeObserver(setH);
+    if (header) ro.observe(header);
+    window.addEventListener("resize", setH);
+    return () => { ro.disconnect(); window.removeEventListener("resize", setH); };
+  }, []);
+
 
   return (
-    <header className="w-full px-6 py-4 bg-white shadow md:px-10 lg:px-20">
+    <header
+      id="site-header"
+      className="fixed top-0 left-0 z-50 w-full px-6 py-4 bg-white shadow md:px-10 lg:px-20"
+    >
       <CartSyncPrompt />
       <div className="flex items-center justify-between">
         {/* Logo */}

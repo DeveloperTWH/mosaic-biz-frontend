@@ -541,10 +541,10 @@ const CreateServiceForm: React.FC<CreateServiceFormProps> = ({ businessId, busin
             return false;
         }
 
-        if (!serviceData.contact?.website?.trim()) {
-            toast.error('Please enter a website');
-            return false;
-        }
+        // if (!serviceData.contact?.website?.trim()) {
+        //     toast.error('Please enter a website');
+        //     return false;
+        // }
 
         if (!serviceData.contact?.address?.trim()) {
             toast.error('We are unable to get your location');
