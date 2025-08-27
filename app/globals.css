@@ -26,12 +26,12 @@ body {
 
 }
 
-:root {
+:root.with-fixed-header {
   --header-h: 64px;
 }
 
-/* sensible default before JS runs */
-body {
+/* padding only in pages rendered by this layout */
+:root.with-fixed-header body {
   padding-top: var(--header-h);
 }
 

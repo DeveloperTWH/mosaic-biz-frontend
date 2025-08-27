@@ -66,7 +66,7 @@ const FeaturedProducts: React.FC<Props> = ({ products, loading }) => {
                     return (
                         <div
                             key={product._id}
-                            className="flex flex-col p-4 bg-white border rounded-lg hover:shadow-lg transition-shadow duration-200 min-h-[420px]"
+                            className="flex flex-col p-4 bg-white border rounded-lg hover:shadow-lg transition-shadow duration-200 min-h-[350px]"
                         >
                             {/* Clickable area (redirects to product detail) */}
                             <div
@@ -127,7 +127,7 @@ const FeaturedProducts: React.FC<Props> = ({ products, loading }) => {
                             </div>
 
                             {/* Cart Icon - stays outside the click zone */}
-                            <div className="flex justify-end mt-4">
+                            {/* <div className="flex justify-end mt-4">
                                 <button onClick={() => {
                                     console.log(product._id);
                                 }}>
@@ -138,7 +138,7 @@ const FeaturedProducts: React.FC<Props> = ({ products, loading }) => {
                                         height={32}
                                     />
                                 </button>
-                            </div>
+                            </div> */}
                         </div>
 
                     );
