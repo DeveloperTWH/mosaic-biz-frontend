@@ -253,7 +253,7 @@ const ServiceDetailPage = () => {
                                 <div className="space-y-1">
                                     <p className="font-medium">What type of service do you need?</p>
                                     {service.services.map((svc: any) => (
-                                        <label key={svc.name} className="block">
+                                        <label key={svc._id} className="block">
                                             <input
                                                 type="checkbox"
                                                 name="selectedService"

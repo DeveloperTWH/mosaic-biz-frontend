@@ -435,7 +435,7 @@ export default function ProductDetailPage() {
       </div>
 
       {/* Similar Products */}
-      <SimilarProduct />
+      <SimilarProduct productId={product._id} />
     </div>
   );
 }

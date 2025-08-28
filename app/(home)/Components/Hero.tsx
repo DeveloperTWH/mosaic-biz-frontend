@@ -31,7 +31,7 @@ const Hero = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="bg-white">
       {/* Search & Filters */}
       <section className="flex flex-col items-start justify-between p-5 py-4 space-y-4 bg-gray-50 md:px-20 md:flex-row md:space-y-0 md:space-x-4">
         <div className="flex flex-col w-full md:w-1/3">
@@ -96,9 +96,9 @@ const Hero = () => {
             Ultrices Ligulaeros.
           </p>
           {isLoggedIn === null &&
-            <div className="flex gap-2 animate-pulse">
-              <div className="w-32 rounded bg-gray-100/70 h-9" />
-              <div className="w-32 rounded bg-gray-100/70 h-9" />
+            <div className="flex flex-col gap-4 md:flex-row">
+              <div className="w-40 h-10 py-2 rounded bg-gray-100/70 px-7" />
+              <div className="w-40 h-10 py-2 rounded bg-gray-100/70 px-7" />
             </div>
           }
           {
