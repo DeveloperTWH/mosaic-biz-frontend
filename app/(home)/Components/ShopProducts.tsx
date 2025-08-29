@@ -252,157 +252,154 @@ function ProductCard({ item }: { item: RankedItem }) {
   };
 
   return (
-    <div className="group border rounded-2xl p-4 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
-      {/* Slider (square) */}
-      <div className="relative w-full overflow-hidden bg-gray-50 rounded-xl">
-        <div className="pt-[100%]" />
-        <div className="absolute inset-0">
-          <Swiper
-            modules={[Navigation, Pagination, Keyboard, A11y, Autoplay]}
-            slidesPerView={1}
-            pagination={{ clickable: true, dynamicBullets: true }}
-            keyboard={{ enabled: true }}
-            autoplay={{ delay: 2500, disableOnInteraction: false, pauseOnMouseEnter: false }}
-            loop
-            onSliderMove={() => (draggingRef.current = true)}
-            onTouchStart={() => (draggingRef.current = false)}
-            onTouchEnd={() => setTimeout(() => (draggingRef.current = false), 0)}
-            className="h-full product-swiper"
-          >
-            {images.map((src, i) => (
-              <SwiperSlide key={i}>
-                <img
-                  src={src}
-                  alt={`${title} ${i + 1}`}
-                  loading="lazy"
-                  className="object-contain w-full h-full p-3"
-                />
-              </SwiperSlide>
-            ))}
-          </Swiper>
+    <Link
+          href={href}
+          target="_blank"
+          onClickCapture={handleClickCapture}
+          aria-label={`Open ${title}`}
+        >
+      <div className="group border rounded-2xl p-4 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
+        {/* Slider (square) */}
+        <div className="relative w-full overflow-hidden bg-gray-50 rounded-xl">
+          <div className="pt-[100%]" />
+          <div className="absolute inset-0">
+            <Swiper
+              modules={[Navigation, Pagination, Keyboard, A11y, Autoplay]}
+              slidesPerView={1}
+              pagination={{ clickable: true, dynamicBullets: true }}
+              keyboard={{ enabled: true }}
+              autoplay={{ delay: 2500, disableOnInteraction: false, pauseOnMouseEnter: false }}
+              loop
+              onSliderMove={() => (draggingRef.current = true)}
+              onTouchStart={() => (draggingRef.current = false)}
+              onTouchEnd={() => setTimeout(() => (draggingRef.current = false), 0)}
+              className="h-full product-swiper"
+            >
+              {images.map((src, i) => (
+                <SwiperSlide key={i}>
+                  <img
+                    src={src}
+                    alt={`${title} ${i + 1}`}
+                    loading="lazy"
+                    className="object-contain w-full h-full p-3"
+                  />
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </div>
+
+          {onSale && (
+            <span className="absolute left-2 top-2 text-[11px] font-semibold bg-red-600 text-white px-2 py-0.5 rounded z-10">
+              {discount > 0 ? `-${discount}%` : "SALE"}
+            </span>
+          )}
         </div>
 
-        {onSale && (
-          <span className="absolute left-2 top-2 text-[11px] font-semibold bg-red-600 text-white px-2 py-0.5 rounded z-10">
-            {discount > 0 ? `-${discount}%` : "SALE"}
-          </span>
-        )}
-      </div>
-
-      {/* Title */}
-      <h3
-        className="mt-3 mb-1 text-sm font-semibold text-gray-900 sm:text-base"
-        title={title}
-        style={{
-          display: "-webkit-box",
-          WebkitLineClamp: 2,
-          WebkitBoxOrient: "vertical",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          wordBreak: "break-word",
-        }}
-      >
-        {title}
-      </h3>
+        {/* Title */}
+        <h3
+          className="mt-3 mb-1 text-sm font-semibold text-gray-900 sm:text-base"
+          title={title}
+          style={{
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            wordBreak: "break-word",
+          }}
+        >
+          {title}
+        </h3>
 
 
-      <p
-        className="mb-2 text-xs text-gray-600"
-        title={description || ""}
-        style={{
-          display: "-webkit-box",
-          WebkitLineClamp: 2,        // clamp to 2 lines; bump to 3 if you prefer
-          WebkitBoxOrient: "vertical",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          wordBreak: "break-word",
-        }}
-      >
-        {description || ""}
-      </p>
-
-
-      {/* Variant meta */}
-      {(label || size) && (
-        <p className="mb-2 text-xs text-gray-500">
-          {label ? `${label}: ` : ""}
-          {size}
-          {color ? (
-            <span
-              className="inline-block w-3 h-3 ml-2 align-middle border rounded-full"
-              style={{ backgroundColor: color }}
-            />
-          ) : null}
+        <p
+          className="mb-2 text-xs text-gray-600"
+          title={description || ""}
+          style={{
+            display: "-webkit-box",
+            WebkitLineClamp: 2,        // clamp to 2 lines; bump to 3 if you prefer
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            wordBreak: "break-word",
+          }}
+        >
+          {description || ""}
         </p>
-      )}
 
-      {/* Rating */}
-      <div className="flex items-center mb-2 space-x-0.5 text-yellow-500">
-        {Array(fullStars)
-          .fill(0)
-          .map((_, idx) => (
-            <Star
-              key={`full-${idx}`}
+
+        {/* Variant meta */}
+        {(label || size) && (
+          <p className="mb-2 text-xs text-gray-500">
+            {label ? `${label}: ` : ""}
+            {size}
+            {color ? (
+              <span
+                className="inline-block w-3 h-3 ml-2 align-middle border rounded-full"
+                style={{ backgroundColor: color }}
+              />
+            ) : null}
+          </p>
+        )}
+
+        {/* Rating */}
+        <div className="flex items-center mb-2 space-x-0.5 text-yellow-500">
+          {Array(fullStars)
+            .fill(0)
+            .map((_, idx) => (
+              <Star
+                key={`full-${idx}`}
+                size={14}
+                fill="currentColor"
+                stroke="currentColor"
+                className="text-yellow-400"
+              />
+            ))}
+          {hasHalfStar && (
+            <StarHalf
+              key="half"
               size={14}
               fill="currentColor"
               stroke="currentColor"
               className="text-yellow-400"
             />
-          ))}
-        {hasHalfStar && (
-          <StarHalf
-            key="half"
-            size={14}
-            fill="currentColor"
-            stroke="currentColor"
-            className="text-yellow-400"
-          />
-        )}
-        {Array(emptyStars)
-          .fill(0)
-          .map((_, idx) => (
-            <Star
-              key={`empty-${idx}`}
-              size={14}
-              fill="none"
-              stroke="gray"
-              className="text-gray-300"
-            />
-          ))}
-        {ratingCount > 0 && (
-          <span className="ml-2 text-[11px] text-gray-500">({ratingCount})</span>
-        )}
-      </div>
+          )}
+          {Array(emptyStars)
+            .fill(0)
+            .map((_, idx) => (
+              <Star
+                key={`empty-${idx}`}
+                size={14}
+                fill="none"
+                stroke="gray"
+                className="text-gray-300"
+              />
+            ))}
+          {ratingCount > 0 && (
+            <span className="ml-2 text-[11px] text-gray-500">({ratingCount})</span>
+          )}
+        </div>
 
-      {/* Price */}
-      <div className="flex items-baseline gap-2">
-        {onSale ? (
-          <>
-            <span className="text-base font-semibold text-red-600 sm:text-lg">
-              ${effective.toFixed(2)}
-            </span>
-            <span className="text-xs text-gray-500 line-through sm:text-sm">
+        {/* Price */}
+        <div className="flex items-baseline gap-2">
+          {onSale ? (
+            <>
+              <span className="text-base font-semibold text-red-600 sm:text-lg">
+                ${effective.toFixed(2)}
+              </span>
+              <span className="text-xs text-gray-500 line-through sm:text-sm">
+                ${price.toFixed(2)}
+              </span>
+            </>
+          ) : (
+            <span className="text-base font-semibold text-gray-900 sm:text-lg">
               ${price.toFixed(2)}
             </span>
-          </>
-        ) : (
-          <span className="text-base font-semibold text-gray-900 sm:text-lg">
-            ${price.toFixed(2)}
-          </span>
-        )}
-      </div>
+          )}
+        </div>
 
-      {/* Full-card link overlay (prevents click during drag) */}
-      <Link
-        href={href}
-        target="_blank"
-        onClickCapture={handleClickCapture}
-        className="absolute inset-0"
-        aria-label={`Open ${title}`}
-      >
-        <span className="sr-only">{`Open ${title}`}</span>
-      </Link>
-      <style jsx global>{`
+        {/* Full-card link overlay (prevents click during drag) */}
+        <style jsx global>{`
         .product-swiper .swiper-pagination-bullets {
           bottom: 6px !important;
           opacity: 0; /* hidden by default for a cleaner look */
@@ -425,7 +422,8 @@ function ProductCard({ item }: { item: RankedItem }) {
           transform: scale(1.15);
         }
       `}</style>
-    </div>
+      </div>
+    </Link>
   );
 }
 
