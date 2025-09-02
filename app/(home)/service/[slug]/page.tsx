@@ -8,6 +8,7 @@ import axios from 'axios';
 import { Service } from '@/types/service';
 import { Review } from '@/types/review';
 import { toast } from "react-toastify"
+import Link from "next/link";
 
 interface GetServiceBySlugResponse {
     success: boolean;
@@ -43,7 +44,6 @@ const ServiceDetailPage = () => {
         time: '',
     });
     const visibleCount = showAll ? reviews.length : 4;
-    let mapSrc, address;
 
     useEffect(() => {
         const fetchService = async () => {
@@ -54,10 +54,6 @@ const ServiceDetailPage = () => {
             } catch (error) {
                 console.error('Error fetching service:', error);
             } finally {
-                address = encodeURIComponent('MG Road, Pune');
-                mapSrc = `https://www.google.com/maps?q=${address}&output=embed`;
-                console.log(mapSrc);
-
                 setLoading(false);
             }
         };
@@ -130,6 +126,19 @@ const ServiceDetailPage = () => {
         }
     };
 
+    // inside your component render:
+    const coords = service?.location?.coordinates; // [lng, lat]
+    const [lng, lat] =
+        Array.isArray(coords) && coords.length === 2 ? [coords[0], coords[1]] : [undefined, undefined];
+
+    const hasLatLng =
+        typeof lat === "number" && Number.isFinite(lat) &&
+        typeof lng === "number" && Number.isFinite(lng);
+
+    const mapSrc = hasLatLng
+        ? `https://www.google.com/maps?q=${lat},${lng}&z=15&output=embed`
+        : `https://www.google.com/maps?q=${encodeURIComponent(service?.contact?.address ?? "")}&z=15&output=embed`;
+
 
 
     if (loading) return (
@@ -150,8 +159,17 @@ const ServiceDetailPage = () => {
             <main className="px-4 py-8 mx-auto max-w-7xl">
                 {/* Breadcrumb */}
                 <nav className="mb-4 text-sm text-gray-500">
-                    Home &gt; Services &gt; <span className="font-semibold text-black">{service.title}</span>
+                    <Link href="/" className="hover:underline">
+                        Home
+                    </Link>{" "}
+                    &gt;{" "}
+                    <Link href="/services" className="hover:underline">
+                        Services
+                    </Link>{" "}
+                    &gt;{" "}
+                    <span className="font-semibold text-black">{service.title}</span>
                 </nav>
+
 
                 {/* Top Split Section: Banner + Booking Form */}
                 <section className="grid gap-8 mb-10 md:grid-cols-3">
@@ -408,21 +426,32 @@ const ServiceDetailPage = () => {
                                 <div className="mt-2 overflow-hidden rounded-lg shadow-sm md:mt-0">
                                     <iframe
                                         title="Service Location"
-                                        src={`https://www.google.com/maps?q=${service.contact.address}&output=embed`}
+                                        src={mapSrc}
                                         width="100%"
                                         height="260"
                                         style={{ border: 0 }}
                                         allowFullScreen
                                         loading="lazy"
                                         referrerPolicy="no-referrer-when-downgrade"
-                                    ></iframe>
+                                    />
                                 </div>
                             </div>
                             <div className="mt-5">
-                                <button className="px-5 py-2 font-medium text-white transition-all bg-orange-500 rounded hover:bg-orange-600">
+                                <button
+                                    onClick={() => {
+                                        const url = hasLatLng
+                                            ? `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`
+                                            : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+                                                service?.contact?.address ?? ""
+                                            )}`;
+                                        window.open(url, "_blank");
+                                    }}
+                                    className="px-5 py-2 font-medium text-white transition-all bg-orange-500 rounded hover:bg-orange-600"
+                                >
                                     Get Directions
                                 </button>
                             </div>
+
                         </div>
 
                         {/* Amenities */}

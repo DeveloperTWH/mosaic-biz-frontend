@@ -1,31 +1,48 @@
-import Link from "next/link";
+'use client';
 
-const categories = [
-  { name: "Home Care Service", slug: "home-care-service", icon: "🏠" },
-  { name: "Fashion", slug: "fashion", icon: "👗" },
-  { name: "Skin & Beauty Treatment", slug: "skincare-service", icon: "💆" },
-  { name: "Pet Care", slug: "pet-care", icon: "🐶" },
-  { name: "Professional Services", slug: "professional", icon: "📋" },
-  { name: "Automotive", slug: "automotive", icon: "🚗" },
-  { name: "Tour & Travel", slug: "tour-travel", icon: "✈️" },
-  { name: "Construction", slug: "construction", icon: "🏗️" },
-  { name: "Finance Services", slug: "finance", icon: "💰" },
-  { name: "More", slug: "more", icon: "➕" }, // Added icon
-];
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import Image from "next/image";
+import { Category } from "@/types/Category";
 
 const CategoryGrid = () => {
+
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/category/service`);
+
+        setCategories(res.data.categories); // Adjust if API shape is different
+      } catch (err) {
+        console.error("Failed to fetch product categories", err);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+
   return (
-    <section className="px-6 max-w-7xl mx-auto">
-      <h2 className="text-xl md:text-2xl font-bold mb-6 heading">Browse Service by Category</h2>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+    <section className="px-6 mx-auto max-w-7xl">
+      <h2 className="mt-6 mb-6 text-xl font-bold text-center md:text-2xl heading">Browse by Category</h2>
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
         {categories.map((cat) => (
           <Link
-            key={cat.slug}
-            href={`/services/${cat.slug}`}
-            className="border p-4 rounded text-center hover:shadow transition"
+            key={cat._id}
+            href={`/services/${cat.slug}`} // or `/service/${cat.slug}` depending on your route
+            className="p-4 text-center transition border rounded hover:shadow"
           >
-            <div className="text-3xl mb-2">{cat.icon}</div>
-            <div className="text-sm md:text-base font-medium">{cat.name}</div>
+            <Image
+              src={cat.img || "/placeholder.png"}
+              alt={cat.name}
+              width={60}
+              height={60}
+              className="mx-auto mb-2 grayscale hover:grayscale-0"
+            />
+            <div className="text-sm font-medium md:text-base">{cat.name}</div>
           </Link>
         ))}
       </div>
