@@ -81,7 +81,7 @@ const AddressComponent = ({
             className="px-5 py-2 bg-[#FFC400] font-semibold"
             onClick={() => setShowModal(true)}
           >
-            Change
+            {addresses.length > 0 ? "Change" : "Add Address"}
           </button>
         </div>
       </div>

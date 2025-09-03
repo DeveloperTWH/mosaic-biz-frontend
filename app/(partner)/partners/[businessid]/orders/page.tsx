@@ -179,8 +179,8 @@ const page = () => {
                 { withCredentials: true }
             );
             setOrders(res.data.orders || []);
-        } catch {
-            toast.error(`Failed to ${action} order`);
+        } catch(err:any) {
+            toast.error(err.response?.data.message || `Failed to ${action} order`);
         }
     };
 

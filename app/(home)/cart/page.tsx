@@ -55,16 +55,7 @@ export default function CartPage() {
     const [itemsFood, setItemsFood] = useState<CartItem[]>([]); // keep for future Grocery integration
     const [loading, setLoading] = useState<boolean>(true);
     const [addresses, setAddresses] = useState<Address[]>([
-        {
-            id: "addr_1",
-            fullName: "John Doe",
-            phone: "9999999999",
-            addressLine1: "123 Street",
-            city: "City",
-            postalCode: "123456",
-            country: "IN",
-            isDefault: true,
-        },
+        
     ]);
 
     const [selectedAddressId, setSelectedAddressId] = useState<string | undefined>(
@@ -399,7 +390,7 @@ export default function CartPage() {
                                         className="px-4 py-2 text-white bg-blue-500"
                                         onClick={() => {
                                             if (!selectedAddress) {
-                                                alert("Please select an address");
+                                                alert("Please add address");
                                                 return;
                                             }
                                             handlePlaceOrderFlow(
