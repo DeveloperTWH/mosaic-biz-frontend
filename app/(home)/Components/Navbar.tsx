@@ -104,7 +104,7 @@ const Navbar = () => {
 
               {showDropdown && (
                 <div className="absolute right-0 z-50 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl top-full w-44">
-                  <Link
+                  {/* <Link
                     href="/dashboard"
                     className="block px-4 py-2 text-sm text-gray-700 rounded-t-lg hover:bg-gray-100"
                     onClick={() => setShowDropdown(false)}
@@ -117,7 +117,7 @@ const Navbar = () => {
                     onClick={() => setShowDropdown(false)}
                   >
                     Profile
-                  </Link>
+                  </Link> */}
                   <button
                     onClick={async () => await logoutUser()}
                     className="w-full px-4 py-2 text-sm text-left text-red-500 rounded-b-lg hover:bg-red-50"

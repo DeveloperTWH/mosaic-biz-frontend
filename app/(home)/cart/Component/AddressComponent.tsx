@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { LocateFixed } from "lucide-react";
+import { useMemo, useState, useEffect, useRef } from "react";
 
 export type Address = {
   id: string;
@@ -32,6 +33,37 @@ const emptyNew: Omit<Address, "id"> = {
   isDefault: false,
 };
 
+declare global {
+  interface Window {
+    google?: any;
+  }
+}
+
+const GOOGLE_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY
+
+
+const COUNTRIES = [
+  { code: "US", name: "United States" }
+];
+
+
+// States for India (sample); extend per country as needed.
+const STATES_BY_COUNTRY: Record<string, string[]> = {
+  US: [
+    "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut",
+    "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa",
+    "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan",
+    "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada",
+    "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina",
+    "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island",
+    "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont",
+    "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"
+  ]
+};
+
+
+
+
 const AddressComponent = ({
   addresses,
   selectedAddressId,
@@ -40,6 +72,164 @@ const AddressComponent = ({
 }: AddressComponentProps) => {
   const [showModal, setShowModal] = useState(false);
   const [newAddress, setNewAddress] = useState<Omit<Address, "id">>(emptyNew);
+  const addr2Ref = useRef<HTMLInputElement | null>(null);
+  const [countryCode, setCountryCode] = useState<string>("US");
+
+
+
+  // Lightweight loader (no extra deps)
+  const loadGooglePlaces = (): Promise<void> => {
+    if (window.google?.maps?.places) return Promise.resolve();
+    return new Promise((resolve, reject) => {
+      const existing = document.getElementById("gmaps-places");
+      if (existing) return resolve();
+      const s = document.createElement("script");
+      s.id = "gmaps-places";
+      s.async = true;
+      s.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_API_KEY}&libraries=places`;
+      s.onload = () => resolve();
+      s.onerror = () => reject(new Error("Failed to load Google Maps Places"));
+      document.head.appendChild(s);
+    });
+  };
+
+  const getComponent = (components: any[], type: string) =>
+    components.find((c: any) => c.types.includes(type))?.long_name || "";
+
+  const getComponentShort = (components: any[], type: string) =>
+    components.find((c: any) => c.types.includes(type))?.short_name || "";
+
+  // Build Address Line 2 = street/locality, without house/apt no.
+  const composeAddressLine2 = (components: any[]) => {
+    const route = getComponent(components, "route"); // e.g., "Main St"
+    const neighborhood = getComponent(components, "neighborhood"); // e.g., "Downtown"
+    const sublocality =
+      getComponent(components, "sublocality") ||
+      getComponent(components, "sublocality_level_1"); // e.g., "Midtown"
+    const adminLvl3 = getComponent(components, "administrative_area_level_3"); // sometimes township
+
+    const parts = [route, neighborhood, sublocality, adminLvl3]
+      .filter(Boolean);
+
+    // de-duplicate while preserving order
+    return Array.from(new Set(parts)).join(", ");
+  };
+
+  // Reverse-geocode for "Use my current location" near Postal Code
+  const fillFromLatLng = async (lat: number, lng: number) => {
+    await loadGooglePlaces();
+    const geocoder = new window.google.maps.Geocoder();
+    geocoder.geocode({ location: { lat, lng } }, (results: any, status: string) => {
+      if (status !== "OK" || !results?.length) return;
+      const place = results[0];
+      const comps = place.address_components || [];
+
+      const countryShort = getComponentShort(comps, "country");
+      if (countryShort && countryShort !== "US") {
+        alert("Sorry, we currently deliver only within the United States.");
+        setNewAddress((prev) => ({
+          ...prev,
+          addressLine2: "",
+          city: "",
+          state: "",
+          postalCode: "",
+          country: "United States",
+        }));
+        setCountryCode("US");
+        return;
+      }
+
+      const postalCode = getComponent(comps, "postal_code");
+      const city =
+        getComponent(comps, "locality") ||
+        getComponent(comps, "administrative_area_level_2");
+      const state = getComponent(comps, "administrative_area_level_1");
+
+      // Build street/locality for addr2 (keep addr1 manual for house/apt)
+      const addr2 = composeAddressLine2(comps);
+
+      setNewAddress((prev) => ({
+        ...prev,
+        postalCode: postalCode || prev.postalCode || "",
+        city: city || prev.city || "",
+        state: state || prev.state || "",
+        country: "United States",
+        addressLine2: addr2 || prev.addressLine2 || "",
+      }));
+      setCountryCode("US");
+    });
+  };
+
+  const useMyLocation = () => {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => fillFromLatLng(pos.coords.latitude, pos.coords.longitude),
+      () => {/* ignore errors silently */ }
+    );
+  };
+
+
+  useEffect(() => {
+    if (!showModal) return;
+    let ac: any;
+
+    loadGooglePlaces()
+      .then(() => {
+        if (!addr2Ref.current || !window.google?.maps?.places) return;
+        ac = new window.google.maps.places.Autocomplete(addr2Ref.current, {
+          types: ["address"],
+          componentRestrictions: { country: ["US"] }, // ← force US only
+          fields: ["address_components", "formatted_address", "name"],
+        });
+
+        ac.addListener("place_changed", () => {
+          const place = ac.getPlace();
+          if (!place?.address_components) return;
+          const comps = place.address_components;
+
+          const countryShort = getComponentShort(comps, "country");
+          if (countryShort && countryShort !== "US") {
+            alert("Sorry, we currently deliver only within the United States.");
+            // Clear non-US address pieces and keep country fixed to US
+            setNewAddress((prev) => ({
+              ...prev,
+              addressLine2: "",
+              city: "",
+              state: "",
+              postalCode: "",
+              country: "United States",
+            }));
+            setCountryCode("US");
+            return;
+          }
+
+          const city =
+            getComponent(comps, "locality") ||
+            getComponent(comps, "administrative_area_level_2");
+          const state = getComponent(comps, "administrative_area_level_1");
+          const postalCode = getComponent(comps, "postal_code");
+          const addr2 = composeAddressLine2(comps) || place.name || "";
+
+          setNewAddress((prev) => ({
+            ...prev,
+            addressLine2: addr2 || prev.addressLine2 || "",
+            city: city || prev.city || "",
+            state: state || prev.state || "",
+            postalCode: postalCode || prev.postalCode || "",
+            country: "United States",
+          }));
+
+          setCountryCode("US");
+        });
+      })
+      .catch(() => { });
+
+    return () => {
+      ac = null;
+    };
+  }, [showModal, countryCode]);
+
+
 
   const selected = useMemo(
     () => addresses.find(a => a.id === selectedAddressId) || addresses.find(a => a.isDefault) || addresses[0],
@@ -52,9 +242,13 @@ const AddressComponent = ({
       : "No address selected";
 
   const handleAddNewAddress = () => {
-    const { fullName, phone, addressLine1, city, postalCode, country } = newAddress;
-    if (!fullName || !phone || !addressLine1 || !city || !postalCode || !country) {
+    const { fullName, phone, addressLine1 , addressLine2, city, postalCode, country, state } = newAddress;
+    if (!fullName || !phone || !addressLine2 || !addressLine1 || !city || !postalCode || !country || !state) {
       alert("Please fill in all required fields.");
+      return;
+    }
+    if (newAddress.country && newAddress.country !== "United States") {
+      alert("Sorry, we only deliver within the United States.");
       return;
     }
     const newAddr: Address = {
@@ -65,6 +259,64 @@ const AddressComponent = ({
     setShowModal(false);
     setNewAddress(emptyNew);
   };
+
+  useEffect(() => {
+    if (!showModal) return;
+    setNewAddress((prev) => ({ ...prev, country: "United States" }));
+  }, [showModal]);
+
+useEffect(() => {
+  const zip = (newAddress.postalCode || "").trim();
+  if (!showModal || zip.length < 5) return; // wait until user typed enough
+
+  let cancelled = false;
+
+  (async () => {
+    await loadGooglePlaces();
+    const geocoder = new window.google.maps.Geocoder();
+
+    geocoder.geocode(
+      { componentRestrictions: { postalCode: zip } }, // no country → detect actual country
+      (results: any, status: string) => {
+        if (cancelled) return;
+        if (status !== "OK" || !results?.length) return;
+
+        const comps = results[0].address_components || [];
+        const countryShort = getComponentShort(comps, "country");
+
+        if (countryShort !== "US") {
+          alert("Sorry, we only deliver within the United States.");
+          setNewAddress((prev) => ({
+            ...prev,
+            postalCode: "",
+            city: "",
+            state: "",
+            country: "United States",
+          }));
+          setCountryCode("US");
+          return;
+        }
+
+        const state = getComponent(comps, "administrative_area_level_1");
+        const city =
+          getComponent(comps, "locality") ||
+          getComponent(comps, "administrative_area_level_2");
+
+        setNewAddress((prev) => ({
+          ...prev,
+          state: state || prev.state || "",
+          city: city || prev.city || "",
+          country: "United States",
+        }));
+        setCountryCode("US");
+      }
+    );
+  })();
+
+  return () => { cancelled = true; };
+}, [newAddress.postalCode, showModal]);
+
+
 
   return (
     <div>
@@ -129,54 +381,96 @@ const AddressComponent = ({
               </div>
 
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                {/* POSTAL CODE FIRST + GEO BUTTON */}
+                <div className="flex gap-2 sm:col-span-2">
+                  <input
+                    className="flex-1 p-2 border"
+                    placeholder="Postal code *"
+                    value={newAddress.postalCode ?? ""}
+                    onChange={(e) => setNewAddress({ ...newAddress, postalCode: e.target.value })}
+                    autoComplete="postal-code"
+                  />
+                  <button
+                    type="button"
+                    onClick={useMyLocation}
+                    className="flex items-center justify-center gap-2 px-3 py-2 text-sm text-white border rounded-md bg-custom-blue"
+                    title="Use my current location"
+                  >
+                    <LocateFixed/> Use my location
+                  </button>
+                </div>
+
+                {/* COUNTRY DROPDOWN */}
+                <select
+                  className="p-2 border"
+                  value={countryCode}
+                  onChange={(e) => {
+                    const cc = e.target.value;
+                    setCountryCode(cc);
+                    const selected = COUNTRIES.find(c => c.code === cc);
+                    setNewAddress((prev) => ({ ...prev, country: selected?.name || "", state: "" }));
+                  }}
+                >
+                  {COUNTRIES.map((c) => (
+                    <option key={c.code} value={c.code}>{c.name}</option>
+                  ))}
+                </select>
+
+                {/* STATE DROPDOWN (depends on country) */}
+                <select
+                  required
+                  className="p-2 border"
+                  value={newAddress.state ?? ""}
+                  onChange={(e) => setNewAddress({ ...newAddress, state: e.target.value })}
+                >
+                  <option value="">Select state/region</option>
+                  {(STATES_BY_COUNTRY[countryCode] || []).map((s) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
+
+                {/* CITY */}
+                <input
+                  className="p-2 border"
+                  placeholder="City *"
+                  value={newAddress.city ?? ""}
+                  onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })}
+                  autoComplete="address-level2"
+                />
+
+                {/* ADDRESS LINE 2 WITH AUTOCOMPLETE (searchable street/locality) */}
+                <input
+                  ref={addr2Ref}
+                  className="p-2 border sm:col-span-2"
+                  placeholder="Address line 2 (search & select street/locality)"
+                  value={newAddress.addressLine2 ?? ""}
+                  onChange={(e) => setNewAddress({ ...newAddress, addressLine2: e.target.value })}
+                />
+
+                {/* ADDRESS LINE 1 (manual: house/flat no., building, etc.) */}
+                <input
+                  className="p-2 border sm:col-span-2"
+                  placeholder="Address line 1 (House/Flat No., Building) *"
+                  value={newAddress.addressLine1}
+                  onChange={(e) => setNewAddress({ ...newAddress, addressLine1: e.target.value })}
+                />
+
+                {/* FULL NAME & PHONE */}
                 <input
                   className="p-2 border"
                   placeholder="Full name *"
                   value={newAddress.fullName}
                   onChange={(e) => setNewAddress({ ...newAddress, fullName: e.target.value })}
+                  autoComplete="name"
                 />
                 <input
                   className="p-2 border"
                   placeholder="Phone *"
                   value={newAddress.phone}
                   onChange={(e) => setNewAddress({ ...newAddress, phone: e.target.value })}
+                  autoComplete="tel"
                 />
-                <input
-                  className="p-2 border sm:col-span-2"
-                  placeholder="Address line 1 *"
-                  value={newAddress.addressLine1}
-                  onChange={(e) => setNewAddress({ ...newAddress, addressLine1: e.target.value })}
-                />
-                <input
-                  className="p-2 border sm:col-span-2"
-                  placeholder="Address line 2"
-                  value={newAddress.addressLine2 ?? ""}
-                  onChange={(e) => setNewAddress({ ...newAddress, addressLine2: e.target.value })}
-                />
-                <input
-                  className="p-2 border"
-                  placeholder="City *"
-                  value={newAddress.city ?? ""}
-                  onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })}
-                />
-                <input
-                  className="p-2 border"
-                  placeholder="State/Region"
-                  value={newAddress.state ?? ""}
-                  onChange={(e) => setNewAddress({ ...newAddress, state: e.target.value })}
-                />
-                <input
-                  className="p-2 border"
-                  placeholder="Postal code *"
-                  value={newAddress.postalCode ?? ""}
-                  onChange={(e) => setNewAddress({ ...newAddress, postalCode: e.target.value })}
-                />
-                <input
-                  className="p-2 border"
-                  placeholder="Country *"
-                  value={newAddress.country ?? ""}
-                  onChange={(e) => setNewAddress({ ...newAddress, country: e.target.value })}
-                />
+
                 <label className="flex items-center gap-2 mt-1 text-sm sm:col-span-2">
                   <input
                     type="checkbox"

@@ -61,9 +61,9 @@ const page = () => {
                 setSearchLocation={setSearchLocation}
                 onSearch={handleSearch}
             />
-            {/* {(!searchText && !minorityType && !searchLocation) && (
+            {(!searchText && !minorityType && !searchLocation) && (
                 <CategoryGrid />
-            )} */}
+            )}
             <FeaturedProducts products={products} loading={loading} />
         </div>
     )

@@ -235,7 +235,19 @@ function ProductCard({ item }: { item: RankedItem }) {
   const { price, salePrice, effective, onSale, size, label, color } = pickPrice(item);
   const rating = pickRating(item);
   const ratingCount = pickRatingCount(item);
-  const discount = pctOff(price, salePrice);
+  const norm = (n: number) => (Number.isFinite(n) ? n : 0);
+  const _price = norm(price);
+  const _sale = norm(salePrice ?? NaN);
+  const discount = _price > 0 && Number.isFinite(_sale) && _sale < _price
+    ? ((_price - _sale) / _price) * 100
+    : 0;
+
+  const fmtPct = (n: number) => {
+    const v = Number(n);
+    if (!Number.isFinite(v) || v <= 0) return null;
+    return Number.isInteger(v) ? String(v) : v.toFixed(1); // e.g. 0.5, 12.3
+  };
+  const discountLabel = fmtPct(discount);
 
   const fullStars = Math.floor(rating);
   const fractional = rating % 1;
@@ -253,11 +265,11 @@ function ProductCard({ item }: { item: RankedItem }) {
 
   return (
     <Link
-          href={href}
-          target="_blank"
-          onClickCapture={handleClickCapture}
-          aria-label={`Open ${title}`}
-        >
+      href={href}
+      target="_blank"
+      onClickCapture={handleClickCapture}
+      aria-label={`Open ${title}`}
+    >
       <div className="group border rounded-2xl p-4 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
         {/* Slider (square) */}
         <div className="relative w-full overflow-hidden bg-gray-50 rounded-xl">
@@ -290,7 +302,7 @@ function ProductCard({ item }: { item: RankedItem }) {
 
           {onSale && (
             <span className="absolute left-2 top-2 text-[11px] font-semibold bg-red-600 text-white px-2 py-0.5 rounded z-10">
-              {discount > 0 ? `-${discount}%` : "SALE"}
+              {discountLabel ? `-${discountLabel}%` : "SALE"}
             </span>
           )}
         </div>

@@ -53,13 +53,13 @@ const FilterBar: React.FC<FilterBarProps> = ({
         <input
           type="text"
           placeholder="Search Here"
-          className="w-full px-4 py-2 border md:w-1/4"
+          className="w-full px-4 py-2 border md:w-1/2"
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
         />
 
         <select
-          className="w-full px-4 py-2 border md:w-1/4 "
+          className="w-full px-4 py-3 border md:w-1/3 "
           value={minorityType}
           onChange={(e) => setMinorityType(e.target.value)}
           disabled={loadingMinority}
@@ -79,13 +79,13 @@ const FilterBar: React.FC<FilterBarProps> = ({
             <option disabled>No types available</option>
           )}
         </select>
-        <input
+        {/* <input
           type="text"
           placeholder="Search by Location"
           className="w-full px-4 py-2 border md:w-1/4"
           value={searchLocation}
           onChange={(e) => setSearchLocation(e.target.value)}
-        />
+        /> */}
 
         <button
           onClick={onSearch}
