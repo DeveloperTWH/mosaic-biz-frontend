@@ -41,6 +41,8 @@ export interface Business {
   isActive: boolean;
   subscriptionId: Subscription;
   stripeSubscriptionId: string;
+  stripeCustomerId?: string;
+  stripeConnectAccountId: string;
   slug: string;
   createdAt: string;
   updatedAt: string;

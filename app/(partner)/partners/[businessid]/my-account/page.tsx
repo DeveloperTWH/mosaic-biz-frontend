@@ -3,7 +3,7 @@
 import { useBusinessStore } from "@/app/store/businessStore";
 import { fetchBusinessBySlug } from "../utils/fetchBusiness";
 import { useParams } from "next/navigation";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import Sidebar from "../components/Sidebar";
 import Topbar from "../components/Topbar";
 import LoadingPage from "../components/LoadingPage";
@@ -60,6 +60,10 @@ const Page = () => {
   const [subActioning, setSubActioning] = useState(false);
   const [sub, setSub] = useState<SubscriptionSummary | null>(null);
 
+  const customerId = useMemo(() => business?.stripeCustomerId ?? null, [business?.stripeCustomerId]);
+
+  const apiBase = useMemo(() => process.env.NEXT_PUBLIC_API_BASE_URL || "", []);
+
   useEffect(() => {
     const session = localStorage.getItem("user_session");
     const userGender = localStorage.getItem("user_gender");
@@ -106,12 +110,34 @@ const Page = () => {
   }, [businessid]);
 
   // --- Load current subscription for this business
+  // const loadSubscription = useCallback(async () => {
+  //   if (!business?._id) return;
+  //   setSubLoading(true);
+  //   try {
+  //     const { data } = await api.get<{ success: boolean; subscription: SubscriptionSummary | null }>(
+  //       "/api/subscriptions/current",
+  //       { params: { businessId: business._id } }
+  //     );
+  //     setSub(data?.subscription ?? null);
+  //   } catch (e: any) {
+  //     toast.error(e?.response?.data?.message || "Failed to load subscription");
+  //     setSub(null);
+  //   } finally {
+  //     setSubLoading(false);
+  //   }
+  // }, [business?._id]);
+
+  // useEffect(() => {
+  //   loadSubscription();
+  // }, [loadSubscription]);
+
+  // --- Load current subscription for this BUSINESS
   const loadSubscription = useCallback(async () => {
     if (!business?._id) return;
     setSubLoading(true);
     try {
       const { data } = await api.get<{ success: boolean; subscription: SubscriptionSummary | null }>(
-        "/api/subscriptions/current",
+        `${apiBase}/api/subscriptions/current`,
         { params: { businessId: business._id } }
       );
       setSub(data?.subscription ?? null);
@@ -121,18 +147,21 @@ const Page = () => {
     } finally {
       setSubLoading(false);
     }
-  }, [business?._id]);
+  }, [apiBase, business?._id]);
+
 
   useEffect(() => {
-    loadSubscription();
-  }, [loadSubscription]);
+    if (business?._id) loadSubscription();
+  }, [business?._id, loadSubscription]);
+
+
 
   const cancelAtEnd = async () => {
     if (!business?._id || !sub) return;
     if (!confirm("Cancel at the end of the current period? You will retain access until it ends.")) return;
     setSubActioning(true);
     try {
-      await api.post(`/api/subscriptions/${sub.id}/cancel`, {
+      await api.post(`${apiBase}/api/subscriptions/${sub.id}/cancel`, {
         atPeriodEnd: true,
         businessId: business._id,
       });
@@ -150,8 +179,8 @@ const Page = () => {
     if (!confirm("Cancel immediately? You may lose access right away.")) return;
     setSubActioning(true);
     try {
-      await api.post(`/api/subscriptions/${sub.id}/cancel`, {
-        atPeriodEnd: false,
+      await api.post(`${apiBase}/api/subscriptions/${sub.id}/cancel`, {
+        atPeriodEnd: true,
         businessId: business._id,
       });
       toast.success("Subscription canceled.");
@@ -167,7 +196,7 @@ const Page = () => {
     if (!business?._id || !sub) return;
     setSubActioning(true);
     try {
-      await api.post(`/api/subscriptions/${sub.id}/resume`, { businessId: business._id });
+      await api.post(`${apiBase}/api/subscriptions/${sub.id}/resume`, { businessId: business._id });
       toast.success("Cancellation removed. Your plan will continue to renew.");
       await loadSubscription();
     } catch (e: any) {
@@ -178,14 +207,19 @@ const Page = () => {
   };
 
   const openBillingPortal = async () => {
-    if (!business?._id) return;
+    if (!business?._id) {
+      toast.error("Business not loaded.");
+      return;
+    }
     setSubActioning(true);
     try {
-      const { data } = await api.post<{ url: string }>("/api/billing-portal/session", {
-        businessId: business._id,
-      });
+      const { data } = await api.post<{ url: string }>(
+        `${apiBase}/api/billing-portal/session`,
+        { businessId: business._id },
+        { withCredentials: true }
+      );
       if (data?.url) {
-        window.location.href = data.url;
+        window.open(data.url, "_blank", "noopener,noreferrer");
       } else {
         toast.error("Could not open billing portal");
       }
@@ -195,6 +229,8 @@ const Page = () => {
       setSubActioning(false);
     }
   };
+
+
 
   if (isLoading) return <LoadingPage />;
   if (error) return <NotFoundPage />;
@@ -305,7 +341,7 @@ const Page = () => {
                   <h2 className="text-lg font-semibold heading">Subscription & Billing</h2>
                   <button
                     onClick={openBillingPortal}
-                    disabled={subActioning}
+                    disabled={subActioning || !business?._id}
                     className="px-3 py-2 border rounded hover:bg-gray-50 disabled:opacity-50"
                   >
                     Open Billing Portal

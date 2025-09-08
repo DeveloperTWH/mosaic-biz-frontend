@@ -39,7 +39,6 @@ declare global {
   }
 }
 
-const GOOGLE_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY
 
 
 const COUNTRIES = [
@@ -86,7 +85,7 @@ const AddressComponent = ({
       const s = document.createElement("script");
       s.id = "gmaps-places";
       s.async = true;
-      s.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_API_KEY}&libraries=places`;
+      s.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY}&libraries=places`;
       s.onload = () => resolve();
       s.onerror = () => reject(new Error("Failed to load Google Maps Places"));
       document.head.appendChild(s);

@@ -25,7 +25,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/admin": {
+    "/admin/orders": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -38,8 +38,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/admin",
-      "dataRoute": "/admin.rsc",
+      "srcRoute": "/admin/orders",
+      "dataRoute": "/admin/orders.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -193,30 +193,6 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/signup": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "Next-Action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/signup",
-      "dataRoute": "/signup.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
     "/login": {
       "experimentalBypassFor": [
         {
@@ -241,7 +217,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/about": {
+    "/signup": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -254,8 +230,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/about",
-      "dataRoute": "/about.rsc",
+      "srcRoute": "/signup",
+      "dataRoute": "/signup.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -289,7 +265,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/checkout/address": {
+    "/about": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -302,8 +278,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/checkout/address",
-      "dataRoute": "/checkout/address.rsc",
+      "srcRoute": "/about",
+      "dataRoute": "/about.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -328,6 +304,30 @@
       "initialRevalidateSeconds": false,
       "srcRoute": "/checkout",
       "dataRoute": "/checkout.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/checkout/address": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "Next-Action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/checkout/address",
+      "dataRoute": "/checkout/address.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -625,7 +625,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/admin/orders": {
+    "/admin": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -638,8 +638,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/admin/orders",
-      "dataRoute": "/admin/orders.rsc",
+      "srcRoute": "/admin",
+      "dataRoute": "/admin.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -653,8 +653,8 @@
   "dynamicRoutes": {},
   "notFoundRoutes": [],
   "preview": {
-    "previewModeId": "cb2346c219f515c43a2dd7b651e88d96",
-    "previewModeSigningKey": "aae1f75c4be63122128aea97832c26649d08ad1fc0c8e2b634af31072534010e",
-    "previewModeEncryptionKey": "d57ef00469b6c07cd74be0fd05883238d4e8a0e6c5a0a43f4bd561fa12772650"
+    "previewModeId": "338d70b2f9459bcf39abe4df95f0fa5d",
+    "previewModeSigningKey": "26eb24a6d18070c3fc243e4decbc0da89c06b5325de72cf06c2194325d0f5877",
+    "previewModeEncryptionKey": "90ba57e6c2649bab3c8d849edc9822a274f20dc87f721cacca95f4bd0b086f5a"
   }
 }

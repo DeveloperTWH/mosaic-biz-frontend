@@ -63,6 +63,14 @@
       "namedRegex": "^/partners/(?<nxtPbusinessid>[^/]+?)/bookings(?:/)?$"
     },
     {
+      "page": "/partners/[businessid]/finance",
+      "regex": "^/partners/([^/]+?)/finance(?:/)?$",
+      "routeKeys": {
+        "nxtPbusinessid": "nxtPbusinessid"
+      },
+      "namedRegex": "^/partners/(?<nxtPbusinessid>[^/]+?)/finance(?:/)?$"
+    },
+    {
       "page": "/partners/[businessid]/inventory",
       "regex": "^/partners/([^/]+?)/inventory(?:/)?$",
       "routeKeys": {

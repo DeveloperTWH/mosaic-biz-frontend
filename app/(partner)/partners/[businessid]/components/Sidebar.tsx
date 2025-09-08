@@ -11,6 +11,7 @@ import {
   LogOut,
   X,
   Camera,
+  Wallet
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useParams } from "next/navigation";
@@ -57,15 +58,20 @@ const Sidebar: React.FC<SidebarProps> = ({
     ...(business?.listingType === "service"
       ? [{ label: "Bookings", icon: <UserCircle className="w-5 h-5" /> }]
       : []),
+    { label: "Transactions & Payouts", icon: <Wallet className="w-5 h-5" /> },
     { label: "My Account", icon: <UserCircle className="w-5 h-5" /> },
     { label: "Settings", icon: <Settings className="w-5 h-5" /> },
     { label: "Support", icon: <LifeBuoy className="w-5 h-5" /> },
   ];
 
   const getLink = (label: string) => {
-    return label === "Dashboard"
-      ? `/partners/${businessId}`
-      : `/partners/${businessId}/${label.toLowerCase().replace(" ", "-")}`;
+    if (label === "Dashboard") {
+      return `/partners/${businessId}`;
+    }
+    if (label === "Transactions & Payouts") {
+      return `/partners/${businessId}/finance`;
+    }
+    return `/partners/${businessId}/${label.toLowerCase().replace(" ", "-")}`;
   };
 
   return (
@@ -78,9 +84,8 @@ const Sidebar: React.FC<SidebarProps> = ({
       ) : (
         <aside
           className={`fixed top-0 left-0 z-40 flex flex-col w-64 h-screen bg-[#333333] shadow transform transition-transform duration-300 md:static md:translate-x-0
-        ${
-          isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
-        } overflow-hidden`}
+        ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+            } overflow-hidden`}
         >
           {/* ✅ Close Button (Mobile Only) */}
           <div className="flex justify-end p-4 md:hidden">
@@ -95,15 +100,15 @@ const Sidebar: React.FC<SidebarProps> = ({
           <div className="flex flex-col items-center p-6">
             <div className="p-1 border-2 border-white rounded-full">
               {business?.logo ? (
-                <div className="flex items-center justify-center w-12 h-12 overflow-hidden rounded-full text-lg font-bold text-white">
+                <div className="flex items-center justify-center w-12 h-12 overflow-hidden text-lg font-bold text-white rounded-full">
                   <img
                     src={business.logo}
                     alt={businessName || "Business"}
-                    className="w-full h-full object-cover"
+                    className="object-cover w-full h-full"
                   />
                 </div>
               ) : (
-                <div className="flex items-center justify-center w-12 h-12 overflow-hidden rounded-full bg-red-600 text-lg font-bold text-white">
+                <div className="flex items-center justify-center w-12 h-12 overflow-hidden text-lg font-bold text-white bg-red-600 rounded-full">
                   businessName?.charAt(0).toUpperCase() || "B"
                 </div>
               )}

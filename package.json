@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@stripe/connect-js": "^3.3.28",
+    "@stripe/react-connect-js": "^3.3.26",
     "@stripe/react-stripe-js": "^3.7.0",
     "@stripe/stripe-js": "^7.4.0",
     "@tiptap/extension-image": "^2.23.0",
