@@ -84,7 +84,7 @@ function getRedirectPathByRole(role: string): string {
         case 'business_owner':
             return '/partners';
         case 'customer':
-            return '/customer';
+            return '/';
         default:
             return '/';
     }

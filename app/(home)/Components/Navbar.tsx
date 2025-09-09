@@ -6,10 +6,13 @@ import { logoutUser } from "@/utils/logoutUser";
 import { ShoppingCart } from "lucide-react";
 import { useCartCount } from "@/hooks/useCartCount";
 import CartSyncPrompt from "./CartSyncPrompt";
+import { getLoggedInCustomer } from "@/utils/authUtils";
+
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
+  const [isCustomer, setIsCustomer] = useState<boolean | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [gender, setGender] = useState<string | null>(null);
   const [bump, setBump] = useState(false);
@@ -22,10 +25,15 @@ const Navbar = () => {
 
   useEffect(() => {
     const session = localStorage.getItem("user_session");
-    setIsLoggedIn(session === 'true');
+    setIsLoggedIn(session === "true");
 
     const userGender = localStorage.getItem("user_gender");
     setGender(userGender);
+
+    (async () => {
+      const user = await getLoggedInCustomer(); // returns user only if role === 'customer'
+      setIsCustomer(!!user);
+    })();
 
     setMounted(true);
   }, []);
@@ -104,13 +112,23 @@ const Navbar = () => {
 
               {showDropdown && (
                 <div className="absolute right-0 z-50 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl top-full w-44">
-                  <Link
-                    href="/dashboard"
-                    className="block px-4 py-2 text-sm text-gray-700 rounded-t-lg hover:bg-gray-100"
-                    onClick={() => setShowDropdown(false)}
-                  >
-                    Dashboard
-                  </Link>
+                  {isCustomer ? (
+                    <Link
+                      href="/customer/order"
+                      className="block px-4 py-2 text-sm text-gray-700 rounded-t-lg hover:bg-gray-100"
+                      onClick={() => setShowDropdown(false)}
+                    >
+                      Orders
+                    </Link>
+                  ) : (
+                    <Link
+                      href="/dashboard"
+                      className="block px-4 py-2 text-sm text-gray-700 rounded-t-lg hover:bg-gray-100"
+                      onClick={() => setShowDropdown(false)}
+                    >
+                      Dashboard
+                    </Link>
+                  )}
                   {/* <Link
                     href="/profile"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"

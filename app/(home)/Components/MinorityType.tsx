@@ -43,7 +43,7 @@ const MinorityType: React.FC<Props> = ({ value, onChange }) => {
 
       <select
         id="minorityType"
-        className="px-4 py-2 border rounded min-w-[300px]"
+        className="px-4 py-3 border rounded min-w-[300px]"
         value={loadingMinority ? '' : value}     // keep controlled; empty while loading
         onChange={(e) => onChange(e.target.value)}
         disabled={loadingMinority}
@@ -54,7 +54,7 @@ const MinorityType: React.FC<Props> = ({ value, onChange }) => {
           <>
             <option value="">All Types</option>
             {minorityTypes.map((type) => (
-              <option key={type._id} value={type._id}>
+              <option key={type._id} value={type.name}>
                 {type.name}
               </option>
             ))}

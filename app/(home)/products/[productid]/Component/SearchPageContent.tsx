@@ -179,17 +179,31 @@ function useRankedProducts() {
 };
 
 
+type Filters = {
+  brand: string;
+  minPrice: number;
+  maxPrice: number;
+  subcategory?: string;
+  minorityType?: string;
+  size?: string;
+  color?: string;
+};
+
+type Subcategory = { _id: string; name: string; slug: string };
+
+
 export default function SearchPageContent() {
   const { productid } = useParams<{ productid: string }>();
   const { items, error, reload } = useRankedProducts();
-  const categorySlug = productid ?? ""; "";
+  const categorySlug = productid ?? "";
 
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<Filters>({
     brand: "",
     minPrice: 0,
     maxPrice: 1000,
   });
 
+  const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
   const [products, setProducts] = useState<RankedItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -198,37 +212,57 @@ export default function SearchPageContent() {
     const run = async () => {
       setLoading(true);
       try {
-        const params = new URLSearchParams();
-        if (categorySlug) params.set("categorySlug", categorySlug);
-        params.set("page", "1");
-        params.set("pageSize", "24");
-        // optionally: params.set("maxPerVendor", "3");
 
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/ranked?${params.toString()}`, {
-          headers: { "Accept": "application/json" },
-          cache: "no-store",
-        });
-        const data: RankedResponse = await res.json();
+        const rankedParams = new URLSearchParams();
+        if (categorySlug) rankedParams.set("categorySlug", categorySlug);
+        if (filters.subcategory) rankedParams.set("subcategorySlug", filters.subcategory);
+        if (filters.brand) rankedParams.set("brand", filters.brand);
+        if (filters.minorityType) rankedParams.set("minorityType", filters.minorityType);
+        if (filters.size) rankedParams.set("size", String(filters.size).toUpperCase());
+        rankedParams.set("page", "1");
+        rankedParams.set("pageSize", "24");
+
+        const [subRes, prodRes] = await Promise.all([
+          categorySlug
+            ? fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/sub-categories?categorySlug=${encodeURIComponent(categorySlug)}`, {
+              headers: { "Accept": "application/json" },
+              cache: "no-store",
+            })
+            : Promise.resolve(null as unknown as Response),
+          fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/ranked?${rankedParams.toString()}`, {
+            headers: { "Accept": "application/json" },
+            cache: "no-store",
+          }),
+        ]);
+
+        if (!abort && subRes) {
+          const subData = await subRes.json();
+          setSubcategories(Array.isArray(subData) ? subData : []);
+        } else if (!abort && !categorySlug) {
+          setSubcategories([]);
+        }
+
+        const data: RankedResponse = await prodRes.json();
 
         if (!abort) {
-          // client-side price filter (uses effectivePrice); keep brand filter best-effort on title
-          const filtered = (data.items || []).filter((item) => {
+          const priced = (data.items || []).filter((item) => {
             const price =
               item.firstEligible?.effectivePrice ??
               item.firstEligible?.price ??
               0;
-            const inPrice =
+            return (
               price >= (filters.minPrice ?? 0) &&
-              price <= (filters.maxPrice ?? Infinity);
-            const brandOk = !filters.brand
-              || (item.title || "").toLowerCase().includes(filters.brand.toLowerCase()); // adjust if you have a real brand field
-            return inPrice && brandOk;
+              price <= (filters.maxPrice ?? Infinity)
+            );
           });
 
-          setProducts(filtered);
+          setProducts(priced);
         }
       } catch {
-        if (!abort) setProducts([]);
+        if (!abort) {
+          setProducts([]);
+          setSubcategories([]);
+        }
       } finally {
         if (!abort) setLoading(false);
       }
@@ -242,7 +276,7 @@ export default function SearchPageContent() {
     <>
       <BannerSection />
       <div className="flex flex-col gap-6 px-6 py-8 mx-auto md:flex-row">
-        <FilterSidebar filters={filters} setFilters={setFilters} />
+        <FilterSidebar filters={filters} setFilters={setFilters} subcategories={subcategories} />
         <main className="flex-1">
           {products === null || loading ? (
             <SkeletonGrid />

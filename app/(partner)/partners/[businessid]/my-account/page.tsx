@@ -206,6 +206,11 @@ const Page = () => {
     }
   };
 
+  const stripePortalSettingsUrl =
+    process.env.NEXT_PUBLIC_STRIPE_MODE === "live"
+      ? "https://dashboard.stripe.com/settings/billing/portal"
+      : "https://dashboard.stripe.com/test/settings/billing/portal";
+
   const openBillingPortal = async () => {
     if (!business?._id) {
       toast.error("Business not loaded.");
@@ -224,11 +229,26 @@ const Page = () => {
         toast.error("Could not open billing portal");
       }
     } catch (e: any) {
-      toast.error(e?.response?.data?.message || "Could not open billing portal");
+      const apiErr = e?.response?.data;
+      const msg: string =
+        apiErr?.message || apiErr?.error || "Could not open billing portal";
+
+      if (
+        typeof msg === "string" &&
+        msg.includes("No configuration provided") &&
+        msg.includes("customer portal settings")
+      ) {
+        toast.error(
+          `Stripe Customer Portal is not configured. Open ${stripePortalSettingsUrl}, save the portal settings, then retry.`
+        );
+      } else {
+        toast.error(msg);
+      }
     } finally {
       setSubActioning(false);
     }
   };
+
 
 
 
@@ -344,8 +364,9 @@ const Page = () => {
                     disabled={subActioning || !business?._id}
                     className="px-3 py-2 border rounded hover:bg-gray-50 disabled:opacity-50"
                   >
-                    Open Billing Portal
+                    {subActioning ? "Opening…" : "Open Billing Portal"}
                   </button>
+
                 </div>
 
                 {subLoading ? (
@@ -400,13 +421,6 @@ const Page = () => {
                             className="px-4 py-2 border rounded hover:bg-gray-50 disabled:opacity-50"
                           >
                             Cancel at period end
-                          </button>
-                          <button
-                            onClick={cancelNow}
-                            disabled={subActioning}
-                            className="px-4 py-2 text-white bg-red-600 rounded hover:bg-red-700 disabled:opacity-50"
-                          >
-                            Cancel now
                           </button>
                         </>
                       )}

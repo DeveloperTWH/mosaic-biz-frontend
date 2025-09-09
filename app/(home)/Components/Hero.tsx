@@ -19,8 +19,8 @@ const Hero = () => {
   const go = () => {
     const qs = new URLSearchParams();
 
-    if (search.trim()) qs.set("search", search.trim());
-    if (location.trim()) qs.set("location", location.trim());
+    if (search.trim()) qs.set("q", search.trim());
+    if (location.trim()) qs.set("city", location.trim());
     if (minorityType) qs.set("minorityType", minorityType);
 
     router.push(`/products${qs.toString() ? `?${qs}` : ""}`);
@@ -41,7 +41,7 @@ const Hero = () => {
           <input
             id="search"
             type="text"
-            placeholder="e.g. Products, Services..."
+            placeholder="e.g. Products..."
             className="px-4 py-2 border rounded"
             value={search}
             onChange={(e) => setSearch(e.target.value)}

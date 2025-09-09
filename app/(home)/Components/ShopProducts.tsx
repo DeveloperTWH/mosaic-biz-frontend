@@ -269,8 +269,9 @@ function ProductCard({ item }: { item: RankedItem }) {
       target="_blank"
       onClickCapture={handleClickCapture}
       aria-label={`Open ${title}`}
+      className="border rounded-2xl transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
     >
-      <div className="group border rounded-2xl p-4 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
+      <div className="p-4 group rounded-2xl ">
         {/* Slider (square) */}
         <div className="relative w-full overflow-hidden bg-gray-50 rounded-xl">
           <div className="pt-[100%]" />
