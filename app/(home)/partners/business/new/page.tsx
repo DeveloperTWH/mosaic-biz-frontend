@@ -145,7 +145,7 @@ export default function CreateNewBusinessPage() {
     }
 
     try {
-      const response = await fetch('http://localhost:3001/api/google-places', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/google-places`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -592,7 +592,7 @@ export default function CreateNewBusinessPage() {
 
               <div className="flex flex-col w-full md:col-span-2">
                 <label htmlFor="description" className="text-sm font-medium text-gray-700">
-                  Description
+                  Business Description
                 </label>
                 <textarea
                   name="description"
