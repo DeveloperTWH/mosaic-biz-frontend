@@ -1,8 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import Image from 'next/image';
 import { toast } from 'react-toastify';
+// ADD
+import {
+  getPlaceSuggestions,
+  getPlaceDetails,
+} from '@/lib/googlePlaces';
+
 
 
 interface BusinessForm {
@@ -15,6 +21,7 @@ interface BusinessForm {
   city: string;
   state: string;
   country: string;
+  zipCode: string;
   logo?: File | null;
   coverImage?: File | null;
   productCategories?: string[];
@@ -76,9 +83,38 @@ const initialForm: BusinessForm = {
   city: '',
   state: '',
   country: '',
+  zipCode: '',
   logo: null,
   coverImage: null,
 };
+
+
+const _debounce = (fn: (...a: any[]) => void, ms = 250) => {
+  let t: any;
+  return (...a: any[]) => {
+    clearTimeout(t);
+    t = setTimeout(() => fn(...a), ms);
+  };
+};
+
+const _newSession = () => crypto.randomUUID?.() ?? Math.random().toString(36).slice(2);
+
+interface _Sug {
+  description: string;
+  placeId: string;
+  matched_substrings: any[]; // Array of matched substrings
+  place_id: string;
+  structured_formatting: {
+    main_text: string;
+    secondary_text: string;
+    main_text_matched_substrings: any[]; // Add this to match the expected type
+  };
+  terms: any[]; // Array of terms
+  types: string[]; // Array of types
+}
+
+
+
 
 export default function CreateNewBusinessPage() {
   const [formData, setFormData] = useState(initialForm);
@@ -95,6 +131,57 @@ export default function CreateNewBusinessPage() {
   const [productCategories, setProductCategories] = useState<Category[]>([]);
   const [serviceCategories, setServiceCategories] = useState<Category[]>([]);
   const [foodCategories, setFoodCategories] = useState<Category[]>([]);
+
+  const [addressSugs, setAddressSugs] = useState<_Sug[]>([]);
+  const [showAddrSugs, setShowAddrSugs] = useState(false);
+  const [streetSugs, setStreetSugs] = useState<_Sug[]>([]);
+  const streetSessionRef = useRef<string>(_newSession());
+
+  const fetchStreetAutocomplete = async (input: string) => {
+    if (!input.trim()) {
+      setStreetSugs([]);
+      setShowAddrSugs(false);
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:3001/api/google-places', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ input }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch suggestions');
+      }
+
+      const data = await response.json();
+      const list: _Sug[] = (data?.suggestions ?? [])
+        .map((s: any) => ({
+          description: s?.placePrediction?.text?.text ?? "",
+          placeId: s?.placePrediction?.placeId,
+          matched_substrings: s?.placePrediction?.text?.matches ?? [],
+          place_id: s?.placePrediction?.placeId,
+          structured_formatting: {
+            main_text: s?.placePrediction?.structuredFormat?.mainText?.text ?? "",
+            secondary_text: s?.placePrediction?.structuredFormat?.secondaryText?.text ?? "",
+            main_text_matched_substrings: s?.placePrediction?.structuredFormat?.mainText?.matches ?? [],
+          },
+          terms: s?.placePrediction?.terms ?? [],
+          types: s?.placePrediction?.types ?? [],
+        }))
+        .filter((x: _Sug) => x.description && x.placeId);
+
+      setStreetSugs(list);
+      setShowAddrSugs(list.length > 0); // Toggle the suggestions dropdown
+    } catch (error) {
+      console.error('Error fetching suggestions:', error);
+    }
+  };
+
+  const debouncedStreetAuto = useMemo(() => _debounce(fetchStreetAutocomplete, 250), []);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -203,38 +290,6 @@ export default function CreateNewBusinessPage() {
         }
       } catch (error) {
         console.error('Error fetching subscription plans:', error);
-
-        // Fallback to dummy data
-        const dummy = [
-          {
-            _id: '685281f61e1de765d6b297c0',
-            name: 'Basic',
-            price: 100,
-            durationInDays: 30,
-            limits: { productListings: 3, serviceListings: 1, foodListings: 1, imageLimit: 3, videoLimit: 0 },
-            features: { analyticsDashboard: false, supportLevel: 'basic' },
-          },
-          {
-            _id: '685281f61e1de765d6b297c1',
-            name: 'Pro',
-            price: 499,
-            durationInDays: 90,
-            limits: { productListings: 10, serviceListings: 5, foodListings: 2, imageLimit: 6, videoLimit: 1 },
-            features: { analyticsDashboard: true, supportLevel: 'standard', marketingTools: true },
-          },
-          {
-            _id: '685281f61e1de765d6b297c2',
-            name: 'Pro Plus',
-            price: 999,
-            durationInDays: 180,
-            limits: { productListings: 20, serviceListings: 10, foodListings: 5, imageLimit: 10, videoLimit: 3 },
-            features: { analyticsDashboard: true, supportLevel: 'priority', marketingTools: true, aiRecommendation: true },
-          },
-        ];
-
-        // Set the fallback dummy data and select the first plan as default
-        setPlans(dummy);
-        setSelectedPlanId(dummy[0]._id);
       } finally {
         setPageLoading(false);  // Set pageLoading to false after fetch
       }
@@ -243,10 +298,52 @@ export default function CreateNewBusinessPage() {
     fetchPlans();
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  let debounceTimeout: NodeJS.Timeout;
+
+  const debounce = (callback: Function, delay: number) => {
+    clearTimeout(debounceTimeout);
+    debounceTimeout = setTimeout(() => callback(), delay);
   };
+
+
+  const handleChange = async (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev: any) => ({ ...prev, [name]: value }));
+
+    if (name === "address") {
+      if (!value.trim()) {
+        setStreetSugs([]);
+        setShowAddrSugs(false);
+        return;
+      }
+      debouncedStreetAuto(value); // Call debounced function
+      setShowAddrSugs(true);
+    }
+  };
+
+  // ADD
+  const handlePickAddressSuggestion = async (pred: google.maps.places.AutocompletePrediction) => {
+    const normalized = await getPlaceDetails(pred.place_id);
+    setShowAddrSugs(false);
+    setAddressSugs([]);
+
+    if (!normalized) return;
+
+    // Extract address without city, state, or country
+    const addressParts = normalized.formatted.split(',');
+    const streetAddress = addressParts.slice(0, addressParts.length - 3).join(',').trim(); // assuming the last 3 parts are city, state, and country
+
+    setFormData(prev => ({
+      ...prev,
+      address: streetAddress || prev.address,
+      city: normalized.city || prev.city,
+      state: normalized.state || prev.state,
+      country: normalized.country || prev.country,
+      zipCode: normalized.postalCode || prev.zipCode,
+    }));
+  };
+
+
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, files } = e.target;
@@ -430,18 +527,49 @@ export default function CreateNewBusinessPage() {
             <hr className="h-[2px] w-[100px] bg-green-900 mt-[1px]" />
 
             <div className="grid grid-cols-1 gap-4 mt-6 md:grid-cols-2">
-              {['businessName', 'email', 'phoneNumber', 'address', 'city', 'state', 'country'].map((field) => (
-                <div key={field} className="flex flex-col w-full">
+              {['businessName', 'email', 'phoneNumber', 'address', 'city', 'state', 'country', 'zipCode'].map((field) => (
+                <div key={field} className={`flex flex-col w-full ${field === 'address' ? 'relative md:col-span-2' : ''}`}>
                   <label htmlFor={field} className="text-sm font-medium text-gray-700 capitalize">
                     {field.replace(/([A-Z])/g, ' $1')}
                   </label>
+
                   <input
                     name={field}
                     id={field}
                     value={(formData as any)[field]}
                     onChange={handleChange}
                     className="w-full px-4 py-2 border rounded"
+                    // ADD: keep the browser from showing its own suggestions
+                    autoComplete={field === 'address' ? 'off' : undefined}
+                    // ADD: reopen list on focus if suggestions exist
+                    onFocus={() => field === 'address' && addressSugs.length && setShowAddrSugs(true)}
+                    // ADD: delay closing so click can register
+                    onBlur={() => field === 'address' && setTimeout(() => setShowAddrSugs(false), 150)}
                   />
+
+                  {/* ADD: dropdown only for address */}
+                  {field === "address" && showAddrSugs && streetSugs.length > 0 && (
+                    <div className="absolute z-50 w-full mt-1 bg-white border rounded shadow top-full">
+                      {streetSugs.map((sug) => (
+                        <button
+                          key={sug.placeId} // Use placeId as key
+                          type="button"
+                          className="w-full px-3 py-2 text-left hover:bg-gray-50"
+                          onMouseDown={(e) => e.preventDefault()} // prevent blur before click
+                          onClick={() => handlePickAddressSuggestion(sug)}
+                          title={sug.description}
+                        >
+                          {sug.structured_formatting.main_text || sug.description} {/* Correct usage */}
+                          {sug.structured_formatting.secondary_text && (
+                            <span className="block text-xs text-gray-500">
+                              {sug.structured_formatting.secondary_text}
+                            </span>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
                 </div>
               ))}
 

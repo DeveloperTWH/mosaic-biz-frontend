@@ -78,7 +78,6 @@ const OrderPage = () => {
                   className="w-full p-2 border rounded"
                 >
                   <option value="">Select Status</option>
-                  <option value="created">Created</option>
                   <option value="ordered">Ordered</option>
                   <option value="accepted">Accepted</option>
                   <option value="rejected">Rejected</option>

@@ -26,9 +26,10 @@ const page = () => {
         if (!businessid) return;
 
         const loadBusiness = async () => {
-            try {
-                if (business && business.slug === businessid) return;
-                if (business && business.slug !== businessid) clearBusiness();
+            try {                
+                // if (business && business.slug === businessid) return;
+                // if (business && business.slug !== businessid) clearBusiness();
+                clearBusiness();
 
                 const fetchedBusiness = await fetchBusinessBySlug(businessid as string);
                 setBusiness(fetchedBusiness);
@@ -76,7 +77,7 @@ const page = () => {
                     {error && (
                         <NotFoundPage />
                     )}
-                    <AddProductPage businessId={business?._id} businessSlug={business?.slug} />
+                    <AddProductPage businessId={business?._id} businessSlug={business?.slug} imageLimit={business.imageLimit} videoLimit={business.videoLimit} />
                 </main>
             </div>
         </div>

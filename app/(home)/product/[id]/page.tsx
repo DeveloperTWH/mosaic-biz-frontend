@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { useParams } from "next/navigation";
 import { Heart } from "lucide-react";
@@ -28,7 +28,17 @@ export default function ProductDetailPage() {
   const [cartQty, setCartQty] = useState<number>(0);
   const [loadingQty, setLoadingQty] = useState<boolean>(false);
   const [isBlocking, setIsBlocking] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isPlaying, setIsPlaying] = useState(true);
 
+
+  // Reset play state whenever mainImage changes
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.play().catch(() => { });
+      setIsPlaying(true); // remove overlay when switching
+    }
+  }, [mainImage]);
 
 
 
@@ -89,6 +99,16 @@ export default function ProductDetailPage() {
     refreshCartQty();
   }, [refreshCartQty]);
 
+
+  useEffect(() => {
+    if (selectedVariant) {
+      // Prefer first image, fallback to cover image
+      setMainImage(selectedVariant.images?.[0] || product?.coverImage || selectedVariant.videos?.[0] || "");
+    }
+  }, [selectedVariant, product?.coverImage]);
+
+
+
   if (!product) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -116,11 +136,42 @@ export default function ProductDetailPage() {
         {/* Image Section */}
         <div className="flex-1">
           <div className="relative w-full mx-auto aspect-[4/5] sm:aspect-[3/4] md:aspect-[4/3] lg:aspect-[5/3] xl:aspect-[3/2]">
-            <img
-              src={mainImage || selectedVariant?.images?.[0] || product.coverImage}
-              alt={product.title}
-              className="absolute inset-0 object-contain w-full h-full rounded shadow"
-            />
+            {mainImage && (mainImage.endsWith(".mp4") || mainImage.endsWith(".webm")) ? (
+              <div className="relative w-full h-full overflow-hidden rounded shadow">
+                <video
+                  ref={videoRef}
+                  className="absolute inset-0 object-contain w-full h-full rounded cursor-pointer"
+                  muted
+                  autoPlay
+                  onClick={() => {
+                    if (!videoRef.current) return;
+                    if (videoRef.current.paused) {
+                      videoRef.current.play();
+                      setIsPlaying(true);
+                    } else {
+                      videoRef.current.pause();
+                      setIsPlaying(false);
+                    }
+                  }}
+                >
+                  <source src={mainImage} type={mainImage.endsWith(".mp4") ? "video/mp4" : "video/webm"} />
+                  Your browser does not support the video tag.
+                </video>
+
+                {/* Overlay only when paused and pointer events don't block clicks */}
+                {!isPlaying && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black pointer-events-none bg-opacity-30">
+                    <span className="text-4xl text-white">▶</span>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <img
+                src={mainImage || selectedVariant?.images?.[0] || product.coverImage}
+                alt={product.title}
+                className="absolute inset-0 object-contain w-full h-full rounded shadow"
+              />
+            )}
 
             <button
               className="absolute z-10 p-1 transition rounded-full top-4 right-4 bg-white/70 hover:bg-white"
@@ -139,7 +190,7 @@ export default function ProductDetailPage() {
           </div>
 
           <div className="flex flex-wrap gap-2 mt-4">
-            {/* Include cover image first */}
+            {/* Cover image first */}
             {[product.coverImage, ...(selectedVariant?.images || [])].map((img, i) => (
               <img
                 key={i}
@@ -149,6 +200,30 @@ export default function ProductDetailPage() {
                 className={`object-cover w-16 h-16 border rounded cursor-pointer ${mainImage === img ? "ring-2 ring-yellow-400" : ""
                   }`}
               />
+            ))}
+
+            {/* Videos */}
+            {(selectedVariant?.videos || []).map((vid) => (
+              <div
+                key={vid} // changed from index to URL
+                className={`w-16 h-16 relative border rounded cursor-pointer ${mainImage === vid ? "ring-2 ring-yellow-400" : ""
+                  }`}
+                onClick={() => setMainImage(vid)}
+              >
+                {mainImage === vid && !isPlaying && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                    <span className="text-2xl text-white">▶</span>
+                  </div>
+                )}
+
+                <video
+                  className="object-cover w-full h-full rounded"
+                  muted
+                  poster="" // optionally add a thumbnail if you have one
+                >
+                  <source src={vid} type={vid.endsWith(".mp4") ? "video/mp4" : "video/webm"} />
+                </video>
+              </div>
             ))}
           </div>
         </div>

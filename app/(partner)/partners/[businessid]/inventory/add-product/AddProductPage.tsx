@@ -16,9 +16,11 @@ import { useRouter } from "next/navigation";
 interface AddProductPageProps {
     businessId: string | undefined;
     businessSlug: string | undefined;
+    imageLimit: number;
+    videoLimit: number;
 }
 
-const AddProductPage: React.FC<AddProductPageProps> = ({ businessId, businessSlug }) => {
+const AddProductPage: React.FC<AddProductPageProps> = ({ businessId, businessSlug, imageLimit, videoLimit }) => {
     const [productData, setProductData] = useState<CreateProductWithVariantsPayload>({
         title: "",
         description: "",
@@ -39,6 +41,9 @@ const AddProductPage: React.FC<AddProductPageProps> = ({ businessId, businessSlu
 
     const router = useRouter();
     useEffect(() => {
+        console.log("image", imageLimit);
+        console.log("video", videoLimit);
+
         const fetchCategories = async () => {
             try {
                 const res = await axios.get(
@@ -176,11 +181,24 @@ const AddProductPage: React.FC<AddProductPageProps> = ({ businessId, businessSlu
     const handleVariantImageUpload = (variantIndex: number, e: ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
         if (!files) return;
-        const urls = Array.from(files).map((file) => URL.createObjectURL(file));
+
+        const selectedFiles = Array.from(files);
         const updatedVariants = [...productData.variants];
-        updatedVariants[variantIndex].images.push(...urls);
+        const currentImages = updatedVariants[variantIndex].images || [];
+
+        const remainingSlots = imageLimit - currentImages.length;
+        if (remainingSlots <= 0) {
+            alert(`You can only upload up to ${imageLimit} images.`);
+            return;
+        }
+
+        const limitedFiles = selectedFiles.slice(0, remainingSlots);
+        const urls = limitedFiles.map((file) => URL.createObjectURL(file));
+
+        updatedVariants[variantIndex].images = [...currentImages, ...urls];
         handleChange("variants", updatedVariants);
     };
+
 
     const removeVariantImage = (variantIndex: number, imageIndex: number) => {
         const updatedVariants = [...productData.variants];
@@ -194,16 +212,34 @@ const AddProductPage: React.FC<AddProductPageProps> = ({ businessId, businessSlu
     ) => {
         const files = e.target.files;
         if (!files) return;
-        const urls = Array.from(files).map((file) => URL.createObjectURL(file));
+
         const updatedVariants = [...productData.variants];
 
-        if (!updatedVariants[variantIndex].videos) {
-            updatedVariants[variantIndex].videos = [];
+        // Ensure array exists
+        const currentVideos: string[] = updatedVariants[variantIndex].videos ?? [];
+        const remainingSlots = Math.max(0, videoLimit - currentVideos.length);
+
+        if (remainingSlots <= 0) {
+            alert(`You can only upload up to ${videoLimit} videos.`);
+            e.target.value = "";
+            return;
         }
 
-        updatedVariants[variantIndex].videos.push(...urls);
+        const selectedFiles = Array.from(files);
+        const allowedFiles = selectedFiles.slice(0, remainingSlots);
+        const urls = allowedFiles.map((file) => URL.createObjectURL(file));
+
+        updatedVariants[variantIndex].videos = [...currentVideos, ...urls];
         handleChange("variants", updatedVariants);
+
+        if (allowedFiles.length < selectedFiles.length) {
+            alert(`Only ${remainingSlots} more video(s) allowed. Extra file(s) were ignored.`);
+        }
+
+        // Optional: reset so the same file can be selected again
+        e.target.value = "";
     };
+
 
     const removeVariantVideo = (variantIndex: number, videoIndex: number) => {
         const updatedVariants = [...productData.variants];
@@ -348,7 +384,7 @@ const AddProductPage: React.FC<AddProductPageProps> = ({ businessId, businessSlu
 
             toast.success(isPublished ? "✅ Product Published!" : "✅ Draft Saved!");
             router.push(`/partners/${businessSlug}/inventory`);
-        } catch (error:any) {
+        } catch (error: any) {
             console.error("Error submitting product:", error);
             toast.error(error?.response.data.error || "An error occurred while submitting the product.");
         } finally {
@@ -423,7 +459,7 @@ const AddProductPage: React.FC<AddProductPageProps> = ({ businessId, businessSlu
                             </button>
                         </div>
                         {productData.specifications?.map((spec, i) => (
-                            <div key={i} className="flex gap-2 mt-2">
+                            <div key={i} className="flex flex-wrap gap-2 mt-2">
                                 <input
                                     type="text"
                                     placeholder="Key"
@@ -543,51 +579,98 @@ const AddProductPage: React.FC<AddProductPageProps> = ({ businessId, businessSlu
 
                                 {variant.sizes.map((size, sIndex) => (
                                     <div key={sIndex} className="grid grid-cols-2 gap-2 sm:grid-cols-6">
-                                        <input
-                                            type="text"
-                                            placeholder={variant.label || "Size"}
-                                            value={size.size}
-                                            onChange={(e) =>
-                                                updateVariantSize(vIndex, sIndex, "size", e.target.value)
-                                            }
-                                            className="p-2 border rounded"
-                                        />
-                                        <input
-                                            type="text"
-                                            placeholder="Stock"
-                                            value={size.stock || ""}
-                                            onChange={(e) =>
-                                                updateVariantSize(vIndex, sIndex, "stock", Number(e.target.value))
-                                            }
-                                            className="p-2 border rounded"
-                                        />
-                                        <input
-                                            type="text"
-                                            placeholder="Price"
-                                            value={size.price || ""}
-                                            onChange={(e) =>
-                                                updateVariantSize(vIndex, sIndex, "price", Number(e.target.value))
-                                            }
-                                            className="p-2 border rounded"
-                                        />
-                                        <input
-                                            type="text"
-                                            placeholder="Sale Price"
-                                            value={size.salePrice || ""}
-                                            onChange={(e) =>
-                                                updateVariantSize(vIndex, sIndex, "salePrice", Number(e.target.value))
-                                            }
-                                            className="p-2 border rounded"
-                                        />
-                                        <input
-                                            type="text"
-                                            placeholder="SKU"
-                                            value={size.sku}
-                                            onChange={(e) =>
-                                                updateVariantSize(vIndex, sIndex, "sku", e.target.value)
-                                            }
-                                            className="p-2 border rounded"
-                                        />
+                                        <div className="relative">
+                                            <input
+                                                id={`size-${vIndex}-${sIndex}`}
+                                                type="text"
+                                                placeholder=" "  // <-- enables floating label via peer
+                                                value={size.size}
+                                                onChange={(e) =>
+                                                    updateVariantSize(vIndex, sIndex, "size", e.target.value)
+                                                }
+                                                className="w-full p-2 border rounded outline-none peer"
+                                            />
+                                            <label
+                                                htmlFor={`size-${vIndex}-${sIndex}`}
+                                                className="absolute left-2 top-2 text-gray-500 transition-all peer-placeholder-shown:top-2 peer-placeholder-shown:text-sm peer-focus:-top-2 peer-focus:text-xs peer-focus:text-gray-700 peer-[&:not(:placeholder-shown)]:-top-2 peer-[&:not(:placeholder-shown)]:text-xs bg-white py-0.5 px-2"
+                                            >
+                                                {variant.label || "Size"}
+                                            </label>
+                                        </div>
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                id={`stock-${vIndex}-${sIndex}`}
+                                                placeholder=" "
+                                                value={size.stock ?? ""}
+                                                onChange={(e) =>
+                                                    updateVariantSize(vIndex, sIndex, "stock", Number(e.target.value))
+                                                }
+                                                className="w-full p-2 border rounded outline-none peer"
+                                            />
+                                            <label
+                                                htmlFor={`stock-${vIndex}-${sIndex}`}
+                                                className="absolute left-2 top-2 text-gray-500 transition-all select-none peer-placeholder-shown:top-2 peer-placeholder-shown:text-sm peer-focus:-top-2 peer-focus:text-xs peer-focus:text-gray-700 peer-[&:not(:placeholder-shown)]:-top-2 peer-[&:not(:placeholder-shown)]:text-xs bg-white py-0.5 px-2">
+                                                Stock
+                                            </label>
+                                        </div>
+                                        {/* Price */}
+                                        <div className="relative">
+                                            <input
+                                                id={`price-${vIndex}-${sIndex}`}
+                                                type="number"
+                                                step="0.01"
+                                                min="0"
+                                                inputMode="decimal"
+                                                value={(size.price ?? 0) === 0 ? "" : size.price}
+                                                onChange={(e) => updateVariantSize(vIndex, sIndex, "price", Number(e.target.value))}
+                                                placeholder=" "                 // <-- single space to enable peer placeholder trick
+                                                className="w-full p-2 border rounded outline-none peer"
+                                            />
+                                            <label
+                                                htmlFor={`price-${vIndex}-${sIndex}`}                     // ⬅️ add
+                                                onMouseDown={(e) => e.preventDefault()}
+                                                className="absolute left-2 top-2 text-gray-500 transition-all select-none peer-placeholder-shown:top-2 peer-placeholder-shown:text-sm peer-focus:-top-2 peer-focus:text-xs peer-focus:text-gray-700 peer-[&:not(:placeholder-shown)]:-top-2 peer-[&:not(:placeholder-shown)]:text-xs bg-white py-0.5 px-1">
+                                                Price
+                                            </label>
+                                        </div>
+
+                                        {/* Sale Price */}
+                                        <div className="relative">
+                                            <input
+                                                id={`salePrice-${vIndex}-${sIndex}`}
+                                                type="number"
+                                                step="0.01"
+                                                min="0"
+                                                inputMode="decimal"
+                                                value={(size.salePrice ?? 0) === 0 ? "" : size.salePrice}
+                                                onChange={(e) => updateVariantSize(vIndex, sIndex, "salePrice", Number(e.target.value))}
+                                                placeholder=" "
+                                                className="w-full p-2 border rounded outline-none peer"
+                                            />
+                                            <label
+                                                htmlFor={`salePrice-${vIndex}-${sIndex}`}
+                                                className="absolute left-2 top-2 text-gray-500 transition-all select-none peer-placeholder-shown:top-2 peer-placeholder-shown:text-sm peer-focus:-top-2 peer-focus:text-xs peer-focus:text-gray-700 peer-[&:not(:placeholder-shown)]:-top-2 peer-[&:not(:placeholder-shown)]:text-xs bg-white py-0.5 px-2">
+                                                Sale Price (optional)
+                                            </label>
+                                        </div>
+
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                id={`sku-${vIndex}-${sIndex}`}
+                                                placeholder=" "  // enable floating label via peer trick
+                                                value={size.sku}
+                                                onChange={(e) =>
+                                                    updateVariantSize(vIndex, sIndex, "sku", e.target.value)
+                                                }
+                                                className="w-full p-2 border rounded outline-none peer"
+                                            />
+                                            <label htmlFor={`sku-${vIndex}-${sIndex}`} className="absolute left-2 top-2 text-gray-500 transition-all select-none peer-placeholder-shown:top-2 peer-placeholder-shown:text-sm peer-focus:-top-2 peer-focus:text-xs peer-focus:text-gray-700 peer-[&:not(:placeholder-shown)]:-top-2 peer-[&:not(:placeholder-shown)]:text-xs bg-white px-2 py-0.5">
+                                                SKU
+                                            </label>
+                                        </div>
+
 
                                         {/* Sale End Date */}
                                         <div className="col-span-2 sm:col-span-6">

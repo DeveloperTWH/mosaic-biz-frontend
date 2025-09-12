@@ -46,4 +46,6 @@ export interface Business {
   slug: string;
   createdAt: string;
   updatedAt: string;
+  imageLimit: number;
+  videoLimit: number;
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { toast } from 'react-toastify';
 import { Service } from '@/types/service'
 import { useRouter } from 'next/navigation';
@@ -12,6 +12,8 @@ import { uploadToS3 } from '@/utils/s3Uploader';
 interface CreateServiceFormProps {
     businessId: string;
     businessSlug: string;
+    imageLimit: number;
+    videoLimit: number;
 }
 
 type CategorySelection = {
@@ -69,42 +71,67 @@ type AddressParts = {
 };
 
 // ---- Best-result picker (same as before or your improved scorer) ----
+// ---- Priority (defensive against missing location_type) ----
 const LT_PRIORITY = ['ROOFTOP', 'RANGE_INTERPOLATED', 'GEOMETRIC_CENTER', 'APPROXIMATE'] as const;
 
 function pickBestResult(results: GeocodeResult[], _srcLat?: number, _srcLng?: number): GeocodeResult | null {
     if (!results?.length) return null;
-    return [...results].sort(
-        (a, b) => LT_PRIORITY.indexOf(a?.geometry?.location_type as any) - LT_PRIORITY.indexOf(b?.geometry?.location_type as any)
-    )[0];
+    return [...results].sort((a, b) => {
+        const ai = LT_PRIORITY.indexOf((a?.geometry?.location_type as any) ?? '') ?? -1;
+        const bi = LT_PRIORITY.indexOf((b?.geometry?.location_type as any) ?? '') ?? -1;
+        return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
+    })[0];
 }
 
-// ---- Helpers (fixed 't' implicit any) ----
+// ---- Small sanitizer: remove commas/newlines; collapse spaces ----
+const clean = (s?: string) =>
+    (s ?? '')
+        .replace(/[,\r\n]+/g, ' ')   // no commas/newlines inside fields
+        .replace(/\s+/g, ' ')
+        .trim();
+
+// Keep getComponent as-is but we'll clean the output later
 const getComponent = (components: GeocodeAddressComponent[], types: string[]): string =>
     components?.find((c) => types.every((t: string) => c.types?.includes(t)))?.long_name || '';
 
-// ---- Extractor (adds aliases so your existing code compiles) ----
+// ---- Extractor: produce comma-free parts + a safe formattedAddress ----
 function extractAddressParts(result: GeocodeResult): AddressParts {
     const comps = result?.address_components || [];
     const get = (t: string[]) => getComponent(comps, t);
 
-    const line1 =
-        ((get(['street_number']) && get(['route'])) ? `${get(['street_number'])} ${get(['route'])}` : '') ||
+    // Prefer house/building → street → sublocality
+    let line1 =
+        ((get(['street_number']) || get(['route'])) ? [get(['street_number']), get(['route'])].filter(Boolean).join(' ') : '') ||
         get(['premise']) ||
         get(['subpremise']) ||
         get(['route']) ||
         get(['sublocality', 'sublocality_level_3']) ||
         '';
 
-    const line2 = get(['neighborhood']) || get(['sublocality', 'sublocality_level_2']) || get(['sublocality']) || '';
+    let line2 =
+        get(['neighborhood']) ||
+        get(['sublocality', 'sublocality_level_2']) ||
+        get(['sublocality']) ||
+        '';
 
-    const city = get(['locality']) || get(['administrative_area_level_3']) || '';
-    const state = get(['administrative_area_level_1']) || '';
-    const zip = get(['postal_code']) || '';
-    const country = get(['country']) || '';
+    let city = get(['locality']) || get(['administrative_area_level_3']) || '';
+    let state = get(['administrative_area_level_1']) || '';
+    let zip = get(['postal_code']) || '';
+    let country = get(['country']) || '';
 
-    const fullFormatted =
-        result?.formatted_address || [line1, line2, city, state, zip, country].filter(Boolean).join(', ');
+    // Clean every field so none contains commas/newlines
+    line1 = clean(line1);
+    line2 = clean(line2);
+    city = clean(city);
+    state = clean(state);
+    zip = clean(zip);
+    country = clean(country);
 
+    // Build formattedAddress ONLY from cleaned fields, with EXACT separators
+    const fields = [line1, line2, city, state, zip, country].filter(Boolean);
+    const formattedAddress = fields.join(', ');  // <- safe to split later
+
+    // Coordinates
     const { lat, lng } = result?.geometry?.location || {};
     const latitude = typeof lat === 'function' ? lat() : (lat as number);
     const longitude = typeof lng === 'function' ? lng() : (lng as number);
@@ -112,29 +139,44 @@ function extractAddressParts(result: GeocodeResult): AddressParts {
     return {
         line1,
         line2,
-        addressLine1: line1,          // alias for backward compatibility
-        addressLine2: line2,          // alias
+        addressLine1: line1,
+        addressLine2: line2,
         city,
         state,
         zip,
         country,
-        fullFormatted,
-        formattedAddress: fullFormatted, // alias
-        shortFormatted: [line1, line2 || city, state].filter(Boolean).join(', '),
+        fullFormatted: formattedAddress,     // keep alias, but now guaranteed comma-safe
+        formattedAddress,                    // <- use this downstream
+        shortFormatted: [line1, line2 || city, state].filter(Boolean).map(clean).join(', '),
         latitude,
         longitude,
     };
 }
 
 
+const _debounce = (fn: (...a: any[]) => void, ms = 250) => {
+    let t: any; return (...a: any[]) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); };
+};
+const _newSession = () => crypto.randomUUID?.() ?? Math.random().toString(36).slice(2);
+type _Sug = { description: string; placeId: string };
+
+
+const stripCommas = (s = '') => s.replace(/,/g, '');
+
+// Compose the one-string address for DB (comma+space as the separator)
+const buildFormattedAddress = (f: {
+    addressLine1?: string; addressLine2?: string;
+    city?: string; state?: string; zip?: string; country?: string;
+}) => [f.addressLine1, f.addressLine2, f.city, f.state, f.zip, f.country]
+    .map((x) => stripCommas(x ?? ''))
+    .filter((x) => x !== '')           // omit empties to avoid trailing ", ,"
+    .join(', ');
 
 
 
 
 
-
-
-const CreateServiceForm: React.FC<CreateServiceFormProps> = ({ businessId, businessSlug }) => {
+const CreateServiceForm: React.FC<CreateServiceFormProps> = ({ businessId, businessSlug, imageLimit, videoLimit }) => {
 
     const router = useRouter()
 
@@ -219,11 +261,114 @@ const CreateServiceForm: React.FC<CreateServiceFormProps> = ({ businessId, busin
         city: '',
         state: '',
         zip: '',
+        country: '',
     });
+
+    // ✅ ADD (inside the same component, above your JSX)
+    const [streetQuery, setStreetQuery] = useState(addressFields.addressLine1 || "");
+    const [streetOpen, setStreetOpen] = useState(false);
+    const [streetSugs, setStreetSugs] = useState<_Sug[]>([]);
+    const streetSessionRef = useRef<string>(_newSession());
+
+    const fetchStreetAutocomplete = async (input: string) => {
+        if (!input.trim()) { setStreetSugs([]); setStreetOpen(false); return; }
+        const token = streetSessionRef.current;
+
+        const resp = await fetch('https://places.googleapis.com/v1/places:autocomplete', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Goog-Api-Key': process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY as string,
+                'X-Goog-FieldMask': 'suggestions.placePrediction.placeId,suggestions.placePrediction.text',
+                'X-Goog-Maps-Platform-Api-Client': 'platform-js',
+                'X-Sdk-Version': 'custom',
+            },
+            body: JSON.stringify({
+                input,
+                sessionToken: token,
+                includedPrimaryTypes: ['street_address', 'premise'],
+                languageCode: 'en',
+                // optionally add origin/location bias here if desired
+            }),
+        });
+        const data = await resp.json();
+        const list: _Sug[] = (data?.suggestions ?? [])
+            .map((s: any) => ({ description: s?.placePrediction?.text?.text ?? "", placeId: s?.placePrediction?.placeId }))
+            .filter((x: _Sug) => x.description && x.placeId);
+        setStreetSugs(list);
+        setStreetOpen(list.length > 0);
+    };
+    const debouncedStreetAuto = useMemo(() => _debounce(fetchStreetAutocomplete, 250), []);
+
+    // replace your function body with this (same signature)
+    const pickStreetSuggestion = async (s: _Sug) => {
+        console.log( "here ua " ,process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY);
+        
+        const resp = await fetch(`https://places.googleapis.com/v1/places/${encodeURIComponent(s.placeId)}`, {
+            headers: {
+                "X-Goog-Api-Key": process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY as string,
+                "X-Goog-FieldMask": "formattedAddress,addressComponents",
+            },
+        });
+        const data = await resp.json();
+
+        const comps: any[] = data?.addressComponents ?? [];
+        const get = (t: string) => comps.find(c => (c.types || []).includes(t))?.longText ?? "";
+
+        const streetNumber = get("street_number");
+        const route = get("route");
+        const neighborhood = get("neighborhood");
+        const sublocality2 = get("sublocality_level_2");
+        const sublocality = get("sublocality");
+
+        const city = get("locality") || sublocality || get("administrative_area_level_2");
+        const state = get("administrative_area_level_1");
+        const zip = get("postal_code");
+        const country = get("country");
+        const premise = get("premise") || get("subpremise") || get("establishment") || "";
+
+
+        const partsL1 = [premise, streetNumber, route].filter(Boolean);
+        const line1Raw = partsL1.length ? partsL1.join(' ') : (route || '');
+        const line2Raw = neighborhood || sublocality2 || sublocality || "";
+
+        // NEW: strip commas only (preserve spaces as typed)
+        const line1 = stripCommas(line1Raw);
+        const line2 = stripCommas(line2Raw);
+        const _city = stripCommas(city);
+        const _state = stripCommas(state);
+        const _zip = stripCommas(zip);
+        const _country = stripCommas(country);
+
+        setAddressFields(prev => ({
+            ...prev,
+            addressLine1: line1,
+            addressLine2: line2 || prev.addressLine2,  // NEW
+            city: _city || prev.city,
+            state: _state || prev.state,
+            zip: _zip || prev.zip,
+            country: _country || prev.country,
+        }));
+
+        // NEW: persist clean single-string address; DO NOT set coords
+        const formatted = [line1, line2, _city, _state, _zip, _country]
+            .filter(Boolean)
+            .join(', ');
+        setServiceData((prev: any) => ({
+            ...prev,
+            contact: { ...prev.contact, address: formatted },
+            location: null,              // let backend geocode
+        }));
+
+        setStreetQuery(line1);
+        setStreetSugs([]); setStreetOpen(false);
+        streetSessionRef.current = _newSession();
+    };
+
 
     // Updates structured fields and combines into single address
     const updateAddressField = (key: string, value: string) => {
-        const updatedFields = { ...addressFields, [key]: value };
+        const updatedFields = { ...addressFields, [key]: stripCommas(value) };
 
         const fullAddress = [
             updatedFields.addressLine1,
@@ -272,10 +417,10 @@ const CreateServiceForm: React.FC<CreateServiceFormProps> = ({ businessId, busin
 
         navigator.geolocation.getCurrentPosition(
             async (position) => {
-                const { latitude, longitude } = position.coords;
+                const { latitude, longitude } = position.coords; // we won't persist these
 
                 try {
-                    const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY; // <-- set in .env.local
+                    const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY;
                     if (!API_KEY) {
                         console.error('Missing NEXT_PUBLIC_GOOGLE_MAPS_KEY');
                         alert('Google Maps key is missing. Please configure your env variable.');
@@ -288,65 +433,38 @@ const CreateServiceForm: React.FC<CreateServiceFormProps> = ({ businessId, busin
 
                     if (data.status !== 'OK' || !data.results?.length) {
                         console.error('Reverse geocoding failed:', data);
-                        alert(
-                            data.error_message
-                                ? `Reverse geocoding failed: ${data.error_message}`
-                                : 'No address found for this location.'
-                        );
+                        alert(data.error_message || 'No address found for this location.');
                         return;
                     }
 
-                    const best = pickBestResult(data.results as GeocodeResult[], latitude, longitude);
-
+                    const best = pickBestResult(data.results as GeocodeResult[]);
                     if (!best) {
                         console.error('No geocoding candidate from API', data);
                         alert('No address found for this location.');
-                        return; // ⬅️ stop here if null
-                    }
-
-                    const parts = extractAddressParts(best); // now types are happy
-
-                    if (!parts.formattedAddress) {
-                        console.warn('No formatted address. Data:', data);
-                        alert('Failed to retrieve address. Filling with dummy data.');
-                        setAddressFields({
-                            addressLine1: 'EP Block, Bidhannagar',
-                            addressLine2: 'Arch Square',
-                            city: 'Kolkata',
-                            state: 'West Bengal',
-                            zip: '72001',
-                        });
-                        setServiceData((prev: any) => ({
-                            ...prev,
-                            contact: {
-                                ...prev.contact,
-                                address: 'EP Block, Bidhannagar, Arch Square, Kolkata, West Bengal, 72001',
-                            },
-                            location: {
-                                type: 'Point',
-                                coordinates: [88.43846940063182, 22.57463569699314], // dummy [lng, lat]
-                            },
-                        }));
                         return;
                     }
 
-                    // Fill UI fields
-                    setAddressFields({
-                        addressLine1: parts.addressLine1,
-                        addressLine2: parts.addressLine2,
-                        city: parts.city,
-                        state: parts.state,
-                        zip: parts.zip,
-                    });
+                    // Your existing extractor
+                    const parts = extractAddressParts(best);
 
-                    // Persist in service form (GeoJSON MUST be [lng, lat])
+                    // --- sanitize fields (strip only commas) ---
+                    const cleaned = {
+                        addressLine1: stripCommas(parts.addressLine1 || ''),
+                        addressLine2: stripCommas(parts.addressLine2 || ''),
+                        city: stripCommas(parts.city || ''),
+                        state: stripCommas(parts.state || ''),
+                        zip: stripCommas(parts.zip || ''),
+                        country: stripCommas(parts.country || ''),
+                    };
+
+                    // Fill UI fields (single source of truth)
+                    setAddressFields(cleaned);
+
+                    // Persist ONLY the one-string address; send sentinel coords [0,0]
                     setServiceData((prev: any) => ({
                         ...prev,
-                        contact: { ...prev.contact, address: parts.formattedAddress },
-                        location: {
-                            type: 'Point',
-                            coordinates: [parts.longitude ?? longitude, parts.latitude ?? latitude],
-                        },
+                        contact: { ...prev.contact, address: buildFormattedAddress(cleaned) },
+                        location: { type: 'Point', coordinates: [0, 0] }, // sentinel → backend geocodes
                     }));
                 } catch (error) {
                     console.error('Google reverse geocoding failed:', error);
@@ -364,13 +482,48 @@ const CreateServiceForm: React.FC<CreateServiceFormProps> = ({ businessId, busin
 
 
 
-    const handleFileUpload = (key: string, e: React.ChangeEvent<HTMLInputElement>) => {
+
+    // replace handleFileUpload with this (uses imageLimit/videoLimit from props)
+    const handleFileUpload = (
+        key: 'coverImage' | 'images' | 'videos',
+        e: React.ChangeEvent<HTMLInputElement>
+    ) => {
         const files = e.target.files;
         if (!files) return;
 
-        const urls = Array.from(files).map(file => URL.createObjectURL(file));
-        if (key === 'coverImage') setServiceData((prev: any) => ({ ...prev, coverImage: urls[0] }));
-        else setServiceData((prev: any) => ({ ...prev, [key]: [...prev[key], ...urls] }));
+        const urls = Array.from(files).map((file) => URL.createObjectURL(file));
+
+        if (key === 'coverImage') {
+            setServiceData((prev: any) => ({ ...prev, coverImage: urls[0] ?? prev?.coverImage }));
+            e.target.value = '';
+            return;
+        }
+
+        const currentArr: string[] = Array.isArray((serviceData as any)?.[key])
+            ? (serviceData as any)[key]
+            : [];
+
+        const max = key === 'images' ? imageLimit : videoLimit;
+        const remaining = Math.max(0, (max ?? 0) - currentArr.length);
+
+        if (remaining <= 0) {
+            alert(`You can only upload up to ${max} ${key}.`);
+            e.target.value = '';
+            return;
+        }
+
+        const limited = urls.slice(0, remaining);
+        if (limited.length < urls.length) {
+            alert(`Only ${remaining} more ${key === 'images' ? 'image(s)' : 'video(s)'} allowed. Extra file(s) were ignored.`);
+        }
+
+        setServiceData((prev: any) => ({
+            ...prev,
+            [key]: [...currentArr, ...limited],
+        }));
+
+        // allow selecting the same files again
+        e.target.value = '';
     };
 
     const removeImage = (key: string | number) => {
@@ -666,6 +819,7 @@ const CreateServiceForm: React.FC<CreateServiceFormProps> = ({ businessId, busin
                 })
             );
 
+
             // ✅ 4. Final Payload
             const payload = {
                 ...serviceData,
@@ -675,6 +829,9 @@ const CreateServiceForm: React.FC<CreateServiceFormProps> = ({ businessId, busin
                 images: uploadedImages,
                 videos: uploadedVideos,
             };
+
+            console.log(payload);
+
 
             console.log(publish ? "Publishing service..." : "Saving draft...", payload);
 
@@ -943,18 +1100,42 @@ const CreateServiceForm: React.FC<CreateServiceFormProps> = ({ businessId, busin
                         <div className="p-4 space-y-3 border rounded-md">
                             <h3 className="text-base font-semibold roboto">Business Address</h3>
 
-                            <input
-                                type="text"
-                                placeholder="Street Address"
-                                value={addressFields.addressLine1}
-                                required
-                                onChange={(e) => updateAddressField('addressLine1', e.target.value)}
-                                className="w-full p-2 text-sm border rounded"
-                            />
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    placeholder="Street Address"
+                                    value={addressFields.addressLine1}
+                                    required
+                                    onChange={(e) => {
+                                        const v = e.target.value;
+                                        setStreetQuery(v);
+                                        updateAddressField('addressLine1', v);
+                                        debouncedStreetAuto(v);
+                                    }}
+                                    onFocus={() => { if (streetSugs.length) setStreetOpen(true); }}
+                                    onBlur={() => setTimeout(() => setStreetOpen(false), 150)}  // allow click on menu
+                                    className="w-full p-2 text-sm border rounded"
+                                    autoComplete="off"
+                                />
+                                {streetOpen && streetSugs.length > 0 && (
+                                    <ul className="absolute z-50 w-full mt-1 overflow-auto bg-white border rounded shadow max-h-64">
+                                        {streetSugs.map((s) => (
+                                            <li
+                                                key={s.placeId}
+                                                onMouseDown={(e) => e.preventDefault()}
+                                                onClick={() => pickStreetSuggestion(s)}
+                                                className="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100"
+                                            >
+                                                {s.description}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </div>
 
                             <input
                                 type="text"
-                                placeholder="Apartment, Suite, etc. (optional)"
+                                placeholder="Address Line 2"
                                 value={addressFields.addressLine2}
                                 required
                                 onChange={(e) => updateAddressField('addressLine2', e.target.value)}
@@ -987,6 +1168,15 @@ const CreateServiceForm: React.FC<CreateServiceFormProps> = ({ businessId, busin
                                     className="w-full p-2 text-sm border rounded"
                                 />
                             </div>
+
+                            <input
+                                type="text"
+                                placeholder="Country"
+                                value={addressFields.country}
+                                required
+                                onChange={(e) => updateAddressField('country', e.target.value)}
+                                className="w-full p-2 text-sm border rounded"
+                            />
 
                             <div className="flex justify-end">
                                 <button

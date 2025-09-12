@@ -34,7 +34,7 @@ const Hero = () => {
     <div className="bg-white">
       {/* Search & Filters */}
       <section className="flex flex-col items-start justify-between p-5 py-4 space-y-4 bg-gray-50 md:px-20 md:flex-row md:space-y-0 md:space-x-4">
-        <div className="flex flex-col w-full md:w-1/3">
+        <div className="flex flex-col w-full md:w-3/5">  {/* make 3/5 to 1/3 when you loaction  */} 
           <label htmlFor="search" className="mb-1 text-sm font-medium">
             Search
           </label>
@@ -51,7 +51,7 @@ const Hero = () => {
 
         <MinorityType value={minorityType} onChange={setMinorityType} />
 
-        <div className="flex flex-col w-full md:w-auto">
+        {/* <div className="flex flex-col w-full md:w-auto">
           <label htmlFor="location" className="mb-1 text-sm font-medium">
             Filter By Location
           </label>
@@ -64,7 +64,7 @@ const Hero = () => {
             onChange={(e) => setLocation(e.target.value)}
             onKeyDown={onKeyDown}
           />
-        </div>
+        </div> */}
 
         <div className="flex flex-col justify-end w-full md:w-auto">
           <label className="invisible mb-1 text-sm font-medium">Search</label>

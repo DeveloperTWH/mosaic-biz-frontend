@@ -123,6 +123,7 @@ export interface ProductDetailItem {
     color: string;
     label: string;
     images: string[];
+    videos: string[];
     averageRating: number;
     totalReviews: number;
     allowBackorder: boolean;
