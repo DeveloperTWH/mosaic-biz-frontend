@@ -5,7 +5,7 @@ import { useSearchParams, usePathname, useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { useEffect, useState, Suspense } from 'react'
 import Link from 'next/link'
-import { X } from 'lucide-react';
+import { Eye, EyeOff, X } from 'lucide-react';
 
 function LoginContent() {
 
@@ -13,12 +13,25 @@ function LoginContent() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const searchParams = useSearchParams()
   const pathname = usePathname()
 
   const type = searchParams.get('type')
   const isValidType = type === 'vendor' || type === 'customer'
+
+  const role = type === 'vendor' ? 'business_owner' : 'customer';
+
+  const handleGoogleLoginRedirect = () => {
+    const returnTo =
+      typeof window !== 'undefined' ? window.location.origin : '';
+    const url =
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/google` +
+      `?role=${encodeURIComponent(role)}` +
+      `&redirect=${encodeURIComponent(returnTo)}`;
+    window.location.href = url; // full-page redirect
+  };
 
   if (!isValidType) {
     return (
@@ -73,7 +86,7 @@ function LoginContent() {
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center bg-[url('/login/footer-bg.jpg')] bg-cover bg-center relative p-1 py-10">
-      <div className="fixed z-50 p-2 text-white bg-gray-700 rounded-lg cursor-pointer top-4 right-4" onClick={() => router.back()}>
+      <div className="fixed z-50 p-2 text-white bg-gray-700 rounded-lg cursor-pointer top-4 right-4" onClick={() => router.push("/")}>
         <X size={20} />
       </div>
 
@@ -113,24 +126,35 @@ function LoginContent() {
           />
 
           <label className="block mb-2 text-gray-700">Password</label>
-          <input
-            type="password"
-            name="password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-2 mb-2 border rounded"
-            autoCapitalize="none"
-            autoComplete="email"
-            spellCheck="false"
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-2 pr-10 mb-2 border rounded"
+              autoCapitalize="none"
+              autoComplete="new-password"
+              spellCheck="false"
+            />
 
-          <div className="flex items-center justify-between mb-4 text-sm">
-            <label className="flex items-center">
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute inset-y-0 flex items-center text-gray-500 right-2"
+              tabIndex={-1}
+            >
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
+          </div>
+
+          <div className="flex items-center justify-end mb-4 text-sm">
+            {/* <label className="flex items-center">
               <input type="checkbox" className="mr-2" />
               Keep Me Signed In
-            </label>
-            <a href="#" className="font-medium text-blue-600">Forget Password</a>
+            </label> */}
+            <a href="#" className="font-medium text-blue-500">Forget Password ?</a>
           </div>
 
           {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
@@ -146,8 +170,15 @@ function LoginContent() {
 
 
         <div className="flex justify-center mt-4 space-x-4">
-          <button className="w-10 h-10 font-bold text-white bg-blue-600 rounded-full">f</button>
-          <button className="w-10 h-10 text-black bg-gray-200 rounded-full">G</button>
+          {/* <button
+            type="button"
+            onClick={handleGoogleLoginRedirect}
+            className="w-10 h-10 text-black bg-gray-200 rounded-full"
+            aria-label="Continue with Google"
+            title="Continue with Google"
+          >
+            G
+          </button> */}
         </div>
 
         <p className="mt-4 text-sm text-center">

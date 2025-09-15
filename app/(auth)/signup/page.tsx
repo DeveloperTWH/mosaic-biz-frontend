@@ -7,7 +7,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Suspense } from "react";
-import { X } from "lucide-react";
+import { Eye, EyeOff, X } from "lucide-react";
 
 type MinorityType = {
   _id: string;
@@ -20,6 +20,19 @@ function SignupContent() {
   const [isValidType, setIsValidType] = useState(true);
   const [minorityTypes, setMinorityTypes] = useState<MinorityType[]>([]);
   const [loadingMinority, setLoadingMinority] = useState(true);
+  const [password, setPassword] = useState("");
+  const [pwdError, setPwdError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [pwdChecks, setPwdChecks] = useState({
+    hasMinLen: false,
+    hasUpper: false,
+    hasLower: false,
+    hasDigit: false,
+    hasSpecial: false,
+  });
+  const [showPwdHints, setShowPwdHints] = useState(false);
+
+
 
   useEffect(() => {
     const fetchMinorityTypes = async () => {
@@ -69,16 +82,41 @@ function SignupContent() {
     }
   };
 
+  function computePwdChecks(pwd: string) {
+    const hasMinLen = pwd.length >= 10;
+    const hasUpper = /[A-Z]/.test(pwd);
+    const hasLower = /[a-z]/.test(pwd);
+    const hasDigit = /\d/.test(pwd);
+    const hasSpecial = /[^A-Za-z0-9]/.test(pwd);
+    return { hasMinLen, hasUpper, hasLower, hasDigit, hasSpecial };
+  }
+
+
+
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.target as HTMLFormElement; // ✅ Fix here
     const formData = new FormData(form);
+
+    const firstName = (formData.get("firstName") as string).trim();
+    const lastName = (formData.get("lastName") as string).trim();
+    const email = (formData.get("email") as string).trim();
+    const password = (formData.get("password") as string) || "";
+    const checks = computePwdChecks(password);
+    setPwdChecks(checks);
+
+    if (Object.values(checks).some(v => v === false)) {
+      setShowPwdHints(true);
+      setPwdError("Please meet all password requirements before continuing.");
+      return;
+    }
+    setPwdError(null);
+
     const payload = {
-      name: `${(formData.get("firstName") as string).trim()} ${(
-        formData.get("lastName") as string
-      ).trim()}`.trim(),
-      email: formData.get("email"),
-      password: formData.get("password"),
+      name: `${firstName} ${lastName}`.trim(),
+      email,
+      password,
       role: type === "vendor" ? "business_owner" : "customer",
       mobile: formData.get("mobile"),
       gender: formData.get("gender"), // vendor can skip gender
@@ -221,12 +259,61 @@ function SignupContent() {
           />
 
           <label className="block mb-2 text-gray-700">Password</label>
-          <input
-            name="password"
-            type="password"
-            required
-            className="w-full p-2 mb-4 border rounded"
-          />
+          <div className="relative">
+            <input
+              name="password"
+              type={showPassword ? "text" : "password"}
+              required
+              className="w-full p-2 pr-10 mb-2 border rounded"
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="none"
+              value={password}
+              onFocus={() => setShowPwdHints(true)}
+              onBlur={() => {
+                if (!password) setShowPwdHints(false);
+              }}
+              onChange={(e) => {
+                const val = e.target.value;
+                setPassword(val);
+                setPwdError(null);
+                setPwdChecks(computePwdChecks(val));
+              }}
+            />
+
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute inset-y-0 flex items-center text-gray-500 right-2"
+              tabIndex={-1}
+            >
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
+          </div>
+
+          {showPwdHints && (
+            <ul className="mb-3 space-y-1 text-sm">
+              <li className={pwdChecks.hasMinLen ? "text-green-600" : "text-gray-600"}>
+                {pwdChecks.hasMinLen ? "✓" : "•"} At least 10 characters
+              </li>
+              <li className={pwdChecks.hasUpper ? "text-green-600" : "text-gray-600"}>
+                {pwdChecks.hasUpper ? "✓" : "•"} One uppercase letter (A–Z)
+              </li>
+              <li className={pwdChecks.hasLower ? "text-green-600" : "text-gray-600"}>
+                {pwdChecks.hasLower ? "✓" : "•"} One lowercase letter (a–z)
+              </li>
+              <li className={pwdChecks.hasDigit ? "text-green-600" : "text-gray-600"}>
+                {pwdChecks.hasDigit ? "✓" : "•"} One number (0–9)
+              </li>
+              <li className={pwdChecks.hasSpecial ? "text-green-600" : "text-gray-600"}>
+                {pwdChecks.hasSpecial ? "✓" : "•"} One special character (!@#$% etc.)
+              </li>
+            </ul>
+          )}
+
+          {pwdError && (
+            <p className="mb-3 text-sm text-red-600">{pwdError}</p>
+          )}
 
           <button
             type="submit"
