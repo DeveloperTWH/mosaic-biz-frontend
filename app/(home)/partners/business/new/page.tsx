@@ -244,7 +244,7 @@ export default function CreateNewBusinessPage() {
 
   // NEW: step-aware submit handler
   const handleNext = () => {
-    // if (!validateStep(step)) return;
+    if (!validateStep(step)) return;
 
     if (step !== 'plan') {
       return goNext();
@@ -677,7 +677,7 @@ export default function CreateNewBusinessPage() {
                       </div>
 
                       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                        {["BusinessName", "Email", "phoneNumber"].map((field) => (
+                        {["businessName", "email", "phoneNumber"].map((field) => (
                           <div key={field} className="flex flex-col w-full">
                             <label htmlFor={field} className={labelBase}>
                               {field.replace(/([A-Z])/g, " $1")}
@@ -689,8 +689,8 @@ export default function CreateNewBusinessPage() {
                               onChange={handleChange}
                               className={inputBase}
                               placeholder={
-                                field === "BusinessName" ? "e.g., Mosaic Biz Hub"
-                                  : field === "Email" ? "you@business.com"
+                                field === "businessName" ? "e.g., Mosaic Biz Hub"
+                                  : field === "email" ? "you@business.com"
                                     : "+1 9XXXXXXXXX"
                               }
                               type={field === "email" ? "email" : "text"}
