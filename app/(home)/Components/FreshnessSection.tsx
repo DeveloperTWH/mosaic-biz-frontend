@@ -55,8 +55,7 @@ export default function FreshnessSection() {
             />
             <div className="p-4 text-left w-4/5 h-[100%] relative z-10">
               <h3
-                className="text-3xl font-bold text-gray-800 leading-10"
-                style={{ fontFamily: "Roboto Slab", fontWeight: "700" }}
+                className="text-3xl font-bold text-gray-800 leading-10 heading"
               >
                 {item.title}
               </h3>
