@@ -9,7 +9,7 @@ const items = [
     title: "ESSENTIALS NEAR YOU - GROCERIES",
     description:
       "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Eaque maxime accusantium vero consequuntur sapiente ea laboriosam nesciunt sed magnam ipsa",
-    img: "/restaurant.png",
+    img: "/gros.png",
     bgColor: "bg-yellow-100",
   },
   {
@@ -17,7 +17,7 @@ const items = [
     title: "FLAVORS NEAR YOU - RESTAURANTS",
     description:
       "Lorem ipsum, dolor sit amet consectetur adipisicing elit. Voluptatibus, quae perferendis laboriosam maxime tempora nemo",
-    img: "/gros.png",
+    img: "/restaurant.png",
     bgColor: "bg-custom-blue",
   },
 ];
