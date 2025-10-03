@@ -13,7 +13,7 @@ const Hero = () => {
 
   useEffect(() => {
     const session = localStorage.getItem("user_session");
-    setIsLoggedIn(session === 'true');
+    setIsLoggedIn(session === "true");
   }, []);
 
   const go = () => {
@@ -34,7 +34,9 @@ const Hero = () => {
     <div className="bg-white">
       {/* Search & Filters */}
       <section className="flex flex-col items-start justify-between p-5 py-4 space-y-4 bg-gray-50 md:px-20 md:flex-row md:space-y-0 md:space-x-4">
-        <div className="flex flex-col w-full md:w-3/5">  {/* make 3/5 to 1/3 when you loaction  */} 
+        <div className="flex flex-col w-full md:w-3/5">
+          {" "}
+          {/* make 3/5 to 1/3 when you loaction  */}
           <label htmlFor="search" className="mb-1 text-sm font-medium">
             Search
           </label>
@@ -49,7 +51,9 @@ const Hero = () => {
           />
         </div>
 
-        <MinorityType value={minorityType} onChange={setMinorityType} />
+        <div className="w-1/5">
+          <MinorityType value={minorityType} onChange={setMinorityType} />
+        </div>
 
         {/* <div className="flex flex-col w-full md:w-auto">
           <label htmlFor="location" className="mb-1 text-sm font-medium">
@@ -69,7 +73,7 @@ const Hero = () => {
         <div className="flex flex-col justify-end w-full md:w-auto">
           <label className="invisible mb-1 text-sm font-medium">Search</label>
           <button
-            className="px-14 py-2 text-white bg-custom-orange"
+            className="px-12 py-2 text-white bg-custom-orange"
             onClick={go}
           >
             Search Here
@@ -95,14 +99,13 @@ const Hero = () => {
             Rhoncus Ullamcorper Mi Tortor Et Libero. Maecenas Lacinia Lorem
             Ultrices Ligulaeros.
           </p>
-          {isLoggedIn === null &&
+          {isLoggedIn === null && (
             <div className="flex flex-col gap-4 md:flex-row">
               <div className="w-40 h-10 py-2 rounded bg-gray-100/70 px-7" />
               <div className="w-40 h-10 py-2 rounded bg-gray-100/70 px-7" />
             </div>
-          }
-          {
-            isLoggedIn === false && 
+          )}
+          {isLoggedIn === false && (
             <div className="flex flex-col gap-4 md:flex-row">
               <Link href="/signup?type=customer">
                 <button className="py-2 text-white border border-white rounded px-7">
@@ -115,7 +118,7 @@ const Hero = () => {
                 </button>
               </Link>
             </div>
-          }
+          )}
           {/* <div className="flex flex-col gap-4 md:flex-row">
             <Link href="/login?type=customer">
               <button className="py-2 text-white border border-white rounded px-7">
