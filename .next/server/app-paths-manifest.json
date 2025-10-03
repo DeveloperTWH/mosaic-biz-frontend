@@ -1,16 +1,4 @@
 {
-  "/(auth)/login/page": "app/(auth)/login/page.js",
-  "/(home)/about/page": "app/(home)/about/page.js",
-  "/(home)/contact/page": "app/(home)/contact/page.js",
-  "/(home)/foods/page": "app/(home)/foods/page.js",
   "/(home)/page": "app/(home)/page.js",
-  "/(home)/product/[id]/page": "app/(home)/product/[id]/page.js",
-  "/(home)/products/[productid]/page": "app/(home)/products/[productid]/page.js",
-  "/(home)/products/page": "app/(home)/products/page.js",
-  "/(home)/service/[slug]/page": "app/(home)/service/[slug]/page.js",
-  "/(home)/services/[id]/page": "app/(home)/services/[id]/page.js",
-  "/(home)/services/page": "app/(home)/services/page.js",
-  "/(home)/vendors/[vendor_id]/page": "app/(home)/vendors/[vendor_id]/page.js",
-  "/(home)/vendors/page": "app/(home)/vendors/page.js",
   "/_not-found/page": "app/_not-found/page.js"
 }
