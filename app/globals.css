@@ -3,12 +3,12 @@
 @tailwind utilities;
 
 
-@font-face {
+/* @font-face {
   font-family: 'Roboto Slab';
   src: url('/fonts/RobotoSlab/RobotoSlab.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
-}
+} */
 
 html,
 body {
@@ -41,8 +41,7 @@ body {
 }
 
 .heading {
-  font-family: Roboto Slab;
-  font-weight: 700;
+  @apply font-heading uppercase tracking-wide font-normal;
   /* font-size: 42px; */
   line-height: 56px;
   letter-spacing: 2%;

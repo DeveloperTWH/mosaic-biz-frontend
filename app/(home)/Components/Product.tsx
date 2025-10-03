@@ -31,7 +31,7 @@ const Product = () => {
           <h1 className="mb-4 text-2xl font-bold sm:text-3xl md:text-4xl text-zinc-800 heading md:mb-0">
             BROWSE BY CATEGORY
           </h1>
-          <div className="flex space-x-3">
+          {/* <div className="flex space-x-3">
             <button
               onClick={() => setActive("left")}
               className={`border border-custom-orange px-3 py-2 rounded transition-colors duration-200 ${active === "left"
@@ -79,10 +79,10 @@ const Product = () => {
                 <path d="M9 18L15 12L9 6" />
               </svg>
             </button>
-          </div>
+          </div> */}
         </div>
 
-        <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8">
+        <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5">
           {categories.map((cat) => (
             <Link
               key={cat._id}

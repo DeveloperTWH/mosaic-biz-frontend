@@ -24,7 +24,7 @@ export default function FreshnessSection() {
     return (
         <section className="pt-20 px-5 md:px-20 bg-white text-center">
             <div className="mb-10">
-                <h2 className="text-2xl md:text-3xl font-semibold uppercase text-gray-800 mb-2">
+                <h2 className="text-2xl md:text-3xl font-semibold uppercase text-gray-800 mb-2 heading">
                     Freshness All Around - Pantry Picks & Nearby Kitchens
                 </h2>
                 <div className="flex justify-center flex-col items-center">

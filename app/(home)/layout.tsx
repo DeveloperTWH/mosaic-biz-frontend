@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Josefin_Sans, Anton } from "next/font/google";
 import "../globals.css";
 import Navbar from "./Components/Navbar";
 import Footer from "./Components/Footer";
@@ -7,14 +7,15 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const josefin = Josefin_Sans({
   subsets: ["latin"],
+  variable: "--font-josefin",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const anton = Anton({
+  weight: "400",
   subsets: ["latin"],
+  variable: "--font-anton",
 });
 
 export const metadata: Metadata = {
@@ -30,7 +31,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="with-fixed-header">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen w-screen`}
+        className={`${josefin.variable} ${anton.variable} antialiased min-h-screen w-screen`}
       >
         <Navbar/>
         {children}

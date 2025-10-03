@@ -1,6 +1,6 @@
 import React from 'react';
 
-const tabs = ['Food from Shop', 'Food from Farm', 'Food from Restaurant'];
+const tabs = ['Groceries', 'Restaurant'];
 
 const TabsHeadingSection: React.FC<{
     selected: string;

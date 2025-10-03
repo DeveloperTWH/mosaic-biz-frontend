@@ -5,11 +5,11 @@ import FoodFromFarm from './FoodFromFarm';
 import FoodFromRestaurant from './FoodFromRestaurant';
 
 export default function FoodsAndRestaurantsPage() {
-  const [selectedTab, setSelectedTab] = useState('Food from Shop');
+  const [selectedTab, setSelectedTab] = useState('Groceries');
 
   const renderSection = () => {
-    if (selectedTab === 'Food from Shop') return <FoodFromFarm />;
-    if (selectedTab === 'Food from Farm') return <FoodFromFarm />;
+    if (selectedTab === 'Groceries') return <FoodFromFarm />;
+    // if (selectedTab === 'Food from Farm') return <FoodFromFarm />;
     return <FoodFromRestaurant />;
   };
 
