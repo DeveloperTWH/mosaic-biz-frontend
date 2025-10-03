@@ -1,52 +1,8 @@
 {
   "app": {
-    "[project]/app/(home)/about/page": [
-      "static/media/Qw3aZQNVED7rKGKxtqIqX5EUDXx4Vn8sig-s.p.2c8886bf.woff2",
-      "static/media/1Ptgg87LROyAm3Kz_C8CSKlv-s.p.ec4b47c1.woff2"
-    ],
-    "[project]/app/(home)/contact/page": [
-      "static/media/Qw3aZQNVED7rKGKxtqIqX5EUDXx4Vn8sig-s.p.2c8886bf.woff2",
-      "static/media/1Ptgg87LROyAm3Kz_C8CSKlv-s.p.ec4b47c1.woff2"
-    ],
-    "[project]/app/(home)/foods/page": [
-      "static/media/Qw3aZQNVED7rKGKxtqIqX5EUDXx4Vn8sig-s.p.2c8886bf.woff2",
-      "static/media/1Ptgg87LROyAm3Kz_C8CSKlv-s.p.ec4b47c1.woff2"
-    ],
     "[project]/app/(home)/page": [
-      "static/media/Qw3aZQNVED7rKGKxtqIqX5EUDXx4Vn8sig-s.p.2c8886bf.woff2",
-      "static/media/1Ptgg87LROyAm3Kz_C8CSKlv-s.p.ec4b47c1.woff2"
-    ],
-    "[project]/app/(home)/product/[id]/page": [
-      "static/media/Qw3aZQNVED7rKGKxtqIqX5EUDXx4Vn8sig-s.p.2c8886bf.woff2",
-      "static/media/1Ptgg87LROyAm3Kz_C8CSKlv-s.p.ec4b47c1.woff2"
-    ],
-    "[project]/app/(home)/products/[productid]/page": [
-      "static/media/Qw3aZQNVED7rKGKxtqIqX5EUDXx4Vn8sig-s.p.2c8886bf.woff2",
-      "static/media/1Ptgg87LROyAm3Kz_C8CSKlv-s.p.ec4b47c1.woff2"
-    ],
-    "[project]/app/(home)/products/page": [
-      "static/media/Qw3aZQNVED7rKGKxtqIqX5EUDXx4Vn8sig-s.p.2c8886bf.woff2",
-      "static/media/1Ptgg87LROyAm3Kz_C8CSKlv-s.p.ec4b47c1.woff2"
-    ],
-    "[project]/app/(home)/service/[slug]/page": [
-      "static/media/Qw3aZQNVED7rKGKxtqIqX5EUDXx4Vn8sig-s.p.2c8886bf.woff2",
-      "static/media/1Ptgg87LROyAm3Kz_C8CSKlv-s.p.ec4b47c1.woff2"
-    ],
-    "[project]/app/(home)/services/[id]/page": [
-      "static/media/Qw3aZQNVED7rKGKxtqIqX5EUDXx4Vn8sig-s.p.2c8886bf.woff2",
-      "static/media/1Ptgg87LROyAm3Kz_C8CSKlv-s.p.ec4b47c1.woff2"
-    ],
-    "[project]/app/(home)/services/page": [
-      "static/media/Qw3aZQNVED7rKGKxtqIqX5EUDXx4Vn8sig-s.p.2c8886bf.woff2",
-      "static/media/1Ptgg87LROyAm3Kz_C8CSKlv-s.p.ec4b47c1.woff2"
-    ],
-    "[project]/app/(home)/vendors/[vendor_id]/page": [
-      "static/media/Qw3aZQNVED7rKGKxtqIqX5EUDXx4Vn8sig-s.p.2c8886bf.woff2",
-      "static/media/1Ptgg87LROyAm3Kz_C8CSKlv-s.p.ec4b47c1.woff2"
-    ],
-    "[project]/app/(home)/vendors/page": [
-      "static/media/Qw3aZQNVED7rKGKxtqIqX5EUDXx4Vn8sig-s.p.2c8886bf.woff2",
-      "static/media/1Ptgg87LROyAm3Kz_C8CSKlv-s.p.ec4b47c1.woff2"
+      "static/media/1Ptgg87LROyAm3Kz_C8CSKlv-s.p.ec4b47c1.woff2",
+      "static/media/Qw3aZQNVED7rKGKxtqIqX5EUDXx4Vn8sig-s.p.2c8886bf.woff2"
     ]
   },
   "appUsingSizeAdjust": true,

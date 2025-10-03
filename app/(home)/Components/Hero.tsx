@@ -69,7 +69,7 @@ const Hero = () => {
         <div className="flex flex-col justify-end w-full md:w-auto">
           <label className="invisible mb-1 text-sm font-medium">Search</label>
           <button
-            className="px-16 py-2 text-white bg-custom-orange"
+            className="px-14 py-2 text-white bg-custom-orange"
             onClick={go}
           >
             Search Here
