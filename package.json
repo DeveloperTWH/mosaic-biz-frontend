@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@next/font": "^14.2.15",
     "@stripe/connect-js": "^3.3.28",
     "@stripe/react-connect-js": "^3.3.26",
     "@stripe/react-stripe-js": "^3.7.0",

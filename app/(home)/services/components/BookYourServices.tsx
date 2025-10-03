@@ -16,7 +16,7 @@ const BookServices: React.FC<BookServicesProps> = ({ services }) => {
         <p className="text-center text-gray-600">No services found.</p>
       ) : (
         <>
-          <h2 className="mb-4 text-2xl font-bold">Book Your Services</h2>
+          {/* <h2 className="mb-4 text-2xl font-bold">Book Your Services</h2> */}
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {services.map((service) => (
               <div key={service._id} className="overflow-hidden border rounded-lg shadow-sm">
@@ -37,7 +37,7 @@ const BookServices: React.FC<BookServicesProps> = ({ services }) => {
                     href={`/service/${service.slug}`}
                     className="inline-block mt-3 text-primary hover:underline"
                   >
-                    Read More →
+                    View More →
                   </Link>
                 </div>
               </div>

@@ -33,7 +33,7 @@ const CategoryGrid = () => {
           <Link
             key={cat._id}
             href={`/products/${cat.slug}`} // or `/service/${cat.slug}` depending on your route
-            className="p-4 text-center transition border rounded hover:shadow"
+            className="p-4 text-center transition rounded hover:shadow"
           >
             <Image
               src={cat.img || "/placeholder.png"}

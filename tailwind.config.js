@@ -13,6 +13,10 @@ module.exports = {
         'custom-soil': '#FFF6E0',
         'custom-dark': '#333333',
       },
+      fontFamily: {
+        sans: ["var(--font-josefin)", "sans-serif"], // default body
+        heading: ["var(--font-anton)", "sans-serif"], // headings
+      },
     },
   },
   plugins: [

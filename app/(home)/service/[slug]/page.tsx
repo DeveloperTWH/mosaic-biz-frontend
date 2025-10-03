@@ -217,12 +217,12 @@ const ServiceDetailPage = () => {
                                     <button className="flex items-center gap-1 px-4 py-1 transition-all duration-200 ease-in-out border border-custom-blue text-custom-blue hover:bg-custom-orange hover:text-white hover:border-transparent active:bg-custom-orange active:text-white active:border-transparent">
                                         <PenTool size={16} /> Add Review
                                     </button>
-                                    <button className="flex items-center gap-1 px-4 py-1 transition-all duration-200 ease-in-out border border-custom-blue text-custom-blue hover:bg-custom-orange hover:text-white hover:border-transparent active:bg-custom-orange active:text-white active:border-transparent">
+                                    {/* <button className="flex items-center gap-1 px-4 py-1 transition-all duration-200 ease-in-out border border-custom-blue text-custom-blue hover:bg-custom-orange hover:text-white hover:border-transparent active:bg-custom-orange active:text-white active:border-transparent">
                                         <Camera size={16} /> Upload Photo
                                     </button>
                                     <button className="flex items-center gap-1 px-4 py-1 transition-all duration-200 ease-in-out border border-custom-blue text-custom-blue hover:bg-custom-orange hover:text-white hover:border-transparent active:bg-custom-orange active:text-white active:border-transparent">
                                         <Import size={16} /> Save
-                                    </button>
+                                    </button> */}
                                     <button className="flex items-center gap-1 px-4 py-1 transition-all duration-200 ease-in-out border border-custom-blue text-custom-blue hover:bg-custom-orange hover:text-white hover:border-transparent active:bg-custom-orange active:text-white active:border-transparent">
                                         <Share2 size={16} /> Share
                                     </button>
