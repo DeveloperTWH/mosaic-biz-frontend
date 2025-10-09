@@ -43,7 +43,7 @@ const MinorityType: React.FC<Props> = ({ value, onChange }) => {
 
       <select
         id="minorityType"
-        className="px-4 py-3 border rounded min-w-[300px]"
+        className="px-4 py-3 border rounded min-w-[200px]"
         value={loadingMinority ? '' : value}     // keep controlled; empty while loading
         onChange={(e) => onChange(e.target.value)}
         disabled={loadingMinority}

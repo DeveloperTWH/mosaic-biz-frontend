@@ -51,7 +51,7 @@ const Hero = () => {
           />
         </div>
 
-        <div className="w-1/5">
+        <div className="w-full md:w-1/5">
           <MinorityType value={minorityType} onChange={setMinorityType} />
         </div>
 
@@ -84,7 +84,7 @@ const Hero = () => {
       {/* Hero Section */}
       <section
         className="relative h-[650px] bg-cover bg-center"
-        style={{ backgroundImage: "url(/hero-image.png)" }}
+        style={{ backgroundImage: "url(/hero-image-1.jpg)" }}
       >
         <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center text-white bg-opacity-50 bg-stone-800">
           <h2 className="mb-4 text-3xl font-bold md:text-5xl">

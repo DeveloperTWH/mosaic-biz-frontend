@@ -78,12 +78,14 @@ const Navbar = () => {
       <div className="flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center">
-          <Image src="/logo.png" alt="Mosaic Biz Hub Logo" width={350} height={100} />
+          <Link href="/">
+            <Image src="/logo.png" alt="Mosaic Biz Hub Logo" width={350} height={100} />
+          </Link>
         </div>
 
         {/* Desktop Nav */}
         <nav className="items-center hidden space-x-6 text-sm font-light lg:flex">
-          <Link href="/">Home</Link>
+          {/* <Link href="/">Home</Link> */}
           <Link href="/products">Products</Link>
           <Link href="/foods">Foods</Link>
           <Link href="/services">Services</Link>
@@ -212,7 +214,7 @@ const Navbar = () => {
       {isOpen && (
         <div className="mt-4 space-y-4 lg:hidden">
           <nav className="flex flex-col space-y-2 text-sm font-light">
-            <Link href="/" onClick={() => setIsOpen(false)}>Home</Link>
+            {/* <Link href="/" onClick={() => setIsOpen(false)}>Home</Link> */}
             <Link href="/products" onClick={() => setIsOpen(false)}>Products</Link>
             <Link href="/foods" onClick={() => setIsOpen(false)}>Foods</Link>
             <Link href="/services" onClick={() => setIsOpen(false)}>Services</Link>
