@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { logoutUser } from "@/utils/logoutUser";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, ChevronDown } from "lucide-react";
 import { useCartCount } from "@/hooks/useCartCount";
 import CartSyncPrompt from "./CartSyncPrompt";
 import { getLoggedInCustomer } from "@/utils/authUtils";
@@ -19,6 +19,7 @@ const Navbar = () => {
   const [delta, setDelta] = useState(0);
   const prevCountRef = useRef<number | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [openLogin, setOpenLogin] = useState(false);
 
 
   const { count: cartCount, source, loading } = useCartCount(isLoggedIn);
@@ -148,18 +149,45 @@ const Navbar = () => {
               )}
             </div>
           ) : (
-            <>
-              <Link href="/login?type=customer">
-                <button className="border border-sky-500 text-sky-500 px-4 py-1.5 rounded text-sm">
-                  Login As Customer
+            <div className="relative flex items-center gap-4">
+              {/* Login Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setOpenLogin(!openLogin)}
+                  className="border border-sky-500 text-sky-500 px-4 py-1.5 rounded text-sm flex items-center gap-1 hover:bg-sky-50 transition"
+                >
+                  Login
+                  <ChevronDown className={`w-4 h-4 transition-transform ${openLogin ? "rotate-180" : ""}`} />
+                </button>
+
+                {openLogin && (
+                  <div
+                    className="absolute z-20 mt-2 overflow-hidden bg-white border border-gray-200 rounded-md shadow-lg w-44"
+                    onMouseLeave={() => setOpenLogin(false)}
+                  >
+                    <Link
+                      href="/login?type=customer"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-sky-50"
+                    >
+                      Login as Customer
+                    </Link>
+                    <Link
+                      href="/login?type=vendor"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-sky-50"
+                    >
+                      Login as Vendor
+                    </Link>
+                  </div>
+                )}
+              </div>
+
+              {/* Become Vendor Button */}
+              <Link href="/signup?type=vendor">
+                <button className="bg-sky-500 text-white px-4 py-1.5 rounded text-sm hover:bg-sky-600 transition">
+                  Become a Vendor
                 </button>
               </Link>
-              <Link href="/login?type=vendor">
-                <button className="border border-sky-500 text-sky-500 px-4 py-1.5 rounded text-sm">
-                  Login As Vendor
-                </button>
-              </Link>
-            </>
+            </div>
           )}
           <Link
             href="/cart"
@@ -280,6 +308,11 @@ const Navbar = () => {
                 <Link href="/login?type=vendor">
                   <button className="border border-sky-500 text-sky-500 px-4 py-1.5 rounded text-sm w-full">
                     Login As Vendor
+                  </button>
+                </Link>
+                <Link href="/signup?type=vendor">
+                  <button className="bg-sky-500 text-white px-4 py-1.5 rounded text-sm hover:bg-sky-600 w-full">
+                    Become a Vendor
                   </button>
                 </Link>
               </>
