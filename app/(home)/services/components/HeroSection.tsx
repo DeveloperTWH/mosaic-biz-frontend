@@ -1,15 +1,25 @@
 import Image from "next/image";
 
-const HeroSection = () => {
+interface HeroSectionProps {
+  heading: string;
+  imageUrl: string;
+}
+
+const HeroSection = ({ heading, imageUrl }: HeroSectionProps) => {
   return (
-    <section className="w-full relative">
+    <section className="relative w-full h-[300px] md:h-[500px]">
       <Image
-        src="/about/banner_new 1.png"
-        alt="Service Hero"
-        width={1920}  // adjust to actual image width
-        height={500}  // adjust to actual image height
-        className="w-full h-auto"
+        src={imageUrl}
+        alt={heading}
+        fill
+        priority
+        className="object-cover w-full h-full"
       />
+      <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+        <h1 className="text-3xl font-bold leading-loose text-white md:text-5xl font-heading">
+          {heading}
+        </h1>
+      </div>
     </section>
   );
 };

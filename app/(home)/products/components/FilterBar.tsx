@@ -89,7 +89,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
 
         <button
           onClick={onSearch}
-          className="px-10 py-2 text-base text-white bg-custom-orange md:text-lg"
+          className="py-2 text-base text-white px-7 bg-custom-orange md:text-lg"
         >
           Search Here
         </button>

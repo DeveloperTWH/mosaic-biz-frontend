@@ -6,20 +6,20 @@ export default function ContactUsPage() {
     return (
         <div className="flex flex-col">
             {/* Hero Section */}
-            <HeroSection />
+            <HeroSection heading="CONNECT WITH US" imageUrl="/contact/contact_banner.png" />
 
             {/* Contact Form & Newsletter */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-6 lg:p-12 max-w-7xl mx-auto w-full">
+            <div className="grid w-full grid-cols-1 gap-8 p-6 mx-auto lg:grid-cols-2 lg:p-12 max-w-7xl">
                 {/* Contact Form */}
                 <div className='p-4 sm:p-6 md:p-8 lg:p-10'>
-                    <h2 className="text-2xl sm:text-3xl font-semibold mb-3 heading">CONNECT WITH US</h2>
+                    <h2 className="mb-3 text-2xl font-semibold sm:text-3xl heading">CONNECT WITH US</h2>
                     <hr className="h-[2px] w-[100px] bg-green-900" />
                     <hr className="h-[2px] w-[100px] bg-green-900 mt-[1px] mb-4" />
-                    <p className="mb-6 text-gray-600 text-sm sm:text-base">
+                    <p className="mb-6 text-sm text-gray-600 sm:text-base">
                         Lorem Ipsum Dolor Sit Amet, Consectetur Adipisicing Elit, Praesent Vitae Libero Venenatis, Tristique Justo.
                     </p>
 
-                    <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <form className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <div className="flex flex-col">
                             <label htmlFor="FirstName" className="">First Name</label>
                             <input id="FirstName" type="text" placeholder="Enter First Name" className="input" />
@@ -53,7 +53,7 @@ export default function ContactUsPage() {
                         <div className="md:col-span-2">
                             <button
                                 type="submit"
-                                className="bg-custom-orange text-white py-2 px-20 w-full md:w-auto"
+                                className="w-full px-20 py-2 text-white bg-custom-orange md:w-auto"
                             >
                                 Submit
                             </button>
@@ -65,17 +65,17 @@ export default function ContactUsPage() {
                 {/* Newsletter */}
                 <div className="relative min-h-[600px]">
                     <div
-                        className="absolute inset-0 bg-cover bg-center z-0"
+                        className="absolute inset-0 z-0 bg-center bg-cover"
                         style={{ backgroundImage: "url('/about/about 1.png')" }}
                     >
                         <div className="absolute inset-0 bg-gray-700 opacity-90" />
                     </div>
 
-                    <div className="relative z-10 text-white p-6 sm:p-10 h-full flex flex-col justify-center">
-                        <h2 className="text-2xl sm:text-3xl font-bold mb-4">SUBSCRIBE NEWSLETTER</h2>
+                    <div className="relative z-10 flex flex-col justify-center h-full p-6 text-white sm:p-10">
+                        <h2 className="mb-4 text-2xl font-bold sm:text-3xl">SUBSCRIBE NEWSLETTER</h2>
                         <hr className="h-[2px] w-[100px] bg-white" />
                         <hr className="h-[2px] w-[100px] bg-white mt-[1px] mb-5" />
-                        <p className="text-sm mb-6">
+                        <p className="mb-6 text-sm">
                             Lorem Ipsum Dolor Sit Amet, Consectetur Adipiscing Elit. Nullam Laoreet, Diam Sit Amet Porta Eleifend, Turpis Justo Maximus Eros, Rhoncus Ullamcorper Mi Tortor Et Libero. Maecenas Lacinia Lorem Ultrices Ligula Mollis Accumsan Dictum Ut Eros. Ut Varius A Nunc Vel Vestibulum. Cras Dignissim Consequat Sapien Et Viverra. Mauris A Ipsum Id Urna Interdum Pretium.
                         </p>
 
@@ -84,7 +84,7 @@ export default function ContactUsPage() {
                             id="Name"
                             type="text"
                             placeholder="Enter Name"
-                            className="mb-4 w-full bg-transparent border border-white text-white placeholder-white p-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            className="w-full p-2 mb-4 text-white placeholder-white bg-transparent border border-white focus:outline-none focus:ring-2 focus:ring-orange-500"
                         />
 
                         <label htmlFor="email" className="block mb-1">Email</label>
@@ -92,10 +92,10 @@ export default function ContactUsPage() {
                             id="email"
                             type="email"
                             placeholder="Enter Email"
-                            className="mb-4 w-full bg-transparent border border-white text-white placeholder-white p-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            className="w-full p-2 mb-4 text-white placeholder-white bg-transparent border border-white focus:outline-none focus:ring-2 focus:ring-orange-500"
                         />
 
-                        <button className="bg-custom-orange hover:bg-orange-700 transition text-white py-2 px-6 w-full">
+                        <button className="w-full px-6 py-2 text-white transition bg-custom-orange hover:bg-orange-700">
                             Subscribe Now
                         </button>
                     </div>
@@ -103,27 +103,27 @@ export default function ContactUsPage() {
             </div>
 
             {/* Contact Info Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 px-4 md:px-8 mb-8 max-w-7xl mx-auto w-full">
-                <div className="bg-gradient-blue text-white px-10 py-8">
+            <div className="grid w-full grid-cols-1 gap-6 px-4 mx-auto mb-8 sm:grid-cols-2 md:grid-cols-3 md:px-8 max-w-7xl">
+                <div className="px-10 py-8 text-white bg-gradient-blue">
                     <PhoneCall size={40} className='mb-10' />
-                    <h3 className="font-bold text-lg mb-2">CALL US:</h3>
+                    <h3 className="mb-2 text-lg font-bold">CALL US:</h3>
                     <hr className="h-[2px] w-[50px] bg-white" />
                     <hr className="h-[2px] w-[50px] bg-white mt-[1px] mb-5" />
                     <p>+1 234 56 7890</p>
                     <p>For Vendors: +9876 54 3201</p>
                 </div>
 
-                <div className="bg-gradient-orange text-white px-10 py-8">
+                <div className="px-10 py-8 text-white bg-gradient-orange">
                     <Mail size={40} className='mb-10' />
-                    <h3 className="font-bold text-lg mb-2">EMAIL US:</h3>
+                    <h3 className="mb-2 text-lg font-bold">EMAIL US:</h3>
                     <hr className="h-[2px] w-[50px] bg-white" />
                     <hr className="h-[2px] w-[50px] bg-white mt-[1px] mb-5" />
                     <p>Mosaicbizhub@gmail.com</p>
                 </div>
 
-                <div className="bg-gradient-yellow text-white px-10 py-8">
+                <div className="px-10 py-8 text-white bg-gradient-yellow">
                     <MapPinned size={40} className='mb-10' />
-                    <h3 className="text-lg mb-2">LOCATE US:</h3>
+                    <h3 className="mb-2 text-lg">LOCATE US:</h3>
                     <hr className="h-[2px] w-[50px] bg-white" />
                     <hr className="h-[2px] w-[50px] bg-white mt-[1px] mb-5" />
                     <p>Lorem Ipsum Dolor Sit Amet, Consectetur Adipisicing Elit.</p>
@@ -132,25 +132,25 @@ export default function ContactUsPage() {
 
             {/* Call To Action Section */}
             <div
-                className="relative w-full bg-cover bg-center my-10 "
+                className="relative w-full my-10 bg-center bg-cover "
                 style={{ backgroundImage: "url('/contact/becomeVendor.png')" }}
             >
                 {/* Black overlay */}
                 <div className="bg-[#3333339E] p-6 sm:p-12 md:p-32 w-full">
-                    <div className="flex flex-col items-center justify-center text-white text-center px-4">
-                        <h2 className="text-3xl sm:text-3xl font-bold mb-2 heading" style={{color:"white"}}>EXPAND YOUR REACH -</h2>
-                        <h2 className="text-3xl sm:text-3xl font-bold mb-4 heading" style={{color:"white"}}>LIST YOUR BUSINESS ON OUR PLATFORM!</h2>
+                    <div className="flex flex-col items-center justify-center px-4 text-center text-white">
+                        <h2 className="mb-2 text-3xl font-bold sm:text-3xl heading" style={{color:"white"}}>EXPAND YOUR REACH -</h2>
+                        <h2 className="mb-4 text-3xl font-bold sm:text-3xl heading" style={{color:"white"}}>LIST YOUR BUSINESS ON OUR PLATFORM!</h2>
 
                         <hr className="h-[2px] w-[150px] bg-white" />
                         <hr className="h-[2px] w-[150px] bg-white mt-[1px] mb-5" />
 
-                        <p className="mb-6 max-w-3xl text-sm sm:text-base">
+                        <p className="max-w-3xl mb-6 text-sm sm:text-base">
                             Lorem ipsum dolor sit amet consectetur adipisicing elit. Quas maxime iure quidem vel optio sequi,
                             suscipit recusandae eum pariatur reprehenderit veritatis laboriosam dolorem a libero culpa quisquam
                             quae. Fuga, nihil.
                         </p>
 
-                        <button className="bg-transparent text-white border border-white mt-5 mb-5 py-2 px-5 font-semibold hover:bg-white hover:text-black transition">
+                        <button className="px-5 py-2 mt-5 mb-5 font-semibold text-white transition bg-transparent border border-white hover:bg-white hover:text-black">
                             Become A Vendor
                         </button>
                     </div>
@@ -161,7 +161,7 @@ export default function ContactUsPage() {
 
 
             {/* Map Section */}
-            <div className="relative my-8 py-10 px-4 sm:px-8">
+            <div className="relative px-4 py-10 my-8 sm:px-8">
                 <div className="absolute bottom-[-10%] left-[0%] w-[50%] h-[80%] bg-custom-blue -z-10" />
 
                 <iframe
@@ -170,7 +170,7 @@ export default function ContactUsPage() {
                     height="400"
                     allowFullScreen={false}
                     loading="lazy"
-                    className=" mx-auto w-full max-w-5xl border"
+                    className="w-full max-w-5xl mx-auto border "
                 ></iframe>
             </div>
         </div>

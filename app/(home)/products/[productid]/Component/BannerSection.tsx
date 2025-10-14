@@ -1,19 +1,37 @@
-// components/BannerSection.jsx
 import Image from "next/image";
 
-export default function BannerSection() {
+interface HeroSectionProps {
+  heading: string;
+  imageUrl: string;
+}
+
+const BannerSection = ({ heading, imageUrl }: HeroSectionProps) => {
   return (
-    <section className="w-full">
-      <div className="relative w-full">
-        <Image
-          src="/Search/banner.png" // Adjust path if needed
-          alt="New Arrival Fashion Banner"
-          width={1920}
-          height={442}
-          layout="responsive"
-          priority
-        />
+    <section className="relative w-full h-[300px] md:h-[500px]">
+      <Image
+        src={imageUrl}
+        alt={heading}
+        fill
+        priority
+        className="object-cover w-full h-full"
+      />
+      <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+        <h1
+          className="text-3xl font-bold leading-loose text-white md:text-5xl font-heading"
+          style={{
+            textShadow: `
+      1px 1px 2px rgba(0,0,0,0.8),
+      -1px -1px 2px rgba(0,0,0,0.8),
+      1px -1px 2px rgba(0,0,0,0.8),
+      -1px 1px 2px rgba(0,0,0,0.8)
+    `,
+          }}
+        >
+          {heading}
+        </h1>
       </div>
     </section>
   );
-}
+};
+
+export default BannerSection;

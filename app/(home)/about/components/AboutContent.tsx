@@ -1,27 +1,34 @@
 export default function AboutContent() {
   return (
-    <section className="w-full px-6 md:px-16 md:py-20 py-10 grid md:grid-cols-2 gap-5 ">
+    <section className="grid w-full gap-5 px-6 py-10 md:px-16 md:py-20 md:grid-cols-2 ">
 
-      <div className="relative w-full flex justify-center items-center md:order-2">
+      <div className="relative flex items-center justify-center w-full md:order-2">
 
         <div className="absolute top-[-18%] left-[30%] w-[110%] h-[95%] bg-sky-400 -z-10" />
 
         <img
           src="/about/about 1.png"
           alt="Team"
-          className="shadow-md w-full max-w-xl object-cover"
+          className="object-cover w-full max-w-xl shadow-md"
         />
       </div>
       {/* Text content */}
       <div className="py-10 md:pl-10 md:order-1">
-        <h2 className="text-3xl mb-2 font-bold heading">ABOUT US</h2>
+        <h2 className="mb-2 text-3xl font-bold heading">ABOUT US</h2>
         <hr className="h-[2px] w-[120px] bg-green-900" />
         <hr className="h-[2px] w-[120px] bg-green-900 mt-[1px] mb-5" />
-        <p className="text-sm text-gray-700 leading-relaxed">
-          Lorem ipsum dolor sit amet consectetur, adipisicing elit. Sunt sit autem commodi, nihil necessitatibus quidem rem culpa! Dignissimos provident, error sapiente voluptatibus repellat nulla delectus inventore deleniti ratione consequatur, at doloribus! Accusantium natus, impedit commodi facilis omnis quibusdam nostrum libero nam quos possimus porro recusandae dignissimos fugit ea at repellendus?
+        <p className="text-sm leading-relaxed text-gray-700">
+          Mosaic Biz Hub was found with a single vision: to empower minority-owned businesses and provide them with success in the digital age. We think every business has a story—and every story should be heard.
         </p>
-        <p className="text-sm text-gray-700 leading-relaxed mt-10">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Alias ducimus minima dolores id libero eligendi vero doloribus minus deserunt, dolore quis sunt nulla nihil excepturi maiores sed possimus vel impedit placeat accusantium nobis optio eius quam. Iure quisquam voluptatem necessitatibus perferendis ab aspernatur, aliquam, debitis iste quis ea, illo sapiente?
+        <p className="mt-5 text-sm leading-relaxed text-gray-700">
+          Started by Bryan Harris, Mosaic Biz Hub aims to bridge the gap. Minority entrepreneurs fought to get noticed, had fewer opportunities, and were hindered by obstacles that prevented them from achieving their full potential. We wanted to make that happen. 
+        </p>
+        <p className="mt-5 text-sm leading-relaxed text-gray-700">
+          Now, Mosaic Biz Hub is more than a platform—it's an ecosystem. A place where businesses can reach out to customers, express their culture, and develop with the support they should have. 
+        </p>
+        <p className="mt-5 text-sm leading-relaxed text-gray-700">
+          So, what sets us apart? We don't merely list businesses. We highlight their voices, their traditions, and the impact they make in their communities. Our platform brings together restaurants, services, products, and more—all under one digital roof that is proud to celebrate diversity. 
+
         </p>
       </div>
 

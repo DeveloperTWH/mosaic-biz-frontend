@@ -11,6 +11,7 @@ import ServiceCard from "./components/ServiceCard";
 import { Service } from '@/types/service';
 import AllServicesMap from "./components/AllServicesMap";
 import AffixSidebar from "./components/AffixSidebar"; // adjust path as needed
+import HeroSection from "../components/HeroSection";
 
 
 
@@ -130,15 +131,7 @@ export default function ServiceCategoryPage({ params }: PageProps) {
         <>
             <main className="text-black bg-white">
                 {/* Banner */}
-                <section className="relative w-full">
-                    <Image
-                        src="/Service/Banner.png"
-                        alt="Category Banner"
-                        width={1200}
-                        height={400}
-                        className="object-cover w-full"
-                    />
-                </section>
+                <HeroSection heading={`${id} Services`} imageUrl="/Service/service.png"  />
                 <FilterBar
                     searchText={searchText}
                     setSearchText={setSearchText}
@@ -159,7 +152,7 @@ export default function ServiceCategoryPage({ params }: PageProps) {
                             <div className="mx-auto max-w-7xl">
                                 <p className="text-xs uppercase text-custom-blue">{id}</p>
                                 <h2 className="mb-4 text-xl font-bold md:text-2xl heading custom-blue">
-                                    Top {id} Near San Francisco, California
+                                    Top {id} Service's Near you 
                                 </h2>
                                 <div className="flex flex-wrap gap-2 text-[12px]">
                                     <div className="flex items-center justify-center gap-1 px-3 py-1 capitalize border border-black rounded-full cursor-pointer">

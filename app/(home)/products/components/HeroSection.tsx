@@ -2,16 +2,22 @@ import Image from "next/image";
 
 const HeroSection = () => {
   return (
-    <section className="relative w-full">
+    <section className="relative w-full h-[300px] md:h-[500px]">
       <Image
-        src="/products/product_banner.png"
+        src="/products/product.png"
         alt="Product Hero"
-        width={1920}  // adjust to actual image width
-        height={500}  // adjust to actual image height
-        className="w-full h-auto"
+        fill
+        priority
+        className="object-cover w-full h-full"
       />
+      <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+        <h1 className="text-3xl font-bold leading-loose text-white md:text-5xl font-heading">
+          Product
+        </h1>
+      </div>
     </section>
   );
 };
 
 export default HeroSection;
+

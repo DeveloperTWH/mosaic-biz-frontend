@@ -10,7 +10,7 @@ import Vision from "./components/Vision";
 export default function AboutPage() {
   return (
     <main className="flex flex-col items-center w-full">
-      <HeroSection/>
+      <HeroSection heading={"About"} imageUrl='/about/about_banner.png'/>
       <AboutContent/>
       <EconomicImpact/>
       <CommunityDevelopment/>
