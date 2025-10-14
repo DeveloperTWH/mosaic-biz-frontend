@@ -6,7 +6,7 @@ export default function ContactUsPage() {
     return (
         <div className="flex flex-col">
             {/* Hero Section */}
-            <HeroSection heading="CONNECT WITH US" imageUrl="/contact/contact_banner.png" />
+            <HeroSection heading="Connect With Us" imageUrl="/contact/contact_banner.png" />
 
             {/* Contact Form & Newsletter */}
             <div className="grid w-full grid-cols-1 gap-8 p-6 mx-auto lg:grid-cols-2 lg:p-12 max-w-7xl">

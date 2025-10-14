@@ -155,7 +155,7 @@ export default function CheckoutAddressPage() {
 
   return (
     <>
-      <BannerSection />
+      <BannerSection heading={`Checkout`} imageUrl='/products/product.png' />
       <div className="relative z-10 -mt-[15%]">
         <div className="max-w-4xl p-8 mx-auto my-10 bg-white rounded-lg shadow-md">
           <h2 className="text-2xl font-bold tracking-wide uppercase heading">

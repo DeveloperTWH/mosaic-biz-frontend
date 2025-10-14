@@ -8,7 +8,7 @@ export default function VendorsPage() {
   return (
     <div className="min-h-screen bg-white">
       
-        <HeroSection/>
+        <HeroSection heading={"Our Vendors"} imageUrl='/about/about_banner.png'/>
       <div className="container px-4 py-10 mx-auto">
         <VendorGrid/>
         <div className="mt-12">
