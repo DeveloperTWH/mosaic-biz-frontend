@@ -7,7 +7,7 @@ export default function AboutContent() {
         <div className="absolute top-[-18%] left-[30%] w-[110%] h-[95%] bg-sky-400 -z-10" />
 
         <img
-          src="/about/about 1.png"
+          src="/about (2).png"
           alt="Team"
           className="object-cover w-full max-w-xl shadow-md"
         />

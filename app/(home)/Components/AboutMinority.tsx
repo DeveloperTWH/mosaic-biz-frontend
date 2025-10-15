@@ -20,7 +20,7 @@ export default function AboutMinority() {
 
       <div className="relative z-10 flex flex-col items-center w-4/5 gap-16 mx-auto md:flex-row">
         <img
-          src="/about.png"
+          src="/about (2).png"
           alt="Minority Owned"
           className="object-cover w-full md:w-1/2"
         />

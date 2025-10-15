@@ -2,21 +2,21 @@ import { CheckCircle } from "lucide-react";
 
 export default function InnovationDiversity() {
     return (
-        <section className="w-full px-6 md:px-16 md:py-20 py-10 grid md:grid-cols-2 gap-5 ">
+        <section className="grid w-full gap-5 px-6 py-10 md:px-16 md:py-20 md:grid-cols-2 ">
 
-            <div className="relative w-full flex justify-center items-center">
+            <div className="relative flex items-center justify-center w-full">
 
                 <div className="absolute top-[-18%] right-[30%] w-[110%] h-[95%] bg-sky-400 -z-10" />
 
                 <img
-                    src="/about/about 1.png"
+                    src="/about_page_2.png"
                     alt="Team"
-                    className="shadow-md w-full max-w-xl object-cover"
+                    className="object-cover w-full max-w-xl shadow-md"
                 />
             </div>
             {/* Text content */}
             <div className="py-10 md:px-10">
-                <h2 className="text-3xl font-bold heading mb-2">INNOVATION AND DIVERSITY:</h2>
+                <h2 className="mb-2 text-3xl font-bold heading">INNOVATION AND DIVERSITY:</h2>
                 <hr className="h-[2px] w-[120px] bg-green-900" />
                 <hr className="h-[2px] w-[120px] bg-green-900 mt-[1px] mb-5" />
                 <div className="mt-8 space-y-4 text-gray-700">
@@ -33,7 +33,7 @@ export default function InnovationDiversity() {
                         </p>
                     </div>
                 </div>
-                <p className="text-sm text-gray-700 leading-relaxed mt-5">
+                <p className="mt-5 text-sm leading-relaxed text-gray-700">
                     "The Road To America's Economic Prosperity Runs Through Our Minority Business Communities," "We Must Continue To Ensure That Minority-Owned Business And The Entrepreneurs Behind Them Have The Tools, Resources, And Support They Need To Not Just Take Part In But Drive The Economic Success Of This Country." Deputy Commerce Secretary Don Graves.
                 </p>
             </div>
