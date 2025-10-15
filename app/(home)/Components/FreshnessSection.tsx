@@ -66,7 +66,7 @@ export default function FreshnessSection() {
                 {item.description}
               </p>
               <Link
-                href="/shop"
+                href="/foods"
                 className="inline-block px-6 py-2 text-sm text-white transition bg-custom-orange hover:bg-green-800"
               >
                 Shop Now
