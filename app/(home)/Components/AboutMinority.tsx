@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function AboutMinority() {
   return (
     <section
@@ -16,35 +18,27 @@ export default function AboutMinority() {
         style={{ transform: "scaleX(1)" }} // no flip or flip as you want
       />
 
-      <div className="flex flex-col md:flex-row items-center gap-16 w-4/5 mx-auto z-10 relative">
+      <div className="relative z-10 flex flex-col items-center w-4/5 gap-16 mx-auto md:flex-row">
         <img
           src="/about.png"
           alt="Minority Owned"
-          className="w-full md:w-1/2 object-cover"
+          className="object-cover w-full md:w-1/2"
         />
         <div className="md:w-[40%]">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-4 uppercase heading">
+          <h2 className="mb-4 text-2xl font-semibold uppercase sm:text-3xl md:text-4xl heading">
             About Minority Owned Business
           </h2>
           <hr className="h-[2px] w-[100px] bg-green-900" />
           <hr className="h-[2px] w-[100px] bg-green-900 mt-[1px]" />
           <p className="text-gray-700 mb-4 text-[13px] mt-5">
-            Lorem Ipsum Dolor Sit Amet, Consectetur Adipiscing Elit. Nullam
-            Laoreet, Diam Sit Amet Porta Eleifend, Turpis Justo Maximus Eros,
-            Rhoncus Ullamcorper Mi Tortor Et Libero. Maecenas Lacinia Lorem
-            Ultrices Ligula Mollis Accumsan Dictum Ut Eros. Ut Varius A Nunc Vel
-            Vestibulum. Cras Dignissim Consequat Sapien Et Viverra. Mauris A
-            Ipsum Id Urna Interdum Pretium.
+            Minority-owned businesses are the backbone of diverse, resilient communities. Mosaic Biz Hub is here to amplify their voices by providing a platform that showcases products, services, and stories. From food and fashion to tech and wellness, we empower business owners to thrive in the digital marketplace.
           </p>
           <p className="text-gray-700 mb-4 text-[13px] mt-5">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus minus
-            quae laudantium, qui dignissimos, voluptate exercitationem labore
-            distinctio, aperiam voluptas nostrum cumque accusamus vel et maiores
-            molestiae soluta repellat quasi?
+            We believe every entrepreneur deserves visibility and access to opportunity. By listing your business, you join a growing network focused on growth, collaboration, and lasting success — all in one place.
           </p>
-          <button className="px-4 py-2 mt-5 bg-custom-orange text-white ">
+          <Link href="/about" className="px-4 py-3 mt-5 text-white bg-custom-orange ">
             Learn More
-          </button>
+          </Link>
         </div>
       </div>
     </section>

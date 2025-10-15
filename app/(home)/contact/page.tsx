@@ -1,6 +1,7 @@
 import React from 'react';
 import HeroSection from '../services/components/HeroSection';
 import { Mail, MapPinned, PhoneCall } from 'lucide-react';
+import Link from 'next/link';
 
 export default function ContactUsPage() {
     return (
@@ -16,7 +17,7 @@ export default function ContactUsPage() {
                     <hr className="h-[2px] w-[100px] bg-green-900" />
                     <hr className="h-[2px] w-[100px] bg-green-900 mt-[1px] mb-4" />
                     <p className="mb-6 text-sm text-gray-600 sm:text-base">
-                        Lorem Ipsum Dolor Sit Amet, Consectetur Adipisicing Elit, Praesent Vitae Libero Venenatis, Tristique Justo.
+                        Reach out to Mosaic Biz Hub anytime. We’re here to support your journey, answer your questions, and help your business thrive in the digital world.
                     </p>
 
                     <form className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -76,7 +77,7 @@ export default function ContactUsPage() {
                         <hr className="h-[2px] w-[100px] bg-white" />
                         <hr className="h-[2px] w-[100px] bg-white mt-[1px] mb-5" />
                         <p className="mb-6 text-sm">
-                            Lorem Ipsum Dolor Sit Amet, Consectetur Adipiscing Elit. Nullam Laoreet, Diam Sit Amet Porta Eleifend, Turpis Justo Maximus Eros, Rhoncus Ullamcorper Mi Tortor Et Libero. Maecenas Lacinia Lorem Ultrices Ligula Mollis Accumsan Dictum Ut Eros. Ut Varius A Nunc Vel Vestibulum. Cras Dignissim Consequat Sapien Et Viverra. Mauris A Ipsum Id Urna Interdum Pretium.
+                            Stay connected with Mosaic Biz Hub by subscribing to our newsletter. Receive the latest news, exclusive promotions, and inspiring stories from minority-owned businesses thriving in today’s digital landscape. Whether you’re a business owner or a supporter, our updates will keep you informed and motivated to help our community grow stronger every day. Don’t miss out on tips, events, and opportunities designed to empower and uplift.
                         </p>
 
                         <label htmlFor="Name" className="block mb-1">Name</label>
@@ -145,14 +146,12 @@ export default function ContactUsPage() {
                         <hr className="h-[2px] w-[150px] bg-white mt-[1px] mb-5" />
 
                         <p className="max-w-3xl mb-6 text-sm sm:text-base">
-                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Quas maxime iure quidem vel optio sequi,
-                            suscipit recusandae eum pariatur reprehenderit veritatis laboriosam dolorem a libero culpa quisquam
-                            quae. Fuga, nihil.
+                            Take your business to new heights by listing it on Mosaic Biz Hub. Connect with customers who value minority-owned brands, showcase your unique products and services, and grow your presence in the digital marketplace. Join a community dedicated to supporting your success every step of the way.
                         </p>
 
-                        <button className="px-5 py-2 mt-5 mb-5 font-semibold text-white transition bg-transparent border border-white hover:bg-white hover:text-black">
+                        <Link href={"/become-a-vendor"} className="px-5 py-2 mt-5 mb-5 font-semibold text-white transition bg-transparent border border-white hover:bg-white hover:text-black">
                             Become A Vendor
-                        </button>
+                        </Link>
                     </div>
                 </div>
                 {/* <div className="absolute inset-0 bg-[#3333339E] z-20 pointer-events-none" /> */}

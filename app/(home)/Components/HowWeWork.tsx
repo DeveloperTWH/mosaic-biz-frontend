@@ -1,38 +1,34 @@
+import Link from "next/link";
+
 export default function HowWeWork() {
   return (
-    <section className="flex flex-col items-center justify-center w-full my-12 px-4 sm:px-6 lg:px-12">
-      <div className="md:w-4/5 max-w-7xl flex flex-col-reverse md:flex-row items-center gap-10">
+    <section className="flex flex-col items-center justify-center w-full px-4 my-12 sm:px-6 lg:px-12">
+      <div className="flex flex-col-reverse items-center gap-10 md:w-4/5 max-w-7xl md:flex-row">
         
         {/* Text Content */}
         <div className="w-full md:w-1/2">
           <div>
-            <h2 className="text-3xl sm:text-4xl font-semibold mb-3 uppercase heading text-center md:text-left">
+            <h2 className="mb-3 text-3xl font-semibold text-center uppercase sm:text-4xl heading md:text-left">
               How We Work
             </h2>
-            <div className="flex flex-col items-center md:items-start mb-6">
+            <div className="flex flex-col items-center mb-6 md:items-start">
               <hr className="h-[2px] w-[100px] bg-black" />
               <hr className="h-[2px] w-[100px] mt-[1px] bg-black" />
             </div>
 
-            <div className="text-sm text-gray-700 space-y-6 mb-8 text-justify md:text-left">
+            <div className="mb-8 space-y-6 text-sm text-justify text-gray-700 md:text-left">
               <p>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Exercitationem
-                perferendis facere, atque praesentium minus labore magnam nemo molestiae ratione
-                velit tempore reiciendis, nisi consectetur ipsum placeat? Pariatur fugit,
-                cupiditate voluptate, dolorum quibusdam necessitatibus est repellendus quas
-                eligendi vero consequatur. Accusantium fuga aliquid modi, non laboriosam maiores
-                sapiente nemo. Facilis, obcaecati?
+                At Mosaic Biz Hub, we make it easy for minority-owned businesses to connect with customers and grow. Our platform allows you to list your products or services, reach new audiences, and build your brand with confidence. Whether you're selling food, offering services, or promoting events, we give you the tools to shine in the digital space.
               </p>
               <p>
-                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Soluta eum consequatur
-                nulla possimus optio nesciunt vitae enim nihil deleniti asperiores!
+                Joining is simple. Create a profile, showcase what makes your business unique, and start connecting with a supportive, engaged community ready to support and celebrate your success.
               </p>
             </div>
 
             <div className="flex justify-center md:justify-start">
-              <button className="px-7 py-2 bg-custom-orange text-white shadow hover:bg-orange-600 transition duration-300">
+              <Link href={"/about"} className="py-2 text-white transition duration-300 shadow px-7 bg-custom-orange hover:bg-orange-600">
                 Read More
-              </button>
+              </Link>
             </div>
           </div>
         </div>
@@ -42,7 +38,7 @@ export default function HowWeWork() {
           <img
             src="/HowWeWork/2149006867 1.png"
             alt="How We Work"
-            className="w-full h-auto object-cover rounded"
+            className="object-cover w-full h-auto rounded"
           />
         </div>
       </div>

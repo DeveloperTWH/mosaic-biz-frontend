@@ -49,8 +49,8 @@ const FeaturedProducts: React.FC<Props> = ({ products, loading }) => {
     return (
         <section className="px-6 py-16 mx-auto max-w-7xl">
             <h2 className="text-3xl font-bold text-center">SHOP PRODUCTS</h2>
-            <p className="max-w-xl mx-auto mt-2 text-center text-gray-600">
-                Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor enim minim veniam quis.
+            <p className="mx-auto mt-2 text-center text-gray-600">
+                Explore a diverse selection of products from trusted minority-owned businesses. Find everything you need, from handmade goods to specialty foods, all in one convenient place.
             </p>
             <div className="grid grid-cols-1 gap-6 mt-12 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                 {paginatedProducts.map((product) => {

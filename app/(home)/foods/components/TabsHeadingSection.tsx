@@ -7,26 +7,27 @@ const TabsHeadingSection: React.FC<{
     onTabChange: (tab: string) => void;
 }> = ({ selected, onTabChange }) => {
     return (
-        <div className="mb-8 text-center px-4">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-3 mt-10 text-gray-800 heading">
+        <div className="px-4 mb-8 text-center">
+            <h2 className="mt-10 mb-3 text-2xl font-bold text-gray-800 sm:text-3xl heading">
                 Choose Your Food
             </h2>
             <hr className="h-[2px] w-[100px] bg-green-900 mx-auto" />
             <hr className="h-[2px] w-[100px] bg-green-900 mt-[1px] mb-4 mx-auto" />
-            <div className="w-full max-w-2xl mx-auto mb-8 px-2">
-                <p className="text-sm sm:text-base text-gray-600">
-                    Lorem ipsum dolor sit, amet consectetur adipisicing elit. Inventore, minima. Quo, hic eum deleniti nulla dolorem sapiente aliquid animi dolore.
+            <div className="w-full px-2 mx-auto mb-8">
+                <p className="text-sm text-gray-600 sm:text-base">
+                    Food is not just a meal—it's tradition, culture, and identity. Each recipe holds history. Each flavor holds a story. Minority-owned food companies bring those stories to life, giving communities rich cuisines.
+                    <br />
+                    At Mosaic Biz Hub, we provide minority-owned food companies with the stage they require to be noticed, encouraged, and celebrated.
                 </p>
             </div>
-            <div className="flex flex-col md:flex-row md:gap-4 gap-3 border-b pb-4 justify-center items-center">
+            <div className="flex flex-col items-center justify-center gap-3 pb-4 border-b md:flex-row md:gap-4">
                 {tabs.map((tab) => (
                     <button
                         key={tab}
-                        className={`border px-10 sm:px-10 py-2 text-sm sm:text-base rounded-full font-medium transition duration-200 ${
-                            selected === tab
+                        className={`border px-10 sm:px-10 py-2 text-sm sm:text-base rounded-full font-medium transition duration-200 ${selected === tab
                                 ? 'bg-custom-yellow text-white border-0'
                                 : 'text-gray-600 hover:text-black hover:bg-gray-100 border border-black'
-                        }`}
+                            }`}
                         onClick={() => onTabChange(tab)}
                     >
                         {tab}

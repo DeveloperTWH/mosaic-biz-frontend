@@ -22,6 +22,7 @@ const FoodSection = () => {
   }
   return (
     <div>
+      <HeroSection heading={"Foods"} imageUrl='/foods/food_section.png' />
       <FilterBar
         searchText={searchText}
         setSearchText={setSearchText}
@@ -31,10 +32,9 @@ const FoodSection = () => {
         setSearchLocation={setSearchLocation}
         onSearch={handleSearch}
       />
-      <HeroSection heading={"Food"} imageUrl='/foods/food_section.png' />
       <FoodsAndRestaurantsPage />
       <div className="max-w-screen-xl px-8 py-10 mx-auto">
-        <SimilarProduct />
+        {/* <SimilarProduct /> */}
       </div>
     </div>
   )

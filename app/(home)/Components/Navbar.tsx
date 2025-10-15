@@ -182,7 +182,7 @@ const Navbar = () => {
               </div>
 
               {/* Become Vendor Button */}
-              <Link href="/signup?type=vendor">
+              <Link href="/become-a-vendor">
                 <button className="bg-sky-500 text-white px-4 py-1.5 rounded text-sm hover:bg-sky-600 transition">
                   Become a Vendor
                 </button>
@@ -310,7 +310,7 @@ const Navbar = () => {
                     Login As Vendor
                   </button>
                 </Link>
-                <Link href="/signup?type=vendor">
+                <Link href="/become-a-vendor">
                   <button className="bg-sky-500 text-white px-4 py-1.5 rounded text-sm hover:bg-sky-600 w-full">
                     Become a Vendor
                   </button>

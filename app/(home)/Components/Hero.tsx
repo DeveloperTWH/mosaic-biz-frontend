@@ -94,10 +94,7 @@ const Hero = () => {
             Businesses to Thrive in the Digital Age
           </h2>
           <p className="max-w-2xl mb-6">
-            Lorem Ipsum Dolor Sit Amet, Consectetur Adipiscing Elit. Nullam
-            Laoreet, Diam Sit Amet Porta Eleifend, Turpis Justo Maximus Eros,
-            Rhoncus Ullamcorper Mi Tortor Et Libero. Maecenas Lacinia Lorem
-            Ultrices Ligulaeros.
+            Empowering Minority-Owned Businesses to Succeed in the Digital Era. Unlock New Opportunities, Expand Your Reach, and Connect with a Vibrant Community of Entrepreneurs. Your Business, Your Future, Thriving Together
           </p>
           {isLoggedIn === null && (
             <div className="flex flex-col gap-4 md:flex-row">

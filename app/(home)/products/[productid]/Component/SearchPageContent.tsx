@@ -295,7 +295,7 @@ export default function SearchPageContent() {
         </main>
       </div>
       <div className="max-w-screen-xl px-8 py-10 mx-auto">
-        <SimilarProduct />
+        {/* <SimilarProduct /> */}
       </div>
     </>
   );

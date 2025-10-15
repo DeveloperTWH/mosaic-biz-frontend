@@ -56,7 +56,7 @@ export default function FAQSection() {
         <div className="w-[60%] mx-auto text-center">
 
           <p className="text-[13px] text-gray-600 mb-5">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Impedit adipisci doloremque amet recusandae nostrum voluptates rem suscipit dolores magni velit?
+            Have questions? We’re here to help. Learn more about how Mosaic Biz Hub works, how to list your business, and how to make the most of our platform.
           </p>
         </div>
         <div className="">

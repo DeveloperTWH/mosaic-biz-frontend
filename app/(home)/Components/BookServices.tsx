@@ -15,13 +15,13 @@ export default function BookServices() {
         <img
           src="/hserv-background.png"
           alt="Background"
-          className="w-full object-contain"
+          className="object-contain w-full"
         />
       </div>
 
       <div className="w-[90%] mx-auto relative z-10">
         <h2
-          className="text-center text-2xl sm:text-3xl md:text-4xl font-semibold mb-2 heading"
+          className="mb-2 text-2xl font-semibold text-center sm:text-3xl md:text-4xl heading"
           style={{ color: "white" }}
         >
           BOOK YOUR SERVICES
@@ -30,9 +30,7 @@ export default function BookServices() {
         <hr className="h-[2px] w-[100px] mx-auto mt-[1px] mb-5" />
         <div className="mx-auto w-1/2 text-[13px] text-center mb-10">
           <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elitsed eiusmod
-            tempor enim minim veniam quis notru exercit ation Lorem ipsum dolor
-            sit amet. Veniam quis notru exercit.
+            Discover skilled professionals in your community. From expert care to reliable solutions, find and book the services you need — all in just a few clicks. Support local. Book with confidence.
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-[95%] mx-auto">
@@ -42,9 +40,9 @@ export default function BookServices() {
               className={`px-10 py-10 text-center text-white rounded ${service.bgColor}`}
             >
               <div>
-                <UserRoundCog className="mx-auto mb-10 w-16 h-16" />
+                <UserRoundCog className="w-16 h-16 mx-auto mb-10" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">{service.title}</h3>
+              <h3 className="mb-2 text-xl font-semibold">{service.title}</h3>
               <p className="text-sm">
                 Lorem ipsum dolor sit amet consectetur adipisicing elitsed
                 eiusmod tempor enim minim veniam quis notru exercit ation Lorem
@@ -59,10 +57,10 @@ export default function BookServices() {
             </div>
           ))}
         </div>
-        <div className="text-center mt-8 mb-10">
+        <div className="mt-8 mb-10 text-center">
           <Link
             href="/services"
-            className="px-10 py-2 mt-5 bg-custom-orange text-white inline-block"
+            className="inline-block px-10 py-2 mt-5 text-white bg-custom-orange"
           >
             View All Services
           </Link>
