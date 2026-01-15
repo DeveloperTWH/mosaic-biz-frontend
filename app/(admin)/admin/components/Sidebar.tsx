@@ -7,13 +7,14 @@ import {
   Package,
   Users,
   CreditCard,
-  ListTree ,
+  ListTree,
   MessageSquareQuote,
   Newspaper,
   HelpCircle,
   LogOut,
-  X
-} from "lucide-react";// Lucide icons
+  X,
+  FileText
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname, useParams } from "next/navigation";
 import { logoutUser } from "@/utils/logoutUser";
@@ -27,25 +28,25 @@ interface SidebarProps {
 const AdminSidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
   const pathname = usePathname();
   const params = useParams();
-  const businessId = params.businessid as string; // ✅ Get businessId from URL
+  const businessId = params.businessid as string;
 
   const navItems = [
     { label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5" /> },
     { label: "Businesses", icon: <Building2 className="w-5 h-5" /> },
+    { label: "Vendor Applications", icon: <FileText className="w-5 h-5" /> },
     { label: "Orders", icon: <Package className="w-5 h-5" /> },
     { label: "Users", icon: <Users className="w-5 h-5" /> },
     { label: "Subscription", icon: <CreditCard className="w-5 h-5" /> },
-    { label: "Categories Management", icon: <ListTree  className="w-5 h-5" /> },
+    { label: "Categories Management", icon: <ListTree className="w-5 h-5" /> },
     { label: "Testimonial", icon: <MessageSquareQuote className="w-5 h-5" /> },
     { label: "Blog", icon: <Newspaper className="w-5 h-5" /> },
     { label: "FAQ", icon: <HelpCircle className="w-5 h-5" /> },
-    // { label: "Support", icon: <LifeBuoy className="w-5 h-5" /> },
   ];
 
   const getLink = (label: string) => {
     return label === "Dashboard"
       ? `/admin`
-      : `/admin/${label.toLowerCase().replace(" ", "-")}`;
+      : `/admin/${label.toLowerCase().replace(/ /g, "-")}`;
   };
 
   return (
@@ -54,7 +55,6 @@ const AdminSidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
         className={`fixed top-0 left-0 z-40 flex flex-col w-64 h-screen bg-[#333333] shadow transform transition-transform duration-300 md:static md:translate-x-0
         ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"} overflow-hidden`}
       >
-        {/* Close Button (Mobile Only) */}
         <div className="flex justify-end p-4 md:hidden">
           <button
             onClick={() => setIsOpen(false)}
@@ -65,7 +65,6 @@ const AdminSidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
         </div>
 
         <div className="flex flex-col items-center p-6">
-          {/* Avatar */}
           <div className="p-1 border-2 border-white rounded-full">
             <div className="flex items-center justify-center w-12 h-12 text-lg font-bold text-white bg-red-600 rounded-full">
               {"B"}
@@ -78,8 +77,8 @@ const AdminSidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
             const link = getLink(item.label);
             const isActive =
               item.label === "Dashboard"
-                ? pathname === link // Dashboard only active on exact path
-                : pathname.startsWith(link); // Others active for subpaths too
+                ? pathname === link
+                : pathname.startsWith(link);
 
             return (
               <Link

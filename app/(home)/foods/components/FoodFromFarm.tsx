@@ -58,7 +58,7 @@ const dummyFarmItems: FarmItem[] = [
         number: "+123456789"
     },
 ];
-export default function FoodFromFarm() {
+export default function   () {
   const [activeFarm, setActiveFarm] = useState<number | null>(null);
   const [isMobile, setIsMobile] = useState<boolean>(false);
 

@@ -1,1213 +1,1031 @@
 'use client';
 
-import { useState, useEffect, useMemo, useRef } from 'react';
-import Image from 'next/image';
+import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { motion, AnimatePresence } from "framer-motion";
-import type { Variants } from "framer-motion";
 
-// ADD
-import { getPlaceDetails } from '@/lib/googlePlaces';
+import {
+  saveStage1Draft,
+  createStage1Payment,
+  submitStage1
+} from '@/lib/api/vendorOnboarding';
+import { loadStripe } from '@stripe/stripe-js';
 
+/* ======================================================
+   TYPES - Updated to match API
+====================================================== */
 
-
-interface BusinessForm {
-  businessName: string;
-  description: string;
-  email: string;
-  phoneNumber: string;
-  listingType: string;
-  address: string;
+interface Address {
+  street: string;
   city: string;
   state: string;
   country: string;
   zipCode: string;
-  logo?: File | null;
-  coverImage?: File | null;
-  productCategories?: string[];
-  serviceCategories?: string[];
-  foodCategories?: string[];
-  taxId: string;                     // Business EIN / Tax ID
-  businessLicenseNumber: string;     // Business Licence
-  isFranchise: boolean;     // Optional
-  franchiseLocation?: string;      // Select Franchise Locations (as labels for now)
 }
 
-type Category = {
-  _id: string;
-  name: string;
-};
-
-
-interface SubscriptionPlan {
-  _id: string;
-  name: string;
-  price: number;
-  durationInDays: number;
-  limits: {
-    productListings: number;
-    serviceListings: number;
-    foodListings: number;
-    imageLimit: number;
-    videoLimit: number;
-  };
-  features: {
-    analyticsDashboard?: boolean;
-    marketingTools?: boolean;
-    featuredPlacement?: boolean;
-    supportLevel?: string;
-    communityEventsAccess?: boolean;
-    searchPriority?: boolean;
-    listingPriority?: boolean;
-    pushNotifications?: boolean;
-    aiRecommendation?: boolean;
-  };
+interface Document {
+  type: string;
+  url: string;
+  verified: boolean;
 }
 
-interface Subscription {
-  _id: string;
-  userId: string;
-  businessId: string | null; // Can be null initially
-  subscriptionPlanId: SubscriptionPlan; // This is the full subscription plan
-  paymentStatus: string;
-  startDate: string;
-  endDate: string;
-  status: string;
-  createdAt: string;
-  updatedAt: string;
+interface VerificationPayment {
+  status: 'pending' | 'completed' | 'failed';
 }
 
-const initialForm: BusinessForm = {
+type BusinessType = 'product' | 'service' | 'food' | '';
+type OwnershipType = 'Limited Liability Company' | 'Sole Proprietor' | 'S-Corporation' | 'C-Corporation' | 'Nonprofit' | '';
+
+interface Stage1Form {
+  // Section 1: Basic Business Info
+  businessName: string;
+  
+  // Section 2: Minority Status
+  isMinorityOwned: boolean;
+  minorityCategories: string[];
+  
+  // Section 3: Legal & Tax
+  hasEIN: boolean;
+  einNumber: string;
+  ssnLast9: string;
+  hasBusinessLicense: boolean;
+  
+  // Section 4: Business Details
+  businessOwnershipType: OwnershipType;
+  yearsInBusiness: string;
+  isFranchise: boolean;
+  franchiseName: string;
+  businessType: BusinessType;
+  hasThirdPartyBooking: boolean;
+  hasPhysicalLocation: boolean;
+  numberOfEmployees: string;
+  
+  // Section 5: Online Presence
+  websiteUrl: string;
+  facebookUrl: string;
+  instagramUrl: string;
+  linkedinUrl: string;
+  tiktokUrl: string;
+  
+  // Section 6: Contact Info
+  primaryContactName: string;
+  primaryContactDesignation: string;
+  contactEmail: string;
+  businessEmail: string;
+  contactPhone: string;
+  
+  // Section 7: Address
+  address: Address;
+  
+  // Section 8: Documents
+  minorityProofDocuments: Document[];
+  taxDocuments: Document[];
+  businessLicenseDocuments: Document[];
+  
+  // Section 9: Payment & Terms
+  verificationPayment: VerificationPayment;
+  acceptedTerms: boolean;
+  declarationAccepted: boolean;
+}
+
+/* ======================================================
+   INITIAL STATE - Updated to match API
+====================================================== */
+
+const initialState: Stage1Form = {
   businessName: '',
-  description: '',
-  email: '',
-  phoneNumber: '',
-  listingType: '',
-  address: '',
-  city: '',
-  state: '',
-  country: '',
-  zipCode: '',
-  logo: null,
-  coverImage: null,
-  taxId: '',
-  businessLicenseNumber: '',
+  
+  isMinorityOwned: true,
+  minorityCategories: [],
+  
+  hasEIN: true,
+  einNumber: '',
+  ssnLast9: '',
+  
+  hasBusinessLicense: true,
+  
+  businessOwnershipType: '',
+  yearsInBusiness: '',
   isFranchise: false,
-  franchiseLocation: '',
-};
-
-
-const _debounce = (fn: (...a: any[]) => void, ms = 250) => {
-  let t: any;
-  return (...a: any[]) => {
-    clearTimeout(t);
-    t = setTimeout(() => fn(...a), ms);
-  };
-};
-
-// Easing: cubic-bezier(0.16, 1, 0.3, 1) — nice ease-out
-const EASE_OUT: [number, number, number, number] = [0.16, 1, 0.3, 1];
-
-const stepVariants: Variants = {
-  initial: { opacity: 0, x: 24 },
-  animate: {
-    opacity: 1,
-    x: 0,
-    transition: { duration: 0.22, ease: EASE_OUT, type: "tween" },
+  franchiseName: '',
+  businessType: '',
+  hasThirdPartyBooking: false,
+  hasPhysicalLocation: true,
+  numberOfEmployees: '',
+  
+  websiteUrl: '',
+  facebookUrl: '',
+  instagramUrl: '',
+  linkedinUrl: '',
+  tiktokUrl: '',
+  
+  primaryContactName: '',
+  primaryContactDesignation: '',
+  contactEmail: '',
+  businessEmail: '',
+  contactPhone: '',
+  
+  address: {
+    street: '',
+    city: '',
+    state: '',
+    country: '',
+    zipCode: '',
   },
-  exit: {
-    opacity: 0,
-    x: -24,
-    transition: { duration: 0.18, ease: EASE_OUT, type: "tween" },
+  
+  minorityProofDocuments: [],
+  taxDocuments: [],
+  businessLicenseDocuments: [],
+  
+  verificationPayment: {
+    status: 'pending'
   },
+  acceptedTerms: false,
+  declarationAccepted: false,
 };
 
-const imageVariants: Variants = {
-  initial: { opacity: 0, x: -12 },
-  animate: {
-    opacity: 1,
-    x: 0,
-    transition: { duration: 0.3, ease: EASE_OUT },
-  },
-  exit: {
-    opacity: 0,
-    x: -12,
-    transition: { duration: 0.2, ease: EASE_OUT },
-  },
+/* ======================================================
+   PROGRESS STEPS
+====================================================== */
+
+const progressSteps = [
+  { id: 1, title: 'Business Info', description: 'Basic business details' },
+  { id: 2, title: 'Legal Status', description: 'Minority & legal verification' },
+  { id: 3, title: 'Business Details', description: 'Ownership & operations' },
+  { id: 4, title: 'Online Presence', description: 'Website & social media' },
+  { id: 5, title: 'Contact Info', description: 'Primary contacts' },
+  { id: 6, title: 'Address', description: 'Business location' },
+  { id: 7, title: 'Documents', description: 'Upload required files' },
+  { id: 8, title: 'Review & Submit', description: 'Final verification' },
+];
+
+/* ======================================================
+   HELPER FUNCTIONS FOR FILE UPLOAD
+====================================================== */
+
+// Function to get cookie value
+const getCookie = (name: string): string | null => {
+  if (typeof document === 'undefined') return null;
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+  return null;
 };
 
-// ADD
-const planListVariants: Variants = {
-  animate: {
-    transition: { staggerChildren: 0.06, delayChildren: 0.05 },
-  },
+// Function to get upload URL from backend
+ const getUploadUrl = async (fileName: string, fileType: string, documentType: string) => {
+  const response = await fetch(
+    `http://localhost:3001/api/vendor-onboarding/stage1/upload-url?fileName=${encodeURIComponent(fileName)}&fileType=${encodeURIComponent(fileType)}&documentType=${documentType}`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // This sends cookies automatically
+    }
+  );
+  
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: 'Failed to get upload URL' }));
+    throw new Error(error.message || 'Failed to get upload URL');
+  }
+  return response.json();
 };
 
-const planCardVariants: Variants = {
-  initial: { opacity: 0, x: 24 },
-  animate: { opacity: 1, x: 0, transition: { duration: 0.22, ease: EASE_OUT, type: 'tween' } },
+// Function to upload file to S3
+const uploadToS3 = async (uploadUrl: string, file: File, fileType: string) => {
+  const response = await fetch(uploadUrl, {
+    method: 'PUT',
+    headers: { 'Content-Type': fileType },
+    body: file,
+  });
+  
+  if (!response.ok) throw new Error('Failed to upload file');
 };
 
+// Validate file
+const validateFile = (file: File): { isValid: boolean; error?: string } => {
+  const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+  const ALLOWED_TYPES = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+  
+  if (file.size > MAX_SIZE) return { isValid: false, error: 'File must be under 5MB' };
+  if (!ALLOWED_TYPES.includes(file.type)) return { isValid: false, error: 'Only PDF, JPG, PNG files allowed' };
+  return { isValid: true };
+};
 
+/* ======================================================
+   INDUSTRY STYLE FORM SECTIONS
+====================================================== */
 
-const inputBase =
-  "w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 outline-none " +
-  "focus:ring-4 focus:ring-orange-100 focus:border-orange-300 transition placeholder:text-gray-400";
-const labelBase = "text-sm font-medium text-gray-700 capitalize";
-const cardBase = "rounded-2xl border border-gray-200 bg-white/70 backdrop-blur p-6 md:p-8 shadow-sm";
-
-
-const _newSession = () => crypto.randomUUID?.() ?? Math.random().toString(36).slice(2);
-
-interface _Sug {
-  description: string;
-  placeId: string;
-  matched_substrings: any[]; // Array of matched substrings
-  place_id: string;
-  structured_formatting: {
-    main_text: string;
-    secondary_text: string;
-    main_text_matched_substrings: any[]; // Add this to match the expected type
-  };
-  terms: any[]; // Array of terms
-  types: string[]; // Array of types
+interface SectionProps {
+  title: string;
+  description?: string;
+  children: React.ReactNode;
+  className?: string;
 }
 
+const FormSection: React.FC<SectionProps> = ({ title, description, children, className = '' }) => (
+  <div className={`bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6 ${className}`}>
+    <div className="mb-4">
+      <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+      {description && <p className="text-sm text-gray-600 mt-1">{description}</p>}
+    </div>
+    {children}
+  </div>
+);
 
+const InputField: React.FC<{
+  label: string;
+  required?: boolean;
+  children: React.ReactNode;
+  error?: string;
+}> = ({ label, required = false, children, error }) => (
+  <div className="mb-4">
+    <label className="block text-sm font-medium text-gray-700 mb-1">
+      {label} {required && <span className="text-red-500">*</span>}
+    </label>
+    {children}
+    {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
+  </div>
+);
 
+/* ======================================================
+   MAIN COMPONENT
+====================================================== */
 
-export default function CreateNewBusinessPage() {
-  const [formData, setFormData] = useState(initialForm);
-  const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
-  const [selectedPlanId, setSelectedPlanId] = useState('');
+export default function VendorOnboardingStage1Page() {
+  const [form, setForm] = useState<Stage1Form>(initialState);
   const [loading, setLoading] = useState(false);
-  const [pageLoading, setPageLoading] = useState(true);
-  const [userSubscriptions, setUserSubscriptions] = useState<Subscription[]>([]);
-  const [selectedTab, setSelectedTab] = useState("new"); // "new" or "existing"
-  const [selectedCategories, setSelectedCategories] = useState<{ _id: string; name: string }[]>([]);
-  const [categories, setCategories] = useState<{ _id: string; name: string }[]>([]);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [showAllSections, setShowAllSections] = useState(false);
+  const [uploading, setUploading] = useState<Record<string, boolean>>({});
+  const [selectedFiles, setSelectedFiles] = useState<Record<string, File | null>>({});
 
+  /* ======================================================
+     FILE UPLOAD FUNCTIONS
+  ====================================================== */
 
-  const [productCategories, setProductCategories] = useState<Category[]>([]);
-  const [serviceCategories, setServiceCategories] = useState<Category[]>([]);
-  const [foodCategories, setFoodCategories] = useState<Category[]>([]);
+  const handleFileSelect = async (
+    documentType: 'business-license' | 'minority-proof' | 'tax-doc',
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
 
-  const [addressSugs, setAddressSugs] = useState<_Sug[]>([]);
-  const [showAddrSugs, setShowAddrSugs] = useState(false);
-  const [streetSugs, setStreetSugs] = useState<_Sug[]>([]);
-
-  // NEW: step constants
-  const STEPS = ['basic', 'address', 'compliance', 'categories', 'plan'] as const;
-  type Step = typeof STEPS[number];
-
-  // NEW: step state
-  const [step, setStep] = useState<Step>('basic');
-  const stepIndex = STEPS.indexOf(step);
-
-  // NEW: navigation
-  const goNext = () => setStep(STEPS[Math.min(stepIndex + 1, STEPS.length - 1)]);
-  const goBack = () => setStep(STEPS[Math.max(stepIndex - 1, 0)]);
-
-  // NEW: lightweight per-step validator (no external libs)
-  const validateStep = (s: Step) => {
-    const f = formData;
-    const errs: string[] = [];
-
-    if (s === 'basic') {
-      if (!f.businessName?.trim()) errs.push('Business name is required');
-      if (!f.email?.trim()) errs.push('Email is required');
-      if (!f.phoneNumber?.trim()) errs.push('Phone number is required');
-      if (!f.listingType) errs.push('Listing type is required');
-    }
-
-    if (s === 'address') {
-      if (!f.address?.trim()) errs.push('Address is required');
-      if (!f.city?.trim()) errs.push('City is required');
-      if (!f.state?.trim()) errs.push('State is required');
-      if (!f.country?.trim()) errs.push('Country is required');
-      if (!f.zipCode?.trim()) errs.push('ZIP/Postal code is required');
-    }
-
-    if (s === 'compliance') {
-      if (!f.taxId?.trim()) errs.push('Tax ID is required');
-      if (!f.businessLicenseNumber?.trim()) errs.push('Business licence is required');
-      if (f.isFranchise && !f.franchiseLocation?.trim()) errs.push('Franchise location is required');
-    }
-
-    if (s === 'categories') {
-      if (selectedCategories.length === 0) errs.push('Pick at least one category');
-    }
-
-    if (errs.length) toast.error(errs[0]); // show first error
-    return errs.length === 0;
-  };
-
-  // NEW: step-aware submit handler
-  const handleNext = () => {
-    if (!validateStep(step)) return;
-
-    if (step !== 'plan') {
-      return goNext();
-    }
-
-    // Final step:
-    if (!selectedPlanId) {
-      toast.error(selectedTab === 'existing' ? 'Select an existing subscription' : 'Select a plan');
+    const validation = validateFile(file);
+    if (!validation.isValid) {
+      toast.error(validation.error);
       return;
     }
 
-    if (selectedTab === 'existing') {
-      // No payment — create business with existing subscription
-      return handleBusinessCreation();
-    }
-
-    // New plan — go to Stripe
-    return handleSubmit();
-  };
-
-
-  const fetchStreetAutocomplete = async (input: string) => {
-    if (!input.trim()) {
-      setStreetSugs([]);
-      setShowAddrSugs(false);
-      return;
-    }
-
+    setSelectedFiles(prev => ({ ...prev, [documentType]: file }));
+    
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/google-places`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ input }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch suggestions');
+      setUploading(prev => ({ ...prev, [documentType]: true }));
+      
+      // Get upload URL
+      const { uploadUrl, fileUrl } = await getUploadUrl(
+        `${Date.now()}-${file.name}`,
+        file.type,
+        documentType
+      );
+      
+      // Upload to S3
+      await uploadToS3(uploadUrl, file, file.type);
+      
+      // Add to form state
+      const newDoc = { type: documentType, url: fileUrl, verified: false };
+      
+      switch (documentType) {
+        case 'business-license':
+          setForm(prev => ({
+            ...prev,
+            businessLicenseDocuments: [...prev.businessLicenseDocuments, newDoc]
+          }));
+          break;
+        case 'minority-proof':
+          setForm(prev => ({
+            ...prev,
+            minorityProofDocuments: [...prev.minorityProofDocuments, newDoc]
+          }));
+          break;
+        case 'tax-doc':
+          setForm(prev => ({
+            ...prev,
+            taxDocuments: [...prev.taxDocuments, newDoc]
+          }));
+          break;
       }
-
-      const data = await response.json();
-      const list: _Sug[] = (data?.suggestions ?? [])
-        .map((s: any) => ({
-          description: s?.placePrediction?.text?.text ?? "",
-          placeId: s?.placePrediction?.placeId,
-          matched_substrings: s?.placePrediction?.text?.matches ?? [],
-          place_id: s?.placePrediction?.placeId,
-          structured_formatting: {
-            main_text: s?.placePrediction?.structuredFormat?.mainText?.text ?? "",
-            secondary_text: s?.placePrediction?.structuredFormat?.secondaryText?.text ?? "",
-            main_text_matched_substrings: s?.placePrediction?.structuredFormat?.mainText?.matches ?? [],
-          },
-          terms: s?.placePrediction?.terms ?? [],
-          types: s?.placePrediction?.types ?? [],
-        }))
-        .filter((x: _Sug) => x.description && x.placeId);
-
-      setStreetSugs(list);
-      setShowAddrSugs(list.length > 0); // Toggle the suggestions dropdown
-    } catch (error) {
-      console.error('Error fetching suggestions:', error);
+      
+      toast.success('File uploaded successfully!');
+      
+    } catch (error: any) {
+      toast.error(`Upload failed: ${error.message}`);
+    } finally {
+      setUploading(prev => ({ ...prev, [documentType]: false }));
+      setSelectedFiles(prev => ({ ...prev, [documentType]: null }));
     }
   };
 
-  const debouncedStreetAuto = useMemo(() => _debounce(fetchStreetAutocomplete, 250), []);
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/categories`);
-        const data = await response.json();
-        console.log(data);
-
-        // Check if the API response contains valid data fields
-        if (response.ok && data?.success === true && data?.data) {
-          // Store categories based on listingType
-          setProductCategories(data.data.productCategories);
-          setServiceCategories(data.data.serviceCategories);
-          setFoodCategories(data.data.foodCategories);
-
-          // Default to one of the categories or empty
-          setCategories([]);
-        } else {
-          console.log('Error fetching categories: Invalid response structure');
-          throw new Error('Failed to fetch categories');
-        }
-      } catch (error) {
-        console.error('Error fetching categories:', error);
-      } finally {
-        setPageLoading(false); // Set pageLoading to false after fetch
-      }
-    };
-
-    if (formData.listingType) {
-      fetchCategories(); // Fetch categories only when listingType is selected
+  const removeDocument = (
+    documentType: 'business-license' | 'minority-proof' | 'tax-doc',
+    index: number
+  ) => {
+    switch (documentType) {
+      case 'business-license':
+        setForm(prev => ({
+          ...prev,
+          businessLicenseDocuments: prev.businessLicenseDocuments.filter((_, i) => i !== index)
+        }));
+        break;
+      case 'minority-proof':
+        setForm(prev => ({
+          ...prev,
+          minorityProofDocuments: prev.minorityProofDocuments.filter((_, i) => i !== index)
+        }));
+        break;
+      case 'tax-doc':
+        setForm(prev => ({
+          ...prev,
+          taxDocuments: prev.taxDocuments.filter((_, i) => i !== index)
+        }));
+        break;
     }
-  }, [formData.listingType]); // Dependency on listingType
-
-  const handleListingTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setFormData({ ...formData, listingType: e.target.value });
+    toast.success('Document removed');
   };
 
-  const getCategoriesForListingType = () => {
-    if (formData.listingType === 'product') {
-      return productCategories;
-    } else if (formData.listingType === 'service') {
-      return serviceCategories;
-    } else if (formData.listingType === 'food') {
-      return foodCategories;
-    } else {
-      return []; // Return empty if no valid listingType is selected
-    }
-  };
-  // Only run once on component mount
+  /* ======================================================
+     EXISTING FUNCTIONS (minimal changes)
+  ====================================================== */
 
-  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedOptionId = e.target.value;
-
-    // Find the category object from the available categories based on the selected ID
-    const selectedCategory = getCategoriesForListingType().find((category) => category._id === selectedOptionId);
-
-    if (selectedCategory && !selectedCategories.some((category) => category._id === selectedCategory._id) && selectedCategories.length < 5) {
-      setSelectedCategories([...selectedCategories, selectedCategory]);
-    }
+  const update = <K extends keyof Stage1Form>(key: K, value: Stage1Form[K]) => {
+    setForm(prev => ({ ...prev, [key]: value }));
   };
 
-
-  const handleRemoveCategory = (category: { _id: string; name: string }) => {
-    setSelectedCategories(selectedCategories.filter((cat) => cat._id !== category._id));
-  };
-
-
-
-  useEffect(() => {
-    setSelectedCategories([]);
-  }, [formData.listingType]);
-
-
-
-  useEffect(() => {
-    const fetchPlans = async () => {
-      try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/subscription-plans`);
-        const data = await res.json();
-
-        // Check if the response is ok and the data is an array
-        if (res.ok && Array.isArray(data.data)) {
-          // Set the fetched plans and select the plan with the lowest price
-          setPlans(data.data);
-          setSelectedPlanId(
-            data.data.sort((a: SubscriptionPlan, b: SubscriptionPlan) => a.price - b.price)[0]._id
-          );
-        } else {
-          console.log('Error: Invalid response data');
-          throw new Error('Failed to fetch subscription plans');
-        }
-
-        const userSubscriptionRes = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user/subscriptions`, {
-          method: 'GET',
-          credentials: 'include',
-        });
-
-        const userSubscriptionData = await userSubscriptionRes.json();
-
-        if (userSubscriptionRes.ok && Array.isArray(userSubscriptionData.subscriptions)) {
-          console.log(userSubscriptionData.subscriptions);
-
-          setUserSubscriptions(userSubscriptionData.subscriptions);
-        } else {
-          console.log('No subscriptions found for the user');
-        }
-      } catch (error) {
-        console.error('Error fetching subscription plans:', error);
-      } finally {
-        setPageLoading(false);  // Set pageLoading to false after fetch
-      }
-    };
-
-    fetchPlans();
-  }, []);
-
-
-  const handleChange = async (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const target = e.target as HTMLInputElement;
-    const { name } = target;
-    const value = target.type === 'checkbox' ? target.checked : target.value;
-
-    setFormData((prev: any) => ({ ...prev, [name]: value }));
-
-    if (name === "address") {
-      if (!String(value).trim()) {
-        setStreetSugs([]);
-        setShowAddrSugs(false);
-        return;
-      }
-      debouncedStreetAuto(String(value));
-      setShowAddrSugs(true);
-    }
-  };
-
-
-  // ADD
-  const handlePickAddressSuggestion = async (pred: google.maps.places.AutocompletePrediction) => {
-    const normalized = await getPlaceDetails(pred.place_id);
-    setShowAddrSugs(false);
-    setAddressSugs([]);
-
-    if (!normalized) return;
-
-    // Extract address without city, state, or country
-    const addressParts = normalized.formatted.split(',');
-    const streetAddress = addressParts.slice(0, addressParts.length - 3).join(',').trim(); // assuming the last 3 parts are city, state, and country
-
-    setFormData(prev => ({
+  const updateAddress = (key: keyof Address, value: string) => {
+    setForm(prev => ({
       ...prev,
-      address: streetAddress || prev.address,
-      city: normalized.city || prev.city,
-      state: normalized.state || prev.state,
-      country: normalized.country || prev.country,
-      zipCode: normalized.postalCode || prev.zipCode,
+      address: { ...prev.address, [key]: value }
     }));
   };
 
+  const validateStep = (step: number): boolean => {
+    const errors: Record<string, string> = {};
 
-  // const handleSubmit = async () => {
-  //   setLoading(true);
-  //   try {
-  //     const body = new FormData();
-  //     Object.entries(formData).forEach(([key, value]) => {
-  //       if (value) body.append(key, value);
-  //     });
-  //     body.append('subscriptionPlanId', selectedPlanId);
-  //     body.append('paymentId', 'TechwareHut12342');
-  //     body.append('paymentStatus', 'COMPLETED');
-  //     body.append('isApproved', 'true');
-  //     console.log(body);
-
-  //     const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/business`, {
-  //       method: 'POST',
-  //       body,
-  //       credentials: 'include',
-  //     });
-  //     const data = await res.json();
-  //     if (res.ok) {
-  //       toast.success('Business registered successfully!');
-  //       setTimeout(() => {
-  //         window.location.href = '/partners';
-  //       }, 2000);
-  //     } else {
-  //       toast.error(data.message || 'Something went wrong');
-  //     }
-  //   } catch {
-  //      toast.error('Network error');
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-  const handleSubmit = async () => {
-    setLoading(true);
-    // setPageLoading(true);
-    if (!formData.isFranchise) {
-      formData.franchiseLocation = '';
+    switch (step) {
+      case 1:
+        if (!form.businessName.trim()) errors.businessName = 'Business name is required';
+        break;
+      case 2:
+        if (form.isMinorityOwned && form.minorityCategories.length === 0) {
+          errors.minorityCategories = 'Please select at least one minority category';
+        }
+        if (form.hasEIN && !form.einNumber.match(/^\d{9}$/)) {
+          errors.einNumber = 'EIN must be 9 digits';
+        }
+        if (!form.hasEIN && !form.ssnLast9.match(/^\d{9}$/)) {
+          errors.ssnLast9 = 'SSN must be 9 digits';
+        }
+        break;
+      case 3:
+        if (!form.businessOwnershipType) errors.businessOwnershipType = 'Ownership type is required';
+        if (!form.yearsInBusiness) errors.yearsInBusiness = 'Years in business is required';
+        if (!form.businessType) errors.businessType = 'Business type is required';
+        break;
+      case 6:
+        if (!form.address.street.trim()) errors.address_street = 'Street address is required';
+        if (!form.address.city.trim()) errors.address_city = 'City is required';
+        if (!form.address.state.trim()) errors.address_state = 'State is required';
+        if (!form.address.zipCode.trim()) errors.address_zipCode = 'ZIP code is required';
+        break;
+      case 7:
+        if (!form.hasBusinessLicense && form.businessLicenseDocuments.length === 0) {
+          errors.businessLicenseDocuments = 'Business license is required';
+        }
+        break;
+      case 8:
+        if (!form.acceptedTerms) errors.acceptedTerms = 'You must accept the Terms & Conditions';
+        if (!form.declarationAccepted) errors.declarationAccepted = 'You must declare the information is correct';
+        break;
     }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleNextStep = () => {
+    if (validateStep(currentStep)) {
+      if (currentStep < progressSteps.length) {
+        setCurrentStep(prev => prev + 1);
+        window.scrollTo(0, 0);
+      }
+    } else {
+      toast.error('Please fix the errors before proceeding');
+    }
+  };
+
+  const handlePrevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(prev => prev - 1);
+      window.scrollTo(0, 0);
+    }
+  };
+
+  const saveDraft = async () => {
     try {
-
-      if (formData.listingType === 'product') {
-        // Extract only the _id from selectedCategories for the backend
-        formData.productCategories = selectedCategories.map((category) => category._id);
-      } else if (formData.listingType === 'service') {
-        formData.serviceCategories = selectedCategories.map((category) => category._id);
-      } else if (formData.listingType === 'food') {
-        formData.foodCategories = selectedCategories.map((category) => category._id);
-      }
-      // ➤ 1. Save Business Draft
-      const draftRes = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/business/draft`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          businessName: formData.businessName,
-          email: formData.email,
-          subscriptionPlanId: selectedPlanId,
-          formData,  // send rest of the fields
-        }),
-      });
-
-      const draftData = await draftRes.json();
-      if (!draftRes.ok) {
-        toast.error(draftData.message || 'Draft creation failed');
-        setLoading(false);
-        return;
-      }
-
-      const draftId = draftData.draftId;
-
-      // ➤ 2. Create Stripe Checkout Session
-      const stripeRes = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/stripe/create-checkout-session`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ draftId }),
-      });
-
-      const stripeData = await stripeRes.json();
-      if (!stripeRes.ok) {
-        toast.error(stripeData.message || 'Failed to create payment session');
-        setLoading(false);
-        return;
-      }
-
-      // ➤ 3. Redirect to Stripe
-      window.location.href = stripeData.sessionUrl;
-
-    } catch (error) {
-      console.error(error);
-      toast.error('Something went wrong. Please try again.');
+      setLoading(true);
+      await saveStage1Draft(form);
+      toast.success('Draft saved successfully');
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to save draft');
     } finally {
       setLoading(false);
     }
   };
 
+  const handlePayAndSubmit = async () => {
+    if (!validateStep(8)) {
+      toast.error('Please fix all errors before proceeding to payment');
+      return;
+    }
 
-  const handleBusinessCreation = async () => {
-    if (selectedPlanId) {
+    try {
       setLoading(true);
-      try {
-        const categoryIds = selectedCategories.map((category) => category._id);
-
-        if (formData.listingType === 'product') {
-          formData.productCategories = categoryIds;
-        } else if (formData.listingType === 'service') {
-          formData.serviceCategories = categoryIds;
-        } else if (formData.listingType === 'food') {
-          formData.foodCategories = categoryIds;
-        }
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/business/retry-create`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({
-            subscriptionId: selectedPlanId,
-            businessName: formData.businessName,
-            formData,
-          }),
-        });
-
-        const data = await res.json();
-        if (res.ok) {
-          toast.success('Business created successfully!');
-          // Redirect or show success message
-          window.location.href = 'http://localhost:3000/partners';
-        } else {
-          toast.error(data.message || 'Error creating business');
-        }
-      } catch (error) {
-        console.error(error);
-        toast.error('Network error, please try again.');
-      } finally {
-        setLoading(false);
+      await saveStage1Draft(form);
+      const paymentResponse = await createStage1Payment();
+      
+      if (paymentResponse?.success && paymentResponse.data?.clientSecret) {
+        sessionStorage.setItem('paymentData', JSON.stringify({
+          clientSecret: paymentResponse.data.clientSecret,
+          amount: paymentResponse.data.amount,
+          currency: paymentResponse.data.currency
+        }));
+        location.assign('/payment/checkout');
+      } else {
+        toast.error('Failed to create payment');
       }
+    } catch (error: any) {
+      toast.error(error.message || 'Payment setup failed');
+    } finally {
+      setLoading(false);
     }
   };
 
+  /* ======================================================
+     PROGRESS BAR
+  ====================================================== */
 
-
-  const Loader = () => (
-    <div className="flex items-center justify-center w-full h-screen">
-      <div className="w-16 h-16 border-4 border-blue-500 rounded-full animate-spin border-t-transparent" />
+  const ProgressBar = () => (
+    <div className="mb-8">
+      <div className="flex justify-between mb-2">
+        {progressSteps.map((step) => (
+          <div
+            key={step.id}
+            className={`flex flex-col items-center ${step.id <= currentStep ? 'text-orange-600' : 'text-gray-400'}`}
+          >
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 mb-2 
+              ${step.id === currentStep ? 'border-orange-600 bg-orange-50' : 
+                step.id < currentStep ? 'border-orange-600 bg-orange-600 text-white' : 
+                'border-gray-300 bg-white'}`}
+            >
+              {step.id < currentStep ? '✓' : step.id}
+            </div>
+            <span className="text-xs font-medium">{step.title}</span>
+          </div>
+        ))}
+      </div>
+      <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+        <div 
+          className="h-full bg-orange-600 transition-all duration-300"
+          style={{ width: `${((currentStep - 1) / (progressSteps.length - 1)) * 100}%` }}
+        />
+      </div>
     </div>
   );
 
-  if (pageLoading) {
-    return <Loader />; // Show loader until everything is loaded
-  }
+  /* ======================================================
+     RENDER SECTION BASED ON CURRENT STEP
+  ====================================================== */
 
+  const renderStepContent = () => {
+    if (showAllSections) {
+      return null; // Simplified for this example
+    }
+
+    switch (currentStep) {
+      case 1:
+        return (
+          <FormSection title="Business Information" description="Tell us about your business">
+            <InputField label="Business Name" required error={formErrors.businessName}>
+              <input
+                type="text"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                value={form.businessName}
+                onChange={e => update('businessName', e.target.value)}
+                placeholder="Enter your legal business name"
+              />
+            </InputField>
+          </FormSection>
+        );
+
+      case 2:
+        return (
+          <FormSection title="Legal Status & Verification" description="Minority status and tax identification">
+            <InputField label="Is this a minority-owned business?" required>
+              <div className="flex gap-6">
+                <label className="inline-flex items-center">
+                  <input type="radio" className="form-radio text-orange-600 h-5 w-5" checked={form.isMinorityOwned} onChange={() => update('isMinorityOwned', true)} />
+                  <span className="ml-2 text-gray-700">Yes</span>
+                </label>
+                <label className="inline-flex items-center">
+                  <input type="radio" className="form-radio text-orange-600 h-5 w-5" checked={!form.isMinorityOwned} onChange={() => update('isMinorityOwned', false)} />
+                  <span className="ml-2 text-gray-700">No</span>
+                </label>
+              </div>
+            </InputField>
+
+            {form.isMinorityOwned && (
+              <InputField label="Select all applicable minority categories" required error={formErrors.minorityCategories}>
+                <div className="grid grid-cols-2 gap-3 mt-2">
+                  {['African-American', 'Asian', 'LatinX', 'Woman', 'Disabled Veteran', 'Other'].map(cat => (
+                    <label key={cat} className="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <input type="checkbox" className="form-checkbox text-orange-600 h-5 w-5" checked={form.minorityCategories.includes(cat)} onChange={(e) => {
+                        if (e.target.checked) {
+                          update('minorityCategories', [...form.minorityCategories, cat]);
+                        } else {
+                          update('minorityCategories', form.minorityCategories.filter(c => c !== cat));
+                        }
+                      }} />
+                      <span className="ml-3">{cat}</span>
+                    </label>
+                  ))}
+                </div>
+              </InputField>
+            )}
+
+            <InputField label="Do you have an Employer Identification Number (EIN)?" required>
+              <div className="flex gap-6 mb-4">
+                <label className="inline-flex items-center">
+                  <input type="radio" className="form-radio text-orange-600 h-5 w-5" checked={form.hasEIN} onChange={() => update('hasEIN', true)} />
+                  <span className="ml-2 text-gray-700">Yes, I have an EIN</span>
+                </label>
+                <label className="inline-flex items-center">
+                  <input type="radio" className="form-radio text-orange-600 h-5 w-5" checked={!form.hasEIN} onChange={() => update('hasEIN', false)} />
+                  <span className="ml-2 text-gray-700">No, I'll use SSN</span>
+                </label>
+              </div>
+              
+              {form.hasEIN ? (
+                <div>
+                  <input type="text" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" placeholder="Enter 9-digit EIN (e.g., 12-3456789)" value={form.einNumber} onChange={e => update('einNumber', e.target.value)} />
+                  <p className="mt-1 text-sm text-gray-500">Enter your 9-digit Employer Identification Number</p>
+                </div>
+              ) : (
+                <div>
+                  <input type="text" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" placeholder="Enter last 9 digits of SSN" value={form.ssnLast9} onChange={e => update('ssnLast9', e.target.value)} />
+                  <p className="mt-1 text-sm text-gray-500">We only need the last 9 digits for verification</p>
+                </div>
+              )}
+              {(formErrors.einNumber || formErrors.ssnLast9) && (
+                <p className="mt-1 text-sm text-red-600">{formErrors.einNumber || formErrors.ssnLast9}</p>
+              )}
+            </InputField>
+          </FormSection>
+        );
+
+      case 3:
+        return (
+          <FormSection title="Business Details" description="Ownership structure and operations">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <InputField label="Ownership Type" required error={formErrors.businessOwnershipType}>
+                <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" value={form.businessOwnershipType} onChange={e => update('businessOwnershipType', e.target.value as OwnershipType)}>
+                  <option value="">Select ownership type</option>
+                  <option value="Limited Liability Company">Limited Liability Company (LLC)</option>
+                  <option value="Sole Proprietor">Sole Proprietor</option>
+                  <option value="S-Corporation">S-Corporation</option>
+                  <option value="C-Corporation">C-Corporation</option>
+                  <option value="Nonprofit">Nonprofit</option>
+                </select>
+              </InputField>
+
+              <InputField label="Years in Business" required error={formErrors.yearsInBusiness}>
+                <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" value={form.yearsInBusiness} onChange={e => update('yearsInBusiness', e.target.value)}>
+                  <option value="">Select</option>
+                  <option value="6mo-1yr">6 months – 1 year</option>
+                  <option value="1yr-2yr">1 year – 2 years</option>
+                  <option value="2yr+">More than 2 years</option>
+                </select>
+              </InputField>
+
+              <InputField label="Business Type" required error={formErrors.businessType}>
+                <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" value={form.businessType} onChange={e => update('businessType', e.target.value as BusinessType)}>
+                  <option value="">Select business type</option>
+                  <option value="product">Product-based</option>
+                  <option value="service">Service-based</option>
+                  <option value="food">Food & Beverage</option>
+                </select>
+              </InputField>
+
+              <InputField label="Number of Employees">
+                <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" value={form.numberOfEmployees} onChange={e => update('numberOfEmployees', e.target.value)}>
+                  <option value="">Select</option>
+                  <option value="1">1 (Solo)</option>
+                  <option value="2-5">2-5</option>
+                  <option value="6-10">6-10</option>
+                  <option value="11-25">11-25</option>
+                  <option value="26-50">26-50</option>
+                  <option value="50+">50+</option>
+                </select>
+              </InputField>
+            </div>
+
+            <div className="mt-6 space-y-4">
+              <label className="flex items-center">
+                <input type="checkbox" className="form-checkbox text-orange-600 h-5 w-5" checked={form.isFranchise} onChange={e => update('isFranchise', e.target.checked)} />
+                <span className="ml-2 text-gray-700">This business is a franchise</span>
+              </label>
+              
+              {form.isFranchise && (
+                <InputField label="Franchise Name">
+                  <input type="text" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" value={form.franchiseName} onChange={e => update('franchiseName', e.target.value)} placeholder="Enter franchise name" />
+                </InputField>
+              )}
+
+              <label className="flex items-center">
+                <input type="checkbox" className="form-checkbox text-orange-600 h-5 w-5" checked={form.hasThirdPartyBooking} onChange={e => update('hasThirdPartyBooking', e.target.checked)} />
+                <span className="ml-2 text-gray-700">Uses third-party booking systems</span>
+              </label>
+
+              <label className="flex items-center">
+                <input type="checkbox" className="form-checkbox text-orange-600 h-5 w-5" checked={form.hasPhysicalLocation} onChange={e => update('hasPhysicalLocation', e.target.checked)} />
+                <span className="ml-2 text-gray-700">Has physical business location</span>
+              </label>
+            </div>
+          </FormSection>
+        );
+
+      case 4:
+        return (
+          <FormSection title="Online Presence" description="Website and social media profiles">
+            <div className="space-y-4">
+              <InputField label="Website URL (optional)">
+                <div className="flex">
+                  <span className="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-500">https://</span>
+                  <input type="text" className="flex-1 px-4 py-3 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" value={form.websiteUrl.replace('https://', '')} onChange={e => update('websiteUrl', `https://${e.target.value}`)} placeholder="yourbusiness.com" />
+                </div>
+              </InputField>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <InputField label="Instagram">
+                  <div className="flex">
+                    <span className="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-500">@</span>
+                    <input type="text" className="flex-1 px-4 py-3 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" value={form.instagramUrl} onChange={e => update('instagramUrl', e.target.value)} placeholder="username" />
+                  </div>
+                </InputField>
+
+                <InputField label="Facebook">
+                  <input type="text" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" value={form.facebookUrl} onChange={e => update('facebookUrl', e.target.value)} placeholder="https://facebook.com/yourpage" />
+                </InputField>
+
+                <InputField label="LinkedIn">
+                  <input type="text" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" value={form.linkedinUrl} onChange={e => update('linkedinUrl', e.target.value)} placeholder="https://linkedin.com/company/yourcompany" />
+                </InputField>
+
+                <InputField label="TikTok">
+                  <div className="flex">
+                    <span className="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-500">@</span>
+                    <input type="text" className="flex-1 px-4 py-3 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" value={form.tiktokUrl} onChange={e => update('tiktokUrl', e.target.value)} placeholder="username" />
+                  </div>
+                </InputField>
+              </div>
+            </div>
+          </FormSection>
+        );
+
+      case 5:
+        return (
+          <FormSection title="Contact Information" description="Primary business contacts">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <InputField label="Primary Contact Name" required>
+                <input type="text" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" value={form.primaryContactName} onChange={e => update('primaryContactName', e.target.value)} placeholder="Full name" />
+              </InputField>
+
+              <InputField label="Designation/Title" required>
+                <input type="text" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" value={form.primaryContactDesignation} onChange={e => update('primaryContactDesignation', e.target.value)} placeholder="e.g., Owner, Manager" />
+              </InputField>
+
+              <InputField label="Contact Email" required>
+                <input type="email" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" value={form.contactEmail} onChange={e => update('contactEmail', e.target.value)} placeholder="email@example.com" />
+              </InputField>
+
+              <InputField label="Business Email" required>
+                <input type="email" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" value={form.businessEmail} onChange={e => update('businessEmail', e.target.value)} placeholder="info@yourbusiness.com" />
+              </InputField>
+
+              <InputField label="Contact Phone" required>
+                <input type="tel" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" value={form.contactPhone} onChange={e => update('contactPhone', e.target.value)} placeholder="(123) 456-7890" />
+              </InputField>
+            </div>
+          </FormSection>
+        );
+
+      case 6:
+        return (
+          <FormSection title="Business Address" description="Physical location of your business">
+            <div className="space-y-4">
+              <InputField label="Street Address" required error={formErrors.address_street}>
+                <input type="text" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" value={form.address.street} onChange={e => updateAddress('street', e.target.value)} placeholder="123 Main Street" />
+              </InputField>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <InputField label="City" required error={formErrors.address_city}>
+                  <input type="text" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" value={form.address.city} onChange={e => updateAddress('city', e.target.value)} placeholder="City" />
+                </InputField>
+
+                <InputField label="State" required error={formErrors.address_state}>
+                  <input type="text" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" value={form.address.state} onChange={e => updateAddress('state', e.target.value)} placeholder="State" />
+                </InputField>
+
+                <InputField label="ZIP Code" required error={formErrors.address_zipCode}>
+                  <input type="text" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" value={form.address.zipCode} onChange={e => updateAddress('zipCode', e.target.value)} placeholder="12345" />
+                </InputField>
+              </div>
+
+              <InputField label="Country">
+                <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" value={form.address.country} onChange={e => updateAddress('country', e.target.value)}>
+                  <option value="">Select Country</option>
+                  <option value="USA">United States</option>
+                  <option value="Canada">Canada</option>
+                  <option value="UK">United Kingdom</option>
+                </select>
+              </InputField>
+            </div>
+          </FormSection>
+        );
+
+      case 7:
+        return (
+          <FormSection title="Required Documents" description="Upload necessary verification documents">
+            <div className="space-y-6">
+              {/* Business License Upload */}
+              <InputField label="Business License" required error={formErrors.businessLicenseDocuments}>
+                <div className="space-y-4">
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-orange-500 transition-colors">
+                    <div className="mb-4">
+                      <svg className="w-12 h-12 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    </div>
+                    <p className="text-gray-600 mb-2">
+                      {selectedFiles['business-license'] ? `Selected: ${selectedFiles['business-license'].name}` : 'Upload your business license'}
+                    </p>
+                    <input
+                      type="file"
+                      id="business-license-upload"
+                      className="hidden"
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      onChange={(e) => handleFileSelect('business-license', e)}
+                      disabled={uploading['business-license']}
+                    />
+                    <label htmlFor="business-license-upload" className="cursor-pointer">
+                      <div className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors inline-block">
+                        {uploading['business-license'] ? 'Uploading...' : 'Browse Files'}
+                      </div>
+                    </label>
+                    <p className="text-sm text-gray-500 mt-2">PDF, JPG, PNG up to 5MB</p>
+                  </div>
+                  
+                  {/* Uploaded Documents List */}
+                  {form.businessLicenseDocuments.length > 0 && (
+                    <div className="mt-4">
+                      <h4 className="text-sm font-medium text-gray-700 mb-2">Uploaded Documents:</h4>
+                      <div className="space-y-2">
+                        {form.businessLicenseDocuments.map((doc, index) => (
+                          <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div className="flex items-center">
+                              <svg className="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                              </svg>
+                              <span className="text-sm text-gray-700 truncate">{doc.url.split('/').pop()}</span>
+                            </div>
+                            <div className="flex space-x-2">
+                              <a href={doc.url} target="_blank" rel="noopener noreferrer" className="text-orange-600 hover:text-orange-700">View</a>
+                              <button onClick={() => removeDocument('business-license', index)} className="text-red-600 hover:text-red-700">Remove</button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </InputField>
+
+              {/* Minority Verification Proof Upload */}
+              <InputField label="Minority Verification Proof">
+                <div className="space-y-4">
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-orange-500 transition-colors">
+                    <p className="text-gray-600 mb-2">
+                      {selectedFiles['minority-proof'] ? `Selected: ${selectedFiles['minority-proof'].name}` : 'Upload documents proving minority ownership'}
+                    </p>
+                    <input
+                      type="file"
+                      id="minority-proof-upload"
+                      className="hidden"
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      onChange={(e) => handleFileSelect('minority-proof', e)}
+                      disabled={uploading['minority-proof']}
+                    />
+                    <label htmlFor="minority-proof-upload" className="cursor-pointer">
+                      <div className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors inline-block">
+                        {uploading['minority-proof'] ? 'Uploading...' : 'Add Document'}
+                      </div>
+                    </label>
+                  </div>
+                  
+                  {form.minorityProofDocuments.length > 0 && (
+                    <div className="space-y-2">
+                      {form.minorityProofDocuments.map((doc, index) => (
+                        <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                          <div className="flex items-center">
+                            <svg className="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <span className="text-sm text-gray-700 truncate">{doc.url.split('/').pop()}</span>
+                          </div>
+                          <div className="flex space-x-2">
+                            <a href={doc.url} target="_blank" rel="noopener noreferrer" className="text-orange-600 hover:text-orange-700">View</a>
+                            <button onClick={() => removeDocument('minority-proof', index)} className="text-red-600 hover:text-red-700">Remove</button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </InputField>
+
+              {/* Tax Documents Upload */}
+              <InputField label="Tax Documents">
+                <div className="space-y-4">
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-orange-500 transition-colors">
+                    <p className="text-gray-600 mb-2">
+                      {selectedFiles['tax-doc'] ? `Selected: ${selectedFiles['tax-doc'].name}` : 'Upload tax identification documents'}
+                    </p>
+                    <input
+                      type="file"
+                      id="tax-doc-upload"
+                      className="hidden"
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      onChange={(e) => handleFileSelect('tax-doc', e)}
+                      disabled={uploading['tax-doc']}
+                    />
+                    <label htmlFor="tax-doc-upload" className="cursor-pointer">
+                      <div className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors inline-block">
+                        {uploading['tax-doc'] ? 'Uploading...' : 'Add Document'}
+                      </div>
+                    </label>
+                  </div>
+                  
+                  {form.taxDocuments.length > 0 && (
+                    <div className="space-y-2">
+                      {form.taxDocuments.map((doc, index) => (
+                        <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                          <div className="flex items-center">
+                            <svg className="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <span className="text-sm text-gray-700 truncate">{doc.url.split('/').pop()}</span>
+                          </div>
+                          <div className="flex space-x-2">
+                            <a href={doc.url} target="_blank" rel="noopener noreferrer" className="text-orange-600 hover:text-orange-700">View</a>
+                            <button onClick={() => removeDocument('tax-doc', index)} className="text-red-600 hover:text-red-700">Remove</button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </InputField>
+            </div>
+          </FormSection>
+        );
+
+      case 8:
+        return (
+          <FormSection title="Review & Submit" description="Final verification and terms agreement">
+            <div className="space-y-6">
+              <div className="bg-gray-50 rounded-lg p-6">
+                <h4 className="font-medium text-gray-900 mb-4">Application Summary</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                  <div><p className="text-gray-600">Business Name</p><p className="font-medium">{form.businessName || "Not provided"}</p></div>
+                  <div><p className="text-gray-600">Business Type</p><p className="font-medium">{form.businessType || "Not provided"}</p></div>
+                  <div><p className="text-gray-600">Contact Email</p><p className="font-medium">{form.contactEmail || "Not provided"}</p></div>
+                  <div><p className="text-gray-600">Address</p><p className="font-medium">{form.address.street ? `${form.address.street}, ${form.address.city}` : "Not provided"}</p></div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <label className={`flex items-start p-4 border rounded-lg ${formErrors.acceptedTerms ? 'border-red-300 bg-red-50' : 'border-gray-200'}`}>
+                  <input type="checkbox" className="form-checkbox text-orange-600 h-5 w-5 mt-0.5" checked={form.acceptedTerms} onChange={e => update('acceptedTerms', e.target.checked)} />
+                  <span className="ml-3 text-gray-700">
+                    I accept the <a href="/terms" className="text-orange-600 hover:underline">Terms & Conditions</a> and agree to the processing of my personal data as described in the <a href="/privacy" className="text-orange-600 hover:underline">Privacy Policy</a>.
+                    {formErrors.acceptedTerms && <p className="text-red-600 text-sm mt-1">{formErrors.acceptedTerms}</p>}
+                  </span>
+                </label>
+
+                <label className={`flex items-start p-4 border rounded-lg ${formErrors.declarationAccepted ? 'border-red-300 bg-red-50' : 'border-gray-200'}`}>
+                  <input type="checkbox" className="form-checkbox text-orange-600 h-5 w-5 mt-0.5" checked={form.declarationAccepted} onChange={e => update('declarationAccepted', e.target.checked)} />
+                  <span className="ml-3 text-gray-700">
+                    I declare that all information provided is true, accurate, and complete to the best of my knowledge.
+                    {formErrors.declarationAccepted && <p className="text-red-600 text-sm mt-1">{formErrors.declarationAccepted}</p>}
+                  </span>
+                </label>
+              </div>
+
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <div className="flex">
+                  <svg className="h-5 w-5 text-yellow-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  <div className="ml-3">
+                    <p className="text-sm text-yellow-700">
+                      <strong>Verification Fee:</strong> A one-time verification fee of $49 is required to process your application.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </FormSection>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  /* ======================================================
+     MAIN RENDER
+  ====================================================== */
 
   return (
-    <>
-      <div className="min-h-screen px-4 py-10 bg-white pb-28 sm:px-6 md:px-10 lg:px-20">
-        <h1 className="mb-4 text-2xl font-semibold uppercase sm:text-3xl md:text-4xl heading">
-          BUSINESS REGISTRATION
-        </h1>
-        <hr className="h-[2px] w-[100px] bg-green-900" />
-        <hr className="h-[2px] w-[100px] bg-green-900 mt-[1px] mb-10" />
-        <div className="flex flex-col gap-10 lg:flex-row lg:items-start">
-          {/* Left Image Section */}
-          <AnimatePresence mode="wait">
-            {step !== "plan" && (
-              <motion.div
-                key="left-visual"
-                variants={imageVariants}
-                initial="initial"
-                animate="animate"
-                exit="exit"
-                className="relative flex md:justify-start w-full lg:w-5/12 aspect-[4/3] pt-2 md:pt-6"
-              >
-                <div className="absolute top-[-10px] left-[-20px] w-[55%] sm:w-[60%] lg:w-[55%] h-[55%] sm:h-[60%] lg:h-[65%] bg-custom-yellow z-0 rounded-2xl" />
-                <Image
-                  src="/partners/registration-image.png"
-                  alt="Business Registration"
-                  width={500}
-                  height={480}
-                  className="relative z-10 object-contain w-full h-auto rounded-2xl shadow max-w-[420px] md:max-w-[520px]"
-                />
-              </motion.div>
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Business Onboarding: Stage 1</h1>
+          <p className="text-gray-600">Complete all required information to verify your business identity</p>
+        </div>
+
+        {/* Progress Bar */}
+        <ProgressBar />
+
+        {/* Current Step Title */}
+        <div className="mb-6">
+          <h2 className="text-xl font-semibold text-gray-900">{progressSteps[currentStep - 1]?.title}</h2>
+          <p className="text-gray-600">{progressSteps[currentStep - 1]?.description}</p>
+        </div>
+
+        {/* Form Content */}
+        <div className="mb-8">{renderStepContent()}</div>
+
+        {/* Navigation Buttons */}
+        <div className="flex justify-between items-center pt-6 border-t border-gray-200">
+          <div>
+            {currentStep > 1 && (
+              <button onClick={handlePrevStep} className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors" disabled={loading}>
+                Previous
+              </button>
             )}
-          </AnimatePresence>
+          </div>
 
+          <div className="flex items-center gap-4">
+            <button onClick={saveDraft} className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors" disabled={loading}>
+              Save Draft
+            </button>
 
-          {/* Right Form Section */}
-
-          <div className="w-full mx-auto lg:w-7/12">
-
-            {step !== "plan" && (
-              <div className="relative mt-6 overflow-visible min-h-[500px]">
-                <AnimatePresence mode="wait">
-                  {step === "basic" && (
-                    <motion.div
-                      key="step-basic"
-                      variants={stepVariants}
-                      initial="initial"
-                      animate="animate"
-                      exit="exit"
-                      className={`${cardBase} [will-change:transform] absolute inset-0 overflow-y-auto`}
-                    >
-                      <div className="mb-6">
-                        <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">Basic Information</h2>
-                        <p className="mt-1 text-sm text-gray-500">Tell customers who you are. You can edit this later.</p>
-                      </div>
-
-                      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                        {["businessName", "email", "phoneNumber"].map((field) => (
-                          <div key={field} className="flex flex-col w-full">
-                            <label htmlFor={field} className={labelBase}>
-                              {field.replace(/([A-Z])/g, " $1")}
-                            </label>
-                            <input
-                              name={field}
-                              id={field}
-                              value={(formData as any)[field]}
-                              onChange={handleChange}
-                              className={inputBase}
-                              placeholder={
-                                field === "businessName" ? "e.g., Mosaic Biz Hub"
-                                  : field === "email" ? "you@business.com"
-                                    : "+1 9XXXXXXXXX"
-                              }
-                              type={field === "email" ? "email" : "text"}
-                            />
-                          </div>
-                        ))}
-
-                        <div className="flex flex-col w-full">
-                          <label htmlFor="listingType" className={labelBase}>Listing Type</label>
-                          <select
-                            name="listingType"
-                            value={formData.listingType}
-                            onChange={handleListingTypeChange}
-                            className={inputBase}
-                          >
-                            <option value="">Select</option>
-                            <option value="product">Products</option>
-                            <option value="service">Services</option>
-                            <option value="food">Foods</option>
-                          </select>
-                        </div>
-
-                        <div className="flex flex-col w-full md:col-span-2">
-                          <label htmlFor="description" className={labelBase}>Business Description</label>
-                          <textarea
-                            name="description"
-                            value={formData.description}
-                            onChange={handleChange}
-                            className={`${inputBase} min-h-[110px]`}
-                            placeholder="What do you do? Highlight your value in 1–3 sentences."
-                            rows={3}
-                          />
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-
-                <AnimatePresence mode="wait">
-                  {step === 'address' && (
-                    <motion.div
-                      layout
-                      key="step-address"
-                      variants={stepVariants}
-                      initial="initial"
-                      animate="animate"
-                      exit="exit"
-                      className={`${cardBase} [will-change:transform] overflow-visible`}
-                    >
-                      <div className="mb-6">
-                        <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">Address</h2>
-                        <p className="mt-1 text-sm text-gray-500">Add your business location details.</p>
-                      </div>
-
-                      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                        {['address', 'city', 'state', 'country', 'zipCode'].map((field) => (
-                          <div
-                            key={field}
-                            className={`flex flex-col w-full ${field === 'address' ? 'relative md:col-span-2' : ''}`}
-                          >
-                            <label htmlFor={field} className={labelBase}>
-                              {field.replace(/([A-Z])/g, ' $1')}
-                            </label>
-
-                            <input
-                              name={field}
-                              id={field}
-                              value={(formData as any)[field]}
-                              onChange={handleChange}
-                              className={inputBase}
-                              autoComplete={field === 'address' ? 'off' : undefined}
-                              onFocus={() => field === 'address' && streetSugs.length && setShowAddrSugs(true)}
-                              onBlur={() => field === 'address' && setTimeout(() => setShowAddrSugs(false), 150)}
-                              placeholder={
-                                field === 'address'
-                                  ? 'Street, area, landmark'
-                                  : field === 'city'
-                                    ? 'City'
-                                    : field === 'state'
-                                      ? 'State'
-                                      : field === 'country'
-                                        ? 'Country'
-                                        : 'ZIP / Postal code'
-                              }
-                            />
-
-                            {field === 'address' && showAddrSugs && streetSugs.length > 0 && (
-                              <motion.div
-                                initial={{ opacity: 0, y: 6 }}
-                                animate={{ opacity: 1, y: 0, transition: { duration: 0.2 } }}
-                                exit={{ opacity: 0, y: 6, transition: { duration: 0.15 } }}
-                                className="absolute z-50 w-full mt-1 overflow-hidden bg-white border border-gray-200 shadow-lg rounded-xl top-full"
-                              >
-                                {streetSugs.map((sug, idx) => (
-                                  <motion.button
-                                    key={sug.placeId}
-                                    type="button"
-                                    onMouseDown={(e) => e.preventDefault()}
-                                    onClick={() => handlePickAddressSuggestion(sug)}
-                                    title={sug.description}
-                                    className="w-full px-3 py-2.5 text-left hover:bg-gray-50"
-                                    initial={{ opacity: 0, y: 4 }}
-                                    animate={{ opacity: 1, y: 0, transition: { duration: 0.15, delay: idx * 0.02 } }}
-                                  >
-                                    <div className="text-sm font-medium text-gray-800">
-                                      {sug.structured_formatting.main_text || sug.description}
-                                    </div>
-                                    {sug.structured_formatting.secondary_text && (
-                                      <div className="text-xs text-gray-500">
-                                        {sug.structured_formatting.secondary_text}
-                                      </div>
-                                    )}
-                                  </motion.button>
-                                ))}
-                              </motion.div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-
-                <AnimatePresence mode="wait">
-                  {step === 'compliance' && (
-                    <motion.div
-                      key="step-compliance"
-                      variants={stepVariants}
-                      initial="initial"
-                      animate="animate"
-                      exit="exit"
-                      className={`${cardBase} [will-change:transform] absolute inset-0 overflow-y-auto`}
-                    >
-                      <div className="mb-6">
-                        <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">Compliance</h2>
-                        <p className="mt-1 text-sm text-gray-500">Tax & licence details. Required for verification.</p>
-                      </div>
-
-                      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                        {['taxId', 'businessLicenseNumber'].map((field) => (
-                          <div key={field} className="flex flex-col w-full">
-                            <label htmlFor={field} className={labelBase}>
-                              {field === 'taxId' ? 'Business EIN / Tax ID' : 'Business Licence'}
-                            </label>
-                            <input
-                              name={field}
-                              id={field}
-                              value={(formData as any)[field]}
-                              onChange={handleChange}
-                              className={inputBase}
-                              placeholder={field === 'taxId' ? 'e.g., 12-3456789' : 'e.g., BLN-2025-001'}
-                            />
-                          </div>
-                        ))}
-
-                        {/* <div className="flex items-center w-full gap-3 md:col-span-2">
-                          <input
-                            type="checkbox"
-                            id="isFranchise"
-                            name="isFranchise"
-                            checked={!!formData.isFranchise}
-                            onChange={handleChange}
-                            className="w-4 h-4"
-                          />
-                          <label htmlFor="isFranchise" className={labelBase}>
-                            Franchise (If any)
-                          </label>
-                        </div>
-
-                        {formData.isFranchise && (
-                          <div className="flex flex-col w-full md:col-span-2">
-                            <label htmlFor="franchiseLocation" className={labelBase}>
-                              Franchise Location
-                            </label>
-                            <input
-                              id="franchiseLocation"
-                              name="franchiseLocation"
-                              value={formData.franchiseLocation || ''}
-                              onChange={handleChange}
-                              className={inputBase}
-                              placeholder="e.g., Banjara Hills – Store #12"
-                            />
-                          </div>
-                        )} */}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-                <AnimatePresence mode="wait">
-                  {step === 'categories' && (
-                    <motion.div
-                      key="step-categories"
-                      variants={stepVariants}
-                      initial="initial"
-                      animate="animate"
-                      exit="exit"
-                      className={`${cardBase} [will-change:transform] absolute inset-0 overflow-y-auto`}
-                    >
-                      <div className="mb-6">
-                        <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">Categories</h2>
-                        <p className="mt-1 text-sm text-gray-500">Choose up to 5 categories that best fit your business.</p>
-                      </div>
-
-                      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                        <div className="flex flex-col w-full md:col-span-2">
-                          <label htmlFor="categories" className={labelBase}>
-                            Business Categories
-                          </label>
-
-                          <select
-                            id="selectCategory"
-                            onChange={handleCategoryChange}
-                            value=""
-                            disabled={(selectedCategories.length >= 5) || !formData.listingType || pageLoading}
-                            className={inputBase}
-                          >
-                            <option value="" disabled>Select Category - Subcategory</option>
-                            {getCategoriesForListingType()
-                              .filter(category => !selectedCategories.some(selected => selected._id === category._id))
-                              .map((category, index) => (
-                                <option key={index} value={category._id}>
-                                  {category.name}
-                                </option>
-                              ))}
-                          </select>
-
-                          <div className="flex flex-row flex-wrap w-full gap-2 mt-4">
-                            {selectedCategories.map((category, index) => (
-                              <span
-                                key={index}
-                                className="inline-flex items-center gap-2 rounded-full bg-gray-100 text-gray-800 px-3 py-1.5 text-sm"
-                              >
-                                {category.name}
-                                <button
-                                  onClick={() => handleRemoveCategory(category)}
-                                  className="text-gray-500 hover:text-red-600"
-                                  aria-label={`Remove ${category.name}`}
-                                >
-                                  &times;
-                                </button>
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-              </div>
+            {currentStep < progressSteps.length ? (
+              <button onClick={handleNextStep} className="px-6 py-2.5 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors disabled:opacity-50" disabled={loading}>
+                Next Step
+              </button>
+            ) : (
+              <button onClick={handlePayAndSubmit} className="px-6 py-2.5 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors disabled:opacity-50" disabled={loading || !form.acceptedTerms || !form.declarationAccepted}>
+                {loading ? 'Processing...' : 'Pay & Submit Application'}
+              </button>
             )}
           </div>
         </div>
 
-        {/* ✅ Full-width Plan Section */}
-        <AnimatePresence mode="wait">
-          {step === 'plan' && (
-            <motion.div
-              key="step-plan"
-              variants={stepVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              className="w-full px-4 mt-5 mb-12 sm:px-6 md:px-10 lg:px-20"
-            >
-              <div className="flex items-start mb-6">
-                {/* New Subscription Tab */}
-                <motion.h2
-                  key="new-tab"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.25 }}
-                  onClick={() => setSelectedTab("new")}
-                  className={`mb-6 font-semibold text-gray-800 uppercase cursor-pointer ${selectedTab === "new"
-                    ? "text-blue-600 font-bold text-2xl"
-                    : "text-gray-400 text-[10px]"
-                    }`}
-                >
-                  Choose a Plan
-                </motion.h2>
-                {userSubscriptions.length > 0 && (
-                  <>
-                    <span className="mx-3 text-2xl text-gray-600">/</span>
+        {/* View All Sections Button */}
+        {!showAllSections && (
+          <div className="mt-8 text-center">
+            <button onClick={() => setShowAllSections(true)} className="text-orange-600 hover:text-orange-700 text-sm font-medium">
+              View all sections at once
+            </button>
+          </div>
+        )}
 
-
-                    <motion.h2
-                      key="existing-tab"
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -20 }}
-                      transition={{ duration: 0.25 }}
-                      onClick={() => setSelectedTab("existing")}
-                      className={`mb-6 font-semibold text-gray-800 uppercase cursor-pointer ${selectedTab === "existing"
-                        ? "text-blue-600 font-bold text-2xl"
-                        : "text-gray-400 text-[10px]"
-                        }`}
-                    >
-                      Existing Plan
-                    </motion.h2>
-                  </>
-                )}
-              </div>
-
-
-              <motion.div
-                className="flex flex-wrap justify-center w-full gap-6"
-                variants={planListVariants}
-                initial="initial"
-                animate="animate"
-              >
-
-                {selectedTab === "existing" ? (
-                  // Display existing subscriptions
-                  userSubscriptions.map((sub: Subscription) => {
-                    const isSelected = selectedPlanId === sub._id;
-
-                    return (
-                      <motion.div
-                        key={sub._id}
-                        variants={planCardVariants}
-                        whileHover={{ y: -2, boxShadow: '0 8px 24px rgba(0,0,0,0.08)' }}
-                        whileTap={{ scale: 0.98 }}
-                        className={`cursor-pointer flex flex-col justify-between rounded-lg border shadow-sm transition-all p-10 hover:shadow-md xl:w-[30%] ${isSelected
-                          ? "bg-[#333333] text-white border-black"
-                          : "bg-white text-gray-800 border-gray-200"}`}
-                        onClick={() => setSelectedPlanId(sub._id)}
-                      >
-                        <div>
-                          <h3 className={`text-2xl font-bold text-center uppercase mb-1 ${isSelected ? "text-orange-400" : "text-gray-800"}`}>
-                            {sub.subscriptionPlanId?.name} Plan
-                          </h3>
-                          <p className={`text-sm text-center mb-4 ${isSelected ? "text-gray-300" : "text-gray-600"}`}>
-                            Your existing plan
-                          </p>
-                          <p className={`text-3xl text-center font-extrabold mb-4 ${isSelected ? "text-white" : "text-black"}`}>
-                            ${sub.subscriptionPlanId?.price}{" "}
-                            <span className="text-base font-medium text-gray-400">
-                              / {sub.subscriptionPlanId?.durationInDays} Days
-                            </span>
-                          </p>
-
-                          {/* Limits Summary */}
-                          <ul className="mb-4 space-y-2 text-sm">
-                            <li className="flex items-start gap-2">
-                              <span className="text-green-500">✔</span>
-                              Products: {sub.subscriptionPlanId?.limits.productListings}
-                            </li>
-                            <li className="flex items-start gap-2">
-                              <span className="text-green-500">✔</span>
-                              Services: {sub.subscriptionPlanId?.limits.serviceListings}
-                            </li>
-                            <li className="flex items-start gap-2">
-                              <span className="text-green-500">✔</span>
-                              Foods: {sub.subscriptionPlanId?.limits.foodListings}
-                            </li>
-                            <li className="flex items-start gap-2">
-                              <span className="text-green-500">✔</span>
-                              Media Limit: {sub.subscriptionPlanId?.limits.imageLimit} images, {sub.subscriptionPlanId?.limits.videoLimit} videos
-                            </li>
-                          </ul>
-
-                          {/* Features */}
-                          <div className="text-xs">
-                            <strong className={`${isSelected ? "text-orange-300" : "text-orange-600"}`}>
-                              Features:
-                            </strong>
-                            <ul className="mt-1 ml-5 space-y-1 list-disc">
-                              {Object.entries(sub.subscriptionPlanId?.features || {}).map(
-                                ([key, val]) =>
-                                  val && (
-                                    <li key={key}>
-                                      {key.replace(/([A-Z])/g, " $1")} {typeof val === "string" ? `(${val})` : ""}
-                                    </li>
-                                  )
-                              )}
-                            </ul>
-                          </div>
-                        </div>
-                      </motion.div>
-                    );
-                  })
-                ) : (
-                  // Display new subscription plans
-                  plans.map((plan) => {
-                    const isSelected = selectedPlanId === plan._id;
-
-                    return (
-                      <motion.div
-                        key={plan._id}
-                        variants={planCardVariants}
-                        whileHover={{ y: -2, boxShadow: '0 8px 24px rgba(0,0,0,0.08)' }}
-                        whileTap={{ scale: 0.98 }}
-                        className={`cursor-pointer flex flex-col justify-between rounded-lg border shadow-sm transition-all p-10 hover:shadow-md xl:w-[30%] ${isSelected
-                          ? "bg-[#333333] text-white border-black"
-                          : "bg-white text-gray-800 border-gray-200"}`}
-                        onClick={() => setSelectedPlanId(plan._id)}
-                      >
-                        <div>
-                          <h3 className={`text-2xl font-bold text-center uppercase mb-1 ${isSelected ? "text-orange-400" : "text-gray-800"}`}>
-                            {plan.name} Plan
-                          </h3>
-                          <p className={`text-sm text-center mb-4 ${isSelected ? "text-gray-300" : "text-gray-600"}`}>
-                            Access powerful features with this plan.
-                          </p>
-                          <p className={`text-3xl text-center font-extrabold mb-4 ${isSelected ? "text-white" : "text-black"}`}>
-                            ${plan.price}{" "}
-                            <span className="text-base font-medium text-gray-400">
-                              / {plan.durationInDays} Days
-                            </span>
-                          </p>
-
-                          {/* Limits Summary */}
-                          <ul className="mb-4 space-y-2 text-sm">
-                            <li className="flex items-start gap-2">
-                              <span className="text-green-500">✔</span>
-                              Products: {plan.limits.productListings}
-                            </li>
-                            <li className="flex items-start gap-2">
-                              <span className="text-green-500">✔</span>
-                              Services: {plan.limits.serviceListings}
-                            </li>
-                            <li className="flex items-start gap-2">
-                              <span className="text-green-500">✔</span>
-                              Foods: {plan.limits.foodListings}
-                            </li>
-                            <li className="flex items-start gap-2">
-                              <span className="text-green-500">✔</span>
-                              Media Limit: {plan.limits.imageLimit} images, {plan.limits.videoLimit} videos
-                            </li>
-                          </ul>
-
-                          {/* Features */}
-                          <div className="text-xs">
-                            <strong className={`${isSelected ? "text-orange-300" : "text-orange-600"}`}>
-                              Features:
-                            </strong>
-                            <ul className="mt-1 ml-5 space-y-1 list-disc">
-                              {Object.entries(plan.features).map(
-                                ([key, val]) =>
-                                  val && (
-                                    <li key={key}>
-                                      {key.replace(/([A-Z])/g, " $1")} {typeof val === "string" ? `(${val})` : ""}
-                                    </li>
-                                  )
-                              )}
-                            </ul>
-                          </div>
-                        </div>
-                      </motion.div>
-                    );
-                  })
-                )}
-              </motion.div>
-
-
-              {/* Bottom Right Submit Button */}
-              {/* <div className="flex justify-end mt-10">
-              {selectedTab === "existing" ? (
-                <button
-                  onClick={handleBusinessCreation}
-                  disabled={loading}
-                  className="px-6 py-2 font-medium text-white bg-orange-600 rounded hover:bg-orange-700"
-                >
-                  {loading ? 'Retrying...' : 'Retry Business Creation'}
-                </button>
-              ) : (
-                <button
-                  onClick={handleSubmit}
-                  disabled={loading}
-                  className="px-6 py-2 font-medium text-white bg-orange-600 rounded hover:bg-orange-700"
-                >
-                  {loading ? 'Submitting...' : 'Submit & Pay'}
-                </button>
-              )}
-            </div> */}
-
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* PROGRESS */}
-        <div className="flex items-center gap-2 my-4">
-          {STEPS.map((s, i) => (
-            <div key={s} className={`h-2 flex-1 rounded ${i <= stepIndex ? 'bg-orange-600' : 'bg-gray-200'}`} />
-          ))}
-        </div>
-
-        {/* NAV BUTTONS */}
-        <div className="flex justify-between mt-10">
-          <button
-            type="button"
-            onClick={goBack}
-            disabled={STEPS.indexOf(step) === 0}
-            className="px-4 py-2 text-gray-700 bg-gray-100 rounded disabled:opacity-50"
-          >
-            Back
-          </button>
-
-          <button
-            type="button"
-            onClick={handleNext}
-            disabled={loading}
-            className="px-6 py-2 font-medium text-white bg-orange-600 rounded hover:bg-orange-700 disabled:opacity-50"
-          >
-            {step === 'plan'
-              ? (loading
-                ? (selectedTab === 'existing' ? 'Creating…' : 'Submitting…')
-                : (selectedTab === 'existing' ? 'Create Business' : 'Submit & Pay'))
-              : 'Next'}
-          </button>
-        </div>
+        {/* Step Indicator */}
+        <div className="mt-8 text-center text-sm text-gray-500">Step {currentStep} of {progressSteps.length}</div>
       </div>
-
-    </>
+    </div>
   );
 }
