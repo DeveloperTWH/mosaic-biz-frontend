@@ -15,9 +15,14 @@ const HeroSection = ({ heading, imageUrl }: HeroSectionProps) => {
         priority
         className="object-cover w-full h-full"
       />
-      <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+      {/* <div className="absolute inset-0 flex items-center justify-center bg-black/40">
         <h1 className="text-3xl font-bold leading-loose text-white md:text-5xl font-heading">
           {heading}
+        </h1>
+      </div> */}
+          <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+        <h1 className="text-3xl font-bold leading-loose text-white md:text-5xl font-heading">
+          Home // services
         </h1>
       </div>
     </section>

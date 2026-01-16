@@ -48,7 +48,7 @@ const FeaturedProducts: React.FC<Props> = ({ products, loading }) => {
 
     return (
         <section className="px-6 py-16 mx-auto max-w-7xl">
-            <h2 className="text-3xl font-bold text-center">SHOP PRODUCTS</h2>
+            <h2 className="text-3xl font-bold text-center">BEST  SELLERS</h2>
             <p className="mx-auto mt-2 text-center text-gray-600">
                 Explore a diverse selection of products from trusted minority-owned businesses. Find everything you need, from handmade goods to specialty foods, all in one convenient place.
             </p>

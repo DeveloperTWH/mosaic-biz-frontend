@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Star, StarHalf, RotateCcw } from "lucide-react";
+import { Star, StarHalf, RotateCcw, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Keyboard, A11y, Autoplay } from "swiper/modules";
@@ -70,7 +70,6 @@ function gatherImages(p: RankedItem): string[] {
     ...(p.firstEligible?.images || []),
     ...(p.coverImage ? [p.coverImage] : []),
   ];
-  // de-dupe while preserving order
   const seen = new Set<string>();
   const out: string[] = [];
   for (const src of arr) {
@@ -81,17 +80,21 @@ function gatherImages(p: RankedItem): string[] {
   }
   return out.length ? out : ["/ShopProduct/Aria-SK6-Helmet 1.png"];
 }
+
 function pickTitle(p: RankedItem): string {
   return p.title ?? "Untitled Product";
 }
+
 function pickRating(p: RankedItem): number {
   const raw = p.variantRatingAvg ?? 0;
   const n = typeof raw === "number" ? raw : Number(raw) || 0;
   return Math.max(0, Math.min(5, n));
 }
+
 function pickRatingCount(p: RankedItem): number {
   return Number(p.variantRatingCount ?? 0) || 0;
 }
+
 function pickPrice(p: RankedItem) {
   const fe = p.firstEligible;
   if (!fe) {
@@ -111,10 +114,7 @@ function pickPrice(p: RankedItem) {
   const effective = onSale ? (salePrice as number) : price;
   return { price, salePrice, effective, onSale, size: fe.size, label: fe.label, color: fe.color };
 }
-function pctOff(price: number, salePrice: number | null) {
-  if (!salePrice || price <= 0) return 0;
-  return Math.max(0, Math.round(((price - salePrice) / price) * 100));
-}
+
 function isAbortError(e: any) {
   return e?.name === "AbortError" || e?.code === 20 || /aborted/i.test(e?.message || "");
 }
@@ -152,7 +152,7 @@ function useRankedProducts() {
       if (!mountedRef.current) return;
       setItems(data.items.slice(0, PAGE_SIZE));
     } catch (e: any) {
-      if (isAbortError(e)) return; // ignore navigation/unmount aborts
+      if (isAbortError(e)) return;
       console.error("ShopProducts fetch error:", e);
       if (!mountedRef.current) return;
       setError(e?.message || "Failed to load products.");
@@ -174,298 +174,333 @@ function useRankedProducts() {
   return { items, error, loading, reload: load };
 }
 
-/* ---------- component ---------- */
-export default function ShopProducts() {
-  const { items, error, loading, reload } = useRankedProducts();
-
+/* ---------- Filter Component ---------- */
+function FilterSection() {
   return (
-    <section className="pt-16 pb-12 px-4 sm:px-6 lg:px-12 max-w-[1400px] mx-auto w-full">
-      <div className="max-w-3xl mx-auto text-center">
-        <h2 className="mb-3 text-2xl uppercase sm:text-3xl md:text-4xl heading">
-          Shop Products
-        </h2>
-        <div className="flex flex-col items-center justify-center mb-4">
-          <hr className="w-20 h-1 bg-green-900" />
-          <hr className="w-20 h-1 bg-green-900" />
+    <div className="w-full bg-blue-800 py-6 text-center text-whitepb-10">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12">
+        <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-6">
+          <div className="flex-1 min-w-0">
+            <label className="block mb-2 text-sm font-medium text-white">
+              Filter By Business Type
+            </label>
+            <input
+              type="text"
+              placeholder="Type Here"
+              className="w-full h-12 px-4 text-gray-700 bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-custom-orange"
+            />
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <label className="block mb-2 text-sm font-medium text-white">
+              Filter By Location
+            </label>
+            <div className="relative">
+              <select className="w-full h-12 px-4 text-gray-700 bg-white rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-custom-orange">
+                <option value="">Choose Location</option>
+                <option value="ny">New York City</option>
+                <option value="gc">Grand Canyon</option>
+                <option value="sf"> San Francisco</option>
+                <option value="ch">Chicago</option>
+              </select>
+              <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
+                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <label className="block mb-2 text-sm font-medium text-white">
+              Filter By Minority
+            </label>
+            <div className="relative">
+              <select className="w-full h-12 px-4 text-gray-700 bg-white rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-custom-orange">
+                <option value="">Choose Minority</option>
+                <option value="women-owned">Women-Owned</option>
+                <option value="minority-owned">Minority-Owned</option>
+                <option value="veteran-owned">Veteran-Owned</option>
+                <option value="lgbtq-owned">LGBTQ+-Owned</option>
+              </select>
+              <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
+                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <label className="block mb-2 text-sm font-medium text-white">
+              Search
+            </label>
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search Here"
+                className="w-full h-12 pl-12 pr-4 text-gray-700 bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-custom-orange"
+              />
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            </div>
+          </div>
         </div>
-        <p className="px-2 mb-10 text-sm text-gray-600 sm:text-base sm:px-0">
-          Explore our most recent, high-quality picks — curated by rank and plan weight.
-        </p>
       </div>
-
-      {/* Loading / Error states */}
-      {items === null || loading ? (
-        <SkeletonGrid />
-      ) : error ? (
-        <ErrorBlock error={error} onRetry={reload} />
-      ) : items.length === 0 ? (
-        <div className="text-center text-gray-600">No products to display.</div>
-      ) : (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {items.map((p) => (
-            <ProductCard key={p._id} item={p} />
-          ))}
-        </div>
-      )}
-
-      <div className="flex justify-center mt-6 md:justify-start">
-        <Link
-          href="/products"
-          className="inline-block px-8 py-2 mx-auto text-white rounded bg-custom-orange md:mx-0"
-        >
-          Show All Products
-        </Link>
-      </div>
-
-      <div className="flex justify-center h-full mt-4 md:justify-end md:mt-2">
-        <hr className="h-[2px] w-1/2 bg-custom-blue mt-0" />
-      </div>
-    </section>
+    </div>
   );
 }
 
-/* ---------- subcomponents ---------- */
+/* ---------- main component ---------- */
+export default function ShopProducts() {
+  const { items, error, loading, reload } = useRankedProducts();
+  const [swiperRef, setSwiperRef] = React.useState<any>(null);
 
-function ProductCard({ item }: { item: RankedItem }) {
-  // const href = item.slug ? `/product/${item.slug}` : `/product/${item._id}`;
-  const href = `/product/${item._id}`;
-  const title = pickTitle(item);
-  const description = item.description;
-  const images = gatherImages(item);
-  const { price, salePrice, effective, onSale, size, label, color } = pickPrice(item);
-  const rating = pickRating(item);
-  const ratingCount = pickRatingCount(item);
-  const norm = (n: number) => (Number.isFinite(n) ? n : 0);
-  const _price = norm(price);
-  const _sale = norm(salePrice ?? NaN);
-  const discount = _price > 0 && Number.isFinite(_sale) && _sale < _price
-    ? ((_price - _sale) / _price) * 100
-    : 0;
-
-  const fmtPct = (n: number) => {
-    const v = Number(n);
-    if (!Number.isFinite(v) || v <= 0) return null;
-    return Number.isInteger(v) ? String(v) : v.toFixed(1); // e.g. 0.5, 12.3
-  };
-  const discountLabel = fmtPct(discount);
-
-  const fullStars = Math.floor(rating);
-  const fractional = rating % 1;
-  const hasHalfStar = fractional >= 0.25 && fractional < 0.75;
-  const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-
-  // prevent navigation when user is dragging/swiping the slider
-  const draggingRef = React.useRef(false);
-  const handleClickCapture = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    if (draggingRef.current) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-  };
+  const prevButton = React.useRef(null);
+  const nextButton = React.useRef(null);
 
   return (
-    <Link
-      href={href}
-      target="_blank"
-      onClickCapture={handleClickCapture}
-      aria-label={`Open ${title}`}
-      className="border rounded-2xl transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
-    >
-      <div className="p-4 group rounded-2xl ">
-        {/* Slider (square) */}
-        <div className="relative w-full overflow-hidden bg-gray-50 rounded-xl">
-          <div className="pt-[100%]" />
-          <div className="absolute inset-0">
+    <>
+      <FilterSection />
+      
+      <section className="pt-12 pb-16 px-4 sm:px-6 lg:px-12 max-w-[1400px] mx-auto w-full">
+        <div className="max-w-3xl mx-auto text-center mb-12">
+          <h2 className="mb-3 text-2xl uppercase sm:text-3xl md:text-4xl font-bold text-gray-900">
+            Featured Products
+          </h2>
+          <div className="flex flex-col items-center justify-center mb-4">
+            <hr className="w-20 h-1 bg-green-900" />
+            <hr className="w-20 h-1 bg-green-900" />
+          </div>
+          <p className="px-2 mb-8 text-sm text-gray-600 sm:text-base sm:px-0">
+            Explore our most recent, high-quality picks — curated by rank and plan weight.
+          </p>
+        </div>
+
+        {/* Products Carousel Section */}
+        {items === null || loading ? (
+          <SkeletonCarousel />
+        ) : error ? (
+          <ErrorBlock error={error} onRetry={reload} />
+        ) : items.length === 0 ? (
+          <div className="text-center text-gray-600 py-8">No products to display.</div>
+        ) : (
+          <div className="relative">
+            {/* Navigation Buttons */}
+            <div className="absolute top-1/2 left-0 -translate-y-1/2 -translate-x-4 z-10">
+              <button
+                ref={prevButton}
+                className="w-12 h-12 flex items-center justify-center bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors"
+              >
+                <ChevronLeft className="w-6 h-6 text-gray-700" />
+              </button>
+            </div>
+            
+            <div className="absolute top-1/2 right-0 -translate-y-1/2 translate-x-4 z-10">
+              <button
+                ref={nextButton}
+                className="w-12 h-12 flex items-center justify-center bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors"
+              >
+                <ChevronRight className="w-6 h-6 text-gray-700" />
+              </button>
+            </div>
+
+            {/* Products Carousel */}
             <Swiper
-              modules={[Navigation, Pagination, Keyboard, A11y, Autoplay]}
+              onSwiper={setSwiperRef}
+              modules={[Navigation, Autoplay]}
+              spaceBetween={30}
               slidesPerView={1}
-              pagination={{ clickable: true, dynamicBullets: true }}
-              keyboard={{ enabled: true }}
-              autoplay={{ delay: 2500, disableOnInteraction: false, pauseOnMouseEnter: false }}
-              loop
-              onSliderMove={() => (draggingRef.current = true)}
-              onTouchStart={() => (draggingRef.current = false)}
-              onTouchEnd={() => setTimeout(() => (draggingRef.current = false), 0)}
-              className="h-full product-swiper"
+              breakpoints={{
+                640: {
+                  slidesPerView: 2,
+                  spaceBetween: 20,
+                },
+                1024: {
+                  slidesPerView: 3,
+                  spaceBetween: 30,
+                },
+                1280: {
+                  slidesPerView: 4,
+                  spaceBetween: 30,
+                },
+              }}
+              navigation={{
+                prevEl: prevButton.current,
+                nextEl: nextButton.current,
+              }}
+              autoplay={{ delay: 5000, disableOnInteraction: false }}
+              className="py-4"
             >
-              {images.map((src, i) => (
-                <SwiperSlide key={i}>
-                  <img
-                    src={src}
-                    alt={`${title} ${i + 1}`}
-                    loading="lazy"
-                    className="object-contain w-full h-full p-3"
-                  />
+              {items.map((p) => (
+                <SwiperSlide key={p._id} className="py-4 h-auto">
+                  <ProductCard item={p} />
                 </SwiperSlide>
               ))}
             </Swiper>
           </div>
+        )}
 
-          {onSale && (
-            <span className="absolute left-2 top-2 text-[11px] font-semibold bg-red-600 text-white px-2 py-0.5 rounded z-10">
-              {discountLabel ? `-${discountLabel}%` : "SALE"}
-            </span>
-          )}
+        {/* Show All Products Button */}
+        <div className="flex justify-center mt-12">
+          <Link
+            href="/products"
+            className="inline-block px-12 py-3 text-lg font-semibold text-white rounded-lg bg-blue-700 hover:bg-blue-600 transition-colors"
+          >
+            Show All Products
+          </Link>
         </div>
 
-        {/* Title */}
-        <h3
-          className="mt-3 mb-1 text-sm font-semibold text-gray-900 sm:text-base"
-          title={title}
-          style={{
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            wordBreak: "break-word",
-          }}
-        >
+        {/* Bottom Decorative Line */}
+        <div className="flex justify-center mt-12">
+          <hr className="h-[2px] w-1/2 bg-custom-blue" />
+        </div>
+      </section>
+    </>
+  );
+}
+
+/* ---------- Product Card (Fixed Height Design) ---------- */
+function ProductCard({ item }: { item: RankedItem }) {
+  const href = `/product/${item._id}`;
+  const title = pickTitle(item);
+  const description = item.description || "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent vitae.";
+  const images = gatherImages(item);
+  const { price, effective, onSale } = pickPrice(item);
+  const rating = pickRating(item);
+  const ratingCount = pickRatingCount(item);
+  const reviewCount = 5;
+
+  const fullStars = Math.floor(rating);
+  const fractional = rating % 1;
+  const hasHalfStar = fractional >= 0.25 && fractional < 0.75;
+
+  return (
+    <div className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col h-[500px]">
+      {/* Product Image - Fixed Height */}
+      <div className="relative h-48 overflow-hidden bg-gray-100 flex-shrink-0">
+        <img
+          src={images[0]}
+          alt={title}
+          loading="lazy"
+          className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+        />
+        
+        {onSale && (
+          <div className="absolute top-3 left-3">
+            <span className="px-3 py-1 text-xs font-bold text-white bg-red-600 rounded-full">
+              SALE
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Product Info - Flex grow to fill space */}
+      <div className="p-5 flex flex-col flex-grow">
+        {/* Title - Fixed height */}
+        <h3 className="mb-2 text-lg font-bold text-gray-900 uppercase tracking-tight line-clamp-2 h-12 overflow-hidden">
           {title}
         </h3>
 
-
-        <p
-          className="mb-2 text-xs text-gray-600"
-          title={description || ""}
-          style={{
-            display: "-webkit-box",
-            WebkitLineClamp: 2,        // clamp to 2 lines; bump to 3 if you prefer
-            WebkitBoxOrient: "vertical",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            wordBreak: "break-word",
-          }}
-        >
-          {description || ""}
+        {/* Description - Fixed height */}
+        <p className="mb-3 text-sm text-gray-600 leading-relaxed line-clamp-2 h-10 overflow-hidden">
+          {description}
         </p>
 
-
-        {/* Variant meta */}
-        {(label || size) && (
-          <p className="mb-2 text-xs text-gray-500">
-            {label ? `${label}: ` : ""}
-            {size}
-            {color ? (
-              <span
-                className="inline-block w-3 h-3 ml-2 align-middle border rounded-full"
-                style={{ backgroundColor: color }}
-              />
-            ) : null}
+        {/* Rating and Reviews - Fixed height */}
+        <div className="mb-4 flex-shrink-0">
+          <div className="flex items-center mb-1">
+            <div className="flex">
+              {[...Array(5)].map((_, i) => (
+                <Star
+                  key={i}
+                  size={14}
+                  fill={i < fullStars ? "#FBBF24" : i === fullStars && hasHalfStar ? "#FBBF24" : "#E5E7EB"}
+                  stroke={i < fullStars ? "#FBBF24" : i === fullStars && hasHalfStar ? "#FBBF24" : "#D1D5DB"}
+                  className={i < fullStars || (i === fullStars && hasHalfStar) ? "text-yellow-400" : "text-gray-300"}
+                />
+              ))}
+            </div>
+            <span className="ml-2 text-sm font-semibold text-gray-700">
+              {rating.toFixed(1)}
+            </span>
+          </div>
+          <p className="text-xs text-gray-500">
+            {ratingCount} Ratings And {reviewCount} Reviews
           </p>
-        )}
-
-        {/* Rating */}
-        <div className="flex items-center mb-2 space-x-0.5 text-yellow-500">
-          {Array(fullStars)
-            .fill(0)
-            .map((_, idx) => (
-              <Star
-                key={`full-${idx}`}
-                size={14}
-                fill="currentColor"
-                stroke="currentColor"
-                className="text-yellow-400"
-              />
-            ))}
-          {hasHalfStar && (
-            <StarHalf
-              key="half"
-              size={14}
-              fill="currentColor"
-              stroke="currentColor"
-              className="text-yellow-400"
-            />
-          )}
-          {Array(emptyStars)
-            .fill(0)
-            .map((_, idx) => (
-              <Star
-                key={`empty-${idx}`}
-                size={14}
-                fill="none"
-                stroke="gray"
-                className="text-gray-300"
-              />
-            ))}
-          {ratingCount > 0 && (
-            <span className="ml-2 text-[11px] text-gray-500">({ratingCount})</span>
-          )}
         </div>
 
-        {/* Price */}
-        <div className="flex items-baseline gap-2">
+        {/* Price - Fixed height */}
+        <div className="mb-5 flex-shrink-0">
           {onSale ? (
-            <>
-              <span className="text-base font-semibold text-red-600 sm:text-lg">
+            <div className="flex items-center gap-3">
+              <span className="text-xl font-bold text-red-600">
                 ${effective.toFixed(2)}
               </span>
-              <span className="text-xs text-gray-500 line-through sm:text-sm">
+              <span className="text-base text-gray-500 line-through">
                 ${price.toFixed(2)}
               </span>
-            </>
+            </div>
           ) : (
-            <span className="text-base font-semibold text-gray-900 sm:text-lg">
+            <span className="text-xl font-bold text-gray-900">
               ${price.toFixed(2)}
             </span>
           )}
         </div>
 
-        {/* Full-card link overlay (prevents click during drag) */}
-        <style jsx global>{`
-        .product-swiper .swiper-pagination-bullets {
-          bottom: 6px !important;
-          opacity: 0; /* hidden by default for a cleaner look */
-          transition: opacity 150ms ease;
-        }
-        /* show dots when card is hovered (requires parent has .group) */
-        .group:hover .product-swiper .swiper-pagination-bullets {
-          opacity: 1;
-        }
-        .product-swiper .swiper-pagination-bullet {
-          width: 6px;
-          height: 6px;
-          background: rgba(0, 0, 0, 0.35);
-          opacity: 1;
-          margin: 0 3px !important;
-          transition: transform 150ms ease, background 150ms ease;
-        }
-        .product-swiper .swiper-pagination-bullet-active {
-          background: rgba(0, 0, 0, 0.75);
-          transform: scale(1.15);
-        }
-      `}</style>
-      </div>
-    </Link>
-  );
-}
-
-function SkeletonGrid() {
-  return (
-    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-      {Array.from({ length: PAGE_SIZE }).map((_, i) => (
-        <div key={i} className="p-4 border rounded-2xl animate-pulse">
-          <div className="relative w-full overflow-hidden bg-gray-100 rounded-xl">
-            <div className="pt-[100%]" />
-          </div>
-          <div className="w-3/4 h-4 mt-4 bg-gray-200 rounded" />
-          <div className="w-1/2 h-3 mt-2 bg-gray-200 rounded" />
-          <div className="w-1/3 h-5 mt-4 bg-gray-200 rounded" />
+        {/* View Product Button - Fixed at bottom */}
+        <div className="mt-auto pt-4">
+          <Link
+            href={href}
+            className="block w-full py-2.5 text-center text-white font-semibold bg-custom-orange rounded-lg hover:bg-orange-600 transition-colors"
+          >
+            View Product
+          </Link>
         </div>
-      ))}
+      </div>
     </div>
   );
 }
 
+/* ---------- Skeleton Carousel ---------- */
+function SkeletonCarousel() {
+  return (
+    <div className="relative">
+      <div className="absolute top-1/2 left-0 -translate-y-1/2 -translate-x-4 z-10">
+        <button className="w-12 h-12 bg-gray-200 rounded-full"></button>
+      </div>
+      
+      <div className="absolute top-1/2 right-0 -translate-y-1/2 translate-x-4 z-10">
+        <button className="w-12 h-12 bg-gray-200 rounded-full"></button>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 py-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="bg-white rounded-xl shadow-sm overflow-hidden flex flex-col h-[480px] animate-pulse">
+            <div className="h-48 bg-gray-200 flex-shrink-0"></div>
+            <div className="p-5 flex flex-col flex-grow">
+              <div className="h-5 bg-gray-200 rounded mb-3"></div>
+              <div className="h-4 bg-gray-200 rounded mb-2"></div>
+              <div className="h-4 bg-gray-200 rounded mb-3"></div>
+              <div className="h-5 bg-gray-200 rounded mb-4 w-1/2"></div>
+              <div className="h-10 bg-gray-200 rounded mt-auto"></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Error Block ---------- */
 function ErrorBlock({ error, onRetry }: { error: string; onRetry: () => void }) {
   return (
-    <div className="flex flex-col items-center gap-3 text-center">
+    <div className="flex flex-col items-center gap-3 py-8 text-center">
       <div className="text-red-600">
-        We’re having trouble loading products: {error}
+        We're having trouble loading products: {error}
       </div>
       <button
         onClick={onRetry}
-        className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white rounded bg-custom-orange"
+        className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white rounded-lg bg-custom-orange hover:bg-orange-600"
       >
         <RotateCcw size={16} /> Retry
       </button>

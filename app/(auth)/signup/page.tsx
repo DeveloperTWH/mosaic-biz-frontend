@@ -212,7 +212,7 @@ function SignupContent() {
             className="w-full p-2 mb-4 border rounded"
           />
 
-          <label className="block mb-2 text-gray-700" htmlFor="minorityType">
+          {/* <label className="block mb-2 text-gray-700" htmlFor="minorityType">
             Minority Type
           </label>
           <select
@@ -238,8 +238,8 @@ function SignupContent() {
 
           <label className="block mb-2 text-gray-700" htmlFor="gender">
             Gender
-          </label>
-          <select
+          </label> */}
+          {/* <select
             id="gender"
             name="gender"
             required
@@ -249,7 +249,7 @@ function SignupContent() {
             <option value="male">Male</option>
             <option value="female">Female</option>
             <option value="other">Other</option>
-          </select>
+          </select> */}
           <label className="block mb-2 text-gray-700">Email</label>
           <input
             name="email"

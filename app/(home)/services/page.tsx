@@ -48,7 +48,7 @@ const ServicePage = () => {
 
   return (
     <main className="text-black bg-white">
-      <HeroSection heading="Services" imageUrl="/Service/service.png"  />
+      <HeroSection heading="Services" imageUrl="/bgdetailpage.png"  />
       <FilterBar
         searchText={searchText}
         setSearchText={setSearchText}

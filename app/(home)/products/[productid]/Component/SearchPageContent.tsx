@@ -275,7 +275,7 @@ export default function SearchPageContent() {
 
   return (
     <>
-      <BannerSection heading={`${categorySlug} Products`} imageUrl='/products/product.png' />
+      <BannerSection heading={`${categorySlug} Products`} imageUrl='/shopfashion/shopfashion.png' />
       <div className="flex flex-col gap-6 px-6 py-8 mx-auto md:flex-row">
         <FilterSidebar filters={filters} setFilters={setFilters} subcategories={subcategories} />
         <main className="flex-1">

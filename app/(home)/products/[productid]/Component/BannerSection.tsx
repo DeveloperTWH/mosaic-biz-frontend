@@ -12,10 +12,10 @@ const BannerSection = ({ heading, imageUrl }: HeroSectionProps) => {
         src={imageUrl}
         alt={heading}
         fill
-        priority
+        priority  
         className="object-cover w-full h-full"
       />
-      <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+      {/* <div className="absolute inset-0 flex items-center justify-center bg-black/40">
         <h1
           className="text-3xl font-bold leading-loose text-white md:text-5xl font-heading"
           style={{
@@ -29,7 +29,7 @@ const BannerSection = ({ heading, imageUrl }: HeroSectionProps) => {
         >
           {heading}
         </h1>
-      </div>
+      </div> */}
     </section>
   );
 };
