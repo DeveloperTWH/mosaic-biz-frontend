@@ -38,32 +38,34 @@ const Hero = () => {
         style={{ backgroundImage: "url(/herobanner.png)" }}
       >
         <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center bg-opacity-50 bg-stone-800">
-          <h1 className="mb-4 text-4xl font-bold text-white uppercase md:text-5xl lg:text-6xl font-sans tracking-tight">
-            EMPOWERING MINORITY-OWNED BUSINESSES
-          </h1>
-          <p className="max-w-3xl mb-8 text-lg text-white md:text-xl font-sans">
-            Unlock New Opportunities In The Digital Era, Expand Your Reach, And Connect With A Vibrant Community Of Entrepreneurs Thriving Together.
-          </p>
-          {isLoggedIn === null && (
-            <div className="flex flex-col gap-4 md:flex-row">
-              <div className="w-40 h-10 py-2 rounded bg-gray-100/70 px-7" />
-              <div className="w-40 h-10 py-2 rounded bg-gray-100/70 px-7" />
-            </div>
-          )}
-          {isLoggedIn === false && (
-            <div className="flex flex-col gap-4 md:flex-row">
-              <Link href="/login?type=customer">
-                <button className="py-3 text-lg font-semibold text-white uppercase transition-colors border-2 border-white rounded-md px-9 font-sans tracking-wide hover:bg-white/10">
-                  Login As Customer
-                </button>
-              </Link>
-              <Link href="/login?type=vendor">
-                <button className="py-3 text-lg font-semibold text-white uppercase transition-colors border-2 border-white rounded-md px-9 font-sans tracking-wide hover:bg-white/10">
-                  Login As Vendor
-                </button>
-              </Link>
-            </div>
-          )}
+          <div className="w-full max-w-[60%] mx-auto">
+            <h1 className="mb-4 text-4xl font-bold text-white uppercase md:text-5xl lg:text-6xl font-sans tracking-tight">
+              EMPOWERING MINORITY-OWNED BUSINESSES
+            </h1>
+            <p className="mb-8 text-lg text-white md:text-xl font-sans">
+              Unlock New Opportunities In The Digital Era, Expand Your Reach, And Connect With A Vibrant Community Of Entrepreneurs Thriving Together.
+            </p>
+            {isLoggedIn === null && (
+              <div className="flex flex-col gap-4 md:flex-row justify-center">
+                <div className="w-40 h-10 py-2 rounded bg-gray-100/70 px-7" />
+                <div className="w-40 h-10 py-2 rounded bg-gray-100/70 px-7" />
+              </div>
+            )}
+            {isLoggedIn === false && (
+              <div className="flex flex-col gap-4 md:flex-row justify-center">
+                <Link href="/login?type=customer">
+                  <button className="py-3 text-lg font-semibold text-white uppercase transition-colors border-2 border-white rounded-md px-9 font-sans tracking-wide hover:bg-white/10">
+                    Login As Customer
+                  </button>
+                </Link>
+                <Link href="/login?type=vendor">
+                  <button className="py-3 text-lg font-semibold text-white uppercase transition-colors border-2 border-white rounded-md px-9 font-sans tracking-wide hover:bg-white/10">
+                    Login As Vendor
+                  </button>
+                </Link>
+              </div>
+            )}
+          </div>
         </div>
       </section>
     </div>
