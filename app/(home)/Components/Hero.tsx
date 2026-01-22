@@ -74,7 +74,6 @@ const Hero = () => {
 
 export default Hero;
 
-
 // "use client";
 // import { useRouter } from "next/navigation";
 // import React, { useState, useEffect } from "react";
