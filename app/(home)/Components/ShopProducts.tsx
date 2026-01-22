@@ -175,9 +175,11 @@ function useRankedProducts() {
 }
 
 /* ---------- Filter Component ---------- */
+
+
 function FilterSection() {
   return (
-    <div className="w-full bg-blue-800 py-6 text-center text-whitepb-10">
+    <div className="w-full bg-blue-800 py-6 text-center text-white pb-10">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12">
         <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-6">
           <div className="flex-1 min-w-0">
@@ -231,24 +233,23 @@ function FilterSection() {
             </div>
           </div>
 
+          {/* Yellow Search Button */}
           <div className="flex-1 min-w-0">
             <label className="block mb-2 text-sm font-medium text-white">
-              Search
+              Search Here
             </label>
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search Here"
-                className="w-full h-12 pl-12 pr-4 text-gray-700 bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-custom-orange"
-              />
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-            </div>
+            <button className="w-full h-12 text-lg font-semibold text-gray-800 bg-yellow-400 rounded-lg hover:bg-yellow-500 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-600 flex items-center justify-center gap-2">
+              <Search className="w-5 h-5" />
+              Search Here
+            </button>
           </div>
         </div>
       </div>
     </div>
   );
 }
+
+
 
 /* ---------- main component ---------- */
 export default function ShopProducts() {
