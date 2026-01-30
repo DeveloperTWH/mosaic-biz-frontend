@@ -54,12 +54,12 @@ const Hero = () => {
             {isLoggedIn === false && (
               <div className="flex flex-col gap-4 md:flex-row justify-center">
                 <Link href="/login?type=customer">
-                  <button className="py-3 text-lg font-semibold text-white uppercase transition-colors border-2 border-white rounded-md px-9 font-sans tracking-wide hover:bg-white/10">
+                  <button className="py-3 text-lg font-semibold text-white uppercase transition-colors border-2 border-white  px-9 font-sans tracking-wide hover:bg-white/10">
                     Login As Customer
                   </button>
                 </Link>
                 <Link href="/login?type=vendor">
-                  <button className="py-3 text-lg font-semibold text-white uppercase transition-colors border-2 border-white rounded-md px-9 font-sans tracking-wide hover:bg-white/10">
+                  <button className="py-3 text-lg font-semibold text-white uppercase transition-colors border-2 border-white  px-9 font-sans tracking-wide hover:bg-white/10">
                     Login As Vendor
                   </button>
                 </Link>

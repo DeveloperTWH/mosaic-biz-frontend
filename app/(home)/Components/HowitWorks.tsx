@@ -2,6 +2,20 @@
 
 import Image from "next/image";
 
+
+
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, Pagination } from "swiper/modules";
+
+// import "swiper/css";
+// import "swiper/css/pagination";
+
+
+
+
+
+
+
 export default function HowItWorks() {
   return (
     <section className="bg-white">
@@ -63,7 +77,8 @@ export default function HowItWorks() {
       </div>
 
       {/* PROMOTIONAL IMAGE (image-only) */}
-      <div className="py-24">
+      <FeaturedVendors/>
+      {/* <div className="py-24">
         <Image
           src="/Promotional Slider.png"
           alt="Featured vendors"
@@ -72,7 +87,55 @@ export default function HowItWorks() {
           className="w-full h-auto object-contain"
           priority
         />
-      </div>
+      </div> */}
     </section>
   );
 }
+
+
+
+const images = [
+  "https://img.freepik.com/free-photo/cascade-boat-clean-china-natural-rural_1417-1356.jpg?t=st=1769771282~exp=1769774882~hmac=430770117169f725ca995d3dcb9f8b8ef9b62c1827b71a4601f90ec69a8e07fc",
+  "https://img.freepik.com/free-photo/mountain-covered-with-fogs_400718-5.jpg?t=st=1769771569~exp=1769775169~hmac=ad09dc5ca036aa18fbb1fc0b8d7afce8744c5e886d555b387b2e8983fab85639",
+  "https://img.freepik.com/free-photo/summer-green-water-sunlight-spring-beauty_1417-1246.jpg?t=st=1769771601~exp=1769775201~hmac=c04e745eded8c592aa84da8674fc27918042302fae154caf0af4a96668b99fcb",
+  "https://images.pexels.com/photos/10337816/pexels-photo-10337816.jpeg"
+];
+ function FeaturedVendors() {
+ return (
+    <section className="w-full py-12 overflow-hidden">
+      <Swiper
+        modules={[Autoplay, Pagination]}
+        centeredSlides={true}
+        slidesPerView="auto"
+        spaceBetween={30}
+        loop
+        autoplay={{
+          delay: 3000,
+          disableOnInteraction: false,
+        }}
+        pagination={{
+          clickable: true,
+        }}
+        className="w-full"
+      >
+        {images.map((src, index) => (
+          <SwiperSlide
+            key={index}
+            className="!w-[600px]" // controls main image width
+          >
+            <div className="relative h-[200px] overflow-hidden">
+              <Image
+                src={src}
+                alt={`Slide ${index + 1}`}
+                fill
+                className="object-cover"
+                priority={index === 0}
+              />
+            </div>
+          </SwiperSlide>
+        ))}
+      </Swiper>
+    </section>
+  );
+}
+

@@ -193,12 +193,12 @@ function FilterSection() {
             />
           </div>
 
-          <div className="flex-1 min-w-0">
+          <div className="flex-[1] min-w-0">
             <label className="block mb-2  text-left  text-sm font-medium text-white">
               Filter By Location
             </label>
             <div className="relative">
-              <select className="w-80 h-10 px-4 text-gray-700 bg-white  appearance-none focus:outline-none focus:ring-2 focus:ring-custom-orange">
+              <select className="w-full h-10 px-4 text-gray-700 bg-white  appearance-none focus:outline-none focus:ring-2 focus:ring-custom-orange">
                 <option value="">Choose Location</option>
                 <option value="ny">New York City</option>
                 <option value="gc">Grand Canyon</option>
@@ -206,7 +206,7 @@ function FilterSection() {
                 <option value="ch">Chicago</option>
               </select>
               <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
-                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <svg className="w-full h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
                 </svg>
               </div>
@@ -333,7 +333,7 @@ export default function ShopProducts() {
               className="py-4"
             >
               {items.map((p) => (
-                <SwiperSlide key={p._id} className="py-4 h-auto">
+                <SwiperSlide key={p._id} className="py-4 w-500 h-auto">
                   <ProductCard item={p} />
                 </SwiperSlide>
               ))}
@@ -342,10 +342,10 @@ export default function ShopProducts() {
         )}
 
         {/* Show All Products Button */}
-        <div className="flex justify-center mt-12">
+        <div className="flex justify-start mt-12">
           <Link
             href="/products"
-            className="inline-block px-12 py-3 text-lg font-semibold text-white rounded-lg bg-blue-700 hover:bg-blue-600 transition-colors"
+            className="inline-block px-12 py-3 text-lg font-semibold text-white  bg-[#1A1F71] hover:bg-blue-600 transition-colors"
           >
             Show All Products
           </Link>
@@ -376,7 +376,7 @@ function ProductCard({ item }: { item: RankedItem }) {
   const hasHalfStar = fractional >= 0.25 && fractional < 0.75;
 
   return (
-    <div className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col h-[500px]">
+    <div className="bg-green p-3  border-2 border-[#D9D9D9] w-200 shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col h-[500px]">
       {/* Product Image - Fixed Height */}
       <div className="relative h-48 overflow-hidden bg-gray-100 flex-shrink-0">
         <img
@@ -410,6 +410,7 @@ function ProductCard({ item }: { item: RankedItem }) {
         {/* Rating and Reviews - Fixed height */}
         <div className="mb-4 flex-shrink-0">
           <div className="flex items-center mb-1">
+
             <div className="flex">
               {[...Array(5)].map((_, i) => (
                 <Star
@@ -421,13 +422,16 @@ function ProductCard({ item }: { item: RankedItem }) {
                 />
               ))}
             </div>
-            <span className="ml-2 text-sm font-semibold text-gray-700">
+            {/* <span className="ml-2 text-sm font-semibold text-gray-700">
               {rating.toFixed(1)}
-            </span>
-          </div>
-          <p className="text-xs text-gray-500">
+            </span> */}
+            <p className="text-xs ml-2 text-gray-500">
             {ratingCount} Ratings And {reviewCount} Reviews
           </p>
+          </div>
+          {/* <p className="text-xs text-gray-500">
+            {ratingCount} Ratings And {reviewCount} Reviews
+          </p> */}
         </div>
 
         {/* Price - Fixed height */}
@@ -449,14 +453,14 @@ function ProductCard({ item }: { item: RankedItem }) {
         </div>
 
         {/* View Product Button - Fixed at bottom */}
-        <div className="mt-auto pt-4">
+        {/* <div className="mt-auto pt-4">
           <Link
             href={href}
             className="block w-full py-2.5 text-center text-white font-semibold bg-custom-orange rounded-lg hover:bg-orange-600 transition-colors"
           >
             View Product
           </Link>
-        </div>
+        </div> */}
       </div>
     </div>
 

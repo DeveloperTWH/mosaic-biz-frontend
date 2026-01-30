@@ -10,6 +10,13 @@ import { ShoppingCart, ChevronDown } from "lucide-react";
 import { useCartCount } from "@/hooks/useCartCount";
 import CartSyncPrompt from "./CartSyncPrompt";
 import { getLoggedInCustomer } from "@/utils/authUtils";
+import { Poppins } from "next/font/google";
+
+const popinFont = Poppins({
+ weight : "600",
+ style : 'normal'
+ 
+})
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -92,18 +99,18 @@ const Navbar = () => {
             <Image
               src="/logo.png"
               alt="OSAIC BIZ HUB Logo"
-              width={180}
-              height={50}
+              width={280}
+              height={60}
               className="h-auto"
             />
           </Link>
         </div>
 
         {/* Desktop Nav - Screenshot Design */}
-        <nav className="items-center hidden space-x-8 text-[15px] font-medium tracking-wide lg:flex">
+        <nav className="items-center hidden space-x-4 text-[12px] font-medium tracking-wide lg:flex">
           <Link 
             href="/" 
-            className="text-gray-800 hover:text-sky-600 transition-colors font-medium uppercase"
+            className={`text-[#A2A2A2] hover:text-sky-600 transition-colors font-medium uppercase ${popinFont.className}`}
           >
             HOME
           </Link>
@@ -113,7 +120,7 @@ const Navbar = () => {
             <button
               onClick={() => setShopDropdown(!shopDropdown)}
               onMouseEnter={() => setShopDropdown(true)}
-              className="flex items-center text-gray-800 hover:text-sky-600 transition-colors focus:outline-none font-medium uppercase"
+              className={`flex items-center text-[#A2A2A2] hover:text-sky-600 transition-colors focus:outline-none font-medium uppercase ${popinFont.className}`}
             >
               SHOP <ChevronDown className={`ml-1 w-3.5 h-3.5 transition-transform ${shopDropdown ? "rotate-180" : ""}`} />
             </button>
@@ -122,13 +129,13 @@ const Navbar = () => {
                 className="absolute left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg w-48 py-2 z-50"
                 onMouseLeave={() => setShopDropdown(false)}
               >
-                <Link href="/products" className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-medium">
+                <Link href="/products" className={`block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-medium ${popinFont.className}`}>
                   Products
                 </Link>
-                <Link href="/foods" className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-medium">
+                <Link href="/foods" className={`block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-medium ${popinFont.className}`}>
                   Foods
                 </Link>
-                <Link href="/services" className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-medium">
+                <Link href="/services" className={`block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-medium ${popinFont.className}`}>
                   Services
                 </Link>
               </div>
@@ -137,21 +144,21 @@ const Navbar = () => {
           
           <Link 
             href="/become-a-vendor" 
-            className="text-gray-800 hover:text-sky-600 transition-colors font-medium uppercase"
+            className={`text-[#A2A2A2] hover:text-sky-600 transition-colors font-medium uppercase  ${popinFont.className}`}
           >
             BECOME A VENDOR
           </Link>
           
           <Link 
             href="/about" 
-            className="text-gray-800 hover:text-sky-600 transition-colors font-medium uppercase"
+            className={`text-[#A2A2A2] hover:text-sky-600 transition-colors font-medium uppercase  ${popinFont.className}`}
           >
             ABOUT
           </Link>
           
           <Link 
             href="/contact" 
-            className="text-gray-800 hover:text-sky-600 transition-colors font-medium uppercase"
+            className={`text-[#A2A2A2] hover:text-sky-600 transition-colors font-small uppercase  ${popinFont.className}`}
           >
             CONTACT
           </Link>
@@ -161,7 +168,7 @@ const Navbar = () => {
             <button
               onClick={() => setMoreDropdown(!moreDropdown)}
               onMouseEnter={() => setMoreDropdown(true)}
-              className="flex items-center text-gray-800 hover:text-sky-600 transition-colors focus:outline-none font-medium uppercase"
+              className={`flex items-center text-[#A2A2A2] hover:text-sky-600 transition-colors focus:outline-none font-small uppercase  ${popinFont.className}`}
             >
               MORE <ChevronDown className={`ml-1 w-3.5 h-3.5 transition-transform ${moreDropdown ? "rotate-180" : ""}`} />
             </button>
@@ -170,9 +177,7 @@ const Navbar = () => {
                 className="absolute left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg w-56 py-2 z-50"
                 onMouseLeave={() => setMoreDropdown(false)}
               >
-                <Link href="/how-to-use-this-app" className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-medium">
-                  HOW TO USE THIS APP
-                </Link>
+
                 <Link href="/faq" className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-medium">
                   FAQ
                 </Link>
@@ -184,7 +189,11 @@ const Navbar = () => {
                 </Link>
               </div>
             )}
+
           </div>
+              <Link href="/how-to-use-this-app"   className={`text-[#A2A2A2] hover:text-sky-600 transition-colors font-small uppercase  ${popinFont.className}`}>
+                  HOW TO USE THIS APP
+              </Link>
         </nav>
 
         {/* Desktop Buttons / Profile */}
@@ -261,7 +270,7 @@ const Navbar = () => {
                 <button
                   onClick={() => setOpenLogin(!openLogin)}
                   onMouseEnter={() => setOpenLogin(true)}
-                  className="px-6 py-2.5 text-sm font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors flex items-center uppercase tracking-wide"
+                  className="px-6 py-2.5 text-sm font-semibold text-white bg-[#1A1F71]  hover:bg-blue-700 transition-colors flex items-center uppercase tracking-wide"
                 >
                   Login
                   <ChevronDown className={`ml-1.5 w-3.5 h-3.5 transition-transform ${openLogin ? "rotate-180" : ""}`} />
@@ -356,9 +365,9 @@ const Navbar = () => {
             <div className="px-4 py-3">
               <div className="font-medium text-gray-800 mb-3 uppercase">MORE</div>
               <div className="ml-4 space-y-3">
-                <Link href="/how-to-use-this-app" onClick={() => setIsOpen(false)} className="block py-2 text-gray-700 hover:text-blue-600 font-medium">
+                {/* <Link href="/how-to-use-this-app" onClick={() => setIsOpen(false)} className="block py-2 text-gray-700 hover:text-blue-600 font-medium">
                   HOW TO USE THIS APP
-                </Link>
+                </Link> */}
                 <Link href="/faq" onClick={() => setIsOpen(false)} className="block py-2 text-gray-700 hover:text-blue-600 font-medium">
                   FAQ
                 </Link>

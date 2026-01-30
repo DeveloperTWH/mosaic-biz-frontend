@@ -5,7 +5,8 @@ import Navbar from "./Components/Navbar";
 import Footer from "./Components/Footer";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import "swiper/css";
+import "swiper/css/pagination";
 
 const josefin = Josefin_Sans({
   subsets: ["latin"],
