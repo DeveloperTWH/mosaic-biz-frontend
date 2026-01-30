@@ -6,9 +6,10 @@ import Image from "next/image";
 
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination } from "swiper/modules";
+import { useState } from "react";
 
-// import "swiper/css";
-// import "swiper/css/pagination";
+import "swiper/css";
+import "swiper/css/pagination";
 
 
 
@@ -17,6 +18,8 @@ import { Autoplay, Pagination } from "swiper/modules";
 
 
 export default function HowItWorks() {
+
+  const [tabClick, setTabClick]= useState(0)
   return (
     <section className="bg-white">
       <div className="py-24 max-w-7xl mx-auto px-6">
@@ -33,14 +36,44 @@ export default function HowItWorks() {
         {/* Content */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           {/* Left Image */}
-          <div>
-            <Image
-              src="/howitworkleft.png"
-              alt="How it works steps"
-              width={600}
-              height={600}
-              className="w-full h-auto"
-            />
+          <div className="grid gap-4">
+ 
+              <Image
+                src={tabClick == 0 ? "/howitworks/browseClick.png" : "/howitworks/browse.png"}
+                alt="How it works steps"
+                width={400}
+                height={150}
+                onClick={()=>setTabClick(0)}
+              />
+
+
+              <Image
+                src={tabClick == 1 ? "/howitworks/discoverClick.png" : "/howitworks/discover.png"}
+                alt="How it works steps"
+                width={400}
+                height={150}
+                // className="w-full h-auto"
+                onClick={()=>setTabClick(1)}
+              />
+
+              <Image
+                src={tabClick == 2 ? "/howitworks/connectClick.png" : "/howitworks/connect.png"}
+                alt="How it works steps"
+                width={400}
+                height={150}
+                // className="w-full h-auto"
+                onClick={()=>setTabClick(2)}
+              />
+
+              <Image
+                src={tabClick == 3 ? "/howitworks/supportClick.png" : "/howitworks/support.png"}
+                alt="How it works steps"
+                width={400}
+                height={150}
+                // className="w-full h-auto"
+                onClick={()=>setTabClick(3)}
+              />
+
           </div>
 
           {/* Right Content */}

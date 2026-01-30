@@ -38,7 +38,7 @@ export default function BrowseServices() {
 
           <Link
             href="/services"
-            className="px-8 py-3 text-lg font-semibold text-white bg-[#d1aa45] hover:bg-[#c19a38] transition rounded-lg"
+            className="px-8 py-3 text-lg font-semibold text-white bg-[#d1aa45] hover:bg-[#c19a38] transition font-montserrat"
           >
             Show All Services
           </Link>

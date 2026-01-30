@@ -183,22 +183,22 @@ function FilterSection() {
       <div className="max-w-[1500px]  mx-auto px-4 sm:px-6 lg:px-12">
         <div className="flex flex-col  md:flex-row md:items-end gap-4 md:gap-6">
         <div className="flex-[3] min-w-0 ">
-            <label className="block mb-2 text-sm text-left  font-medium text-white">
+            <label className="block mb-2 text-sm text-left  font-medium text-white font-poppins">
               Filter By Business Type
             </label>
             <input
               type="text"
               placeholder="Type Here"
-              className="w-full h-10 px-4 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-custom-orange"
+              className="w-full h-10 px-4 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-custom-orange text-xs font-poppins"
             />
           </div>
 
           <div className="flex-[1] min-w-0">
-            <label className="block mb-2  text-left  text-sm font-medium text-white">
+            <label className="block mb-2  text-left  text-sm font-medium text-white font-poppins">
               Filter By Location
             </label>
             <div className="relative">
-              <select className="w-full h-10 px-4 text-gray-700 bg-white  appearance-none focus:outline-none focus:ring-2 focus:ring-custom-orange">
+              <select className="w-full h-10 px-4 text-gray-700 bg-white text-xs appearance-none focus:outline-none focus:ring-2 focus:ring-custom-orange text-[#5F5F5F] font-poppins">
                 <option value="">Choose Location</option>
                 <option value="ny">New York City</option>
                 <option value="gc">Grand Canyon</option>
@@ -214,11 +214,11 @@ function FilterSection() {
           </div>
 
           <div className="flex-1 min-w-0">
-            <label className="block text-left  mb-2 text-sm font-medium text-white">
+            <label className="block text-left  mb-2 text-sm font-medium text-white font-poppins">
               Filter By Minority
             </label>
             <div className="relative">
-              <select className="w-full h-10 px-4 text-gray-700 bg-white  appearance-none focus:outline-none focus:ring-2 focus:ring-custom-orange">
+              <select className="w-full h-10 px-4 text-gray-700 bg-white  text-xs appearance-none focus:outline-none focus:ring-2 focus:ring-custom-orange text-[#5F5F5F] font-poppins">
                 <option value="">Choose Minority</option>
                 <option value="women-owned">Women-Owned</option>
                 <option value="minority-owned">Minority-Owned</option>
@@ -238,8 +238,8 @@ function FilterSection() {
             <label className="block mb-2 text-sm font-medium text-white">
               {/* Search Here */}
             </label>
-            <button className="w-full h-10 text-lg font-semibold text-gray-800 bg-[#C7A040]  hover:bg-yellow-500 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-600 flex items-center justify-center gap-2">
-              <Search className="w-5 h-5" />
+            <button className="w-full h-10 text-sm text-white font-xs text-gray-800 bg-[#C7A040]  hover:bg-yellow-500 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-600 flex items-center justify-center gap-2 font-montserrat">
+              {/* <Search className="w-5 h-5" /> */}
               Search Here
             </button>
           </div>
@@ -308,7 +308,7 @@ export default function ShopProducts() {
             {/* Products Carousel */}
             <Swiper
               onSwiper={setSwiperRef}
-              modules={[Navigation, Autoplay]}
+              modules={[Navigation]}
               spaceBetween={30}
               slidesPerView={1}
               breakpoints={{
@@ -345,7 +345,7 @@ export default function ShopProducts() {
         <div className="flex justify-start mt-12">
           <Link
             href="/products"
-            className="inline-block px-12 py-3 text-lg font-semibold text-white  bg-[#1A1F71] hover:bg-blue-600 transition-colors"
+            className="inline-block px-12 py-3 text-sm font-semibold text-white  bg-[#1A1F71] hover:bg-blue-600 transition-colors font-montserrat"
           >
             Show All Products
           </Link>
@@ -376,9 +376,9 @@ function ProductCard({ item }: { item: RankedItem }) {
   const hasHalfStar = fractional >= 0.25 && fractional < 0.75;
 
   return (
-    <div className="bg-green p-3  border-2 border-[#D9D9D9] w-200 shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col h-[500px]">
+    <div className="bg-green p-3  border-2 border-[#D9D9D9] w-[320px] shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col h-[500px]">
       {/* Product Image - Fixed Height */}
-      <div className="relative h-48 overflow-hidden bg-gray-100 flex-shrink-0">
+      <div className="relative h-60 overflow-hidden bg-gray-100 flex-shrink-0">
         <img
           src={images[0]}
           alt={title}
@@ -398,12 +398,12 @@ function ProductCard({ item }: { item: RankedItem }) {
       {/* Product Info - Flex grow to fill space */}
       <div className="p-5 flex flex-col flex-grow">
         {/* Title - Fixed height */}
-        <h3 className="mb-2 text-lg font-bold text-gray-900 uppercase tracking-tight line-clamp-2 h-12 overflow-hidden">
+        <h3 className="mb-2 text-lg font-bold text-gray-900 uppercase tracking-tight line-clamp-2 h-12 overflow-hidden font-poppins">
           {title}
         </h3>
 
         {/* Description - Fixed height */}
-        <p className="mb-3 text-sm text-gray-600 leading-relaxed line-clamp-2 h-10 overflow-hidden">
+        <p className="mb-3 text-sm text-gray-600 leading-relaxed line-clamp-2 h-10 overflow-hidden font-montserrat">
           {description}
         </p>
 
@@ -425,7 +425,7 @@ function ProductCard({ item }: { item: RankedItem }) {
             {/* <span className="ml-2 text-sm font-semibold text-gray-700">
               {rating.toFixed(1)}
             </span> */}
-            <p className="text-xs ml-2 text-gray-500">
+            <p className="text-xs ml-2 text-gray-500 font-poppins">
             {ratingCount} Ratings And {reviewCount} Reviews
           </p>
           </div>

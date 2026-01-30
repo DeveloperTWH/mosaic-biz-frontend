@@ -54,7 +54,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
           
           {/* Filter By Business Type */}
           <div className="flex-1 min-w-0">
-            <label className="block mb-2 text-sm font-medium text-white">
+            <label className="block mb-2 text-sm font-medium text-white font-poppins">
               Filter By Business Type
             </label>
             <input
@@ -68,7 +68,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
 
           {/* Filter By Location */}
           <div className="flex-1 min-w-0">
-            <label className="block mb-2 text-sm font-medium text-white">
+            <label className="block mb-2 text-sm font-medium text-white font-poppins">
               Filter By Location
             </label>
             <div className="relative">
@@ -125,7 +125,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
             <div className="relative">
               <button
                 onClick={onSearch}
-                className="w-full h-12 pl-12 pr-4 text-left text-lg font-semibold text-gray-700 bg-white rounded-lg hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-custom-orange"
+                className="w-full h-12 pl-12 pr-4 text-left text-lg font-semibold text-gray-700 bg-white rounded-lg hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-custom-orange font-montserrat"
               >
                 Search Here
               </button>

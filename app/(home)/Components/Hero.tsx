@@ -38,11 +38,11 @@ const Hero = () => {
         style={{ backgroundImage: "url(/herobanner.png)" }}
       >
         <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center bg-opacity-50 bg-stone-800">
-          <div className="w-full max-w-[60%] mx-auto">
-            <h1 className="mb-4 text-4xl font-bold text-white uppercase md:text-5xl lg:text-6xl font-sans tracking-tight">
+          <div className="w-full max-w-[80%] mx-auto">
+            <h1 className="mb-4 text-4xl font-bold text-white uppercase md:text-5xl lg:text-6xl  tracking-tight font-poppins">
               EMPOWERING MINORITY-OWNED BUSINESSES
             </h1>
-            <p className="mb-8 text-lg text-white md:text-xl font-sans">
+            <p className="mb-8 w-[60%] ml-[18%]  ml-10 text-sm text-white  font-poppins">
               Unlock New Opportunities In The Digital Era, Expand Your Reach, And Connect With A Vibrant Community Of Entrepreneurs Thriving Together.
             </p>
             {isLoggedIn === null && (
@@ -52,14 +52,14 @@ const Hero = () => {
               </div>
             )}
             {isLoggedIn === false && (
-              <div className="flex flex-col gap-4 md:flex-row justify-center">
+              <div className="flex flex-col gap-8 md:flex-row justify-center">
                 <Link href="/login?type=customer">
-                  <button className="py-3 text-lg font-semibold text-white uppercase transition-colors border-2 border-white  px-9 font-sans tracking-wide hover:bg-white/10">
+                  <button className="py-3 text-xs font-semibold text-white uppercase transition-colors border-2 border-white  px-9 font-poppins tracking-wide hover:bg-white/10">
                     Login As Customer
                   </button>
                 </Link>
                 <Link href="/login?type=vendor">
-                  <button className="py-3 text-lg font-semibold text-white uppercase transition-colors border-2 border-white  px-9 font-sans tracking-wide hover:bg-white/10">
+                  <button className="py-3 text-xs  text-white uppercase transition-colors border-2 border-white  px-9 font-poppins  tracking-wide hover:bg-white/10">
                     Login As Vendor
                   </button>
                 </Link>

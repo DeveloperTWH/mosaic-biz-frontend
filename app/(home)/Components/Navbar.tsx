@@ -191,7 +191,7 @@ const Navbar = () => {
             )}
 
           </div>
-              <Link href="/how-to-use-this-app"   className={`text-[#A2A2A2] hover:text-sky-600 transition-colors font-small uppercase  ${popinFont.className}`}>
+              <Link href="/how-to-use-this-app"   className="text-[#A2A2A2] hover:text-sky-600 transition-colors font-small uppercase font-poppins" >
                   HOW TO USE THIS APP
               </Link>
         </nav>
