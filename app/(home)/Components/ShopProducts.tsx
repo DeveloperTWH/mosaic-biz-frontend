@@ -179,26 +179,26 @@ function useRankedProducts() {
 
 function FilterSection() {
   return (
-    <div className="w-full bg-blue-800 py-6 text-center text-white pb-10">
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12">
-        <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-6">
-          <div className="flex-1 min-w-0">
-            <label className="block mb-2 text-sm font-medium text-white">
+    <div className="w-full bg-[#1A1F71] py-6 text-center text-white pb-10">
+      <div className="max-w-[1500px]  mx-auto px-4 sm:px-6 lg:px-12">
+        <div className="flex flex-col  md:flex-row md:items-end gap-4 md:gap-6">
+        <div className="flex-[3] min-w-0 ">
+            <label className="block mb-2 text-sm text-left  font-medium text-white">
               Filter By Business Type
             </label>
             <input
               type="text"
               placeholder="Type Here"
-              className="w-full h-12 px-4 text-gray-700 bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-custom-orange"
+              className="w-full h-10 px-4 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-custom-orange"
             />
           </div>
 
           <div className="flex-1 min-w-0">
-            <label className="block mb-2 text-sm font-medium text-white">
+            <label className="block mb-2  text-left  text-sm font-medium text-white">
               Filter By Location
             </label>
             <div className="relative">
-              <select className="w-full h-12 px-4 text-gray-700 bg-white rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-custom-orange">
+              <select className="w-80 h-10 px-4 text-gray-700 bg-white  appearance-none focus:outline-none focus:ring-2 focus:ring-custom-orange">
                 <option value="">Choose Location</option>
                 <option value="ny">New York City</option>
                 <option value="gc">Grand Canyon</option>
@@ -214,11 +214,11 @@ function FilterSection() {
           </div>
 
           <div className="flex-1 min-w-0">
-            <label className="block mb-2 text-sm font-medium text-white">
+            <label className="block text-left  mb-2 text-sm font-medium text-white">
               Filter By Minority
             </label>
             <div className="relative">
-              <select className="w-full h-12 px-4 text-gray-700 bg-white rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-custom-orange">
+              <select className="w-full h-10 px-4 text-gray-700 bg-white  appearance-none focus:outline-none focus:ring-2 focus:ring-custom-orange">
                 <option value="">Choose Minority</option>
                 <option value="women-owned">Women-Owned</option>
                 <option value="minority-owned">Minority-Owned</option>
@@ -236,9 +236,9 @@ function FilterSection() {
           {/* Yellow Search Button */}
           <div className="flex-1 min-w-0">
             <label className="block mb-2 text-sm font-medium text-white">
-              Search Here
+              {/* Search Here */}
             </label>
-            <button className="w-full h-12 text-lg font-semibold text-gray-800 bg-yellow-400 rounded-lg hover:bg-yellow-500 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-600 flex items-center justify-center gap-2">
+            <button className="w-full h-10 text-lg font-semibold text-gray-800 bg-[#C7A040]  hover:bg-yellow-500 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-600 flex items-center justify-center gap-2">
               <Search className="w-5 h-5" />
               Search Here
             </button>
@@ -459,6 +459,8 @@ function ProductCard({ item }: { item: RankedItem }) {
         </div>
       </div>
     </div>
+
+
   );
 }
 
