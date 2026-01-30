@@ -79,7 +79,22 @@ body {
   /* Your custom orange */
 }
 
-.swiper-pagination-bullets.swiper-pagination-horizontal {
+/* Scoped custom classes for Featured Vendors slider */
+.my-swiper .my-swiper-bullet {
+  background-color: rgba(255,255,255,0.6);
+  opacity: 1;
+  width: 10px;
+  height: 10px;
+  margin: 0 6px;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.my-swiper .my-swiper-bullet-active {
+  background-color: #ffffff;
+  transform: scale(1.05);
+}
+
+.my-swiper .swiper-pagination-bullets.swiper-pagination-horizontal {
   bottom: -5px !important;
 }
 

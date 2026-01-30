@@ -123,7 +123,7 @@ export default function BrowseServices() {
                             ? "bg-[#d1aa45]/90" 
                             : "bg-[#d1aa45]/0"
                         }`}>
-                          <span className={`text-white font-bold text-lg px-4 text-center transition-opacity duration-300 ${
+                          <span className={`text-white font-poppins font-bold text-lg px-4 text-center transition-opacity duration-300 ${
                             hoveredIndex === index ? "opacity-100" : "opacity-0"
                           }`}>
                             {service.title}

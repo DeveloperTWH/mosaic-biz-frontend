@@ -148,8 +148,10 @@ const images = [
         }}
         pagination={{
           clickable: true,
+          bulletClass: 'my-swiper-bullet',
+          bulletActiveClass: 'my-swiper-bullet-active',
         }}
-        className="w-full"
+        className="w-full my-swiper"
       >
         {images.map((src, index) => (
           <SwiperSlide
