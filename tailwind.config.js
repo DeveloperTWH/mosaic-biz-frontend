@@ -18,6 +18,7 @@ module.exports = {
         heading: ["var(--font-anton)", "sans-serif"], // headings
         poppins : ["Poppins", "sans-serif"],
         montserrat : ["Montserrat", "sans-serif"]
+      
       },
     },
   },

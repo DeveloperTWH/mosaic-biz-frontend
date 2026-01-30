@@ -265,14 +265,14 @@ export default function ShopProducts() {
       
       <section className="pt-12 pb-16 px-4 sm:px-6 lg:px-12 max-w-[1400px] mx-auto w-full">
         <div className="max-w-3xl mx-auto text-center mb-12">
-          <h2 className="mb-3 text-2xl uppercase sm:text-3xl md:text-4xl font-bold text-gray-900">
+          <h2 className="mb-3 text-2xl uppercase sm:text-3xl md:text-4xl font-bold text-gray-900 font-poppins">
             Featured Products
           </h2>
           <div className="flex flex-col items-center justify-center mb-4">
             <hr className="w-20 h-1 bg-green-900" />
             <hr className="w-20 h-1 bg-green-900" />
           </div>
-          <p className="px-2 mb-8 text-sm text-gray-600 sm:text-base sm:px-0">
+          <p className="px-2 mb-8 text-sm text-gray-600 sm:text-base sm:px-0 font-montserrat">
             Explore our most recent, high-quality picks — curated by rank and plan weight.
           </p>
         </div>

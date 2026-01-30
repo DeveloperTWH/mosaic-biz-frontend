@@ -25,7 +25,7 @@ export default function HowItWorks() {
       <div className="py-24 max-w-7xl mx-auto px-6">
         {/* Heading */}
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900">
+          <h2 className="text-4xl font-bold text-gray-900 font-poppins">
             HOW IT WORKS
           </h2>
           <div className="flex justify-center mt-4">

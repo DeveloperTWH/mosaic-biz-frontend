@@ -32,7 +32,7 @@ export default function BrowseServices() {
       <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-16">
-          <h2 className="text-4xl font-bold tracking-wide text-gray-900">
+          <h2 className="text-4xl font-bold tracking-wide text-gray-900 font-poppins">
             BROWSE SERVICES
           </h2>
 
@@ -123,7 +123,7 @@ export default function BrowseServices() {
                             ? "bg-[#d1aa45]/90" 
                             : "bg-[#d1aa45]/0"
                         }`}>
-                          <span className={`text-white font-poppins font-bold text-lg px-4 text-center transition-opacity duration-300 ${
+                          <span className={`text-white font-poppins font-bold text-lg px-4 text-center transition-opacity duration-300 font-poppins ${
                             hoveredIndex === index ? "opacity-100" : "opacity-0"
                           }`}>
                             {service.title}
@@ -133,7 +133,7 @@ export default function BrowseServices() {
                     </div>
 
                     {/* Service Title (shown when not hovered) */}
-                    <p className={`mt-6 text-lg font-medium transition-all duration-300 ${
+                    <p className={`mt-6 text-sm font-medium transition-all duration-300 font-poppins ${
                       hoveredIndex === index 
                         ? "text-[#d1aa45] font-semibold" 
                         : "text-gray-800"

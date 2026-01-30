@@ -40,14 +40,14 @@ export default function ClientTestimonials() {
   return (
     <section className="px-5 py-20 text-white md:px-20">
       <div className="mb-12 text-center">
-        <h2 className="mb-1 text-3xl font-semibold uppercase heading">
+        <h2 className="mb-1 text-3xl font-semibold uppercase heading font-poppins">
           What Our Clients Say
         </h2>
         <div className="flex flex-col items-center justify-center">
           <hr className="h-[2px] w-[100px] bg-gray-700" />
           <hr className="h-[2px] w-[100px] mt-[2px] mb-4 bg-gray-700" />
         </div>
-        <p className="text-[13px] text-gray-600 max-w-xl mx-auto">
+        <p className="text-[13px] text-gray-600 max-w-xl mx-auto font-montserrat">
           Dive into powerful narratives, business tips, and local spotlights curated for our vibrant Mosaic Biz Hub community.
         </p>
       </div>
@@ -59,7 +59,7 @@ export default function ClientTestimonials() {
             className="p-6 mb-6 text-gray-800 transition bg-white shadow-md rounded-xl hover:shadow-xl"
           >
             <Quote className="mb-4 rotate-180 text-custom-yellow" size={64} />
-            <p className="mb-6 text-sm">{testimonial.quote}</p>
+            <p className="mb-6 text-sm font-montserrat">{testimonial.quote}</p>
 
             <div className="flex items-center gap-3">
               <div className="relative flex items-center justify-center w-12 h-12 overflow-hidden bg-gray-100 rounded-full">
@@ -75,7 +75,7 @@ export default function ClientTestimonials() {
                 )}
               </div>
               <div>
-                <p className="text-sm font-semibold text-custom-blue">{testimonial.name}</p>
+                <p className="text-sm font-semibold text-custom-blue font-montserrat">{testimonial.name}</p>
                 <div className="flex mt-1">{renderStars(testimonial.rating)}</div>
               </div>
             </div>

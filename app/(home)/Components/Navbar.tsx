@@ -129,13 +129,13 @@ const Navbar = () => {
                 className="absolute left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg w-48 py-2 z-50"
                 onMouseLeave={() => setShopDropdown(false)}
               >
-                <Link href="/products" className={`block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-medium ${popinFont.className}`}>
+                <Link href="/products" className={`block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-medium font-poppins ${popinFont.className}`}>
                   Products
                 </Link>
-                <Link href="/foods" className={`block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-medium ${popinFont.className}`}>
+                <Link href="/foods" className={`block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-medium font-poppins ${popinFont.className}`}>
                   Foods
                 </Link>
-                <Link href="/services" className={`block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-medium ${popinFont.className}`}>
+                <Link href="/services" className={`block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-medium font-poppins ${popinFont.className}`}>
                   Services
                 </Link>
               </div>
@@ -178,13 +178,13 @@ const Navbar = () => {
                 onMouseLeave={() => setMoreDropdown(false)}
               >
 
-                <Link href="/faq" className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-medium">
+                <Link href="/faq" className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-medium font-poppins">
                   FAQ
                 </Link>
-                <Link href="/terms" className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-medium">
+                <Link href="/terms" className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-medium font-poppins">
                   Terms & Conditions
                 </Link>
-                <Link href="/privacy" className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-medium">
+                <Link href="/privacy" className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-medium font-poppins">
                   Privacy Policy
                 </Link>
               </div>
@@ -282,13 +282,13 @@ const Navbar = () => {
                   >
                     <Link
                       href="/login?type=customer"
-                      className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 font-medium"
+                      className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 font-medium font-poppins"
                     >
                       Login as Customer
                     </Link>
                     <Link
                       href="/login?type=vendor"
-                      className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 font-medium"
+                      className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 font-medium font-poppins"
                     >
                       Login as Vendor
                     </Link>
