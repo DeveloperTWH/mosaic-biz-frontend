@@ -1,18 +1,35 @@
 import Image from "next/image";
 
-const HeroSection = () => {
+interface HeroSectionProps {
+  heading: string;
+  imageUrl: string;
+}
+
+const HeroSection = ({ heading, imageUrl }: HeroSectionProps) => {
   return (
-    <section className="relative w-full h-[100px] md:h-[500px]">
+    <section className="relative w-full h-[300px] md:h-[500px]">
       <Image
-        src="/shopproducts/shopproducthero.png"
-        alt="Product Hero"
+        src={imageUrl}
+        alt={heading}
         fill
         priority
         className="object-cover w-full h-full"
       />
+      {/* <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+        <h1 className="text-3xl font-bold leading-loose text-white md:text-5xl font-heading">
+          {heading}
+        </h1>
+      </div> */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40">
+        <h1 className="text-3xl font-bold leading-loose text-white md:text-5xl font-poppins">
+          SHOP PRODUCTS
+        </h1>
+        <h1 className="text-base  leading-loose text-[#A2A2A2] font-poppins">
+          Home // Shop
+        </h1>
+      </div>
     </section>
   );
 };
 
 export default HeroSection;
-

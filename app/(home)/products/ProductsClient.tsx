@@ -52,6 +52,11 @@ type RankedResponse = {
 };
 
 
+
+const HorizontalLine = () => {
+  return <p style={{ borderTop: '2px solid', color : "#2E2E2E",  margin: '10px 0' }}></p> ;
+};
+
 const page = () => {
 
     const router = useRouter();
@@ -171,7 +176,7 @@ const page = () => {
 
     return (
         <div>
-            <HeroSection />
+        <HeroSection heading="Services" imageUrl="/bgdetailpage.png"  />
             {/* <FilterBar
                 searchText={searchText}
                 setSearchText={setSearchText}
@@ -207,6 +212,12 @@ const page = () => {
               >
                 <ChevronRight className="w-6 h-6 text-gray-700" />
               </button>
+            </div>
+
+            <div className='flex flex-col items-center'>
+            <p className='text-3xl'>BEST SELLERS</p>
+            <HorizontalLine/>
+            <p className='w-[50%] text-xs text-[#2E2E2E] text-center font-thin   text-montserrat'> Lorem ipsum dolor sit amet consectetur adipisicing elitsed eiusmod tempor enim minim veniam quis notru exercit ation Lorem ipsum dolor sit amet.Veniam quis notru exercit.</p>
             </div>
 
             {/* Products Carousel */}

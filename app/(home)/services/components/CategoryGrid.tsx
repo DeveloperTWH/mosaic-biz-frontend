@@ -106,7 +106,7 @@ const CategoryGrid = () => {
           {/* Categories Carousel */}
           <Swiper
             onSwiper={setSwiperInstance}
-            modules={[Navigation, Autoplay]}
+            modules={[Navigation]}
             spaceBetween={50}
             slidesPerView={2}
             breakpoints={{
@@ -136,7 +136,7 @@ const CategoryGrid = () => {
                       href={`/services/${category.slug}`}
                       className="block"
                     >
-                      <div className="relative w-44 h-44 mx-auto rounded-full overflow-hidden border-8 border-white shadow-2xl group-hover:border-custom-orange group-hover:ring-4 group-hover:ring-orange-200 transition-all duration-300">
+                      <div className="relative w-[128px] h-[128px] mx-auto rounded-full overflow-hidden border-8 border-white shadow-2xl group-hover:border-custom-orange group-hover:ring-4 group-hover:ring-orange-200 transition-all duration-300">
                         <Image
                           src={category.img || "/placeholder.png"}
                           alt={category.name}

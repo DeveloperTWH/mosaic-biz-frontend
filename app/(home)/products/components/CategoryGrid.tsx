@@ -141,7 +141,7 @@ const CategoryGrid = () => {
                       onMouseEnter={() => handleMouseEnter(index)}
                       onMouseLeave={handleMouseLeave}
                     >
-                      <div className={`relative w-44 h-44 mx-auto rounded-full overflow-hidden border-8 ${isHovered ? 'border-custom-orange ring-4 ring-orange-200' : 'border-white'} shadow-2xl transition-all duration-300`}>
+                      <div className={`relative w-[128px] h-[128px]  mx-auto rounded-full overflow-hidden border-8 ${isHovered ? 'border-custom-orange ring-4 ring-orange-200' : 'border-white'} shadow-2xl transition-all duration-300`}>
                         <Image
                           src={category.img}
                           alt={category.name}
