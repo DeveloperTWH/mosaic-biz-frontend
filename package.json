@@ -9,6 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/material": "^7.3.7",
     "@next/font": "^14.2.15",
     "@stripe/connect-js": "^3.3.28",
     "@stripe/react-connect-js": "^3.3.26",

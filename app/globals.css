@@ -209,3 +209,28 @@ body {
   padding: 8px 0;
   cursor: pointer;
 }
+.price-section {
+  padding: 12px;
+}
+
+.slider-wrapper {
+  position: relative;
+  height: 24px;
+}
+
+.slider-wrapper input[type="range"] {
+  position: absolute;
+  width: 100%;
+}
+
+.price-inputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.price-inputs input {
+  width: 80px;
+  padding: 6px;
+}
