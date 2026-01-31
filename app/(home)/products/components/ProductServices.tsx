@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Service } from "@/types/service";
 import Image from "next/image";
 import Link from "next/link";
-import FilterAccordion from "../../services/components/FilterAccordion";
+import FilterAccordion from "./FilterAccordion";
 import { Star } from "lucide-react";
 
 
