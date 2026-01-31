@@ -18,7 +18,7 @@ body {
 }
 
 * {
-  @apply font-sans;
+  @apply font-poppins;
   margin: 0px;
   padding: 0px;
   font-weight: 500;
@@ -43,7 +43,7 @@ body {
 }
 
 .heading {
-  @apply font-heading uppercase tracking-wide font-normal;
+  @apply font-montserrat uppercase tracking-wide font-normal;
   /* font-size: 42px; */
   line-height: 56px;
   letter-spacing: 2%;
@@ -52,7 +52,7 @@ body {
   color: rgb(39 39 42 / var(--tw-text-opacity));
 }
 .menu{
-  @apply font-heading;
+  @apply font-montserrat;
 }
 
 
@@ -151,4 +151,61 @@ body {
 .custom-scrollbar::-webkit-scrollbar {
   display: none;
   /* Hides scrollbar in Chrome, Safari, and newer versions of Edge */
+}
+
+
+
+.filter-panel {
+  width: 300px;
+  height: 1000px;
+  background: #fff6df;
+  border-radius: 6px;
+  font-family: Arial, sans-serif;
+}
+
+.filter-header {
+  background: #1c2373;
+  color: white;
+  padding: 16px;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.accordion-btn {
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 16px;
+  font-size: 16px;
+  text-align: left;
+  cursor: pointer;
+  border-bottom: 1px solid #ccc;
+  position: relative;
+}
+
+.accordion-btn::after {
+  content: "⌄";
+  position: absolute;
+  right: 16px;
+  transition: transform 0.3s ease;
+}
+
+.accordion-btn.active::after {
+  transform: rotate(180deg);
+}
+
+.accordion-content {
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.accordion-content ul {
+  list-style: none;
+  padding: 0 16px 16px;
+  margin: 0;
+}
+
+.accordion-content li {
+  padding: 8px 0;
+  cursor: pointer;
 }

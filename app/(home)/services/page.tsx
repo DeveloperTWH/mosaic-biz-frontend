@@ -8,6 +8,7 @@ import HeroSection from "./components/HeroSection";
 import BookServices from "./components/BookYourServices";
 import FeatureBlogs from "../Components/FeatureBlogs";
 import { Service } from "@/types/service";
+import FilterAccordion from "./components/FilterAccordion";
 
 
 const ServicePage = () => {
@@ -49,7 +50,7 @@ const ServicePage = () => {
   return (
     <main className="text-black bg-white">
       <HeroSection heading="Services" imageUrl="/bgdetailpage.png"  />
-      <FilterBar
+      {/* <FilterBar
         searchText={searchText}
         setSearchText={setSearchText}
         minorityType={minorityType}
@@ -57,13 +58,14 @@ const ServicePage = () => {
         searchLocation={searchLocation}
         setSearchLocation={setSearchLocation}
         onSearch={handleSearch}
-      />
+      /> */}
+      {/* <FilterAccordion/> */}
 
       {(!searchText && !minorityType && !searchLocation) && (
         <CategoryGrid />
       )}
       <BookServices services={services} />
-      <FeatureBlogs />
+      {/* <FeatureBlogs /> */}
     </main>
   );
 };

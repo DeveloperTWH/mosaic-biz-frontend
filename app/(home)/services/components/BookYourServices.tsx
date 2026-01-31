@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Service } from "@/types/service";
 import Image from "next/image";
 import Link from "next/link";
+import FilterAccordion from "./FilterAccordion";
 
 interface BookServicesProps {
   services: Service[];
@@ -44,12 +45,12 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Left Sidebar - Filters with Orange Background */}
         <div className="lg:w-1/4">
-          <div className="p-5 rounded-lg bg-orange-50">
-            <h2 className="mb-5 text-xl font-bold text-gray-800"># Filter</h2>
+          {/* <div className="p-5 rounded-lg bg-orange-50"> */}
+            {/* <h2 className="mb-5 text-xl font-bold text-gray-800"># Filter</h2> */}
             
             <div className="space-y-6">
               {/* Category Filter */}
-              <div>
+              {/* <div>
                 <h3 className="mb-2 text-sm font-semibold text-gray-700 uppercase tracking-wider">Select Category</h3>
                 <div className="w-full h-0.5 bg-gray-300 mb-3"></div>
                 <div className="space-y-1">
@@ -67,10 +68,11 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
                     </button>
                   ))}
                 </div>
-              </div>
+              </div> */}
+              <FilterAccordion/>
 
               {/* Sub-Category Filter */}
-              <div>
+              {/* <div>
                 <h3 className="mb-2 text-sm font-semibold text-gray-700 uppercase tracking-wider">Select Sub - Category</h3>
                 <div className="w-full h-0.5 bg-gray-300 mb-3"></div>
                 <div className="space-y-1">
@@ -88,10 +90,10 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
                     </button>
                   ))}
                 </div>
-              </div>
+              </div> */}
 
               {/* Badge Filter */}
-              <div>
+              {/* <div>
                 <h3 className="mb-2 text-sm font-semibold text-gray-700 uppercase tracking-wider">Select Badge</h3>
                 <div className="w-full h-0.5 bg-gray-300 mb-3"></div>
                 <div className="space-y-1">
@@ -109,8 +111,8 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
                     </button>
                   ))}
                 </div>
-              </div>
-            </div>
+              </div> */}
+            {/* </div> */}
           </div>
         </div>
 
