@@ -42,9 +42,12 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
 
   return (
     <section className="px-4 py-8 mx-auto max-w-7xl sm:px-6">
+       
       <div className="flex flex-col lg:flex-row gap-6">
+
         {/* Left Sidebar - Filters with Orange Background */}
         <div className="lg:w-1/4">
+        
           {/* <div className="p-5 rounded-lg bg-orange-50"> */}
             {/* <h2 className="mb-5 text-xl font-bold text-gray-800"># Filter</h2> */}
             
@@ -118,11 +121,27 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
 
         {/* Right Content - Services Grid */}
         <div className="lg:w-3/4">
+    
           {/* Products Count - Compact */}
-          <div className="mb-4">
+          <div className="flex mb-4 flex-row justify-between">
+   
             <p className="text-sm text-gray-600">
               (Showing {startItem} – {endItem} Products Of {totalProducts} Products)
             </p>
+
+                          {/* Sort By Section - Compact */}
+ 
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-700">Sort By:</span>
+                  <select className="px-3 py-1 text-sm border rounded cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                    <option>Default</option>
+                    <option>Price: Low to High</option>
+                    <option>Price: High to Low</option>
+                    <option>Most Popular</option>
+                    <option>Newest</option>
+                  </select>
+                </div>
+              
           </div>
 
           {/* Services Grid - Compact Cards */}
@@ -186,19 +205,7 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
                 ))}
               </div>
 
-              {/* Sort By Section - Compact */}
-              <div className="flex items-center justify-end mt-6 pt-4 border-t">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-700">Sort By:</span>
-                  <select className="px-3 py-1 text-sm border rounded cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
-                    <option>Default</option>
-                    <option>Price: Low to High</option>
-                    <option>Price: High to Low</option>
-                    <option>Most Popular</option>
-                    <option>Newest</option>
-                  </select>
-                </div>
-              </div>
+
             </>
           )}
         </div>
