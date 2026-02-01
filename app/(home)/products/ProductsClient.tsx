@@ -478,97 +478,97 @@ function ProductCard({ item }: { item: RankedItem }) {
   const fractional = rating % 1;
   const hasHalfStar = fractional >= 0.25 && fractional < 0.75;
 
-  return (
-    <div className="bg-green p-3  border-2 border-[#D9D9D9] w-[325px] shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col h-[450px]">
-      {/* Product Image - Fixed Height */}
-      <div className="relative h-60 overflow-hidden bg-gray-100 flex-shrink-0">
-        <img
-          src={images[0]}
-          alt={title}
-          loading="lazy"
-          className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-        />
-        
-        {onSale && (
-          <div className="absolute top-3 left-3">
-            <span className="px-3 py-1 text-xs font-bold text-white bg-red-600 rounded-full">
-              SALE
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* Product Info - Flex grow to fill space */}
-      <div className="p-5 flex flex-col flex-grow">
-        {/* Title - Fixed height */}
-        <h3 className="mb-2 text-lg font-bold text-gray-900 uppercase tracking-tight line-clamp-2 h-12 overflow-hidden font-poppins">
-          {title}
-        </h3>
-
-        {/* Description - Fixed height */}
-        <p className="mb-3 text-sm text-gray-600 leading-relaxed line-clamp-2 h-10 overflow-hidden font-montserrat">
-          {description}
-        </p>
-
-        {/* Rating and Reviews - Fixed height */}
-        <div className="mb-4 flex-shrink-0">
-          <div className="flex items-center mb-1">
-
-            <div className="flex">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  size={14}
-                  fill={i < fullStars ? "#FBBF24" : i === fullStars && hasHalfStar ? "#FBBF24" : "#E5E7EB"}
-                  stroke={i < fullStars ? "#FBBF24" : i === fullStars && hasHalfStar ? "#FBBF24" : "#D1D5DB"}
-                  className={i < fullStars || (i === fullStars && hasHalfStar) ? "text-yellow-400" : "text-gray-300"}
-                />
-              ))}
-            </div>
-            {/* <span className="ml-2 text-sm font-semibold text-gray-700">
-              {rating.toFixed(1)}
-            </span> */}
-            <p className="text-xs ml-2 text-gray-500 font-poppins">
-            {ratingCount} Ratings And {reviewCount} Reviews
-          </p>
-          </div>
-          {/* <p className="text-xs text-gray-500">
-            {ratingCount} Ratings And {reviewCount} Reviews
-          </p> */}
-        </div>
-
-        {/* Price - Fixed height */}
-        <div className="mb-5 flex-shrink-0">
-          {onSale ? (
-            <div className="flex items-center gap-3">
-              <span className="text-xl font-bold text-red-600">
-                ${effective.toFixed(2)}
-              </span>
-              <span className="text-base text-gray-500 line-through">
-                ${price.toFixed(2)}
-              </span>
-            </div>
-          ) : (
-            <span className="text-sm font-bold text-gray-900">
-              ${price.toFixed(2)}
-            </span>
-          )}
-        </div>
-
-        {/* View Product Button - Fixed at bottom */}
-        {/* <div className="mt-auto pt-4">
-          <Link
-            href={href}
-            className="block w-full py-2.5 text-center text-white font-semibold bg-custom-orange rounded-lg hover:bg-orange-600 transition-colors"
-          >
-            View Product
-          </Link>
-        </div> */}
-      </div>
-    </div>
-
-
-  );
+   return (
+     <div className="bg-green p-3  border-2 border-[#D9D9D9] w-[300px] shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col h-[420px]">
+       {/* Product Image - Fixed Height */}
+       <div className="relative h-60 overflow-hidden bg-gray-100 flex-shrink-0">
+         <img
+           src={images[0]}
+           alt={title}
+           loading="lazy"
+           className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+         />
+         
+         {onSale && (
+           <div className="absolute top-3 left-3">
+             <span className="px-3 py-1 text-xs font-bold text-white bg-red-600 rounded-full">
+               SALE
+             </span>
+           </div>
+         )}
+       </div>
+ 
+       {/* Product Info - Flex grow to fill space */}
+       <div className="p-5 flex flex-col flex-grow">
+         {/* Title - Fixed height */}
+         <h3 className="text-lg font-bold text-gray-900 uppercase tracking-tight line-clamp-1 h-9 overflow-hidden font-poppins">
+           {title}
+         </h3>
+ 
+         {/* Description - Fixed height */}
+         <p className="mb-3 text-sm text-gray-600 leading-relaxed line-clamp-2 h-10 overflow-hidden font-montserrat">
+           {description}
+         </p>
+ 
+         {/* Rating and Reviews - Fixed height */}
+         <div className="flex-shrink-0">
+           <div className="flex items-center mb-1">
+ 
+             <div className="flex">
+               {[...Array(5)].map((_, i) => (
+                 <Star
+                   key={i}
+                   size={14}
+                   fill={i < fullStars ? "#FBBF24" : i === fullStars && hasHalfStar ? "#FBBF24" : "#E5E7EB"}
+                   stroke={i < fullStars ? "#FBBF24" : i === fullStars && hasHalfStar ? "#FBBF24" : "#D1D5DB"}
+                   className={i < fullStars || (i === fullStars && hasHalfStar) ? "text-yellow-400" : "text-gray-300"}
+                 />
+               ))}
+             </div>
+             {/* <span className="ml-2 text-sm font-semibold text-gray-700">
+               {rating.toFixed(1)}
+             </span> */}
+             <p className="text-xs ml-2 text-gray-500 font-poppins">
+             {ratingCount} Ratings And {reviewCount} Reviews
+           </p>
+           </div>
+           {/* <p className="text-xs text-gray-500">
+             {ratingCount} Ratings And {reviewCount} Reviews
+           </p> */}
+         </div>
+ 
+         {/* Price - Fixed height */}
+         <div className="flex-shrink-0">
+           {onSale ? (
+             <div className="flex items-center gap-3">
+               <span className="text-xl font-bold text-red-600">
+                 ${effective.toFixed(2)}
+               </span>
+               <span className="text-base text-gray-500 line-through">
+                 ${price.toFixed(2)}
+               </span>
+             </div>
+           ) : (
+             <span className="text-sm font-bold text-gray-900">
+               ${price.toFixed(2)}
+             </span>
+           )}
+         </div>
+ 
+         {/* View Product Button - Fixed at bottom */}
+         {/* <div className="mt-auto pt-4">
+           <Link
+             href={href}
+             className="block w-full py-2.5 text-center text-white font-semibold bg-custom-orange rounded-lg hover:bg-orange-600 transition-colors"
+           >
+             View Product
+           </Link>
+         </div> */}
+       </div>
+     </div>
+ 
+ 
+   );
 }
 
 export default page

@@ -376,7 +376,7 @@ function ProductCard({ item }: { item: RankedItem }) {
   const hasHalfStar = fractional >= 0.25 && fractional < 0.75;
 
   return (
-    <div className="bg-green p-3  border-2 border-[#D9D9D9] w-[325px] shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col h-[450px]">
+    <div className="bg-green p-3  border-2 border-[#D9D9D9] w-[300px] shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col h-[420px]">
       {/* Product Image - Fixed Height */}
       <div className="relative h-60 overflow-hidden bg-gray-100 flex-shrink-0">
         <img
@@ -398,7 +398,7 @@ function ProductCard({ item }: { item: RankedItem }) {
       {/* Product Info - Flex grow to fill space */}
       <div className="p-5 flex flex-col flex-grow">
         {/* Title - Fixed height */}
-        <h3 className="mb-2 text-lg font-bold text-gray-900 uppercase tracking-tight line-clamp-2 h-12 overflow-hidden font-poppins">
+        <h3 className="text-lg font-bold text-gray-900 uppercase tracking-tight line-clamp-1 h-9 overflow-hidden font-poppins">
           {title}
         </h3>
 
@@ -408,7 +408,7 @@ function ProductCard({ item }: { item: RankedItem }) {
         </p>
 
         {/* Rating and Reviews - Fixed height */}
-        <div className="mb-4 flex-shrink-0">
+        <div className="flex-shrink-0">
           <div className="flex items-center mb-1">
 
             <div className="flex">
@@ -435,13 +435,13 @@ function ProductCard({ item }: { item: RankedItem }) {
         </div>
 
         {/* Price - Fixed height */}
-        <div className="mb-5 flex-shrink-0">
+        <div className="flex-shrink-0">
           {onSale ? (
             <div className="flex items-center gap-3">
-              <span className="text-sm font-bold text-red-600">
+              <span className="text-xl font-bold text-red-600">
                 ${effective.toFixed(2)}
               </span>
-              <span className="text-sm text-gray-500 line-through">
+              <span className="text-base text-gray-500 line-through">
                 ${price.toFixed(2)}
               </span>
             </div>
