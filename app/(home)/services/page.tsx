@@ -10,6 +10,7 @@ import FeatureBlogs from "../Components/FeatureBlogs";
 import { Service } from "@/types/service";
 import FilterAccordion from "./components/FilterAccordion";
 import JoinVendorBanner from "./components/JoinVendorBanner";
+import BrowseServices from "../Components/BrowsServices";
 
 
 const ServicePage = () => {
@@ -64,9 +65,11 @@ const ServicePage = () => {
 
       <FilterSection/>
 
-      {(!searchText && !minorityType && !searchLocation) && (
+      {/* {(!searchText && !minorityType && !searchLocation) && (
         <CategoryGrid />
-      )}
+      )} */}
+
+      <BrowseServices showAllService={false}/>
       <BookServices services={services} />
       {/* <FeatureBlogs />
        */}

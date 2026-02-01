@@ -10,18 +10,18 @@ import "swiper/css";
 import "swiper/css/navigation";
 
 const services = [
-  { title: "Salons And Spas", img: "/browsservice/electronics 1.png" },
-  { title: "Legal Services", img: "/browsservice/electronics 2.png" },
-  { title: "Health And Wellness", img: "/browsservice/electronics 3.png" },
-  { title: "Business Consulting", img: "/browsservice/electronics 4.png" },
-  { title: "IT Consulting", img: "/browsservice/electronics 5.png" },
-  { title: "Marketing", img: "/browsservice/electronics 6.png" },
+  { title: "Electronics", img: "/browsecategories/electronics 1.png" },
+  { title: "Fashion and Appaprel", img: "/browsecategories/electronics 2.png" },
+  { title: "Beauty and Personal Care", img: "/browsecategories/electronics 3.png" },
+  { title: "Home and Kitchen Essentials", img: "/browsecategories/electronics 4.png" },
+  { title: "Health and Wellness", img: "/browsecategories/electronics 5.png" },
+  { title: "Toys and Hobbies", img: "/browsecategories/electronics 6.png" },
   // { title: "Education", img: "/browsservice/electronics 7.png" },
   // { title: "Home Services", img: "/browsservice/frame 8.png" },
   // { title: "Financial Services", img: "/browsservice/frame 9.png" },
 ];
 
-export default function BrowseServices({showAllService} : {showAllService : boolean}) {
+export default function BrowseCategories() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const prevButtonRef = React.useRef<HTMLButtonElement>(null);
   const nextButtonRef = React.useRef<HTMLButtonElement>(null);
@@ -36,14 +36,12 @@ export default function BrowseServices({showAllService} : {showAllService : bool
             BROWSE SERVICES
           </h2>
 
-          {showAllService &&
-            <Link
+          <Link
             href="/services"
             className="px-8 py-3 text-lg font-semibold text-white bg-[#d1aa45] hover:bg-[#c19a38] transition font-montserrat"
           >
             Show All Services
           </Link>
-        }
         </div>
 
         {/* Slider Container */}

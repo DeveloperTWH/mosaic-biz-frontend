@@ -20,7 +20,7 @@ export default function Home() {
     <>
       <Hero />
       <ShopProducts />
-      <BrowseServices />
+      <BrowseServices showAllService={true}/>
       <BrowseFoodAndGrocery/>
       <HowItWorksImage/>
       <ClientTestimonials />
