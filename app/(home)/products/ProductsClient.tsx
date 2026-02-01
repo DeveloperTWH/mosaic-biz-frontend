@@ -11,6 +11,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from 'swiper/modules';
 import ProductSevices from './components/ProductServices';
 import { Service } from '@/types/service';
+import JoinVendorBanner from './components/JoinVendorBanner';
 
 type MinorityType = { _id: string; name: string };
 
@@ -216,7 +217,11 @@ const page = () => {
 
             <div className='flex flex-col items-center'>
             <p className='text-3xl'>BEST SELLERS</p>
-            <HorizontalLine/>
+            {/* <HorizontalLine/> */}
+            <div className="flex flex-col items-center justify-center">
+                <hr className="h-[2px] w-[100px] bg-gray-700" />
+                <hr className="h-[2px] w-[100px] mt-[2px] mb-4 bg-gray-700" />
+              </div>
             <p className='w-[50%] text-xs text-[#2E2E2E] text-center font-thin   text-montserrat'> Lorem ipsum dolor sit amet consectetur adipisicing elitsed eiusmod tempor enim minim veniam quis notru exercit ation Lorem ipsum dolor sit amet.Veniam quis notru exercit.</p>
             </div>
 
@@ -256,6 +261,7 @@ const page = () => {
           </div>
 
              <ProductSevices services={services}/>
+             <JoinVendorBanner/>
        
         </div>
     )

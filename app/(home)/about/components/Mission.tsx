@@ -4,10 +4,10 @@ export default function Mission() {
 
         <div className="relative flex items-center justify-center w-full md:order-2">
         
-        <div className="absolute top-[-18%] left-[30%] w-[110%] h-[95%] bg-sky-400 -z-10" />
+        <div className="absolute top-[-18%] left-[30%] w-[110%] h-[95%] -z-10" />
         
         <img
-          src="mision.png"
+          src="/about/mission.png"
           alt="Team"
           className="object-cover w-full max-w-xl shadow-md"
         />

@@ -9,6 +9,7 @@ import BookServices from "./components/BookYourServices";
 import FeatureBlogs from "../Components/FeatureBlogs";
 import { Service } from "@/types/service";
 import FilterAccordion from "./components/FilterAccordion";
+import JoinVendorBanner from "./components/JoinVendorBanner";
 
 
 const ServicePage = () => {
@@ -67,7 +68,9 @@ const ServicePage = () => {
         <CategoryGrid />
       )}
       <BookServices services={services} />
-      <FeatureBlogs />
+      {/* <FeatureBlogs />
+       */}
+       <JoinVendorBanner/>
     </main>
   );
 };

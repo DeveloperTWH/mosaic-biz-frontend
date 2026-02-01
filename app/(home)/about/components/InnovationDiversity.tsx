@@ -6,10 +6,10 @@ export default function InnovationDiversity() {
 
             <div className="relative flex items-center justify-center w-full">
 
-                <div className="absolute top-[-18%] right-[30%] w-[110%] h-[95%] bg-sky-400 -z-10" />
+                <div className="absolute top-[-18%] right-[30%] w-[110%] h-[95%]  -z-10" />
 
                 <img
-                    src="/about_page_2.png"
+                    src="/about/inovation.png"
                     alt="Team"
                     className="object-cover w-full max-w-xl shadow-md"
                 />

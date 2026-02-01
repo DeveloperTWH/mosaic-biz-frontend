@@ -25,7 +25,7 @@ export default function CommunityDevelopment() {
         </div>
 
         {/* Card 2 - Highlighted */}
-        <div className="p-8 bg-orange-400 text-white rounded-2xl shadow-lg flex flex-col items-center text-center">
+        <div className="p-8 bg-[#C7A040] text-white rounded-2xl shadow-lg flex flex-col items-center text-center">
           <Image
             src="/about/shuttle 1.png"
             alt="Local economy support"

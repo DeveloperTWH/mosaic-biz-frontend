@@ -7,7 +7,7 @@ interface HeroSectionProps {
 
 const HeroSection = ({ heading, imageUrl }: HeroSectionProps) => {
   return (
-    <section className="relative w-full h-[300px] md:h-[300px]">
+    <section className="relative w-full h-[250px] md:h-[300px]">
       <Image
         src={imageUrl}
         alt={heading}
@@ -22,10 +22,10 @@ const HeroSection = ({ heading, imageUrl }: HeroSectionProps) => {
       </div> */}
       <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40">
         <h1 className="text-3xl font-bold leading-loose text-white md:text-5xl font-poppins">
-          SHOP PRODUCTS
+          ABOUT US
         </h1>
         <h1 className="text-base  leading-loose text-[#A2A2A2] font-poppins">
-          Home // Shop
+          Home // About
         </h1>
       </div>
     </section>

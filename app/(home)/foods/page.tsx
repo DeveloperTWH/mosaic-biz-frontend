@@ -10,6 +10,7 @@ import BookServices from './components/BookYourServices';
 import { Service } from "@/types/service";
 import axios from "axios";
 import Image from 'next/image';
+import JoinVendorBanner from './components/JoinVendorBanner';
 
 const FoodSection = () => {
 
@@ -49,7 +50,7 @@ const FoodSection = () => {
   },[])
   return (
     <div>
-      <HeroSection heading={"Foods"} imageUrl='/foods/food_section.png' />
+      <HeroSection heading={"Foods"} imageUrl="/bgdetailpage.png"  />
       {/* <FilterBar
         searchText={searchText}
         setSearchText={setSearchText}
@@ -143,6 +144,8 @@ const FoodSection = () => {
 
       
       <BookServices services={services} />
+
+      <JoinVendorBanner/>
       {/* <FoodsAndRestaurantsPage /> */}
       <div className="max-w-screen-xl px-8 py-10 mx-auto">
         {/* <SimilarProduct /> */}
