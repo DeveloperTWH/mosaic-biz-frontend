@@ -1,7 +1,8 @@
 import React from 'react';
-import HeroSection from '../services/components/HeroSection';
+import HeroSection from './components/HeroSection';
 import { Mail, MapPinned, PhoneCall } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function ContactUsPage() {
     return (
@@ -13,48 +14,48 @@ export default function ContactUsPage() {
             <div className="grid w-full grid-cols-1 gap-8 p-6 mx-auto lg:grid-cols-2 lg:p-12 max-w-7xl">
                 {/* Contact Form */}
                 <div className='p-4 sm:p-6 md:p-8 lg:p-10'>
-                    <h2 className="mb-3 text-2xl font-semibold sm:text-3xl heading">CONNECT WITH US</h2>
+                    <h2 className="mb-3 text-3xl font-poppins sm:text-4xl">CONNECT WITH US</h2>
                     <hr className="h-[2px] w-[100px] bg-green-900" />
                     <hr className="h-[2px] w-[100px] bg-green-900 mt-[1px] mb-4" />
-                    <p className="mb-6 text-sm text-gray-600 sm:text-base">
+                    <p className="mb-6 text-sm text-[#5F5F5F] font-montserrat">
                         Reach out to Mosaic Biz Hub anytime. We’re here to support your journey, answer your questions, and help your business thrive in the digital world.
                     </p>
 
                     <form className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <div className="flex flex-col">
-                            <label htmlFor="FirstName" className="">First Name</label>
-                            <input id="FirstName" type="text" placeholder="Enter First Name" className="input" />
+                            <label htmlFor="FirstName" className="text-sm">First Name</label>
+                            <input id="FirstName" type="text" placeholder="Enter First Name" className="input border-[1px] text-sm p-2 text-[#5F5F5F] text-[#5F5F5F] font-montserrat" />
                         </div>
 
                         <div className="flex flex-col">
-                            <label htmlFor="LastName" className="">Last Name</label>
-                            <input id="LastName" type="text" placeholder="Enter Last Name" className="input" />
+                            <label htmlFor="LastName" className="text-sm">Last Name</label>
+                            <input id="LastName" type="text" placeholder="Enter Last Name" className="input border-[1px] text-sm p-2  text-[#5F5F5F] font-montserrat" />
                         </div>
 
                         <div className="flex flex-col">
-                            <label htmlFor="Email" className="">Email</label>
-                            <input id="Email" type="email" placeholder="Enter Email" className="input" />
+                            <label htmlFor="Email" className="text-sm">Email</label>
+                            <input id="Email" type="email" placeholder="Enter Email" className="input border-[1px] text-sm p-2 text-[#5F5F5F] font-montserrat" />
                         </div>
 
                         <div className="flex flex-col">
-                            <label htmlFor="Phone" className="">Phone Number</label>
-                            <input id="Phone" type="tel" placeholder="Enter Phone Number" className="input" />
+                            <label htmlFor="Phone"className="text-sm">Phone Number</label>
+                            <input id="Phone" type="tel" placeholder="Enter Phone Number" className="input border-[1px] text-sm p-2  text-[#5F5F5F] font-montserrat" />
                         </div>
 
                         <div className="flex flex-col md:col-span-2">
-                            <label htmlFor="Subject" className="">Subject</label>
-                            <input id="Subject" type="text" placeholder="Enter Subject" className="input" />
+                            <label htmlFor="Subject" className="text-sm">Subject</label>
+                            <input id="Subject" type="text" placeholder="Enter Subject" className="input border-[1px] text-sm p-2 text-[#5F5F5F] font-montserrat" />
                         </div>
 
                         <div className="flex flex-col md:col-span-2">
-                            <label htmlFor="Message" className="">How Can We Help You?</label>
-                            <textarea id="Message" placeholder="Enter Message" className="input h-28" />
+                            <label htmlFor="Message"className="text-sm">How Can We Help You?</label>
+                            <textarea id="Message" placeholder="Enter Message" className="input h-28 border-[1px] text-sm p-2  text-[#5F5F5F] font-montserrat" />
                         </div>
 
                         <div className="md:col-span-2">
                             <button
                                 type="submit"
-                                className="w-full px-20 py-2 text-white bg-custom-orange md:w-auto"
+                                className="w-full px-20 py-2 text-white bg-[#C7A040] md:w-auto"
                             >
                                 Submit
                             </button>
@@ -64,15 +65,22 @@ export default function ContactUsPage() {
 
 
                 {/* Newsletter */}
-                <div className="relative min-h-[600px]">
-                    <div
+                <div className="relative mt-10 min-h-[500px] w-[600px]">
+                    {/* <div
                         className="absolute inset-0 z-0 bg-center bg-cover"
-                        style={{ backgroundImage: "url('/about/about 1.png')" }}
-                    >
-                        <div className="absolute inset-0 bg-gray-700 opacity-90" />
-                    </div>
+                        style={{ backgroundImage: "url('/contact/contactRight.png')" }}
+                    > */}
+                        {/* <div className="absolute inset-0 bg-gray-700 opacity-90" /> */}
+                    {/* </div> */}
+                    <Image
+                    src={"/contact/contactRight.png"}
+                    alt={"contact"}
+                    height={800}
+                    width={700}
+                    />
+                    
 
-                    <div className="relative z-10 flex flex-col justify-center h-full p-6 text-white sm:p-10">
+                    {/* <div className="relative z-10 flex flex-col justify-center h-full p-6 text-white sm:p-10">
                         <h2 className="mb-4 text-2xl font-bold sm:text-3xl">SUBSCRIBE NEWSLETTER</h2>
                         <hr className="h-[2px] w-[100px] bg-white" />
                         <hr className="h-[2px] w-[100px] bg-white mt-[1px] mb-5" />
@@ -99,7 +107,7 @@ export default function ContactUsPage() {
                         <button className="w-full px-6 py-2 text-white transition bg-custom-orange hover:bg-orange-700">
                             Subscribe Now
                         </button>
-                    </div>
+                    </div> */}
                 </div>
             </div>
 
@@ -114,7 +122,7 @@ export default function ContactUsPage() {
                     <p>For Vendors: +9876 54 3201</p>
                 </div>
 
-                <div className="px-10 py-8 text-white bg-gradient-orange">
+                <div className="px-10 py-8 text-white bg-gradient-skyblue">
                     <Mail size={40} className='mb-10' />
                     <h3 className="mb-2 text-lg font-bold">EMAIL US:</h3>
                     <hr className="h-[2px] w-[50px] bg-white" />
@@ -159,9 +167,10 @@ export default function ContactUsPage() {
             </div>
 
 
+
             {/* Map Section */}
             <div className="relative px-4 py-10 my-8 sm:px-8">
-                <div className="absolute bottom-[-10%] left-[0%] w-[50%] h-[80%] bg-custom-blue -z-10" />
+                <div className="absolute bottom-[-10%] left-[0%] w-[50%] h-[80%]  -z-10" />
 
                 <iframe
                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2886.478198356483!2d-79.38429378450022!3d43.648409279121854!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x882b34d9c2e4fd33%3A0x60aef9634974e0c0!2sUnion%20Station!5e0!3m2!1sen!2sca!4v1632940851879!5m2!1sen!2sca"
@@ -171,6 +180,44 @@ export default function ContactUsPage() {
                     loading="lazy"
                     className="w-full max-w-5xl mx-auto border "
                 ></iframe>
+            </div>
+
+            <div className="flex justify-center  bg-[#FFF6E0]  h-[400px]">
+                <div className='flex mt-8 h-[80%]'>
+                    <Image
+                    src={"/contact/subscribe.png"}
+                    height={250}
+                    width={250 }
+                    alt='subscribe image'
+                    />
+                </div>
+
+                <div className='flex flex-col w-[50%] ml-[20%] justify-center gap-5'>
+
+
+
+                    <p className='text-3xl'>SUBSCRIBE NEWSLTTER</p>
+                    <p className='text-sm w-[80%]'>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam laoreet, diam sit amet porta eleifend, turpis justo maximus eros, rhoncus ullamcorper mi tortor.</p>
+        
+                    <div className="flex flex-col">
+                        <label htmlFor="Email" className="text-sm">Email Adress</label>
+                        <div className='flex flex-row gap-2'>
+                            <input id="Email" type="email" placeholder="Enter Email" className="input w-[400px] border-[1px] text-sm p-2 text-[#5F5F5F] font-montserrat" />
+
+
+                        <div className="md:col-span-2">
+                            <button
+                                type="submit"
+                                className="w-full px-20 py-2 text-white bg-[#C7A040] md:w-auto"
+                            >
+                              Subscribe Now
+                            </button>
+                        </div>
+                        </div>
+                    </div>
+                
+                </div>
+        
             </div>
         </div>
     );
