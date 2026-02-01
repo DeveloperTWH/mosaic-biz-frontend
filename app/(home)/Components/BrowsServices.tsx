@@ -10,15 +10,15 @@ import "swiper/css";
 import "swiper/css/navigation";
 
 const services = [
-  { title: "Salons And Spas", img: "/browsservice/frame 1.png" },
-  { title: "Legal Services", img: "/browsservice/frame 2.png" },
-  { title: "Health And Wellness", img: "/browsservice/frame 3.png" },
-  { title: "Business Consulting", img: "/browsservice/frame 4.png" },
-  { title: "IT Consulting", img: "/browsservice/frame 5.png" },
-  { title: "Marketing", img: "/browsservice/frame 6.png" },
-  { title: "Education", img: "/browsservice/frame 7.png" },
-  { title: "Home Services", img: "/browsservice/frame 8.png" },
-  { title: "Financial Services", img: "/browsservice/frame 9.png" },
+  { title: "Salons And Spas", img: "/browsservice/electronics 1.png" },
+  { title: "Legal Services", img: "/browsservice/electronics 2.png" },
+  { title: "Health And Wellness", img: "/browsservice/electronics 3.png" },
+  { title: "Business Consulting", img: "/browsservice/electronics 4.png" },
+  { title: "IT Consulting", img: "/browsservice/electronics 5.png" },
+  { title: "Marketing", img: "/browsservice/electronics 6.png" },
+  // { title: "Education", img: "/browsservice/electronics 7.png" },
+  // { title: "Home Services", img: "/browsservice/frame 8.png" },
+  // { title: "Financial Services", img: "/browsservice/frame 9.png" },
 ];
 
 export default function BrowseServices() {

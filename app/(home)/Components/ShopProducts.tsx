@@ -376,7 +376,7 @@ function ProductCard({ item }: { item: RankedItem }) {
   const hasHalfStar = fractional >= 0.25 && fractional < 0.75;
 
   return (
-    <div className="bg-green p-3  border-2 border-[#D9D9D9] w-[320px] shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col h-[500px]">
+    <div className="bg-green p-3  border-2 border-[#D9D9D9] w-[325px] shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col h-[450px]">
       {/* Product Image - Fixed Height */}
       <div className="relative h-60 overflow-hidden bg-gray-100 flex-shrink-0">
         <img
@@ -438,15 +438,15 @@ function ProductCard({ item }: { item: RankedItem }) {
         <div className="mb-5 flex-shrink-0">
           {onSale ? (
             <div className="flex items-center gap-3">
-              <span className="text-xl font-bold text-red-600">
+              <span className="text-sm font-bold text-red-600">
                 ${effective.toFixed(2)}
               </span>
-              <span className="text-base text-gray-500 line-through">
+              <span className="text-sm text-gray-500 line-through">
                 ${price.toFixed(2)}
               </span>
             </div>
           ) : (
-            <span className="text-xl font-bold text-gray-900">
+            <span className="text-sm font-bold text-gray-900">
               ${price.toFixed(2)}
             </span>
           )}
