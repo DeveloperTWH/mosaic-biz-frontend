@@ -549,7 +549,7 @@ function ProductCard({ item }: { item: RankedItem }) {
               </span>
             </div>
           ) : (
-            <span className="text-xl font-bold text-gray-900">
+            <span className="text-sm font-bold text-gray-900">
               ${price.toFixed(2)}
             </span>
           )}
