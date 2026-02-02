@@ -115,9 +115,15 @@ function LoginContent() {
       <div className="flex items-center justify-center bg-white px-6">
         <div className="w-full max-w-md">
           <span className="inline-block mb-3 rounded-full bg-[#FFF6E0] px-3 py-1 text-xs font-montserrat font-thin text-[#C7A040]">
-            Customer
+            {type}
           </span>
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">SIGN IN</h2>
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">SIGN IN</h2>
+
+
+            <div className="flex flex-col justify-start mb-5">
+              <hr className="h-[2px] w-[80px] bg-gray-700" />
+              <hr className="h-[2px] w-[80px] mt-[2px] mb-4 bg-gray-700" />
+            </div>
 
           <form className="space-y-4">
             <div>
@@ -126,7 +132,7 @@ function LoginContent() {
               </label>
               <input
                 type="email"
-                placeholder="you@example.com"
+                // placeholder="you@example.com"
                 className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-900"
               />
             </div>
@@ -137,7 +143,7 @@ function LoginContent() {
               </label>
               <input
                 type="password"
-                placeholder="••••••••"
+                // placeholder="••••••••"
                 className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-900"
               />
             </div>
@@ -154,10 +160,11 @@ function LoginContent() {
 
             <button
               type="submit"
-              className="w-full bg-blue-900 text-white py-2  font-medium font-montserrat hover:bg-blue-800 transition"
+              className="w-full bg-blue-900 text-white py-2  text-[16px] font-montserrat hover:bg-blue-800 transition"
             >
               Sign In
             </button>
+
           </form>
 
           <div className="my-6 flex items-center gap-4">
@@ -168,16 +175,27 @@ function LoginContent() {
 
           <div className="flex items-center justify-center gap-4">
             <button className="h-10 w-10 rounded-full border flex items-center justify-center hover:bg-gray-100">
-              f
+              <Image
+              src={"/login/facebookLogo.png"}
+              alt={"facebook"}
+              width={40}
+              height={40} 
+              />
+              
             </button>
             <button className="h-10 w-10 rounded-full border flex items-center justify-center hover:bg-gray-100">
-              G
+              <Image
+              src={"/login/googleLogo.png"}
+              alt={"facebook"}
+              width={40}
+              height={40} 
+              />
             </button>
           </div>
 
           <p className="mt-6 text-center text-sm text-gray-600">
             New Customer?{" "}
-            <a href="#" className="text-blue-900 font-semibold hover:underline">
+            <a href={`/signup?type=${type}`} className="text-blue-900 font-semibold hover:underline">
               Create Account
             </a>
           </p>
