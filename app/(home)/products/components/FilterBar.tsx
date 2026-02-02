@@ -54,7 +54,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
           
           {/* Filter By Business Type */}
           <div className="flex-1 min-w-0">
-            <label className="block mb-2 text-sm font-medium text-white font-poppins">
+            <label className="block   text-left  text-[14px] font-medium text-white font-poppins">
               Filter By Business Type
             </label>
             <input
@@ -68,7 +68,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
 
           {/* Filter By Location */}
           <div className="flex-1 min-w-0">
-            <label className="block mb-2 text-sm font-medium text-white font-poppins">
+            <label className="block   text-left  text-[14px] font-medium text-white font-poppins">
               Filter By Location
             </label>
             <div className="relative">
@@ -84,7 +84,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
 
           {/* Filter By Minority */}
           <div className="flex-1 min-w-0">
-            <label className="block mb-2 text-sm font-medium text-white">
+            <label className="block   text-left  text-[14px] font-medium text-white font-poppins">
               Filter By Minority
             </label>
             <div className="relative">

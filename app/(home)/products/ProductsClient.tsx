@@ -276,7 +276,7 @@ function FilterSection() {
       <div className="max-w-[1500px]  mx-auto px-4 sm:px-6 lg:px-12">
         <div className="flex flex-col  md:flex-row md:items-end gap-4 md:gap-6">
         <div className="flex-[3] min-w-0 ">
-            <label className="block mb-2 text-sm text-left  font-medium text-white font-poppins">
+            <label className="block   text-left  text-[14px] font-medium text-white font-poppins">
               Filter By Business Type
             </label>
             <input
@@ -287,7 +287,7 @@ function FilterSection() {
           </div>
 
           <div className="flex-[1] min-w-0">
-            <label className="block mb-2  text-left  text-sm font-medium text-white font-poppins">
+            <label className="block   text-left  text-[14px] font-medium text-white font-poppins">
               Filter By Location
             </label>
             <div className="relative">
@@ -307,7 +307,7 @@ function FilterSection() {
           </div>
 
           <div className="flex-1 min-w-0">
-            <label className="block text-left  mb-2 text-sm font-medium text-white font-poppins">
+            <label className="block   text-left  text-[14px] font-medium text-white font-poppins">
               Filter By Minority
             </label>
             <div className="relative">
