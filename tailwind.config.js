@@ -14,8 +14,8 @@ module.exports = {
         'custom-dark': '#333333',
       },
       fontFamily: {
-        sans: ["var(--font-josefin)", "sans-serif"], // default body
-        heading: ["var(--font-anton)", "sans-serif"], // headings
+        // sans: ["var(--font-josefin)", "sans-serif"], // default body
+        // heading: ["var(--font-anton)", "sans-serif"], // headings
         poppins : ["Poppins", "sans-serif"],
         montserrat : ["Montserrat", "sans-serif"]
       

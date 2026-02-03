@@ -40,7 +40,7 @@ export default function ClientTestimonials() {
   return (
     <section className="px-5 py-20 text-white md:px-20">
       <div className="mb-12 text-center">
-        <h2 className="mb-1 text-3xl font-semibold uppercase heading font-poppins">
+        <h2 className="mb-1 heading">
           What Our Clients Say
         </h2>
         <div className="flex flex-col items-center justify-center">
