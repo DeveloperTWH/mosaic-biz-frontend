@@ -174,7 +174,7 @@ const getCookie = (name: string): string | null => {
 // Function to get upload URL from backend
  const getUploadUrl = async (fileName: string, fileType: string, documentType: string) => {
   const response = await fetch(
-    `http://localhost:3001/api/vendor-onboarding/stage1/upload-url?fileName=${encodeURIComponent(fileName)}&fileType=${encodeURIComponent(fileType)}&documentType=${documentType}`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/vendor-onboarding/stage1/upload-url?fileName=${encodeURIComponent(fileName)}&fileType=${encodeURIComponent(fileType)}&documentType=${documentType}`,
     {
       method: 'GET',
       headers: {
