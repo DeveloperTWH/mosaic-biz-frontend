@@ -78,13 +78,13 @@ export default function HowItWorks() {
 
           {/* Right Content */}
           <div className="flex gap-6">
-            <Image
+            {/* <Image
               src="/howitworkright.png"
               alt="Discover and connect"
               width={120}
               height={120}
               className="flex-shrink-0"
-            />
+            /> */}
 
             <div className="text-gray-700 space-y-6 text-base leading-relaxed">
               <p>
