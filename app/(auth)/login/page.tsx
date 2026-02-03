@@ -131,10 +131,9 @@ function LoginContent() {
                 Email
               </label>
               <input
+                name="email"
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
+                // placeholder="you@example.com"
                 className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-900"
               />
             </div>
@@ -143,22 +142,11 @@ function LoginContent() {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Password
               </label>
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-900"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-2 flex items-center text-gray-500"
-                >
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                </button>
-              </div>
+              <input
+                type="password"
+                // placeholder="••••••••"
+                className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-900"
+              />
             </div>
 
             <div className="flex items-center justify-between text-sm">
@@ -171,12 +159,9 @@ function LoginContent() {
               </a>
             </div>
 
-            {error && <p className="text-sm text-red-600">{error}</p>}
-
             <button
               type="submit"
-              disabled={loading}
-              className="w-full bg-blue-900 text-white py-2 text-[16px] font-montserrat hover:bg-blue-800 transition disabled:opacity-60"
+              className="w-full bg-blue-900 text-white py-2  text-[16px] font-montserrat hover:bg-blue-800 transition"
             >
               {loading ? 'Signing In...' : 'Sign In'}
             </button>

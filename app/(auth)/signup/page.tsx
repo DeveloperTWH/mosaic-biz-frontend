@@ -23,7 +23,7 @@ function SignupContent() {
   const [password, setPassword] = useState("");
   const [pwdError, setPwdError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pwdChecks, setPwdChecks] = useState({
@@ -34,8 +34,6 @@ function SignupContent() {
     hasSpecial: false,
   });
   const [showPwdHints, setShowPwdHints] = useState(false);
-
-
 
   useEffect(() => {
     const fetchMinorityTypes = async () => {
@@ -48,7 +46,7 @@ function SignupContent() {
       } catch (err) {
         console.error("Failed to load minority types", err);
       } finally {
-        setLoadingMinority(false); // ✅ Stop loading after fetch
+        setLoadingMinority(false);
       }
     };
     fetchMinorityTypes();
@@ -79,7 +77,7 @@ function SignupContent() {
       pathname.includes("/login") || pathname.includes("/signup");
 
     if (isAuthPage) {
-      router.push("/"); // Replace with your landing page or dashboard route
+      router.push("/");
     } else {
       router.back();
     }
@@ -93,9 +91,6 @@ function SignupContent() {
     const hasSpecial = /[^A-Za-z0-9]/.test(pwd);
     return { hasMinLen, hasUpper, hasLower, hasDigit, hasSpecial };
   }
-
-
-
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -112,7 +107,6 @@ function SignupContent() {
     const password = (formData.get("password") as string) || "";
     const confirmPassword = (formData.get("confirmPassword") as string) || "";
     
-    // Validate passwords match for vendor
     if (type === "vendor" && password !== confirmPassword) {
       setError("Passwords do not match");
       setLoading(false);
@@ -122,7 +116,6 @@ function SignupContent() {
     const checks = computePwdChecks(password);
     setPwdChecks(checks);
 
-    // Only require minimum length and at least one letter/number for basic security
     if (!checks.hasMinLen || (!checks.hasUpper && !checks.hasLower) || !checks.hasDigit) {
       setShowPwdHints(true);
       setPwdError("Password must be at least 6 characters with letters and numbers.");
@@ -172,8 +165,7 @@ function SignupContent() {
 if (isVendor == true)
   return (
     <div className="min-h-screen  relative">
-      {/* Top Header */}
-        <header className="w-full px-0 py-4 flex items-center justify-between bg-white md:bg-transparent absolute top-0 left-20 z-20">
+      <header className="w-full px-0 py-4 flex items-center justify-between bg-white md:bg-transparent absolute top-0 left-20 z-20">
         <span className="text-xl font-bold tracking-wide text-blue-900 md:text-white">
           <img
           src="/login/logo.png"
@@ -186,7 +178,6 @@ if (isVendor == true)
       </header>
 
       <div className="min-h-screen grid grid-cols-1 md:grid-cols-[40%_60%]">
-        {/* Left Section */}
         <div className="relative hidden  md:flex bg-gradient-to-br from-blue-950 via-blue-900 to-teal-800 text-white">
           <img
             src="/login/sideImgVendor.png"
@@ -227,7 +218,6 @@ if (isVendor == true)
           </div>
         </div>
 
-        {/* Right Section */}
      <div className="flex items-center justify-center bg-white px-6">
           <div className="w-full max-w-xl">
             <span className="inline-block mb-2 rounded-full bg-[#FFF6E0] px-2 text-[10px] font-thin font-montserrat text-[#C7A040]">
@@ -236,7 +226,6 @@ if (isVendor == true)
             <h2 className="text-3xl font-bold text-gray-900 mb-2">
               CREATE ACCOUNT
             </h2>
-
 
             <div className="flex flex-col justify-start mb-5">
               <hr className="h-[2px] w-[80px] bg-gray-700" />
@@ -378,12 +367,10 @@ if (isVendor == true)
     </div>
   );
 
-
 else
     return (
     <div className="min-h-screen font-sans relative">
-      {/* Top Header */}
-        <header className="w-full px-0 py-4 flex items-center justify-between bg-white md:bg-transparent absolute top-0 left-20 z-20">
+      <header className="w-full px-0 py-4 flex items-center justify-between bg-white md:bg-transparent absolute top-0 left-20 z-20">
         <span className="text-xl font-bold tracking-wide text-blue-900 md:text-white">
           <img
           src="/login/logo.png"
@@ -396,7 +383,6 @@ else
       </header>
 
       <div className="min-h-screen grid grid-cols-1 md:grid-cols-2">
-        {/* Left Section */}
         <div className="relative hidden md:flex bg-gradient-to-br from-blue-950 via-blue-900 to-teal-800 text-white">
           <img
             src="/login/sideImg.png"
@@ -431,13 +417,11 @@ Lorem ipsum dolor sit amet consectetur adipisicing elitsed eiusmod tempor enim m
                 description="Every purchase helps empower minority-owned businesses."
                   src="/login/icon3.png"
                 divider={false}
-
               />
             </div>
           </div>
         </div>
 
-        {/* Right Section */}
         <div className="flex items-center justify-center bg-white px-6">
           <div className="w-full max-w-md">
             <span className="inline-block mb-2 rounded-full bg-[#FFF6E0] px-2 text-[10px] font-thin font-montserrat text-[#C7A040]">
@@ -446,7 +430,6 @@ Lorem ipsum dolor sit amet consectetur adipisicing elitsed eiusmod tempor enim m
             <h2 className="text-3xl font-bold text-gray-900 mb-2">
               CREATE ACCOUNT
             </h2>
-
 
             <div className="flex flex-col justify-start mb-5">
               <hr className="h-[2px] w-[80px] bg-gray-700" />
@@ -483,7 +466,6 @@ Lorem ipsum dolor sit amet consectetur adipisicing elitsed eiusmod tempor enim m
                     className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
                   >
                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-
                   </button>
                 </div>
               </div>
@@ -526,220 +508,18 @@ Lorem ipsum dolor sit amet consectetur adipisicing elitsed eiusmod tempor enim m
       </div>
     </div>
   );
-
-
-
-
 }
-
-  // return (
-  //   <div className="min-h-screen bg-black bg-[url('/login/footer-bg.jpg')] bg-cover bg-center bg-fixed relative py-10 p-1">
-  //     <div
-  //       className="fixed z-50 p-2 text-white bg-gray-700 rounded-lg cursor-pointer top-4 right-4"
-  //       onClick={handleClose}
-  //     >
-  //       <X size={20} />
-  //     </div>
-  //     <div className="z-10 w-full max-w-md p-8 mx-auto bg-white shadow-xl rounded-xl">
-  //       <Link href="/">
-  //         <div className="mb-6 text-center">
-  //           <Image
-  //             src="/logo.png"
-  //             alt="Logo"
-  //             width={350}
-  //             height={100}
-  //             className="mx-auto"
-  //           />
-  //         </div>
-  //       </Link>
-
-  //       <div className="mb-2 text-lg font-bold text-center">{title}</div>
-
-  //       {/* Tabs */}
-  //       <div className="flex justify-center mb-4 border-b border-gray-300">
-  //         <Link
-  //           href={`/login?type=${type}`}
-  //           className="px-4 py-2 font-semibold text-gray-500 hover:text-black"
-  //         >
-  //           Sign In
-  //         </Link>
-  //         <Link
-  //           href={`/create-account?type=${type}`}
-  //           className="px-4 py-2 font-semibold border-b-2 border-black"
-  //         >
-  //           Create Account
-  //         </Link>
-  //       </div>
-
-  //       {/* Full page scrollable form */}
-  //       <form onSubmit={handleSubmit}>
-  //         <label className="block mb-2 text-gray-700">First Name</label>
-  //         <input
-  //           name="firstName"
-  //           type="text"
-  //           required
-  //           className="w-full p-2 mb-4 border rounded"
-  //         />
-
-  //         <label className="block mb-2 text-gray-700">Last Name</label>
-  //         <input
-  //           name="lastName"
-  //           type="text"
-  //           required
-  //           className="w-full p-2 mb-4 border rounded"
-  //         />
-
-  //         <label className="block mb-2 text-gray-700">Mobile Number</label>
-  //         <input
-  //           name="mobile"
-  //           type="text"
-  //           required
-  //           className="w-full p-2 mb-4 border rounded"
-  //         />
-
-  //         {/* <label className="block mb-2 text-gray-700" htmlFor="minorityType">
-  //           Minority Type
-  //         </label>
-  //         <select
-  //           id="minorityType"
-  //           name="minorityType"
-  //           required
-  //           className="w-full p-2 mb-4 border rounded"
-  //           disabled={loadingMinority}
-  //         >
-  //           {loadingMinority ? (
-  //             <option>Loading types...</option>
-  //           ) : (
-  //             <>
-  //               <option value="">Select Minority Type</option>
-  //               {minorityTypes.map((type) => (
-  //                 <option key={type._id} value={type._id}>
-  //                   {type.name}
-  //                 </option>
-  //               ))}
-  //             </>
-  //           )}
-  //         </select>
-
-  //         <label className="block mb-2 text-gray-700" htmlFor="gender">
-  //           Gender
-  //         </label> */}
-  //         {/* <select
-  //           id="gender"
-  //           name="gender"
-  //           required
-  //           className="w-full p-2 mb-4 border rounded"
-  //         >
-  //           <option value="">Select Gender</option>
-  //           <option value="male">Male</option>
-  //           <option value="female">Female</option>
-  //           <option value="other">Other</option>
-  //         </select> */}
-  //         <label className="block mb-2 text-gray-700">Email</label>
-  //         <input
-  //           name="email"
-  //           type="email"
-  //           required
-  //           className="w-full p-2 mb-4 border rounded"
-  //         />
-
-  //         <label className="block mb-2 text-gray-700">Password</label>
-  //         <div className="relative">
-  //           <input
-  //             name="password"
-  //             type={showPassword ? "text" : "password"}
-  //             required
-  //             className="w-full p-2 pr-10 mb-2 border rounded"
-  //             autoComplete="off"
-  //             autoCorrect="off"
-  //             autoCapitalize="none"
-  //             value={password}
-  //             onFocus={() => setShowPwdHints(true)}
-  //             onBlur={() => {
-  //               if (!password) setShowPwdHints(false);
-  //             }}
-  //             onChange={(e) => {
-  //               const val = e.target.value;
-  //               setPassword(val);
-  //               setPwdError(null);
-  //               setPwdChecks(computePwdChecks(val));
-  //             }}
-  //           />
-
-  //           <button
-  //             type="button"
-  //             onClick={() => setShowPassword((prev) => !prev)}
-  //             className="absolute inset-y-0 flex items-center text-gray-500 right-2"
-  //             tabIndex={-1}
-  //           >
-  //             {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-  //           </button>
-  //         </div>
-
-  //         {showPwdHints && (
-  //           <ul className="mb-3 space-y-1 text-sm">
-  //             <li className={pwdChecks.hasMinLen ? "text-green-600" : "text-gray-600"}>
-  //               {pwdChecks.hasMinLen ? "✓" : "•"} At least 10 characters
-  //             </li>
-  //             <li className={pwdChecks.hasUpper ? "text-green-600" : "text-gray-600"}>
-  //               {pwdChecks.hasUpper ? "✓" : "•"} One uppercase letter (A–Z)
-  //             </li>
-  //             <li className={pwdChecks.hasLower ? "text-green-600" : "text-gray-600"}>
-  //               {pwdChecks.hasLower ? "✓" : "•"} One lowercase letter (a–z)
-  //             </li>
-  //             <li className={pwdChecks.hasDigit ? "text-green-600" : "text-gray-600"}>
-  //               {pwdChecks.hasDigit ? "✓" : "•"} One number (0–9)
-  //             </li>
-  //             <li className={pwdChecks.hasSpecial ? "text-green-600" : "text-gray-600"}>
-  //               {pwdChecks.hasSpecial ? "✓" : "•"} One special character (!@#$% etc.)
-  //             </li>
-  //           </ul>
-  //         )}
-
-  //         {pwdError && (
-  //           <p className="mb-3 text-sm text-red-600">{pwdError}</p>
-  //         )}
-
-  //         <button
-  //           type="submit"
-  //           className="bg-[#10A3C9] text-white w-full py-2 font-semibold"
-  //         >
-  //           Register
-  //         </button>
-  //       </form>
-
-  //       <p className="mt-4 text-sm text-center">
-  //         Already a member?{" "}
-  //         <Link href={`/login?type=${type}`} className="font-bold underline">
-  //           Sign In
-  //         </Link>
-  //       </p>
-  //     </div>
-
-  //     <footer className="absolute w-full text-sm text-yellow-500 bottom-2">
-  //       <div className="pr-5 w-[80%] mx-auto">
-  //         <p>Copyright 2025. All Rights Reserved.</p>
-  //       </div>
-  //     </footer>
-  //   </div>
-  // );
-
-
-
 
 function Feature({ title, description, src,  divider } : {title : string, description : string , src : string, divider : boolean}) {
   return (
     <div>
       <div className="flex gap-4 items-start">
         <div className="h-10 w-10 rounded-lg  flex items-center justify-center">
-          {/* <span className="text-lg">□</span>
-           */}
            <Image
            src={src}
            alt="icon"
            height={30}
            width={30}
-
            />
         </div>
         <div>
@@ -754,7 +534,6 @@ function Feature({ title, description, src,  divider } : {title : string, descri
     </div>
   );
 }
-
 
 export default function SignupPage() {
   return (

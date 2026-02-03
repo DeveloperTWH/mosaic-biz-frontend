@@ -120,11 +120,12 @@ function FilterSection() {
             </label>
             <div className="relative">
               <select className="w-full h-10 px-4 text-gray-700 bg-white  text-xs appearance-none focus:outline-none focus:ring-2 focus:ring-custom-orange text-[#5F5F5F] font-poppins">
-                <option value="">Choose Minority</option>
-                <option value="women-owned">Women-Owned</option>
-                <option value="minority-owned">Minority-Owned</option>
-                <option value="veteran-owned">Veteran-Owned</option>
-                <option value="lgbtq-owned">LGBTQ+-Owned</option>
+              <option value="">Choose Minority</option>
+                <option value="african-american">African-American</option>
+                <option value="asian">Asian</option>
+                <option value="latinx">LatinX</option>
+                <option value="woman">Woman</option>
+                 <option value="disabled-veteran">Disabled Veteran</option>
               </select>
               <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
                 <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
