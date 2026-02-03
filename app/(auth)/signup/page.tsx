@@ -222,19 +222,19 @@ if (isVendor == true)
               <hr className="h-[2px] w-[80px] mt-[2px] mb-4 bg-gray-700" />
             </div>
 
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-base font-medium text-gray-700 mb-2">
                     First Name <span className="text-red-500">*</span>
                   </label>
-                  <input className="w-full rounded-md border border-gray-300 px-6 py-2 focus:ring-2 focus:ring-blue-900 focus:outline-none" />
+                  <input name="firstName" required className="w-full rounded-md border border-gray-300 px-6 py-2 focus:ring-2 focus:ring-blue-900 focus:outline-none" />
                 </div>
                 <div>
                   <label className="block text-base font-medium text-gray-700 mb-2">
                     Last Name <span className="text-red-500">*</span>
                   </label>
-                  <input className="w-full rounded-md border border-gray-300 px-6 py-2 focus:ring-2 focus:ring-blue-900 focus:outline-none" />
+                  <input name="lastName" required className="w-full rounded-md border border-gray-300 px-6 py-2 focus:ring-2 focus:ring-blue-900 focus:outline-none" />
                 </div>
               </div>
 
@@ -243,13 +243,13 @@ if (isVendor == true)
                   <label className="block text-base font-medium text-gray-700 mb-2">
                     Mobile Number <span className="text-red-500">*</span>
                   </label>
-                  <input className="w-full rounded-md border border-gray-300 px-6 py-2 focus:ring-2 focus:ring-blue-900 focus:outline-none" />
+                  <input name="mobile" required className="w-full rounded-md border border-gray-300 px-6 py-2 focus:ring-2 focus:ring-blue-900 focus:outline-none" />
                 </div>
                 <div>
                   <label className="block text-base font-medium text-gray-700 mb-2">
                     Email Address <span className="text-red-500">*</span>
                   </label>
-                  <input type="email" className="w-full rounded-md border border-gray-300 px-6 py-2 focus:ring-2 focus:ring-blue-900 focus:outline-none" />
+                  <input name="email" type="email" required className="w-full rounded-md border border-gray-300 px-6 py-2 focus:ring-2 focus:ring-blue-900 focus:outline-none" />
                 </div>
               </div>
 
@@ -260,7 +260,9 @@ if (isVendor == true)
                   </label>
                   <div className="relative">
                     <input
+                      name="password"
                       type={showPassword ? "text" : "password"}
+                      required
                       className="w-full rounded-md border border-gray-300 px-6 py-2 pr-10 focus:ring-2 focus:ring-blue-900 focus:outline-none"
                     />
                     <button
@@ -279,7 +281,9 @@ if (isVendor == true)
                   </label>
                   <div className="relative">
                     <input
+                      name="confirmPassword"
                       type={showConfirmPassword ? "text" : "password"}
+                      required
                       className="w-full rounded-md border border-gray-300 px-6 py-2 pr-10 focus:ring-2 focus:ring-blue-900 focus:outline-none"
                     />
                     <button
@@ -306,7 +310,7 @@ if (isVendor == true)
               </div>
 
               <div className="flex items-center justify-between mt-4">
-              <button className="bg-blue-900 text-white px-[120px] py-2 font-montserrat font-thin hover:bg-blue-800 transition">
+              <button  type="submit" className="bg-blue-900 text-white px-[120px] py-2 font-montserrat font-thin hover:bg-blue-800 transition">
                 Register
               </button>
               <p className="text-sm text-gray-600">
@@ -398,13 +402,15 @@ Lorem ipsum dolor sit amet consectetur adipisicing elitsed eiusmod tempor enim m
               <hr className="h-[2px] w-[80px] mt-[2px] mb-4 bg-gray-700" />
             </div>
 
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
                 <label className="block text-sm font-medium text-[#9E9E9E] mb-1">
                   Email
                 </label>
                 <input
+                  name="email"
                   type="email"
+                  required
                   className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-900"
                 />
               </div>
@@ -415,7 +421,9 @@ Lorem ipsum dolor sit amet consectetur adipisicing elitsed eiusmod tempor enim m
                 </label>
                 <div className="relative">
                   <input
+                    name="password"
                     type={showPassword ? "text" : "password"}
+                    required
                     className="w-full rounded-md border border-gray-300 px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-900"
                   />
                   <button
@@ -464,7 +472,7 @@ Lorem ipsum dolor sit amet consectetur adipisicing elitsed eiusmod tempor enim m
 
 
 
-}
+
 
   // return (
   //   <div className="min-h-screen bg-black bg-[url('/login/footer-bg.jpg')] bg-cover bg-center bg-fixed relative py-10 p-1">
@@ -659,7 +667,7 @@ Lorem ipsum dolor sit amet consectetur adipisicing elitsed eiusmod tempor enim m
   // );
 
 
-
+}
 
 function Feature({ title, description, src,  divider } : {title : string, description : string , src : string, divider : boolean}) {
   return (
