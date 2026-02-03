@@ -24,6 +24,8 @@ function SignupContent() {
   const [pwdError, setPwdError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [pwdChecks, setPwdChecks] = useState({
     hasMinLen: false,
     hasUpper: false,
@@ -84,7 +86,7 @@ function SignupContent() {
   };
 
   function computePwdChecks(pwd: string) {
-    const hasMinLen = pwd.length >= 10;
+    const hasMinLen = pwd.length >= 6;
     const hasUpper = /[A-Z]/.test(pwd);
     const hasLower = /[a-z]/.test(pwd);
     const hasDigit = /\d/.test(pwd);
@@ -97,33 +99,48 @@ function SignupContent() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const form = e.target as HTMLFormElement; // ✅ Fix here
+    setLoading(true);
+    setError(null);
+    setPwdError(null);
+    
+    const form = e.target as HTMLFormElement;
     const formData = new FormData(form);
 
-    const firstName = (formData.get("firstName") as string).trim();
-    const lastName = (formData.get("lastName") as string).trim();
-    const email = (formData.get("email") as string).trim();
+    const firstName = (formData.get("firstName") as string)?.trim() || "";
+    const lastName = (formData.get("lastName") as string)?.trim() || "";
+    const email = (formData.get("email") as string)?.trim() || "";
     const password = (formData.get("password") as string) || "";
+    const confirmPassword = (formData.get("confirmPassword") as string) || "";
+    
+    // Validate passwords match for vendor
+    if (type === "vendor" && password !== confirmPassword) {
+      setError("Passwords do not match");
+      setLoading(false);
+      return;
+    }
+    
     const checks = computePwdChecks(password);
     setPwdChecks(checks);
 
-    if (Object.values(checks).some(v => v === false)) {
+    // Only require minimum length and at least one letter/number for basic security
+    if (!checks.hasMinLen || (!checks.hasUpper && !checks.hasLower) || !checks.hasDigit) {
       setShowPwdHints(true);
-      setPwdError("Please meet all password requirements before continuing.");
+      setPwdError("Password must be at least 6 characters with letters and numbers.");
+      setLoading(false);
       return;
     }
-    setPwdError(null);
 
     const payload = {
-      name: `${firstName} ${lastName}`.trim(),
+      name: type === "vendor" ? `${firstName} ${lastName}`.trim() : undefined,
       email,
       password,
       role: type === "vendor" ? "business_owner" : "customer",
       mobile: formData.get("mobile"),
-      gender: formData.get("gender"), // vendor can skip gender
+      gender: formData.get("gender"),
       minorityType: formData.get("minorityType"),
     };
-    console.log("api calls", payload);
+    
+    console.log("Registration payload:", payload);
 
     try {
       const res = await fetch(
@@ -137,14 +154,18 @@ function SignupContent() {
       );
 
       const data = await res.json();
+      console.log("Registration response:", data);
+      
       if (data.success) {
         router.push(`/verify-otp?email=${payload.email}&type=${type}`);
       } else {
-        alert(data.message || "Registration failed");
+        setError(data.message || "Registration failed");
       }
     } catch (err) {
       console.error("Registration error:", err);
-      alert("Something went wrong. Please try again.");
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -222,19 +243,29 @@ if (isVendor == true)
               <hr className="h-[2px] w-[80px] mt-[2px] mb-4 bg-gray-700" />
             </div>
 
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-base font-medium text-gray-700 mb-2">
                     First Name <span className="text-red-500">*</span>
                   </label>
-                  <input className="w-full rounded-md border border-gray-300 px-6 py-2 focus:ring-2 focus:ring-blue-900 focus:outline-none" />
+                  <input 
+                    name="firstName"
+                    type="text"
+                    required
+                    className="w-full rounded-md border border-gray-300 px-6 py-2 focus:ring-2 focus:ring-blue-900 focus:outline-none" 
+                  />
                 </div>
                 <div>
                   <label className="block text-base font-medium text-gray-700 mb-2">
                     Last Name <span className="text-red-500">*</span>
                   </label>
-                  <input className="w-full rounded-md border border-gray-300 px-6 py-2 focus:ring-2 focus:ring-blue-900 focus:outline-none" />
+                  <input 
+                    name="lastName"
+                    type="text"
+                    required
+                    className="w-full rounded-md border border-gray-300 px-6 py-2 focus:ring-2 focus:ring-blue-900 focus:outline-none" 
+                  />
                 </div>
               </div>
 
@@ -243,13 +274,23 @@ if (isVendor == true)
                   <label className="block text-base font-medium text-gray-700 mb-2">
                     Mobile Number <span className="text-red-500">*</span>
                   </label>
-                  <input className="w-full rounded-md border border-gray-300 px-6 py-2 focus:ring-2 focus:ring-blue-900 focus:outline-none" />
+                  <input 
+                    name="mobile"
+                    type="tel"
+                    required
+                    className="w-full rounded-md border border-gray-300 px-6 py-2 focus:ring-2 focus:ring-blue-900 focus:outline-none" 
+                  />
                 </div>
                 <div>
                   <label className="block text-base font-medium text-gray-700 mb-2">
                     Email Address <span className="text-red-500">*</span>
                   </label>
-                  <input type="email" className="w-full rounded-md border border-gray-300 px-6 py-2 focus:ring-2 focus:ring-blue-900 focus:outline-none" />
+                  <input 
+                    name="email"
+                    type="email" 
+                    required
+                    className="w-full rounded-md border border-gray-300 px-6 py-2 focus:ring-2 focus:ring-blue-900 focus:outline-none" 
+                  />
                 </div>
               </div>
 
@@ -260,7 +301,9 @@ if (isVendor == true)
                   </label>
                   <div className="relative">
                     <input
+                      name="password"
                       type={showPassword ? "text" : "password"}
+                      required
                       className="w-full rounded-md border border-gray-300 px-6 py-2 pr-10 focus:ring-2 focus:ring-blue-900 focus:outline-none"
                     />
                     <button
@@ -279,7 +322,9 @@ if (isVendor == true)
                   </label>
                   <div className="relative">
                     <input
+                      name="confirmPassword"
                       type={showConfirmPassword ? "text" : "password"}
+                      required
                       className="w-full rounded-md border border-gray-300 px-6 py-2 pr-10 focus:ring-2 focus:ring-blue-900 focus:outline-none"
                     />
                     <button
@@ -294,7 +339,7 @@ if (isVendor == true)
               </div>
 
               <div className="flex items-start gap-2 text-xs text-gray-600">
-                <input type="checkbox" className="mt-2" />
+                <input type="checkbox" className="mt-2" required />
                 <p>
                   Your personal data will be used to support your experience
                   throughout this website, to manage access to your account, and
@@ -305,13 +350,23 @@ if (isVendor == true)
                 </p>
               </div>
 
+              {(error || pwdError) && (
+                <div className="text-sm text-red-600">
+                  {error || pwdError}
+                </div>
+              )}
+
               <div className="flex items-center justify-between mt-4">
-              <button className="bg-blue-900 text-white px-[120px] py-2 font-montserrat font-thin hover:bg-blue-800 transition">
-                Register
+              <button 
+                type="submit"
+                disabled={loading}
+                className="bg-blue-900 text-white px-[120px] py-2 font-montserrat font-thin hover:bg-blue-800 transition disabled:opacity-60"
+              >
+                {loading ? 'Registering...' : 'Register'}
               </button>
               <p className="text-sm text-gray-600">
                 Already a member?{" "}
-                <a href="#" className="text-blue-900 font-semibold underline">
+                <a href={`/login?type=${type}`} className="text-blue-900 font-semibold underline">
                   Sign In
                 </a>
               </p>
@@ -398,13 +453,15 @@ Lorem ipsum dolor sit amet consectetur adipisicing elitsed eiusmod tempor enim m
               <hr className="h-[2px] w-[80px] mt-[2px] mb-4 bg-gray-700" />
             </div>
 
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
                 <label className="block text-sm font-medium text-[#9E9E9E] mb-1">
                   Email
                 </label>
                 <input
+                  name="email"
                   type="email"
+                  required
                   className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-900"
                 />
               </div>
@@ -415,7 +472,9 @@ Lorem ipsum dolor sit amet consectetur adipisicing elitsed eiusmod tempor enim m
                 </label>
                 <div className="relative">
                   <input
+                    name="password"
                     type={showPassword ? "text" : "password"}
+                    required
                     className="w-full rounded-md border border-gray-300 px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-900"
                   />
                   <button
@@ -430,7 +489,7 @@ Lorem ipsum dolor sit amet consectetur adipisicing elitsed eiusmod tempor enim m
               </div>
 
               <div className="flex items-start gap-2 text-xs text-gray-600">
-                <input type="checkbox" className="mt-2" />
+                <input type="checkbox" className="mt-2" required />
                 <p className="font-montserrat font-thin">
                   Your personal data will be used to support your experience
                   throughout this website, to manage access to your account,
@@ -441,17 +500,24 @@ Lorem ipsum dolor sit amet consectetur adipisicing elitsed eiusmod tempor enim m
                 </p>
               </div>
 
+              {(error || pwdError) && (
+                <div className="text-sm text-red-600">
+                  {error || pwdError}
+                </div>
+              )}
+
               <button
                 type="submit"
-                className="w-full bg-blue-900 text-white py-2 text-[16px] hover:bg-blue-800 transition font-montserrat font-extralight"
+                disabled={loading}
+                className="w-full bg-blue-900 text-white py-2 text-[16px] hover:bg-blue-800 transition font-montserrat font-extralight disabled:opacity-60"
               >
-                Register
+                {loading ? 'Registering...' : 'Register'}
               </button>
             </form>
 
             <p className="mt-6 text-center underline text-[16px] text-gray-600">
               Already a member?{" "}
-              <a href="#">
+              <a href={`/login?type=${type}`}>
                 Sign In
               </a>
             </p>
