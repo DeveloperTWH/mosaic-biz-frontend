@@ -10,16 +10,18 @@ import "swiper/css";
 import "swiper/css/navigation";
 
 const services = [
-  { title: "Electronics", img: "/browsecategories/electronics 1.png" },
-  { title: "Fashion and Appaprel", img: "/browsecategories/electronics 2.png" },
-  { title: "Beauty and Personal Care", img: "/browsecategories/electronics 3.png" },
-  { title: "Home and Kitchen Essentials", img: "/browsecategories/electronics 4.png" },
-  { title: "Health and Wellness", img: "/browsecategories/electronics 5.png" },
-  { title: "Toys and Hobbies", img: "/browsecategories/electronics 6.png" },
-  // { title: "Education", img: "/browsservice/electronics 7.png" },
-  // { title: "Home Services", img: "/browsservice/frame 8.png" },
-  // { title: "Financial Services", img: "/browsservice/frame 9.png" },
+  { title: "Fashion & Apparel", img: "/browsecategories/electronics 1.png" },
+  { title: "Beauty & Personal Care", img: "/browsecategories/electronics 2.png" },
+  { title: "Home & Living", img: "/browsecategories/electronics 3.png" },
+  { title: "Health & Wellness Products", img: "/browsecategories/electronics 4.png" },
+  { title: "Handmade & Artisan Goods", img: "/browsecategories/electronics 5.png" },
+  { title: "Baby, Kids & Family Products", img: "/browsecategories/electronics 6.png" },
+  { title: "Tech, Gadgets & Accessories", img: "/browsecategories/electronics 7.png" },
+  { title: "Stationery, Gifts & Collectibles", img: "/browsecategories/electronics 8.png" },
+  { title: "Automotive & Utility Products", img: "/browsecategories/electronics 9.png" },
+  { title: "Digital Products & Downloads", img: "/browsecategories/electronics 10.png" },
 ];
+
 
 export default function BrowseCategories() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
