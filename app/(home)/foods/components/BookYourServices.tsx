@@ -10,14 +10,14 @@ import ProductCard from "./ProductCard";
 
 const demoData = [
   {
-    "title": "Home Cleaning Service",
+    "title": "Restaurants",
     "description": "Professional house and apartment cleaning services.",
     "coverImage": "https://images.unsplash.com/photo-1581578731548-c64695cc6952",
     "category": "Restaurants",
     "subcategory": "Cleaning Services"
   },
   {
-    "title": "Plumbing Repair",
+    "title": "Home Grocery",
     "description": "Expert plumbing repair and installation services.",
     "coverImage": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c",
     "category": "Home Grocery",
@@ -31,7 +31,7 @@ const demoData = [
     "subcategory": "Electrical Services"
   },
   {
-    "title": "Haircut & Styling",
+    "title": "Restaurants",
     "description": "Professional haircut and styling for men and women.",
     "coverImage": "https://images.unsplash.com/photo-1595475884562-073c30d45670",
     "category": "Restaurants",
@@ -86,10 +86,12 @@ const demoRanked = demoData.map((d, i) => ({
   title: d.title,
   description: d.description,
   coverImage : d.coverImage,
+
   averageRating: 4.2,
   totalRatings: 10,
   reviews: 10,
   category: d.category,
+  subcategory: d.subcategory,
 }));
 
 interface BookServicesProps {
@@ -131,6 +133,9 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
     badges: ["Premium", "Verified", "Top Rated", "Eco-Friendly", "Luxury"]
   };
 
+     const [categoryFilter, setCategoryFilter] = useState("")
+  
+
   return (
     <section className="px-4 py-8 mx-auto max-w-7xl sm:px-6">
        
@@ -163,7 +168,7 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
                   ))}
                 </div>
               </div> */}
-              <FilterAccordion/>
+              <FilterAccordion setCategoryFilter={setCategoryFilter}/>
 
               {/* Sub-Category Filter */}
               {/* <div>
@@ -306,7 +311,7 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
                 ))}
 
 
-                {demoRanked.map((item, index) => (
+                {demoRanked.filter((data)=> data.category?.includes(categoryFilter) || data.subcategory?.includes(categoryFilter)).map((item, index) => (
                    <ProductCard
                     key={index}
                     image={item.coverImage || "/Service/19099.png"}
