@@ -97,7 +97,7 @@ const page = () => {
     }, []);
 
 
-    const fetchProducts = async (q?: string, m?: string, c?: string) => {
+    const fetchProducts = async (q?: string, m?: string, c?: string, categorySlug?: string) => {
         setLoading(true);
         try {
             const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/products/list`, {
@@ -105,7 +105,7 @@ const page = () => {
                     search: (q ?? searchText) || "",
                     city: (c ?? searchLocation) || "",
                     minorityType: (m ?? minorityType) || "",
-                    categorySlug: "",
+                    categorySlug: categorySlug || "",
                     page: 1,
                     limit: 10,
                 },
@@ -113,6 +113,7 @@ const page = () => {
             setProducts(res.data.data || []);
         } catch (err) {
             console.error("Error fetching products", err);
+            // Set empty array to avoid crashes
             setProducts([]);
         } finally {
             setLoading(false);
@@ -145,9 +146,11 @@ const page = () => {
           limit: 10,
         },
       });
-      setServices(res.data.data);
+      setServices(res.data.data || []);
     } catch (err) {
-      console.error(err);
+      console.error("Error fetching services", err);
+      // Set empty array to avoid crashes
+      setServices([]);
     }
   };
 
@@ -189,7 +192,19 @@ const page = () => {
                 onSearch={handleSearch}
             /> */}
 
-            <FilterSection/>
+            <FilterSection onSearch={(filters) => {
+              console.log('Filter search triggered:', filters);
+              setLoading(true); // Show loading
+              fetchProducts(filters.businessType, filters.minority, filters.location);
+            }}/>
+            
+            {/* Loading indicator */}
+            {loadingn && (
+              <div className="text-center py-8">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+                <p className="mt-2 text-gray-600">Searching products...</p>
+              </div>
+            )}
             {/* {(!searchText && !minorityType && !searchLocation) && (
                 <CategoryGrid />
             )} */}
@@ -263,14 +278,32 @@ const page = () => {
             </Swiper>
           </div>
 
-             <ProductSevices services={services}/>
+             <ProductSevices 
+               services={products}
+               onCategoryFilter={(category, subCategory) => {
+                 console.log('Category filter from ProductServices:', category, subCategory);
+                 if (category) {
+                   setLoading(true);
+                   const categorySlug = category.toLowerCase().replace(/\s+/g, '-').replace('&', '');
+                   fetchProducts('', '', '', categorySlug);
+                 }
+               }}
+             />
              <JoinVendorBanner/>
        
         </div>
     )
 }
 
-function FilterSection() {
+function FilterSection({ onSearch }: { onSearch?: (filters: { businessType: string; location: string; minority: string }) => void }) {
+  const [businessType, setBusinessType] = useState("");
+  const [location, setLocation] = useState("");
+  const [minority, setMinority] = useState("");
+
+  const handleSearch = () => {
+    console.log('Products page search clicked with filters:', { businessType, location, minority });
+    onSearch?.({ businessType, location, minority });
+  };
   return (
     <div className="w-full bg-[#1A1F71] py-6 text-center text-white pb-10">
       <div className="max-w-[1500px]  mx-auto px-4 sm:px-6 lg:px-12">
@@ -282,6 +315,8 @@ function FilterSection() {
             <input
               type="text"
               placeholder="Type Here"
+              value={businessType}
+              onChange={(e) => setBusinessType(e.target.value)}
               className="w-full h-10 px-4 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-custom-orange text-xs font-poppins"
             />
           </div>
@@ -291,12 +326,15 @@ function FilterSection() {
               Filter By Location
             </label>
             <div className="relative">
-              <select className="w-full h-10 px-4 text-gray-700 bg-white text-xs appearance-none focus:outline-none focus:ring-2 focus:ring-custom-orange text-[#5F5F5F] font-poppins">
+              <select 
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                className="w-full h-10 px-4 text-gray-700 bg-white text-xs appearance-none focus:outline-none focus:ring-2 focus:ring-custom-orange text-[#5F5F5F] font-poppins">
                 <option value="">Choose Location</option>
                 <option value="ny">New York City</option>
-                <option value="gc">Grand Canyon</option>
+                {/* <option value="gc">Grand Canyon</option>
                 <option value="sf"> San Francisco</option>
-                <option value="ch">Chicago</option>
+                <option value="ch">Chicago</option> */}
               </select>
               <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
                 <svg className="w-full h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -311,7 +349,10 @@ function FilterSection() {
               Filter By Minority
             </label>
             <div className="relative">
-              <select className="w-full h-10 px-4 text-gray-700 bg-white  text-xs appearance-none focus:outline-none focus:ring-2 focus:ring-custom-orange text-[#5F5F5F] font-poppins">
+              <select 
+                value={minority}
+                onChange={(e) => setMinority(e.target.value)}
+                className="w-full h-10 px-4 text-gray-700 bg-white  text-xs appearance-none focus:outline-none focus:ring-2 focus:ring-custom-orange text-[#5F5F5F] font-poppins">
                 <option value="">Choose Minority</option>
                 <option value="african-american">African-American</option>
                 <option value="asian">Asian</option>
@@ -332,8 +373,9 @@ function FilterSection() {
             <label className="block mb-2 text-sm font-medium text-white">
               {/* Search Here */}
             </label>
-            <button className="w-full h-10 text-sm text-white font-xs text-gray-800 bg-[#C7A040]  hover:bg-yellow-500 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-600 flex items-center justify-center gap-2 font-montserrat">
-              {/* <Search className="w-5 h-5" /> */}
+            <button 
+              onClick={handleSearch}
+              className="w-full h-10 text-sm text-white font-xs text-gray-800 bg-[#C7A040]  hover:bg-yellow-500 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-600 flex items-center justify-center gap-2 font-montserrat">
               Search Here
             </button>
           </div>

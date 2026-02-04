@@ -33,14 +33,14 @@ export default function BrowseCategories() {
         {/* Header */}
         <div className="flex items-center justify-between mb-16">
           <h2 className="text-4xl font-bold tracking-wide text-gray-900 font-poppins">
-            BROWSE SERVICES
+            BROWSE PRODUCTS
           </h2>
 
           <Link
-            href="/services"
+            href="/products"
             className="px-8 py-3 text-lg font-semibold text-white bg-[#d1aa45] hover:bg-[#c19a38] transition font-montserrat"
           >
-            Show All Services
+            Show All Products
           </Link>
         </div>
 

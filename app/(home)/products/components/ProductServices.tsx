@@ -11,6 +11,7 @@ interface BookServicesProps {
   totalProducts?: number;
   currentPage?: number;
   itemsPerPage?: number;
+  onCategoryFilter?: (category: string, subCategory: string) => void;
 }
 
 type RankedItem = {
@@ -44,7 +45,8 @@ const ProductSevices: React.FC<BookServicesProps> = ({
   services, 
   totalProducts = 72,
   currentPage = 1,
-  itemsPerPage = 40 
+  itemsPerPage = 40,
+  onCategoryFilter
 }) => {
   const [selectedFilters, setSelectedFilters] = useState({
     category: "",
@@ -81,7 +83,10 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
             
             <div className="space-y-6">
 
-              <FilterAccordion/>
+              <FilterAccordion onFilterChange={(category, subCategory) => {
+                console.log('Category filter clicked:', category, subCategory);
+                onCategoryFilter?.(category, subCategory);
+              }} />
 
               {/* Sub-Category Filter */}
               {/* <div>
@@ -155,7 +160,7 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
 
           {/* Services Grid - Compact Cards */}
           {services.length === 0 ? (
-            <p className="text-center text-gray-600">No services found.</p>
+            <p className="text-center text-gray-600">No Product found.</p>
           ) : (
             <>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">

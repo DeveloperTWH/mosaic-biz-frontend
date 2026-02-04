@@ -9,9 +9,11 @@ import { uploadToS3 } from '@/utils/s3Uploader';
 interface Props {
     isOpen: boolean;
     onClose: () => void;
-    type: 'product' | 'service' | 'food' | 'product-subcategory';
+    type: 'product' | 'service' | 'food' | 'product-subcategory' | 'service-subcategory' | 'food-subcategory';
     onSuccess?: () => void;
     productCategoryOptions?: { _id: string; name: string }[];
+    serviceCategoryOptions?: { _id: string; name: string }[];
+    foodCategoryOptions?: { _id: string; name: string }[];
     editMode?: boolean;
     selectedCategory?: {
         _id: string;
@@ -30,6 +32,8 @@ export default function CreateCategoryModal({
     type,
     onSuccess,
     productCategoryOptions = [],
+    serviceCategoryOptions = [],
+    foodCategoryOptions = [],
     editMode = false,
     selectedCategory = null,
 }: Props) {
@@ -101,7 +105,7 @@ export default function CreateCategoryModal({
             };
 
             if (imageUrl) payload.img = imageUrl;
-            if (type === 'product-subcategory') {
+            if (type.includes('subcategory')) {
                 if (!parentCategoryId) {
                     toast.error('Please select a parent category');
                     setLoading(false);
@@ -123,6 +127,12 @@ export default function CreateCategoryModal({
                     break;
                 case 'product-subcategory':
                     endpoint = '/api/admin/category/product-subcategory';
+                    break;
+                case 'service-subcategory':
+                    endpoint = '/api/admin/category/service-subcategory';
+                    break;
+                case 'food-subcategory':
+                    endpoint = '/api/admin/category/food-subcategory';
                     break;
             }
 
@@ -151,20 +161,30 @@ export default function CreateCategoryModal({
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
             <h2 className="mb-4 text-lg font-semibold">
-                {type === 'product-subcategory'
-                    ? 'Add Product Subcategory'
-                    : `Add ${type.charAt(0).toUpperCase() + type.slice(1)} Category`}
+                {type.includes('subcategory')
+                    ? `${editMode ? 'Edit' : 'Add'} ${type.replace('-subcategory', '').charAt(0).toUpperCase() + type.replace('-subcategory', '').slice(1)} Subcategory`
+                    : `${editMode ? 'Edit' : 'Add'} ${type.charAt(0).toUpperCase() + type.slice(1)} Category`}
             </h2>
 
             <div className="space-y-4">
-                {type === 'product-subcategory' && (
+                {type.includes('subcategory') && (
                     <select
                         value={parentCategoryId}
                         onChange={(e) => setParentCategoryId(e.target.value)}
                         className="w-full px-4 py-2 border rounded"
                     >
                         <option value="">Select Parent Category</option>
-                        {productCategoryOptions.map((cat) => (
+                        {type === 'product-subcategory' && productCategoryOptions.map((cat) => (
+                            <option key={cat._id} value={cat._id}>
+                                {cat.name}
+                            </option>
+                        ))}
+                        {type === 'service-subcategory' && serviceCategoryOptions.map((cat) => (
+                            <option key={cat._id} value={cat._id}>
+                                {cat.name}
+                            </option>
+                        ))}
+                        {type === 'food-subcategory' && foodCategoryOptions.map((cat) => (
                             <option key={cat._id} value={cat._id}>
                                 {cat.name}
                             </option>

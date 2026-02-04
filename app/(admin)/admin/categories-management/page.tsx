@@ -35,6 +35,10 @@ export default function CategoriesManagementPage() {
     const [showProductSubModal, setShowProductSubModal] = useState(false);
     const [showServiceModal, setShowServiceModal] = useState(false);
     const [showFoodModal, setShowFoodModal] = useState(false);
+    const [showServiceSubModal, setShowServiceSubModal] = useState(false);
+    const [showFoodSubModal, setShowFoodSubModal] = useState(false);
+    const [allServiceCategories, setAllServiceCategories] = useState<Category[]>([]);
+    const [allFoodCategories, setAllFoodCategories] = useState<Category[]>([]);
     const [allProductCategories, setAllProductCategories] = useState<Category[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
     const [selectedSubCategory, setSelectedSubCategory] = useState<Category | null>(null);
@@ -54,6 +58,8 @@ export default function CategoriesManagementPage() {
             setServiceCategories(data.serviceCategories || []);
             setFoodCategories(data.foodCategories || []);
             setAllProductCategories(data.productCategories || []);
+            setAllServiceCategories(data.serviceCategories || []);
+            setAllFoodCategories(data.foodCategories || []);
             setLoading(false);
         } catch (err) {
             console.error('Error fetching categories:', err);
@@ -78,6 +84,36 @@ export default function CategoriesManagementPage() {
         } catch (err) {
             console.error(err);
             toast.error("Failed to delete category");
+        }
+    };
+
+    const handleServiceSubcategoryDelete = async (subcategoryId: string) => {
+        if (!confirm("Are you sure you want to delete this subcategory?")) return;
+        try {
+            await axios.delete(
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/category/service-subcategory/${subcategoryId}`,
+                { withCredentials: true }
+            );
+            toast.success("Subcategory deleted successfully");
+            fetchCategories();
+        } catch (err) {
+            console.error(err);
+            toast.error("Failed to delete subcategory");
+        }
+    };
+
+    const handleFoodSubcategoryDelete = async (subcategoryId: string) => {
+        if (!confirm("Are you sure you want to delete this subcategory?")) return;
+        try {
+            await axios.delete(
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/category/food-subcategory/${subcategoryId}`,
+                { withCredentials: true }
+            );
+            toast.success("Subcategory deleted successfully");
+            fetchCategories();
+        } catch (err) {
+            console.error(err);
+            toast.error("Failed to delete subcategory");
         }
     };
 
@@ -253,11 +289,18 @@ export default function CategoriesManagementPage() {
                                         <Wrench className="w-5 h-5 text-indigo-600" />
                                         Service Categories
                                     </h2>
-                                    <button
-                                        onClick={() => setShowServiceModal(true)}
-                                        className="flex items-center gap-1 px-4 py-2 text-sm text-white bg-indigo-600 rounded hover:bg-indigo-700">
-                                        <PlusCircle className="w-4 h-4" /> Add Category
-                                    </button>
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={() => setShowServiceModal(true)}
+                                            className="flex items-center gap-1 px-4 py-2 text-sm text-white bg-indigo-600 rounded hover:bg-indigo-700">
+                                            <PlusCircle className="w-4 h-4" /> Add Category
+                                        </button>
+                                        <button
+                                            onClick={() => setShowServiceSubModal(true)}
+                                            className="flex items-center gap-1 px-4 py-2 text-sm text-white bg-indigo-600 rounded hover:bg-indigo-700">
+                                            <PlusCircle className="w-4 h-4" /> Add Subcategory
+                                        </button>
+                                    </div>
                                 </div>
                                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
                                     {serviceCategories.map((cat) => (
@@ -287,6 +330,37 @@ export default function CategoriesManagementPage() {
                                             <h3 className="font-semibold text-gray-800">{cat.name}</h3>
                                             <p className="text-sm text-gray-500">{cat.slug}</p>
                                             <p className="mt-1 text-sm text-gray-600">{cat.description}</p>
+                                            
+                                            {Array.isArray(cat.subcategories) && cat.subcategories.length > 0 && (
+                                                <div className="mt-4">
+                                                    <h4 className="mb-1 text-sm font-semibold text-gray-700">Subcategories:</h4>
+                                                    <ul className="space-y-1 text-sm text-gray-600 list-disc list-inside">
+                                                        {cat.subcategories.map((sub) => (
+                                                            <li key={sub._id} className="flex items-center justify-between pr-2 group">
+                                                                <span>
+                                                                    <span className="font-medium">{sub.name}</span> — {sub.slug}
+                                                                </span>
+                                                                <div className="flex items-center gap-2 transition opacity-0 group-hover:opacity-100">
+                                                                    <button
+                                                                        className="text-indigo-600 hover:text-indigo-800"
+                                                                        onClick={() => {
+                                                                            setSelectedSubCategory(sub);
+                                                                            setEditMode(true);
+                                                                            setShowServiceSubModal(true);
+                                                                        }}>
+                                                                        <Pencil className="w-4 h-4" />
+                                                                    </button>
+                                                                    <button
+                                                                        className="text-red-600 hover:text-red-800"
+                                                                        onClick={() => handleServiceSubcategoryDelete(sub._id)}>
+                                                                        <Trash2 className="w-4 h-4" />
+                                                                    </button>
+                                                                </div>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
                                         </div>
                                     ))}
                                 </div>
@@ -299,11 +373,18 @@ export default function CategoriesManagementPage() {
                                         <Utensils className="w-5 h-5 text-indigo-600" />
                                         Food Categories
                                     </h2>
-                                    <button
-                                        onClick={() => setShowFoodModal(true)}
-                                        className="flex items-center gap-1 px-4 py-2 text-sm text-white bg-indigo-600 rounded hover:bg-indigo-700">
-                                        <PlusCircle className="w-4 h-4" /> Add Category
-                                    </button>
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={() => setShowFoodModal(true)}
+                                            className="flex items-center gap-1 px-4 py-2 text-sm text-white bg-indigo-600 rounded hover:bg-indigo-700">
+                                            <PlusCircle className="w-4 h-4" /> Add Category
+                                        </button>
+                                        <button
+                                            onClick={() => setShowFoodSubModal(true)}
+                                            className="flex items-center gap-1 px-4 py-2 text-sm text-white bg-indigo-600 rounded hover:bg-indigo-700">
+                                            <PlusCircle className="w-4 h-4" /> Add Subcategory
+                                        </button>
+                                    </div>
                                 </div>
                                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
                                     {foodCategories.map((cat) => (
@@ -334,6 +415,37 @@ export default function CategoriesManagementPage() {
                                             <h3 className="font-semibold text-gray-800">{cat.name}</h3>
                                             <p className="text-sm text-gray-500">{cat.slug}</p>
                                             <p className="mt-1 text-sm text-gray-600">{cat.description}</p>
+                                            
+                                            {Array.isArray(cat.subcategories) && cat.subcategories.length > 0 && (
+                                                <div className="mt-4">
+                                                    <h4 className="mb-1 text-sm font-semibold text-gray-700">Subcategories:</h4>
+                                                    <ul className="space-y-1 text-sm text-gray-600 list-disc list-inside">
+                                                        {cat.subcategories.map((sub) => (
+                                                            <li key={sub._id} className="flex items-center justify-between pr-2 group">
+                                                                <span>
+                                                                    <span className="font-medium">{sub.name}</span> — {sub.slug}
+                                                                </span>
+                                                                <div className="flex items-center gap-2 transition opacity-0 group-hover:opacity-100">
+                                                                    <button
+                                                                        className="text-indigo-600 hover:text-indigo-800"
+                                                                        onClick={() => {
+                                                                            setSelectedSubCategory(sub);
+                                                                            setEditMode(true);
+                                                                            setShowFoodSubModal(true);
+                                                                        }}>
+                                                                        <Pencil className="w-4 h-4" />
+                                                                    </button>
+                                                                    <button
+                                                                        className="text-red-600 hover:text-red-800"
+                                                                        onClick={() => handleFoodSubcategoryDelete(sub._id)}>
+                                                                        <Trash2 className="w-4 h-4" />
+                                                                    </button>
+                                                                </div>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
                                         </div>
                                     ))}
                                 </div>
@@ -345,7 +457,9 @@ export default function CategoriesManagementPage() {
             <CreateCategoryModal type="product" isOpen={showProductModal} onClose={() => setShowProductModal(false)} onSuccess={fetchCategories} />
             <CreateCategoryModal type="product-subcategory" isOpen={showProductSubModal} onClose={() => setShowProductSubModal(false)} onSuccess={fetchCategories} productCategoryOptions={allProductCategories} />
             <CreateCategoryModal type="service" isOpen={showServiceModal} onClose={() => setShowServiceModal(false)} onSuccess={fetchCategories} />
+            <CreateCategoryModal type="service-subcategory" isOpen={showServiceSubModal} onClose={() => setShowServiceSubModal(false)} onSuccess={fetchCategories} serviceCategoryOptions={allServiceCategories} />
             <CreateCategoryModal type="food" isOpen={showFoodModal} onClose={() => setShowFoodModal(false)} onSuccess={fetchCategories} />
+            <CreateCategoryModal type="food-subcategory" isOpen={showFoodSubModal} onClose={() => setShowFoodSubModal(false)} onSuccess={fetchCategories} foodCategoryOptions={allFoodCategories} />
 
             {/* for edit bellow */}
 
@@ -388,16 +502,30 @@ export default function CategoriesManagementPage() {
                 onSuccess={fetchCategories}
             />
             <CreateCategoryModal
-                type="food"
-                isOpen={showFoodModal}
+                type="service-subcategory"
+                isOpen={showServiceSubModal}
                 onClose={() => {
-                    setShowFoodModal(false);
-                    setSelectedCategory(null); // clear on close
+                    setShowServiceSubModal(false);
                     setEditMode(false);
+                    setSelectedSubCategory(null);
                 }}
-                selectedCategory={selectedCategory}
-                editMode={editMode}
                 onSuccess={fetchCategories}
+                editMode={editMode}
+                selectedCategory={selectedSubCategory}
+                serviceCategoryOptions={allServiceCategories}
+            />
+            <CreateCategoryModal
+                type="food-subcategory"
+                isOpen={showFoodSubModal}
+                onClose={() => {
+                    setShowFoodSubModal(false);
+                    setEditMode(false);
+                    setSelectedSubCategory(null);
+                }}
+                onSuccess={fetchCategories}
+                editMode={editMode}
+                selectedCategory={selectedSubCategory}
+                foodCategoryOptions={allFoodCategories}
             />
 
 

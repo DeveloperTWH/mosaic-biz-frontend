@@ -102,9 +102,9 @@ function FilterSection() {
               <select className="w-full h-10 px-4 text-gray-700 bg-white text-xs appearance-none focus:outline-none focus:ring-2 focus:ring-custom-orange text-[#5F5F5F] font-poppins">
                 <option value="">Choose Location</option>
                 <option value="ny">New York City</option>
-                <option value="gc">Grand Canyon</option>
+                {/* <option value="gc">Grand Canyon</option>
                 <option value="sf"> San Francisco</option>
-                <option value="ch">Chicago</option>
+                <option value="ch">Chicago</option> */}
               </select>
               <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
                 <svg className="w-full h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

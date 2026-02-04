@@ -51,7 +51,7 @@ const PAGE = 1;
 const PAGE_SIZE = 8;
 const MAX_PER_VENDOR = 3;
 
-function buildRankedUrl(): string {
+function buildRankedUrl(searchFilters?: { businessType: string; location: string; minority: string }): string {
   const rankedPath =
     process.env.NEXT_PUBLIC_RANKED_PATH?.replace(/\/$/, "") ||
     "/api/ranked";
@@ -60,8 +60,14 @@ function buildRankedUrl(): string {
     page: String(PAGE),
     pageSize: String(PAGE_SIZE),
     maxPerVendor: String(MAX_PER_VENDOR),
-  }).toString();
-  return base ? `${base}${rankedPath}?${qs}` : `${rankedPath}?${qs}`;
+  });
+  
+  // Add search filters to query params
+  if (searchFilters?.businessType) qs.set("businessType", searchFilters.businessType);
+  if (searchFilters?.location) qs.set("location", searchFilters.location);
+  if (searchFilters?.minority) qs.set("minority", searchFilters.minority);
+  
+  return base ? `${base}${rankedPath}?${qs.toString()}` : `${rankedPath}?${qs.toString()}`;
 }
 
 /* ---------- helpers ---------- */
@@ -120,7 +126,7 @@ function isAbortError(e: any) {
 }
 
 /* ---------- data hook (abort-safe + retry) ---------- */
-function useRankedProducts() {
+function useRankedProducts(searchFilters?: { businessType: string; location: string; minority: string }) {
   const [items, setItems] = React.useState<RankedItem[] | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState<boolean>(false);
@@ -135,7 +141,7 @@ function useRankedProducts() {
     setLoading(true);
     setError(null);
     try {
-      const url = buildRankedUrl();
+      const url = buildRankedUrl(searchFilters);
       const res = await fetch(url, {
         signal: controller.signal,
         headers: { Accept: "application/json" },
@@ -160,7 +166,7 @@ function useRankedProducts() {
     } finally {
       if (mountedRef.current) setLoading(false);
     }
-  }, []);
+  }, [searchFilters]);
 
   React.useEffect(() => {
     mountedRef.current = true;
@@ -169,15 +175,23 @@ function useRankedProducts() {
       mountedRef.current = false;
       ctrlRef.current?.abort();
     };
-  }, [load]);
+  }, [load, searchFilters]); // Add searchFilters as dependency
 
   return { items, error, loading, reload: load };
 }
 
 /* ---------- Filter Component ---------- */
 
+function FilterSection({ onSearch }: { onSearch: (filters: { businessType: string; location: string; minority: string }) => void }) {
+  const [businessType, setBusinessType] = React.useState("");
+  const [location, setLocation] = React.useState("");
+  const [minority, setMinority] = React.useState("");
 
-function FilterSection() {
+  const handleSearch = () => {
+    console.log('Search clicked with filters:', { businessType, location, minority });
+    onSearch({ businessType, location, minority });
+  };
+
   return (
     <div className="w-full bg-[#1A1F71] py-6 text-center text-white pb-10">
       <div className="max-w-[1500px]  mx-auto px-4 sm:px-6 lg:px-12">
@@ -189,6 +203,8 @@ function FilterSection() {
             <input
               type="text"
               placeholder="Type Here"
+              value={businessType}
+              onChange={(e) => setBusinessType(e.target.value)}
               className="w-full h-10 px-4 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-custom-orange text-xs font-poppins"
             />
           </div>
@@ -198,12 +214,15 @@ function FilterSection() {
               Filter By Location
             </label>
             <div className="relative">
-              <select className="w-full h-10 px-4 text-gray-700 bg-white text-xs appearance-none focus:outline-none focus:ring-2 focus:ring-custom-orange text-[#5F5F5F] font-poppins">
+              <select 
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                className="w-full h-10 px-4 text-gray-700 bg-white text-xs appearance-none focus:outline-none focus:ring-2 focus:ring-custom-orange text-[#5F5F5F] font-poppins">
                 <option value="">Choose Location</option>
                 <option value="ny">New York City</option>
-                <option value="gc">Grand Canyon</option>
+                {/* <option value="gc">Grand Canyon</option>
                 <option value="sf"> San Francisco</option>
-                <option value="ch">Chicago</option>
+                <option value="ch">Chicago</option> */}
               </select>
               <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
                 <svg className="w-full h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -218,7 +237,10 @@ function FilterSection() {
               Filter By Minority
             </label>
             <div className="relative">
-              <select className="w-full h-10 px-4 text-gray-700 bg-white  text-xs appearance-none focus:outline-none focus:ring-2 focus:ring-custom-orange text-[#5F5F5F] font-poppins">
+              <select 
+                value={minority}
+                onChange={(e) => setMinority(e.target.value)}
+                className="w-full h-10 px-4 text-gray-700 bg-white  text-xs appearance-none focus:outline-none focus:ring-2 focus:ring-custom-orange text-[#5F5F5F] font-poppins">
                 <option value="">Choose Minority</option>
                 <option value="african-american">African-American</option>
                 <option value="asian">Asian</option>
@@ -239,8 +261,9 @@ function FilterSection() {
             <label className="block mb-2 text-sm font-medium text-white">
               {/* Search Here */}
             </label>
-            <button className="w-full h-10 text-sm text-white font-xs text-gray-800 bg-[#C7A040]  hover:bg-yellow-500 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-600 flex items-center justify-center gap-2 font-montserrat">
-              {/* <Search className="w-5 h-5" /> */}
+            <button 
+              onClick={handleSearch}
+              className="w-full h-10 text-sm text-white font-xs text-gray-800 bg-[#C7A040] hover:bg-yellow-500 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-600 flex items-center justify-center gap-2 font-montserrat">
               Search Here
             </button>
           </div>
@@ -254,15 +277,22 @@ function FilterSection() {
 
 /* ---------- main component ---------- */
 export default function ShopProducts() {
-  const { items, error, loading, reload } = useRankedProducts();
+  const [searchFilters, setSearchFilters] = React.useState({ businessType: "", location: "", minority: "" });
+  const { items, error, loading, reload } = useRankedProducts(searchFilters);
   const [swiperRef, setSwiperRef] = React.useState<any>(null);
 
   const prevButton = React.useRef(null);
   const nextButton = React.useRef(null);
 
+  const handleSearch = (filters: { businessType: string; location: string; minority: string }) => {
+    console.log('Received search filters:', filters);
+    setSearchFilters(filters);
+    // Force reload will happen automatically due to useEffect dependency
+  };
+
   return (
     <>
-      <FilterSection />
+      <FilterSection onSearch={handleSearch} />
       
       <section className="pt-12 pb-16 px-4 sm:px-6 lg:px-12 max-w-[1400px] mx-auto w-full">
         <div className="max-w-3xl mx-auto text-center mb-12">
@@ -279,7 +309,13 @@ export default function ShopProducts() {
         </div>
 
         {/* Products Carousel Section */}
-        {items === null || loading ? (
+        {loading && (
+          <div className="text-center py-8">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+            <p className="mt-2 text-gray-600">Searching products...</p>
+          </div>
+        )}
+        {items === null || (loading && items === null) ? (
           <SkeletonCarousel />
         ) : error ? (
           <ErrorBlock error={error} onRetry={reload} />

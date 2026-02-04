@@ -8,24 +8,18 @@ type Section = {
   type?: "price";
 };
 
-const sections: Section[] = [
-  {
-    title: "Select Category",
-    items: ["Category 1", "Category 2", "Category 3"],
-  },
-  {
-    title: "Select Sub - Category",
-    items: ["Sub 1", "Sub 2", "Sub 3"],
-  },
-  {
-    title: "Select Badge",
-    items: ["Gold", "Silver", "Bronze"],
-  },
-  // {
-  //   title: "Price",
-  //   type: "price",
-  // },
-];
+const categorySubcategories = {
+  "Home Services": ["Cleaning Services", "Plumbing", "Electrical Services", "HVAC & Appliance Repair"],
+  "Health, Beauty & Wellness Services": ["Hair & Barber Services", "Nail & Beauty Services", "Massage Therapy", "Fitness & Personal Training"],
+  "Professional & Business Services": ["Accounting & Bookkeeping", "Legal Services", "Business Consulting", "HR & Payroll Services", "Insurance Services"],
+  "Digital & Technology Services": ["Web & App Development", "IT Support & Managed Services", "Cybersecurity Services", "Software Consulting", "AI & Automation Services"],
+  "Marketing & Creative Services": ["Branding & Graphic Design", "Digital Marketing & SEO", "Social Media Management", "Photography & Videography", "Content Creation & Copywriting"],
+  "Education & Coaching Services": ["Academic Tutoring", "Career Coaching", "Business Coaching", "Language Training", "Life & Personal Development Coaching"],
+  "Real Estate & Property Services": ["Real Estate Agents & Brokers", "Property Management", "Home Inspection Services", "Mortgage & Loan Advisory", "Commercial Leasing Services"],
+  "Event & Lifestyle Services": ["Event Planning & Coordination", "DJs & Live Entertainment", "Decor & Rental Services", "Wedding Services", "Corporate Event Services"],
+  "Automotive Services": ["Auto Repair & Maintenance", "Auto Detailing", "Towing Services", "Car Customization & Accessories"],
+  "Personal & Lifestyle Services": ["Childcare & Nanny Services", "Elder Care Services", "Pet Grooming & Pet Care", "Moving & Relocation Services"]
+};
 
 const MIN = 0;
 const MAX = 1000;
@@ -36,8 +30,8 @@ function valuetext(value: number) {
 
 const FilterAccordion: React.FC = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 700]);
-
   const [value, setValue] = useState<number[]>([20, 37]);
 
   const handleChange = (event: Event, newValue: number[]) => {
@@ -47,6 +41,21 @@ const FilterAccordion: React.FC = () => {
   const toggleSection = (index: number): void => {
     setOpenIndex((prev) => (prev === index ? null : index));
   };
+
+  const sections: Section[] = [
+    {
+      title: "Select Category",
+      items: Object.keys(categorySubcategories),
+    },
+    {
+      title: "Select Sub - Category",
+      items: selectedCategory ? categorySubcategories[selectedCategory as keyof typeof categorySubcategories] : [],
+    },
+    {
+      title: "Select Badge",
+      items: ["Gold", "Silver", "Bronze"],
+    },
+  ];
 
   return (
     <div className="filter-panel">
@@ -117,7 +126,17 @@ const FilterAccordion: React.FC = () => {
               ) : (
                 <ul>
                   {section.items!.map((item, i) => (
-                    <li key={i}>{item}</li>
+                    <li 
+                      key={i} 
+                      onClick={() => {
+                        if (section.title === "Select Category") {
+                          setSelectedCategory(item);
+                        }
+                      }}
+                      style={{ cursor: section.title === "Select Category" ? "pointer" : "default" }}
+                    >
+                      {item}
+                    </li>
                   ))}
                 </ul>
               )}
