@@ -8,14 +8,40 @@ type Section = {
   type?: "price";
 };
 
+type FilterAccordionProps = {
+  setCategoryFilter: (category: string) => void;
+};
+
 const sections: Section[] = [
   {
     title: "Select Category",
-    items: ["Category 1", "Category 2", "Category 3"],
+    items: [
+  "Fashion & Apparel",
+  "Beauty & Personal Care",
+  "Home & Living",
+  "Health & Wellness Products",
+  "Handmade & Artisan Goods",
+  "Baby, Kids & Family Products",
+  "Tech, Gadgets & Accessories",
+  "Stationery, Gifts & Collectibles",
+  "Automotive & Utility Products",
+  "Digital Products & Downloads"
+],
   },
   {
     title: "Select Sub - Category",
-    items: ["Sub 1", "Sub 2", "Sub 3"],
+    items: [
+  "Men’s Clothing and Footwear",
+  "Women’s Clothing and Footwear",
+  "Skincare Products",
+  "Makeup & Cosmetics",
+  "Home Décor & Art",
+  "Kitchenware & Dining",
+  "Vitamins & Supplements",
+  "Handmade Jewellery",
+  "Mobile & Computer Accessories",
+  "Online Courses"
+],
   },
   {
     title: "Select Badge",
@@ -34,7 +60,7 @@ function valuetext(value: number) {
   return `${value}°C`;
 }
 
-const FilterAccordion: React.FC = () => {
+const FilterAccordion: React.FC<FilterAccordionProps> = ({setCategoryFilter}) => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 700]);
 
@@ -42,6 +68,7 @@ const FilterAccordion: React.FC = () => {
 
   const handleChange = (event: Event, newValue: number[]) => {
     setValue(newValue);
+    console.log(newValue)
   };
 
   const toggleSection = (index: number): void => {
@@ -117,7 +144,9 @@ const FilterAccordion: React.FC = () => {
               ) : (
                 <ul>
                   {section.items!.map((item, i) => (
-                    <li key={i}>{item}</li>
+                    <button 
+                    onClick={()=> setCategoryFilter(item)}
+                    key={i}>{item}</button>
                   ))}
                 </ul>
               )}

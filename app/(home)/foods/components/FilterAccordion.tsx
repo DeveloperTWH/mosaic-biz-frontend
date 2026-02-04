@@ -11,11 +11,18 @@ type Section = {
 const sections: Section[] = [
   {
     title: "Select Category",
-    items: ["Category 1", "Category 2", "Category 3"],
+    items: ["Restaurants", "Grocery", "Others"]
   },
   {
     title: "Select Sub - Category",
-    items: ["Sub 1", "Sub 2", "Sub 3"],
+    items: ["American",
+"African",
+"Latin American",
+"Middle Eastern",
+"Indian",
+"Asian",
+"European",
+"Casual Dining"]
   },
   {
     title: "Select Badge",

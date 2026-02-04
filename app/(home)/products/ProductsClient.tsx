@@ -55,6 +55,10 @@ type RankedResponse = {
 
 
 
+
+
+
+
 const HorizontalLine = () => {
   return <p style={{ borderTop: '2px solid', color : "#2E2E2E",  margin: '10px 0' }}></p> ;
 };
@@ -77,7 +81,7 @@ const page = () => {
         const [swiperRef, setSwiperRef] = React.useState<any>(null);
 
     const { items, error, loading, reload } = useRankedProducts();
-
+    const [categories, setCategories] = useState()
 
 
     useEffect(() => {
@@ -145,7 +149,9 @@ const page = () => {
           limit: 10,
         },
       });
+      // console.log(res.data.data)
       setServices(res.data.data);
+
     } catch (err) {
       console.error(err);
     }

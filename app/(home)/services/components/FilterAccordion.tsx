@@ -11,11 +11,33 @@ type Section = {
 const sections: Section[] = [
   {
     title: "Select Category",
-    items: ["Category 1", "Category 2", "Category 3"],
+    items: [
+  "Home Services",
+  "Health, Beauty & Wellness Services",
+  "Professional & Business Services",
+  "Digital & Technology Services",
+  "Marketing & Creative Services",
+  "Education & Coaching Services",
+  "Real Estate & Property Services",
+  "Event & Lifestyle Services",
+  "Automotive Services",
+  "Personal & Lifestyle Services"
+],
   },
   {
     title: "Select Sub - Category",
-    items: ["Sub 1", "Sub 2", "Sub 3"],
+    items: [
+  "Cleaning Services",
+  "Plumbing",
+  "Electrical Services",
+  "Hair & Barber Services",
+  "Massage Therapy",
+  "Accounting & Bookkeeping",
+  "Web & App Development",
+  "Digital Marketing & SEO",
+  "Event Planning & Coordination",
+  "Auto Repair & Maintenance"
+],
   },
   {
     title: "Select Badge",

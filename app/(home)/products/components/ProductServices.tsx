@@ -21,6 +21,8 @@ type RankedItem = {
   coverImage?: string;
   variantRatingAvg?: number;
   variantRatingCount?: number;
+  category?: string;
+  subcategory?: string;
   firstEligible?: {
     variantId: string;
     label?: string;
@@ -40,6 +42,7 @@ type RankedItem = {
   };
 };
 
+
 const ProductSevices: React.FC<BookServicesProps> = ({ 
   services, 
   totalProducts = 72,
@@ -52,6 +55,8 @@ const ProductSevices: React.FC<BookServicesProps> = ({
     badge: ""
   });
 
+  const [categoryFilter, setCategoryFilter] = useState("")
+
   const startItem = (currentPage - 1) * itemsPerPage + 1;
   const endItem = Math.min(currentPage * itemsPerPage, totalProducts);
 
@@ -62,6 +67,106 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
   }));
 };
 
+
+const demoData = [
+  {
+    "title": "Men's Casual Sneakers",
+    "description": "Comfortable and stylish sneakers for everyday wear.",
+    "coverImage": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTZd7MjfZRIgXeF-e5zoCG01AUH8blTDRPbQX0fqKwks_qyA-nr0VlCqivcaBIKDic5XLbnmmA_Nh9NNGoXIh2KtyJiHj4IjfaUzJWcldb6fGt1nPJ4CQbzXe0",
+    "category": "Fashion & Apparel",
+    "subcategory": "Men’s Clothing and Footwear"
+  },
+  {
+    "title": "Organic Face Serum",
+    "description": "Natural skincare serum for glowing skin.",
+    "coverImage": "https://example.com/images/serum.jpg",
+    "category": "Beauty & Personal Care",
+    "subcategory": "Skincare Products"
+  },
+  {
+    "title": "Modern Wall Art",
+    "description": "Abstract wall art for home decoration.",
+    "coverImage": "https://example.com/images/wallart.jpg",
+    "category": "Home & Living",
+    "subcategory": "Home Décor & Art"
+  },
+  {
+    "title": "Vitamin C Tablets",
+    "description": "Daily supplement for immune support.",
+    "coverImage": "https://example.com/images/vitaminc.jpg",
+    "category": "Health & Wellness Products",
+    "subcategory": "Vitamins & Supplements"
+  },
+  {
+    "title": "Handmade Silver Ring",
+    "description": "Beautiful handcrafted silver jewelry.",
+    "coverImage": "https://example.com/images/ring.jpg",
+    "category": "Handmade & Artisan Goods",
+    "subcategory": "Handmade Jewellery"
+  },
+  {
+    "title": "Kids Learning Toy Set",
+    "description": "Educational toys for early development.",
+    "coverImage": "https://example.com/images/toy.jpg",
+    "category": "Baby, Kids & Family Products",
+    "subcategory": "Educational Products"
+  },
+  {
+    "title": "Wireless Earbuds",
+    "description": "High-quality sound with noise cancellation.",
+    "coverImage": "https://example.com/images/earbuds.jpg",
+    "category": "Tech, Gadgets & Accessories",
+    "subcategory": "Audio Devices"
+  },
+  {
+    "title": "Leather Journal",
+    "description": "Premium notebook for writing and planning.",
+    "coverImage": "https://example.com/images/journal.jpg",
+    "category": "Stationery, Gifts & Collectibles",
+    "subcategory": "Journals & Planners"
+  },
+  {
+    "title": "Car Phone Holder",
+    "description": "Dashboard phone mount for safe driving.",
+    "coverImage": "https://example.com/images/holder.jpg",
+    "category": "Automotive & Utility Products",
+    "subcategory": "Car Accessories"
+  },
+  {
+    "title": "Online Web Development Course",
+    "description": "Learn full-stack web development online.",
+    "coverImage": "https://example.com/images/course.jpg",
+    "category": "Digital Products & Downloads",
+    "subcategory": "Online Courses"
+  }
+]
+
+const demoRanked: RankedItem[] = demoData.map((d, i) => ({
+  _id: `demo-${i}`,
+  title: d.title,
+  description: d.description,
+  coverImage: d.coverImage,
+  variantRatingAvg: 4.2,
+  variantRatingCount: 10,
+  category : d.category,
+  subcategory: d.subcategory,
+  firstEligible: {
+    variantId: `demo-${i}-v1`,
+    images: d.coverImage ? [d.coverImage] : [],
+    averageRating: 4.2,
+    totalReviews: 10,
+    allowBackorder: false,
+    totalStock: 10,
+    size: undefined,
+    price: 19.99,
+    salePrice: null,
+    discountEndDate: null,
+    onSale: false,
+    effectivePrice: 19.99,
+    label: undefined,
+    color: undefined,
+  },
+}));
 
   const filterOptions = {
     categories: ["Hair Salon", "Spa", "Nail Salon", "Barber", "Massage"],
@@ -81,7 +186,7 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
             
             <div className="space-y-6">
 
-              <FilterAccordion/>
+              <FilterAccordion setCategoryFilter={setCategoryFilter}/>
 
               {/* Sub-Category Filter */}
               {/* <div>
@@ -211,7 +316,14 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
                   //     </div>
                   //   </div>
                   // </div>
-                  <ProductCard key={index} item={service} />
+                  // <ProductCard key={index} item={service} 
+                  // />
+                  <></>
+          
+                ))}
+
+                  {demoRanked.filter((data)=> data.category?.includes(categoryFilter) || data.subcategory?.includes(categoryFilter) ).map((item, index) => (
+                     <ProductCard key={index} item={item} />
                 ))}
               </div>
 
