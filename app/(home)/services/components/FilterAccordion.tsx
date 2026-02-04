@@ -8,6 +8,10 @@ type Section = {
   type?: "price";
 };
 
+type FilterAccordionProps = {
+  setCategoryFilter: (category: string) => void;
+};
+
 const sections: Section[] = [
   {
     title: "Select Category",
@@ -56,7 +60,7 @@ function valuetext(value: number) {
   return `${value}°C`;
 }
 
-const FilterAccordion: React.FC = () => {
+const FilterAccordion: React.FC<FilterAccordionProps>  = ( {setCategoryFilter}) => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 700]);
 
@@ -139,7 +143,7 @@ const FilterAccordion: React.FC = () => {
               ) : (
                 <ul>
                   {section.items!.map((item, i) => (
-                    <li key={i}>{item}</li>
+                    <button onClick={()=> setCategoryFilter(item)} key={i}>{item}</button>
                   ))}
                 </ul>
               )}

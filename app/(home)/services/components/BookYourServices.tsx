@@ -85,6 +85,7 @@ const demoRanked = demoData.map((d, i) => ({
   title: d.title,
   description: d.description,
   coverImage : d.coverImage,
+  subcategory: d.subcategory,
   averageRating: 4.2,
   totalRatings: 10,
   reviews: 10,
@@ -128,6 +129,9 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
     badges: ["Premium", "Verified", "Top Rated", "Eco-Friendly", "Luxury"]
   };
 
+   const [categoryFilter, setCategoryFilter] = useState("")
+
+
   return (
     <section className="px-4 py-8 mx-auto max-w-7xl sm:px-6">
        
@@ -160,7 +164,7 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
                   ))}
                 </div>
               </div> */}
-              <FilterAccordion/>
+              <FilterAccordion setCategoryFilter={setCategoryFilter}/>
 
               {/* Sub-Category Filter */}
               {/* <div>
@@ -304,7 +308,7 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
                 ))}
 
 
-                {demoRanked.map((item, index) => (
+                {demoRanked.filter((data)=> data.category?.includes(categoryFilter) || data.subcategory?.includes(categoryFilter)).map((item, index) => (
                    <ProductCard
                     key={index}
                     image={item.coverImage || "/Service/19099.png"}

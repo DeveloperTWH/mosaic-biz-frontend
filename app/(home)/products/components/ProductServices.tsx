@@ -56,6 +56,8 @@ const ProductSevices: React.FC<BookServicesProps> = ({
   });
 
   const [categoryFilter, setCategoryFilter] = useState("")
+  const [subCategoryFilter, setSubCategoryFilter] = useState("")
+  
 
   const startItem = (currentPage - 1) * itemsPerPage + 1;
   const endItem = Math.min(currentPage * itemsPerPage, totalProducts);
