@@ -10,9 +10,9 @@ import "swiper/css";
 import "swiper/css/navigation";
 
 const services = [
-  { title: "Fashion & Apparel", img: "/browsecategories/electronics 1.png" },
-  { title: "Beauty & Personal Care", img: "/browsecategories/electronics 2.png" },
-  { title: "Home & Living", img: "/browsecategories/electronics 3.png" },
+  { title: "Fashion & Apparel", img: "/browsecategories/electronics 2.png" },
+  { title: "Beauty & Personal Care", img: "/browsecategories/electronics 3.png" },
+  { title: "Home & Living", img: "/browsecategories/electronics 5.png" },
   { title: "Health & Wellness Products", img: "/browsecategories/electronics 4.png" },
   { title: "Handmade & Artisan Goods", img: "/browsecategories/electronics 5.png" },
   { title: "Baby, Kids & Family Products", img: "/browsecategories/electronics 6.png" },
