@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Slider from "@mui/material/Slider";
+import { Category, SubCategory, CategoryResponse, SubCategoryResponse } from "@/types/Category";
 
 interface FilterAccordionProps {
   onFilterChange?: (category: string, subCategory: string) => void;
+  selectedCategory?: Category | null;
+  onCategoryChange?: (category: Category) => void;
 }
 
 type Section = {
@@ -12,80 +15,51 @@ type Section = {
   type?: "price";
 };
 
-const categorySubcategories = {
-  "Fashion & Apparel": [
-    "Men’s Clothing and Footwear",
-    "Women’s Clothing and Footwear",
-    "Kids & Baby Clothing and Footwear",
-    "Bags, Jewellery & Accessories",
-  ],
-  "Beauty & Personal Care": [
-    "Skincare Products",
-    "Haircare Products",
-    "Makeup & Cosmetics",
-    "Grooming Products",
-  ],
-  "Home & Living": [
-    "Home Décor & Art",
-    "Bedding & Furnishings",
-    "Kitchenware & Dining",
-    "Storage & Organization",
-    "Candles & Home Fragrance",
-  ],
-  "Health & Wellness Products": [
-    "Vitamins & Supplements",
-    "Herbal & Holistic Products",
-    "Medical & Mobility Aids",
-  ],
-  "Handmade & Artisan Goods": [
-    "Handcrafted Home Items",
-    "Handmade Jewellery",
-    "Art & Paintings",
-    "Custom & Personalized Products",
-    "Cultural & Heritage Crafts",
-  ],
-  "Baby, Kids & Family Products": [
-    "Baby Essentials",
-    "Toys & Games",
-    "Educational Products",
-    "Kids Room Products",
-  ],
-  "Tech, Gadgets & Accessories": [
-    "Mobile & Computer Accessories",
-    "Smart Home Devices",
-    "Audio & Wearables",
-  ],
-  "Stationery, Gifts & Collectibles": [
-    "Journals & Planners",
-    "Corporate & Custom Gifts",
-    "Collectibles & Memorabilia",
-  ],
-  "Automotive & Utility Products": [
-    "Car Accessories",
-    "Tools & Equipment",
-    "Safety & Emergency Gear",
-    "Travel & Utility Accessories",
-  ],
-  "Digital Products & Downloads": [
-    "Online Courses & Workshops",
-    "E-books & Guides",
-    "Software & Productivity Tools",
-  ],
-};
-
 function valuetext(value: number) {
   return `${value}°C`;
 }
 
-const FilterAccordion: React.FC<FilterAccordionProps> = ({ onFilterChange }) => {
+const FilterAccordion: React.FC<FilterAccordionProps> = ({ onFilterChange, selectedCategory: externalSelectedCategory, onCategoryChange }) => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedSubCategory, setSelectedSubCategory] = useState<string | null>(
-    null
-  );
-
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const [selectedSubCategory, setSelectedSubCategory] = useState<string | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [subcategories, setSubcategories] = useState<SubCategory[]>([]);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 700]);
   const [value, setValue] = useState<number[]>([20, 37]);
+
+  useEffect(() => {
+    if (externalSelectedCategory && externalSelectedCategory !== selectedCategory) {
+      setSelectedCategory(externalSelectedCategory);
+      setSelectedSubCategory(null);
+      setOpenIndex(1);
+      fetchSubcategories(externalSelectedCategory._id);
+    }
+  }, [externalSelectedCategory]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/categories/products`);
+        const data: CategoryResponse = await response.json();
+        setCategories(data.data.productCategories);
+      } catch (err) {
+        console.error('Error fetching categories:', err);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  const fetchSubcategories = async (categoryId: string) => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/products/subcategories/${categoryId}`);
+      const data: SubCategoryResponse = await response.json();
+      setSubcategories(data.data);
+    } catch (err) {
+      console.error('Error fetching subcategories:', err);
+      setSubcategories([]);
+    }
+  };
 
   const handleChange = (_event: Event, newValue: number[]) => {
     setValue(newValue);
@@ -97,16 +71,12 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({ onFilterChange }) => 
 
   const sections: Section[] = [
     {
-      title: "Products",
-      items: Object.keys(categorySubcategories),
+      title: "Categories",
+      items: categories.map(cat => cat.name),
     },
     {
       title: "Sub Categories",
-      items: selectedCategory
-        ? categorySubcategories[
-            selectedCategory as keyof typeof categorySubcategories
-          ]
-        : [],
+      items: subcategories.map(sub => sub.name),
     },
     {
       title: "Select Badge",
@@ -190,23 +160,25 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({ onFilterChange }) => 
                     <li
                       key={i}
                       onClick={() => {
-                        if (section.title === "Products") {
-                          setSelectedCategory(item);
-                          setSelectedSubCategory(null);
-                          setOpenIndex(1);
-                          console.log('Category clicked:', item);
-                          onFilterChange?.(item, "");
+                        if (section.title === "Categories") {
+                          const category = categories.find(cat => cat.name === item);
+                          if (category) {
+                            setSelectedCategory(category);
+                            setSelectedSubCategory(null);
+                            setOpenIndex(1);
+                            fetchSubcategories(category._id);
+                            onFilterChange?.(item, "");
+                          }
                         }
 
                         if (section.title === "Sub Categories") {
                           setSelectedSubCategory(item);
-                          console.log('Subcategory clicked:', item);
-                          onFilterChange?.(selectedCategory || "", item);
+                          onFilterChange?.(selectedCategory?.name || "", item);
                         }
                       }}
                       style={{
                         cursor:
-                          section.title === "Products" ||
+                          section.title === "Categories" ||
                           section.title === "Sub Categories"
                             ? "pointer"
                             : "default",

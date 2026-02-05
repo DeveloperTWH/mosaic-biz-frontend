@@ -1,6 +1,13 @@
-import { useState } from "react";
-import Box from '@mui/material/Box';
-import Slider from '@mui/material/Slider';
+import { useState, useEffect } from "react";
+import Box from "@mui/material/Box";
+import Slider from "@mui/material/Slider";
+import { Category, SubCategory, ServiceCategoryResponse, SubCategoryResponse } from "@/types/Category";
+
+interface FilterAccordionProps {
+  onFilterChange?: (category: string, subCategory: string) => void;
+  selectedCategory?: Category | null;
+  onCategoryChange?: (category: Category) => void;
+}
 
 type Section = {
   title: string;
@@ -8,33 +15,53 @@ type Section = {
   type?: "price";
 };
 
-const categorySubcategories = {
-  "Home Services": ["Cleaning Services", "Plumbing", "Electrical Services", "HVAC & Appliance Repair"],
-  "Health, Beauty & Wellness Services": ["Hair & Barber Services", "Nail & Beauty Services", "Massage Therapy", "Fitness & Personal Training"],
-  "Professional & Business Services": ["Accounting & Bookkeeping", "Legal Services", "Business Consulting", "HR & Payroll Services", "Insurance Services"],
-  "Digital & Technology Services": ["Web & App Development", "IT Support & Managed Services", "Cybersecurity Services", "Software Consulting", "AI & Automation Services"],
-  "Marketing & Creative Services": ["Branding & Graphic Design", "Digital Marketing & SEO", "Social Media Management", "Photography & Videography", "Content Creation & Copywriting"],
-  "Education & Coaching Services": ["Academic Tutoring", "Career Coaching", "Business Coaching", "Language Training", "Life & Personal Development Coaching"],
-  "Real Estate & Property Services": ["Real Estate Agents & Brokers", "Property Management", "Home Inspection Services", "Mortgage & Loan Advisory", "Commercial Leasing Services"],
-  "Event & Lifestyle Services": ["Event Planning & Coordination", "DJs & Live Entertainment", "Decor & Rental Services", "Wedding Services", "Corporate Event Services"],
-  "Automotive Services": ["Auto Repair & Maintenance", "Auto Detailing", "Towing Services", "Car Customization & Accessories"],
-  "Personal & Lifestyle Services": ["Childcare & Nanny Services", "Elder Care Services", "Pet Grooming & Pet Care", "Moving & Relocation Services"]
-};
-
-const MIN = 0;
-const MAX = 1000;
-
 function valuetext(value: number) {
   return `${value}°C`;
 }
 
-const FilterAccordion: React.FC = () => {
+const FilterAccordion: React.FC<FilterAccordionProps> = ({ onFilterChange, selectedCategory: externalSelectedCategory, onCategoryChange }) => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const [selectedSubCategory, setSelectedSubCategory] = useState<string | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [subcategories, setSubcategories] = useState<SubCategory[]>([]);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 700]);
   const [value, setValue] = useState<number[]>([20, 37]);
 
-  const handleChange = (event: Event, newValue: number[]) => {
+  useEffect(() => {
+    if (externalSelectedCategory && externalSelectedCategory !== selectedCategory) {
+      setSelectedCategory(externalSelectedCategory);
+      setSelectedSubCategory(null);
+      setOpenIndex(1);
+      fetchSubcategories(externalSelectedCategory._id);
+    }
+  }, [externalSelectedCategory]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/categories/services`);
+        const data: ServiceCategoryResponse = await response.json();
+        setCategories(data.data.serviceCategories);
+      } catch (err) {
+        console.error('Error fetching service categories:', err);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  const fetchSubcategories = async (categoryId: string) => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/services/subcategories/${categoryId}`);
+      const data: SubCategoryResponse = await response.json();
+      setSubcategories(data.data);
+    } catch (err) {
+      console.error('Error fetching subcategories:', err);
+      setSubcategories([]);
+    }
+  };
+
+  const handleChange = (_event: Event, newValue: number[]) => {
     setValue(newValue);
   };
 
@@ -44,16 +71,20 @@ const FilterAccordion: React.FC = () => {
 
   const sections: Section[] = [
     {
-      title: "Select Category",
-      items: Object.keys(categorySubcategories),
+      title: "Categories",
+      items: categories.map(cat => cat.name),
     },
     {
-      title: "Select Sub - Category",
-      items: selectedCategory ? categorySubcategories[selectedCategory as keyof typeof categorySubcategories] : [],
+      title: "Sub Categories",
+      items: subcategories.map(sub => sub.name),
     },
     {
       title: "Select Badge",
       items: ["Gold", "Silver", "Bronze"],
+    },
+    {
+      title: "Price",
+      type: "price",
     },
   ];
 
@@ -80,22 +111,22 @@ const FilterAccordion: React.FC = () => {
                 maxHeight: isOpen
                   ? section.type === "price"
                     ? "170px"
-                    : `${section.items!.length * 44}px`
+                    : `${section.items?.length! * 44}px`
                   : "0px",
               }}
             >
               {section.type === "price" ? (
                 <div className="price-section">
-                 <Box sx={{ width: 260}}>
-                  <Slider
-                    getAriaLabel={() => 'Temperature range'}
-                    value={value}
-                    onChange={handleChange}
-                    valueLabelDisplay="auto"
-                    getAriaValueText={valuetext}
-                    style={{color : "#C7A040"}}
-                  />
-                </Box>
+                  <Box sx={{ width: 260 }}>
+                    <Slider
+                      getAriaLabel={() => "Temperature range"}
+                      value={value}
+                      onChange={handleChange}
+                      valueLabelDisplay="auto"
+                      getAriaValueText={valuetext}
+                      style={{ color: "#C7A040" }}
+                    />
+                  </Box>
 
                   <div className="price-inputs justify-space">
                     <input
@@ -125,15 +156,33 @@ const FilterAccordion: React.FC = () => {
                 </div>
               ) : (
                 <ul>
-                  {section.items!.map((item, i) => (
-                    <li 
-                      key={i} 
+                  {section.items?.map((item, i) => (
+                    <li
+                      key={i}
                       onClick={() => {
-                        if (section.title === "Select Category") {
-                          setSelectedCategory(item);
+                        if (section.title === "Categories") {
+                          const category = categories.find(cat => cat.name === item);
+                          if (category) {
+                            setSelectedCategory(category);
+                            setSelectedSubCategory(null);
+                            setOpenIndex(1);
+                            fetchSubcategories(category._id);
+                            onFilterChange?.(item, "");
+                          }
+                        }
+
+                        if (section.title === "Sub Categories") {
+                          setSelectedSubCategory(item);
+                          onFilterChange?.(selectedCategory?.name || "", item);
                         }
                       }}
-                      style={{ cursor: section.title === "Select Category" ? "pointer" : "default" }}
+                      style={{
+                        cursor:
+                          section.title === "Categories" ||
+                          section.title === "Sub Categories"
+                            ? "pointer"
+                            : "default",
+                      }}
                     >
                       {item}
                     </li>

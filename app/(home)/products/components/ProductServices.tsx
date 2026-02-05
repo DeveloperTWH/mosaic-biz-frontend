@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Service } from "@/types/service";
+import { Category } from "@/types/Category";
 import Image from "next/image";
 import Link from "next/link";
 import FilterAccordion from "./FilterAccordion";
@@ -11,6 +12,7 @@ interface BookServicesProps {
   totalProducts?: number;
   currentPage?: number;
   itemsPerPage?: number;
+  selectedCategory?: Category | null;
   onCategoryFilter?: (category: string, subCategory: string) => void;
 }
 
@@ -46,6 +48,7 @@ const ProductSevices: React.FC<BookServicesProps> = ({
   totalProducts = 72,
   currentPage = 1,
   itemsPerPage = 40,
+  selectedCategory,
   onCategoryFilter
 }) => {
   const [selectedFilters, setSelectedFilters] = useState({
@@ -83,10 +86,12 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
             
             <div className="space-y-6">
 
-              <FilterAccordion onFilterChange={(category, subCategory) => {
-                console.log('Category filter clicked:', category, subCategory);
-                onCategoryFilter?.(category, subCategory);
-              }} />
+              <FilterAccordion 
+                selectedCategory={selectedCategory}
+                onFilterChange={(category, subCategory) => {
+                  console.log('Category filter clicked:', category, subCategory);
+                  onCategoryFilter?.(category, subCategory);
+                }} />
 
               {/* Sub-Category Filter */}
               {/* <div>

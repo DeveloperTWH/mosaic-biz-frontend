@@ -1,43 +1,62 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
+import { Category, CategoryResponse } from "@/types/Category";
 import "swiper/css";
 import "swiper/css/navigation";
 
-const services = [
-  { title: "Fashion & Apparel", img: "/browsecategories/electronics 2.png" },
-  { title: "Beauty & Personal Care", img: "/browsecategories/electronics 3.png" },
-  { title: "Home & Living", img: "/browsecategories/electronics 5.png" },
-  { title: "Health & Wellness Products", img: "/browsecategories/electronics 4.png" },
-  { title: "Handmade & Artisan Goods", img: "/browsecategories/electronics 5.png" },
-  { title: "Baby, Kids & Family Products", img: "/browsecategories/electronics 6.png" },
-  { title: "Tech, Gadgets & Accessories", img: "/browsecategories/electronics 7.png" },
-  { title: "Stationery, Gifts & Collectibles", img: "/browsecategories/electronics 8.png" },
-  { title: "Automotive & Utility Products", img: "/browsecategories/electronics 9.png" },
-  { title: "Digital Products & Downloads", img: "/browsecategories/electronics 10.png" },
-];
+interface BrowseCategoriesProps {
+  onCategorySelect?: (category: Category) => void;
+}
 
-
-export default function BrowseCategories() {
+export default function BrowseCategories({ onCategorySelect }: BrowseCategoriesProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
   const prevButtonRef = React.useRef<HTMLButtonElement>(null);
   const nextButtonRef = React.useRef<HTMLButtonElement>(null);
   const [swiperInstance, setSwiperInstance] = useState<any>(null);
 
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/categories/products`);
+        const data: CategoryResponse = await response.json();
+        setCategories(data.data.productCategories);
+      } catch (err) {
+        console.error('Error fetching categories:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="bg-[#fbf4e6] py-10">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex items-center justify-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#d1aa45]"></div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="bg-[#fbf4e6] py-10">
       <div className="max-w-7xl mx-auto px-6">
-        {/* Header */}
         <div className="flex items-center justify-between mb-16">
           <h2 className="text-4xl font-bold tracking-wide text-gray-900 font-poppins">
             BROWSE PRODUCTS
           </h2>
-
           <Link
             href="/products"
             className="px-8 py-3 text-lg font-semibold text-white bg-[#d1aa45] hover:bg-[#c19a38] transition font-montserrat"
@@ -46,19 +65,15 @@ export default function BrowseCategories() {
           </Link>
         </div>
 
-        {/* Slider Container */}
         <div className="relative flex items-center">
-          {/* Left Arrow */}
           <button
             ref={prevButtonRef}
             className="absolute -left-12 z-10 flex items-center justify-center w-12 h-12 rounded-full bg-white border border-gray-300 text-gray-700 hover:bg-gray-100 shadow-lg"
             onClick={() => swiperInstance?.slidePrev()}
-            aria-label="Previous services"
           >
             <ChevronLeft size={24} />
           </button>
 
-          {/* Services Carousel */}
           <div className="w-full mx-auto px-4">
             <Swiper
               onSwiper={setSwiperInstance}
@@ -66,22 +81,10 @@ export default function BrowseCategories() {
               spaceBetween={40}
               slidesPerView={5}
               breakpoints={{
-                0: {
-                  slidesPerView: 2,
-                  spaceBetween: 20,
-                },
-                640: {
-                  slidesPerView: 3,
-                  spaceBetween: 30,
-                },
-                768: {
-                  slidesPerView: 4,
-                  spaceBetween: 40,
-                },
-                1024: {
-                  slidesPerView: 5,
-                  spaceBetween: 50,
-                },
+                0: { slidesPerView: 2, spaceBetween: 20 },
+                640: { slidesPerView: 3, spaceBetween: 30 },
+                768: { slidesPerView: 4, spaceBetween: 40 },
+                1024: { slidesPerView: 5, spaceBetween: 50 },
               }}
               navigation={{
                 prevEl: prevButtonRef.current,
@@ -89,7 +92,6 @@ export default function BrowseCategories() {
               }}
               className="w-full"
               onInit={(swiper) => {
-                // Update navigation buttons after init
                 if (swiper.params.navigation && typeof swiper.params.navigation !== 'boolean') {
                   swiper.params.navigation.prevEl = prevButtonRef.current;
                   swiper.params.navigation.nextEl = nextButtonRef.current;
@@ -98,14 +100,14 @@ export default function BrowseCategories() {
                 swiper.navigation.update();
               }}
             >
-              {services.map((service, index) => (
-                <SwiperSlide key={index}>
+              {categories.map((category, index) => (
+                <SwiperSlide key={category._id}>
                   <div 
-                    className="text-center"
+                    className="text-center cursor-pointer"
                     onMouseEnter={() => setHoveredIndex(index)}
                     onMouseLeave={() => setHoveredIndex(null)}
+                    onClick={() => onCategorySelect?.(category)}
                   >
-                    {/* Circular Image Container */}
                     <div className="relative w-44 h-44 mx-auto rounded-full overflow-hidden border-8 border-white shadow-xl transition-all duration-300">
                       <div className={`relative w-full h-full ${
                         hoveredIndex === index 
@@ -113,34 +115,32 @@ export default function BrowseCategories() {
                           : ""
                       }`}>
                         <Image
-                          src={service.img}
-                          alt={service.title}
+                          src={category.img || "/browsecategories/electronics 1.png"}
+                          alt={category.name}
                           fill
                           className="object-cover"
                         />
                         
-                        {/* Hover overlay - Yellow with text */}
                         <div className={`absolute inset-0 flex items-center justify-center transition-all duration-300 ${
                           hoveredIndex === index 
                             ? "bg-[#d1aa45]/90" 
                             : "bg-[#d1aa45]/0"
                         }`}>
-                          <span className={`text-white font-poppins font-bold text-lg px-4 text-center transition-opacity duration-300 font-poppins ${
+                          <span className={`text-white font-bold text-lg px-4 text-center transition-opacity duration-300 font-poppins ${
                             hoveredIndex === index ? "opacity-100" : "opacity-0"
                           }`}>
-                            {service.title}
+                            {category.name}
                           </span>
                         </div>
                       </div>
                     </div>
 
-                    {/* Service Title (shown when not hovered) */}
                     <p className={`mt-6 text-sm font-medium transition-all duration-300 font-poppins ${
                       hoveredIndex === index 
                         ? "text-[#d1aa45] font-semibold" 
                         : "text-gray-800"
                     }`}>
-                      {service.title}
+                      {category.name}
                     </p>
                   </div>
                 </SwiperSlide>
@@ -148,12 +148,10 @@ export default function BrowseCategories() {
             </Swiper>
           </div>
 
-          {/* Right Arrow */}
           <button
             ref={nextButtonRef}
             className="absolute -right-12 z-10 flex items-center justify-center w-12 h-12 rounded-full bg-white border border-gray-300 text-gray-700 hover:bg-gray-100 shadow-lg"
             onClick={() => swiperInstance?.slideNext()}
-            aria-label="Next services"
           >
             <ChevronRight size={24} />
           </button>

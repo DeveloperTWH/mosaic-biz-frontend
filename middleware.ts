@@ -57,15 +57,15 @@ export async function middleware(req: NextRequest) {
         }
 
         // 🔐 Role-based route protection
-        // if (path.startsWith('/admin') && role !== 'admin') {
-        //     return NextResponse.redirect(new URL(getRedirectPathByRole(role), req.url));
-        // }
-        // if (path.startsWith('/partners') && role !== 'business_owner') {
-        //     return NextResponse.redirect(new URL(getRedirectPathByRole(role), req.url));
-        // }
-        // if (path.startsWith('/customer') && role !== 'customer') {
-        //     return NextResponse.redirect(new URL(getRedirectPathByRole(role), req.url));
-        // }
+        if (path.startsWith('/admin') && role !== 'admin') {
+            return NextResponse.redirect(new URL(getRedirectPathByRole(role), req.url));
+        }
+        if (path.startsWith('/partners') && role !== 'business_owner') {
+            return NextResponse.redirect(new URL(getRedirectPathByRole(role), req.url));
+        }
+        if (path.startsWith('/customer') && role !== 'customer') {
+            return NextResponse.redirect(new URL(getRedirectPathByRole(role), req.url));
+        }
 
         return NextResponse.next(); // ✅ Authorized
     } catch {
