@@ -40,7 +40,7 @@ export default function BrowseFoodAndGrocery() {
         {/* Image Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
           {categories.map((category, index) => (
-            <Link key={index} href={"/"} className="text-center">
+            <Link key={index} href={"/foods"} className="text-center">
               <div className="relative w-full h-64 rounded-xl overflow-hidden font-poppins">
                 <Image
                   src={category.image}

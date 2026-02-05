@@ -10,16 +10,37 @@ import "swiper/css";
 import "swiper/css/navigation";
 
 const services = [
-  { title: "Salons And Spas", img: "/browsservice/electronics 1.png" },
-  { title: "Legal Services", img: "/browsservice/electronics 2.png" },
-  { title: "Health And Wellness", img: "/browsservice/electronics 3.png" },
-  { title: "Business Consulting", img: "/browsservice/electronics 4.png" },
-  { title: "IT Consulting", img: "/browsservice/electronics 5.png" },
-  { title: "Marketing", img: "/browsservice/electronics 6.png" },
-  // { title: "Education", img: "/browsservice/electronics 7.png" },
-  // { title: "Home Services", img: "/browsservice/frame 8.png" },
-  // { title: "Financial Services", img: "/browsservice/frame 9.png" },
+  // Home Services
+  { title: "Home Services", img: "/browsservice/electronics 1.png" },
+
+  // Health, Beauty & Wellness
+  { title: "Health, Beauty & Wellness Services", img: "/browsservice/electronics 2.png" },
+
+  // Professional & Business
+  { title: "Professional & Business Services", img: "/browsservice/electronics 3.png" },
+
+  // Digital & Technology
+  { title: "Digital & Technology Services", img: "/browsservice/electronics 4.png" },
+
+  // Marketing & Creative
+  { title: "Marketing & Creative Services", img: "/browsservice/electronics 5.png" },
+
+  // Education & Coaching
+  { title: "Education & Coaching Services", img: "/browsservice/electronics 6.png" },
+
+  // Real Estate & Property
+  { title: "Real Estate & Property Services", img: "/browsservice/electronics 1.png" },
+
+  // Event & Lifestyle
+  { title: "Event & Lifestyle Services", img: "/browsservice/electronics 2.png" },
+
+  // Automotive
+  { title: "Automotive Services", img: "/browsservice/electronics 3.png" },
+
+  // Personal & Lifestyle
+  { title: "Personal & Lifestyle Services", img: "/browsservice/electronics 4.png" },
 ];
+
 
 export default function BrowseServices({showAllService} : {showAllService : boolean}) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);

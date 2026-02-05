@@ -6,12 +6,103 @@ import FilterAccordion from "./FilterAccordion";
 // 
 import ProductCard from "./ProductCard";
 
+
+
+const demoData = [
+  {
+    "title": "Restaurants",
+    "description": "Professional house and apartment cleaning services.",
+    "coverImage": "https://images.unsplash.com/photo-1581578731548-c64695cc6952",
+    "category": "Restaurants",
+    "subcategory": "Cleaning Services"
+  },
+  {
+    "title": "Home Grocery",
+    "description": "Expert plumbing repair and installation services.",
+    "coverImage": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c",
+    "category": "Home Grocery",
+    "subcategory": "Plumbing"
+  },
+  {
+    "title": "Electrical Installation",
+    "description": "Safe and reliable electrical wiring and repair.",
+    "coverImage": "https://images.unsplash.com/photo-1621905251918-48416bd8575a",
+    "category": "Others",
+    "subcategory": "Electrical Services"
+  },
+  {
+    "title": "Restaurants",
+    "description": "Professional haircut and styling for men and women.",
+    "coverImage": "https://images.unsplash.com/photo-1595475884562-073c30d45670",
+    "category": "Restaurants",
+    "subcategory": "Hair & Barber Services"
+  },
+  {
+    "title": "Relaxation Massage",
+    "description": "Full-body massage therapy for stress relief.",
+    "coverImage": "https://images.unsplash.com/photo-1600334129128-685c5582fd35",
+    "category": "Restaurants",
+    "subcategory": "Massage Therapy"
+  },
+  {
+    "title": "Accounting & Tax Filing",
+    "description": "Complete bookkeeping and tax filing services.",
+    "coverImage": "https://images.unsplash.com/photo-1554224154-22dec7ec8818",
+    "category": "Grocery",
+    "subcategory": "Accounting & Bookkeeping"
+  },
+  {
+    "title": "Website Development",
+    "description": "Custom website and web application development.",
+    "coverImage": "https://images.unsplash.com/photo-1519389950473-47ba0277781c",
+    "category": "Grocery",
+    "subcategory": "Web & App Development"
+  },
+  {
+    "title": "SEO & Digital Marketing",
+    "description": "Improve your online presence and website traffic.",
+    "coverImage": "https://images.unsplash.com/photo-1533750349088-cd871a92f312",
+    "category": "Others",
+    "subcategory": "Digital Marketing & SEO"
+  },
+  {
+    "title": "Event Planning Service",
+    "description": "Complete planning and coordination for events.",
+    "coverImage": "https://images.unsplash.com/photo-1515169067865-5387ec356754",
+    "category": "Others",
+    "subcategory": "Event Planning & Coordination"
+  },
+  {
+    "title": "Car Maintenance Service",
+    "description": "Regular car servicing and mechanical repairs.",
+    "coverImage": "https://images.unsplash.com/photo-1619642751034-765dfdf7c58e",
+    "category": "Others",
+    "subcategory": "Auto Repair & Maintenance"
+  }
+]
+
+const demoRanked = demoData.map((d, i) => ({
+  image: d.coverImage,
+  title: d.title,
+  description: d.description,
+  coverImage : d.coverImage,
+
+  averageRating: 4.2,
+  totalRatings: 10,
+  reviews: 10,
+  category: d.category,
+  subcategory: d.subcategory,
+}));
+
 interface BookServicesProps {
   services: Service[];
   totalProducts?: number;
   currentPage?: number;
   itemsPerPage?: number;
 }
+
+
+
 
 const BookServices: React.FC<BookServicesProps> = ({ 
   services, 
@@ -41,6 +132,9 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
     subCategories: ["Haircut", "Coloring", "Facial", "Manicure", "Pedicure"],
     badges: ["Premium", "Verified", "Top Rated", "Eco-Friendly", "Luxury"]
   };
+
+     const [categoryFilter, setCategoryFilter] = useState("")
+  
 
   return (
     <section className="px-4 py-8 mx-auto max-w-7xl sm:px-6">
@@ -74,7 +168,7 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
                   ))}
                 </div>
               </div> */}
-              <FilterAccordion/>
+              <FilterAccordion setCategoryFilter={setCategoryFilter}/>
 
               {/* Sub-Category Filter */}
               {/* <div>
@@ -204,14 +298,28 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
                   //     </div>
                   //   </div>
                   // </div>
-                  <ProductCard 
-                  key={service._id}
-                  title={service.title}
-                  image={service.coverImage}
-                  description={service.description}
-                  rating={service.averageRating}
-                  totalRatings={service.averageRating}
-                  reviews={service.totalReviews}
+                  // <ProductCard 
+                  // key={service._id}
+                  // title={service.title}
+                  // image={service.coverImage}
+                  // description={service.description}
+                  // rating={service.averageRating}
+                  // totalRatings={service.averageRating}
+                  // reviews={service.totalReviews}
+                  // />
+                  <></>
+                ))}
+
+
+                {demoRanked.filter((data)=> data.category?.includes(categoryFilter) || data.subcategory?.includes(categoryFilter)).map((item, index) => (
+                   <ProductCard
+                    key={index}
+                    image={item.coverImage || "/Service/19099.png"}
+                    title={item.title}
+                    description={item.description}
+                    rating={item.averageRating ?? 0}
+                    totalRatings={item.totalRatings ?? 0}
+                    reviews={item.reviews ?? 0}
                   />
                 ))}
               </div> 
