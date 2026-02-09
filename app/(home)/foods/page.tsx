@@ -91,7 +91,12 @@ const FoodSection = () => {
         fetchFoods(category._id, undefined);
       }} />
 
-      <BookServices services={services} selectedCategory={selectedCategory} loading={loading} onSubcategorySelect={(subcategoryId) => {
+      <BookServices services={services} selectedCategory={selectedCategory} loading={loading} onCategorySelect={(categoryId) => {
+        const category = { _id: categoryId } as Category;
+        setSelectedCategory(category);
+        setSelectedSubcategory("");
+        fetchFoods(categoryId, undefined);
+      }} onSubcategorySelect={(subcategoryId) => {
         setSelectedSubcategory(subcategoryId);
         fetchFoods(selectedCategory?._id, subcategoryId);
       }} />

@@ -73,6 +73,7 @@ const page = () => {
     const [products, setProducts] = useState([]);
     const [loadingn, setLoading] = useState(true);
     const [minorityTypes, setMinorityTypes] = useState<MinorityType[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
     const [subcategories, setSubcategories] = useState<SubCategory[]>([]);
     const [selectedSubcategory, setSelectedSubcategory] = useState("");
@@ -98,7 +99,18 @@ const page = () => {
             }
         };
 
+        const fetchCategories = async () => {
+            try {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/categories/products`);
+                const data: CategoryResponse = await res.json();
+                setCategories(data.data.productCategories);
+            } catch (err) {
+                console.error('Failed to load categories', err);
+            }
+        };
+
         fetchMinorityTypes();
+        fetchCategories();
     }, []);
 
 
@@ -294,6 +306,14 @@ const page = () => {
                services={products}
                selectedCategory={selectedCategory}
                loading={loadingn}
+               onCategorySelect={(categoryId) => {
+                 const category = categories.find(cat => cat._id === categoryId);
+                 if (category) {
+                   setSelectedCategory(category);
+                   setSelectedSubcategory("");
+                 }
+                 fetchProducts('', '', '', categoryId, undefined);
+               }}
                onSubcategorySelect={(subcategoryId) => {
                  fetchProducts('', '', '', selectedCategory?._id, subcategoryId);
                }}

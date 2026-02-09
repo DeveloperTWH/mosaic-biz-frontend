@@ -11,7 +11,7 @@ import { Service } from "@/types/service";
 import FilterAccordion from "./components/FilterAccordion";
 import JoinVendorBanner from "./components/JoinVendorBanner";
 import BrowseServices from "../Components/BrowsServices";
-import { Category, SubCategory, SubCategoryResponse } from "@/types/Category";
+import { Category, SubCategory, SubCategoryResponse, ServiceCategoryResponse } from "@/types/Category";
 
 type MinorityType = { _id: string; name: string };
 
@@ -21,6 +21,7 @@ const ServicePage = () => {
   const [searchLocation, setSearchLocation] = useState("");
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [subcategories, setSubcategories] = useState<SubCategory[]>([]);
   const [selectedSubcategory, setSelectedSubcategory] = useState("");
@@ -77,7 +78,17 @@ const ServicePage = () => {
   };
 
   useEffect(() => {
-    fetchServices(undefined, undefined); // load default services on page load
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/categories/services`);
+        const data: ServiceCategoryResponse = await res.json();
+        setCategories(data.data.serviceCategories);
+      } catch (err) {
+        console.error('Failed to load service categories', err);
+      }
+    };
+    fetchCategories();
+    fetchServices(undefined, undefined);
   }, [minorityType]);
 
   return (
@@ -93,7 +104,14 @@ const ServicePage = () => {
         fetchServices(category._id, undefined);
       }} />
 
-      <BookServices services={services} selectedCategory={selectedCategory} loading={loading} onSubcategorySelect={(subcategoryId) => {
+      <BookServices services={services} selectedCategory={selectedCategory} loading={loading} onCategorySelect={(categoryId) => {
+        const category = categories.find(cat => cat._id === categoryId);
+        if (category) {
+          setSelectedCategory(category);
+          setSelectedSubcategory("");
+        }
+        fetchServices(categoryId, undefined);
+      }} onSubcategorySelect={(subcategoryId) => {
         setSelectedSubcategory(subcategoryId);
         fetchServices(selectedCategory?._id, subcategoryId);
       }} />

@@ -7,6 +7,7 @@ interface FilterAccordionProps {
   onFilterChange?: (category: string, subCategory: string) => void;
   selectedCategory?: Category | null;
   onCategoryChange?: (category: Category) => void;
+  onCategorySelect?: (categoryId: string) => void;
   onSubcategorySelect?: (subcategoryId: string) => void;
 }
 
@@ -20,7 +21,7 @@ function valuetext(value: number) {
   return `${value}°C`;
 }
 
-const FilterAccordion: React.FC<FilterAccordionProps> = ({ onFilterChange, selectedCategory: externalSelectedCategory, onCategoryChange, onSubcategorySelect }) => {
+const FilterAccordion: React.FC<FilterAccordionProps> = ({ onFilterChange, selectedCategory: externalSelectedCategory, onCategoryChange, onCategorySelect, onSubcategorySelect }) => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [selectedSubCategory, setSelectedSubCategory] = useState<string | null>(null);
@@ -157,7 +158,14 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({ onFilterChange, selec
                 </div>
               ) : (
                 <ul>
-                  {section.items?.map((item, i) => (
+                  {section.items?.map((item, i) => {
+                    const isSelected = section.title === "Categories" 
+                      ? selectedCategory?.name === item
+                      : section.title === "Sub Categories"
+                      ? selectedSubCategory === item
+                      : false;
+                    
+                    return (
                     <li
                       key={i}
                       onClick={() => {
@@ -168,6 +176,7 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({ onFilterChange, selec
                             setSelectedSubCategory(null);
                             setOpenIndex(1);
                             fetchSubcategories(category._id);
+                            onCategorySelect?.(category._id);
                             onFilterChange?.(item, "");
                           }
                         }
@@ -187,11 +196,15 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({ onFilterChange, selec
                           section.title === "Sub Categories"
                             ? "pointer"
                             : "default",
+                        backgroundColor: isSelected ? "#C7A040" : "transparent",
+                        color: isSelected ? "white" : "inherit",
+                        fontWeight: isSelected ? "bold" : "normal",
                       }}
                     >
                       {item}
                     </li>
-                  ))}
+                    );
+                  })}
                 </ul>
               )}
             </div>

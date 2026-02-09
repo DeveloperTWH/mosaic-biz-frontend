@@ -13,6 +13,7 @@ interface BookServicesProps {
   itemsPerPage?: number;
   selectedCategory?: Category | null;
   loading?: boolean;
+  onCategorySelect?: (categoryId: string) => void;
   onSubcategorySelect?: (subcategoryId: string) => void;
 }
 
@@ -23,6 +24,7 @@ const BookServices: React.FC<BookServicesProps> = ({
   itemsPerPage = 40,
   selectedCategory,
   loading = false,
+  onCategorySelect,
   onSubcategorySelect
 }) => {
   const [selectedFilters, setSelectedFilters] = useState({
@@ -54,6 +56,7 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
               onFilterChange={(category, subCategory) => {
                 console.log('Service filter clicked:', category, subCategory);
               }}
+              onCategorySelect={onCategorySelect}
               onSubcategorySelect={onSubcategorySelect}
             />
           </div>

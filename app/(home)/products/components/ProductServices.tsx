@@ -15,6 +15,7 @@ interface BookServicesProps {
   selectedCategory?: Category | null;
   loading?: boolean;
   onSubcategorySelect?: (subcategoryId: string) => void;
+  onCategorySelect?: (categoryId: string) => void;
   onCategoryFilter?: (category: string, subCategory: string) => void;
 }
 
@@ -53,6 +54,7 @@ const ProductSevices: React.FC<BookServicesProps> = ({
   selectedCategory,
   loading = false,
   onSubcategorySelect,
+  onCategorySelect,
   onCategoryFilter
 }) => {
   const [selectedFilters, setSelectedFilters] = useState({
@@ -96,6 +98,7 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
                   console.log('Category filter clicked:', category, subCategory);
                   onCategoryFilter?.(category, subCategory);
                 }}
+                onCategorySelect={onCategorySelect}
                 onSubcategorySelect={onSubcategorySelect}
               />
 
