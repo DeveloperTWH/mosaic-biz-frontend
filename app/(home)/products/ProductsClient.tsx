@@ -14,7 +14,7 @@ import { Service } from '@/types/service';
 import JoinVendorBanner from './components/JoinVendorBanner';
 import BrowseCategories from './components/BrowsCategories';
 import FilterAccordion from './components/FilterAccordion';
-import { Category, SubCategory, SubCategoryResponse } from '@/types/Category';
+import { Category, SubCategory, SubCategoryResponse, CategoryResponse } from '@/types/Category';
 
 type MinorityType = { _id: string; name: string };
 
