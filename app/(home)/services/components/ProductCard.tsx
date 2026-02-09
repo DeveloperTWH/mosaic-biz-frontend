@@ -4,12 +4,12 @@ type ProductCardProps = {
   image: string;
   title: string;
   description: string;
-  rating: number; // 0–5
+  rating: number;
   totalRatings: number;
   reviews: number;
   badge?: string;
+  price?: number;
 };
-
 
 const HorizontalLine = () => {
   return <p style={{ borderTop: '1px solid', color : "#D9D9D9",  margin: '10px 0' }}></p> ;
@@ -23,37 +23,48 @@ const ProductCard: React.FC<ProductCardProps> = ({
   totalRatings,
   reviews,
   badge,
+  price,
 }) => {
   return (
-    <div className="product-card h-[400px]">
-      <img src={image} alt={title} className="product-image h-[180px] w-full" />
+    <div className="product-card h-[380px]">
+      {image && <img src={image} alt={title} className="product-image h-[180px] w-full" />}
 
-      <div className="product-content">
-        {/* Ratings */}
-        <div className="mt-1 text-xs text-[#909090]">
-            ⭐ ⭐ ⭐ ⭐ ⭐ {rating} Ratings and Reviews {reviews}
-        </div>
+      <div className="product-content p-4">
+        {/* Badge */}
+        {badge && (
+          <div className="mb-2">
+            <span className="px-2 py-1 text-xs font-semibold text-white bg-yellow-600 rounded uppercase">
+              {badge}
+            </span>
+          </div>
+        )}
 
         {/* Title */}
-        <h3 className="product-title">{title}</h3>
+        <h3 className="product-title text-base font-bold mb-2">{title}</h3>
 
         {/* Description */}
-        {/* <p className="product-description text-xs overflow-hidden text-ellipsis h-10">{description}</p> */}
         <p
-          className="product-description text-sm text-[#5F5F5F] overflow-hidden font-montserrat mt-5"
+          className="product-description text-sm text-[#5F5F5F] overflow-hidden font-montserrat mb-3"
           style={{
             display: "-webkit-box",
             WebkitLineClamp: 2,
             WebkitBoxOrient: "vertical",
-            // fallback for non-webkit browsers
             textOverflow: "ellipsis",
           }}
           title={description}
         >
-
         {description}</p>
 
-        <div className="flex  justify-center mt-2">
+        {/* Price */}
+        {price !== undefined && (
+          <div className="mt-auto mb-3">
+            <span className="text-lg font-bold text-gray-900">
+              ${price.toFixed(2)}
+            </span>
+          </div>
+        )}
+
+        <div className="flex justify-center mt-2">
             <div className="w-[65%] mr-5">
             <HorizontalLine/>
             </div>
@@ -62,17 +73,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
             </a>
         </div>
       </div>
-
-      {/* Badge */}
-      {/* {badge && ( */}
-        <div className="badge h-12 flex  mt-5 bg-[#F4F4F4] items-center justify-around">
- 
-
-      
-            <span className="text-[#ACACAC] text-xs">Earned Badge:</span>
-         <img className="h-[35px] w-[30px]" src={"/badge.png"} alt="Badge" />
-        </div>
-      {/* )} */}
     </div>
   );
 };

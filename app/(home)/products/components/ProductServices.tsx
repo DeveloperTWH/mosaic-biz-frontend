@@ -17,6 +17,8 @@ interface BookServicesProps {
   onSubcategorySelect?: (subcategoryId: string) => void;
   onCategorySelect?: (categoryId: string) => void;
   onCategoryFilter?: (category: string, subCategory: string) => void;
+  onBadgeSelect?: (badge: string) => void;
+  onPriceChange?: (min: number, max: number) => void;
 }
 
 type RankedItem = {
@@ -55,7 +57,9 @@ const ProductSevices: React.FC<BookServicesProps> = ({
   loading = false,
   onSubcategorySelect,
   onCategorySelect,
-  onCategoryFilter
+  onCategoryFilter,
+  onBadgeSelect,
+  onPriceChange
 }) => {
   const [selectedFilters, setSelectedFilters] = useState({
     category: "",
@@ -100,6 +104,8 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
                 }}
                 onCategorySelect={onCategorySelect}
                 onSubcategorySelect={onSubcategorySelect}
+                onBadgeSelect={onBadgeSelect}
+                onPriceChange={onPriceChange}
               />
 
               {/* Sub-Category Filter */}
@@ -318,19 +324,36 @@ function ProductCard({ item }: { item: RankedItem }) {
   const title = pickTitle(item);
   const description = item.description || "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent vitae.";
   const images = gatherImages(item);
-  const { price, effective, onSale } = pickPrice(item);
+  const { price: variantPrice, effective, onSale } = pickPrice(item);
   const rating = pickRating(item);
   const ratingCount = pickRatingCount(item);
   const reviewCount = 5;
+  const badge = (item as any).badge || null;
+  
+  // Get price from item.price or fallback to variant price
+  let displayPrice = 0;
+  if ((item as any).price) {
+    const priceData = (item as any).price;
+    if (priceData.$numberDecimal !== undefined) {
+      displayPrice = parseFloat(priceData.$numberDecimal);
+    } else if (typeof priceData === 'number') {
+      displayPrice = priceData;
+    } else if (typeof priceData === 'string') {
+      displayPrice = parseFloat(priceData);
+    }
+  } else {
+    displayPrice = variantPrice;
+  }
 
   const fullStars = Math.floor(rating);
   const fractional = rating % 1;
   const hasHalfStar = fractional >= 0.25 && fractional < 0.75;
 
   return (
-    <div className="bg-green p-3  border-2 border-[#D9D9D9] w-[300px] shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col h-[420px]">
+    <div className="bg-green p-3 border-2 border-[#D9D9D9] w-full max-w-[300px] shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col h-[380px]">
       {/* Product Image - Fixed Height */}
-      <div className="relative h-60 overflow-hidden bg-gray-100 flex-shrink-0">
+      {images[0] && (
+      <div className="relative h-48 overflow-hidden bg-gray-100 flex-shrink-0">
         <img
           src={images[0]}
           alt={title}
@@ -346,73 +369,46 @@ function ProductCard({ item }: { item: RankedItem }) {
           </div>
         )}
       </div>
+      )}
 
       {/* Product Info - Flex grow to fill space */}
-      <div className="p-5 flex flex-col flex-grow">
+      <div className="p-4 flex flex-col flex-grow">
+        {/* Badge */}
+        {badge && (
+          <div className="mb-2">
+            <span className="px-2 py-1 text-xs font-semibold text-white bg-yellow-600 rounded uppercase">
+              {badge}
+            </span>
+          </div>
+        )}
+        
         {/* Title - Fixed height */}
-        <h3 className="text-lg font-bold text-gray-900 uppercase tracking-tight line-clamp-1 h-9 overflow-hidden font-poppins">
+        <h3 className="text-base font-bold text-gray-900 uppercase tracking-tight line-clamp-1 mb-2 overflow-hidden font-poppins">
           {title}
         </h3>
 
         {/* Description - Fixed height */}
-        <p className="mb-3 text-sm text-gray-600 leading-relaxed line-clamp-2 h-10 overflow-hidden font-montserrat">
+        <p className="mb-3 text-xs text-gray-600 leading-relaxed line-clamp-2 overflow-hidden font-montserrat">
           {description}
         </p>
 
-        {/* Rating and Reviews - Fixed height */}
-        <div className="flex-shrink-0">
-          <div className="flex items-center mb-1">
-
-            <div className="flex">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  size={14}
-                  fill={i < fullStars ? "#FBBF24" : i === fullStars && hasHalfStar ? "#FBBF24" : "#E5E7EB"}
-                  stroke={i < fullStars ? "#FBBF24" : i === fullStars && hasHalfStar ? "#FBBF24" : "#D1D5DB"}
-                  className={i < fullStars || (i === fullStars && hasHalfStar) ? "text-yellow-400" : "text-gray-300"}
-                />
-              ))}
-            </div>
-            {/* <span className="ml-2 text-sm font-semibold text-gray-700">
-              {rating.toFixed(1)}
-            </span> */}
-            <p className="text-xs ml-2 text-gray-500 font-poppins">
-            {ratingCount} Ratings And {reviewCount} Reviews
-          </p>
-          </div>
-          {/* <p className="text-xs text-gray-500">
-            {ratingCount} Ratings And {reviewCount} Reviews
-          </p> */}
-        </div>
-
         {/* Price - Fixed height */}
-        <div className="flex-shrink-0">
+        <div className="flex-shrink-0 mt-auto">
           {onSale ? (
-            <div className="flex items-center gap-3">
-              <span className="text-xl font-bold text-red-600">
+            <div className="flex items-center gap-2">
+              <span className="text-lg font-bold text-red-600">
                 ${effective.toFixed(2)}
               </span>
-              <span className="text-base text-gray-500 line-through">
-                ${price.toFixed(2)}
+              <span className="text-sm text-gray-500 line-through">
+                ${displayPrice.toFixed(2)}
               </span>
             </div>
           ) : (
-            <span className="text-sm font-bold text-gray-900">
-              ${price.toFixed(2)}
+            <span className="text-lg font-bold text-gray-900">
+              ${displayPrice.toFixed(2)}
             </span>
           )}
         </div>
-
-        {/* View Product Button - Fixed at bottom */}
-        {/* <div className="mt-auto pt-4">
-          <Link
-            href={href}
-            className="block w-full py-2.5 text-center text-white font-semibold bg-custom-orange rounded-lg hover:bg-orange-600 transition-colors"
-          >
-            View Product
-          </Link>
-        </div> */}
       </div>
     </div>
 

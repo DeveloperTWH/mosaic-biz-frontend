@@ -34,13 +34,14 @@ const AdminSidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
   const navItems = [
     { label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5" /> },
     { label: "Businesses", icon: <Building2 className="w-5 h-5" /> },
+    { label: "Products", icon: <Package className="w-5 h-5" /> },
     { label: "Vendor Applications", icon: <FileText className="w-5 h-5" /> },
-    { label: "Orders", icon: <Package className="w-5 h-5" /> },
+    { label: "Orders", icon: <FileText className="w-5 h-5" /> },
     { label: "Users", icon: <Users className="w-5 h-5" /> },
     { label: "Subscription", icon: <CreditCard className="w-5 h-5" /> },
     { label: "Categories Management", icon: <ListTree className="w-5 h-5" /> },
     { label: "CMS", icon: <Settings className="w-5 h-5" /> },
-    { label: "Testimonial", icon: <MessageSquareQuote className="w-5 h-5" /> },
+    { label: "Testimonials", icon: <MessageSquareQuote className="w-5 h-5" /> },
     { label: "Blog", icon: <Newspaper className="w-5 h-5" /> },
     { label: "FAQ", icon: <HelpCircle className="w-5 h-5" /> },
   ];

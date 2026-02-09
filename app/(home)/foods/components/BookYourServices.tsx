@@ -15,6 +15,8 @@ interface BookServicesProps {
   loading?: boolean;
   onCategorySelect?: (categoryId: string) => void;
   onSubcategorySelect?: (subcategoryId: string) => void;
+  onBadgeSelect?: (badge: string) => void;
+  onPriceChange?: (min: number, max: number) => void;
 }
 
 const BookServices: React.FC<BookServicesProps> = ({ 
@@ -25,7 +27,9 @@ const BookServices: React.FC<BookServicesProps> = ({
   selectedCategory,
   loading = false,
   onCategorySelect,
-  onSubcategorySelect
+  onSubcategorySelect,
+  onBadgeSelect,
+  onPriceChange
 }) => {
   const [selectedFilters, setSelectedFilters] = useState({
     category: "",
@@ -58,6 +62,8 @@ const BookServices: React.FC<BookServicesProps> = ({
               }}
               onCategorySelect={onCategorySelect}
               onSubcategorySelect={onSubcategorySelect}
+              onBadgeSelect={onBadgeSelect}
+              onPriceChange={onPriceChange}
             />
           </div>
         </div>
@@ -99,12 +105,14 @@ const BookServices: React.FC<BookServicesProps> = ({
                 {services.map((service) => (
                   <ProductCard
                     key={service._id}
-                    image={service.coverImage || "/Service/19099.png"}
+                    image={service.coverImage}
                     title={service.title}
                     description={service.description}
                     rating={service.averageRating ?? 0}
                     totalRatings={service.totalReviews ?? 0}
                     reviews={service.totalReviews ?? 0}
+                    badge={(service as any).badge}
+                    price={(service as any).price}
                   />
                 ))}
               </div> 

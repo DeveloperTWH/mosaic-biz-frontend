@@ -9,6 +9,8 @@ interface FilterAccordionProps {
   onCategoryChange?: (category: Category) => void;
   onCategorySelect?: (categoryId: string) => void;
   onSubcategorySelect?: (subcategoryId: string) => void;
+  onBadgeSelect?: (badge: string) => void;
+  onPriceChange?: (min: number, max: number) => void;
 }
 
 type Section = {
@@ -21,10 +23,11 @@ function valuetext(value: number) {
   return `${value}°C`;
 }
 
-const FilterAccordion: React.FC<FilterAccordionProps> = ({ onFilterChange, selectedCategory: externalSelectedCategory, onCategoryChange, onCategorySelect, onSubcategorySelect }) => {
+const FilterAccordion: React.FC<FilterAccordionProps> = ({ onFilterChange, selectedCategory: externalSelectedCategory, onCategoryChange, onCategorySelect, onSubcategorySelect, onBadgeSelect, onPriceChange }) => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [selectedSubCategory, setSelectedSubCategory] = useState<string | null>(null);
+  const [selectedBadge, setSelectedBadge] = useState<string | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [subcategories, setSubcategories] = useState<SubCategory[]>([]);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 700]);
@@ -63,8 +66,11 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({ onFilterChange, selec
     }
   };
 
-  const handleChange = (_event: Event, newValue: number[]) => {
-    setValue(newValue);
+  const handleChange = (_event: Event, newValue: number | number[]) => {
+    const values = Array.isArray(newValue) ? newValue : [newValue, newValue];
+    setValue(values);
+    setPriceRange([values[0], values[1]]);
+    onPriceChange?.(values[0], values[1]);
   };
 
   const toggleSection = (index: number): void => {
@@ -121,11 +127,13 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({ onFilterChange, selec
                 <div className="price-section">
                   <Box sx={{ width: 260 }}>
                     <Slider
-                      getAriaLabel={() => "Temperature range"}
+                      getAriaLabel={() => "Price range"}
                       value={value}
                       onChange={handleChange}
                       valueLabelDisplay="auto"
                       getAriaValueText={valuetext}
+                      min={0}
+                      max={1000}
                       style={{ color: "#C7A040" }}
                     />
                   </Box>
@@ -135,24 +143,22 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({ onFilterChange, selec
                       type="number"
                       value={priceRange[0]}
                       placeholder="Min"
-                      onChange={(e) =>
-                        setPriceRange([
-                          Number(e.target.value),
-                          priceRange[1],
-                        ])
-                      }
+                      onChange={(e) => {
+                        const newRange: [number, number] = [Number(e.target.value), priceRange[1]];
+                        setPriceRange(newRange);
+                        onPriceChange?.(newRange[0], newRange[1]);
+                      }}
                     />
                     <span className="ml-10">to</span>
                     <input
                       className="ml-10"
                       type="number"
                       value={priceRange[1]}
-                      onChange={(e) =>
-                        setPriceRange([
-                          priceRange[0],
-                          Number(e.target.value),
-                        ])
-                      }
+                      onChange={(e) => {
+                        const newRange: [number, number] = [priceRange[0], Number(e.target.value)];
+                        setPriceRange(newRange);
+                        onPriceChange?.(newRange[0], newRange[1]);
+                      }}
                     />
                   </div>
                 </div>
@@ -163,6 +169,8 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({ onFilterChange, selec
                       ? selectedCategory?.name === item
                       : section.title === "Sub Categories"
                       ? selectedSubCategory === item
+                      : section.title === "Select Badge"
+                      ? selectedBadge === item
                       : false;
                     
                     return (
@@ -188,6 +196,11 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({ onFilterChange, selec
                             onSubcategorySelect?.(subcategory._id);
                           }
                           onFilterChange?.(selectedCategory?.name || "", item);
+                        }
+
+                        if (section.title === "Select Badge") {
+                          setSelectedBadge(item);
+                          onBadgeSelect?.(item.toLowerCase());
                         }
                       }}
                       style={{

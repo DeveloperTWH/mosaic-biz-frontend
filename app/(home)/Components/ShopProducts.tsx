@@ -8,6 +8,7 @@ import { Navigation, Pagination, Keyboard, A11y, Autoplay } from "swiper/modules
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import { getFeaturedProducts, FeaturedProduct } from "@/lib/api/featured-products";
 
 /* ---------- types ---------- */
 type RankedItem = {
@@ -125,57 +126,37 @@ function isAbortError(e: any) {
   return e?.name === "AbortError" || e?.code === 20 || /aborted/i.test(e?.message || "");
 }
 
-/* ---------- data hook (abort-safe + retry) ---------- */
-function useRankedProducts(searchFilters?: { businessType: string; location: string; minority: string }) {
-  const [items, setItems] = React.useState<RankedItem[] | null>(null);
+/* ---------- data hook for featured products ---------- */
+function useFeaturedProducts(searchFilters?: { businessType: string; location: string; minority: string }) {
+  const [items, setItems] = React.useState<FeaturedProduct[] | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState<boolean>(false);
-  const ctrlRef = React.useRef<AbortController | null>(null);
   const mountedRef = React.useRef(true);
 
   const load = React.useCallback(async () => {
-    ctrlRef.current?.abort();
-    const controller = new AbortController();
-    ctrlRef.current = controller;
-
     setLoading(true);
     setError(null);
     try {
-      const url = buildRankedUrl(searchFilters);
-      const res = await fetch(url, {
-        signal: controller.signal,
-        headers: { Accept: "application/json" },
-        cache: "no-store",
-      });
-      if (!res.ok) {
-        const text = await res.text().catch(() => "");
-        throw new Error(`HTTP ${res.status}: ${text || res.statusText}`);
-      }
-      const data = (await res.json()) as RankedResponse;
-      if (!data || !Array.isArray(data.items)) {
-        throw new Error("Unexpected response shape (missing items[])");
-      }
+      const data = await getFeaturedProducts(1, 12);
       if (!mountedRef.current) return;
-      setItems(data.items.slice(0, PAGE_SIZE));
+      setItems(data.products); // Show all products
     } catch (e: any) {
-      if (isAbortError(e)) return;
-      console.error("ShopProducts fetch error:", e);
+      console.error("Featured products fetch error:", e);
       if (!mountedRef.current) return;
-      setError(e?.message || "Failed to load products.");
+      setError(e?.message || "Failed to load featured products.");
       setItems((prev) => prev ?? []);
     } finally {
       if (mountedRef.current) setLoading(false);
     }
-  }, [searchFilters]);
+  }, []);
 
   React.useEffect(() => {
     mountedRef.current = true;
     load();
     return () => {
       mountedRef.current = false;
-      ctrlRef.current?.abort();
     };
-  }, [load, searchFilters]); // Add searchFilters as dependency
+  }, [load]);
 
   return { items, error, loading, reload: load };
 }
@@ -278,7 +259,7 @@ function FilterSection({ onSearch }: { onSearch: (filters: { businessType: strin
 /* ---------- main component ---------- */
 export default function ShopProducts() {
   const [searchFilters, setSearchFilters] = React.useState({ businessType: "", location: "", minority: "" });
-  const { items, error, loading, reload } = useRankedProducts(searchFilters);
+  const { items, error, loading, reload } = useFeaturedProducts(searchFilters);
   const [swiperRef, setSwiperRef] = React.useState<any>(null);
 
   const prevButton = React.useRef(null);
@@ -304,7 +285,7 @@ export default function ShopProducts() {
             <hr className="w-20 h-1 bg-green-900" />
           </div>
           <p className="px-2 mb-8 text-sm text-gray-600 sm:text-base sm:px-0 font-montserrat">
-            Explore our most recent, high-quality picks — curated by rank and plan weight.
+            See what’s trending, what’s new, and what our community is loving right now. Highlighted featured products from verified vendors you can trust
           </p>
         </div>
 
@@ -346,32 +327,37 @@ export default function ShopProducts() {
             <Swiper
               onSwiper={setSwiperRef}
               modules={[Navigation]}
-              spaceBetween={30}
+              spaceBetween={15}
               slidesPerView={1}
               breakpoints={{
                 640: {
                   slidesPerView: 2,
-                  spaceBetween: 20,
+                  spaceBetween: 15,
                 },
                 1024: {
                   slidesPerView: 3,
-                  spaceBetween: 30,
+                  spaceBetween: 15,
                 },
                 1280: {
                   slidesPerView: 4,
-                  spaceBetween: 30,
+                  spaceBetween: 15,
                 },
               }}
               navigation={{
                 prevEl: prevButton.current,
                 nextEl: nextButton.current,
               }}
-              autoplay={{ delay: 5000, disableOnInteraction: false }}
+              onBeforeInit={(swiper) => {
+                if (swiper.params.navigation && typeof swiper.params.navigation !== 'boolean') {
+                  swiper.params.navigation.prevEl = prevButton.current;
+                  swiper.params.navigation.nextEl = nextButton.current;
+                }
+              }}
               className="py-4"
             >
               {items.map((p) => (
                 <SwiperSlide key={p._id} className="py-4 w-500 h-auto">
-                  <ProductCard item={p} />
+                  <FeaturedProductCard item={p} />
                 </SwiperSlide>
               ))}
             </Swiper>
@@ -397,111 +383,68 @@ export default function ShopProducts() {
   );
 }
 
-/* ---------- Product Card (Fixed Height Design) ---------- */
-function ProductCard({ item }: { item: RankedItem }) {
+/* ---------- Featured Product Card ---------- */
+function FeaturedProductCard({ item }: { item: FeaturedProduct }) {
   const href = `/product/${item._id}`;
-  const title = pickTitle(item);
-  const description = item.description || "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent vitae.";
-  const images = gatherImages(item);
-  const { price, effective, onSale } = pickPrice(item);
-  const rating = pickRating(item);
-  const ratingCount = pickRatingCount(item);
-  const reviewCount = 5;
-
-  const fullStars = Math.floor(rating);
-  const fractional = rating % 1;
-  const hasHalfStar = fractional >= 0.25 && fractional < 0.75;
 
   return (
-    <div className="bg-green p-3  border-2 border-[#D9D9D9] w-[300px] shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col h-[420px]">
+    <div className="bg-white p-4 border-2 border-[#D9D9D9] w-[300px] shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col h-[420px]">
       {/* Product Image - Fixed Height */}
-      <div className="relative h-60 overflow-hidden bg-gray-100 flex-shrink-0">
+      <div className="relative h-48 overflow-hidden bg-gray-100 flex-shrink-0 mb-3">
         <img
-          src={images[0]}
-          alt={title}
+          src={item.coverImage}
+          alt={item.title}
           loading="lazy"
           className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
         />
         
-        {onSale && (
-          <div className="absolute top-3 left-3">
-            <span className="px-3 py-1 text-xs font-bold text-white bg-red-600 rounded-full">
-              SALE
-            </span>
-          </div>
-        )}
+        <div className="absolute top-3 left-3">
+          <span className="px-3 py-1 text-xs font-bold text-white bg-yellow-600 rounded-full">
+            FEATURED
+          </span>
+        </div>
       </div>
 
       {/* Product Info - Flex grow to fill space */}
-      <div className="p-5 flex flex-col flex-grow">
+      <div className="flex flex-col flex-grow">
         {/* Title - Fixed height */}
-        <h3 className="text-lg font-bold text-gray-900 uppercase tracking-tight line-clamp-1 h-9 overflow-hidden font-poppins">
-          {title}
+        <h3 className="text-lg font-bold text-gray-900 uppercase tracking-tight line-clamp-2 h-12 overflow-hidden font-poppins mb-2">
+          {item.title}
         </h3>
 
         {/* Description - Fixed height */}
         <p className="mb-3 text-sm text-gray-600 leading-relaxed line-clamp-2 h-10 overflow-hidden font-montserrat">
-          {description}
+          {item.description}
         </p>
 
-        {/* Rating and Reviews - Fixed height */}
-        <div className="flex-shrink-0">
-          <div className="flex items-center mb-1">
-
+        {/* Rating */}
+        <div className="flex-shrink-0 mb-3">
+          <div className="flex items-center">
             <div className="flex">
               {[...Array(5)].map((_, i) => (
                 <Star
                   key={i}
                   size={14}
-                  fill={i < fullStars ? "#FBBF24" : i === fullStars && hasHalfStar ? "#FBBF24" : "#E5E7EB"}
-                  stroke={i < fullStars ? "#FBBF24" : i === fullStars && hasHalfStar ? "#FBBF24" : "#D1D5DB"}
-                  className={i < fullStars || (i === fullStars && hasHalfStar) ? "text-yellow-400" : "text-gray-300"}
+                  fill="#FBBF24"
+                  stroke="#FBBF24"
+                  className="text-yellow-400"
                 />
               ))}
             </div>
-            {/* <span className="ml-2 text-sm font-semibold text-gray-700">
-              {rating.toFixed(1)}
-            </span> */}
             <p className="text-xs ml-2 text-gray-500 font-poppins">
-            {ratingCount} Ratings And {reviewCount} Reviews
-          </p>
+              Featured Product
+            </p>
           </div>
-          {/* <p className="text-xs text-gray-500">
-            {ratingCount} Ratings And {reviewCount} Reviews
-          </p> */}
         </div>
 
-        {/* Price - Fixed height */}
-        <div className="flex-shrink-0">
-          {onSale ? (
-            <div className="flex items-center gap-3">
-              <span className="text-xl font-bold text-red-600">
-                ${effective.toFixed(2)}
-              </span>
-              <span className="text-base text-gray-500 line-through">
-                ${price.toFixed(2)}
-              </span>
-            </div>
-          ) : (
-            <span className="text-sm font-bold text-gray-900">
-              ${price.toFixed(2)}
-            </span>
-          )}
+        {/* Price - Fixed at bottom */}
+        <div className="mt-auto pt-4 border-t border-gray-200">
+          <div className="text-2xl font-bold text-green-600 text-center">
+            ${item.price.toFixed(2)}
+          </div>
         </div>
-
-        {/* View Product Button - Fixed at bottom */}
-        {/* <div className="mt-auto pt-4">
-          <Link
-            href={href}
-            className="block w-full py-2.5 text-center text-white font-semibold bg-custom-orange rounded-lg hover:bg-orange-600 transition-colors"
-          >
-            View Product
-          </Link>
-        </div> */}
       </div>
     </div>
-
-
   );
 }
 

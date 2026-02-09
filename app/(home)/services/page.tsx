@@ -25,8 +25,11 @@ const ServicePage = () => {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [subcategories, setSubcategories] = useState<SubCategory[]>([]);
   const [selectedSubcategory, setSelectedSubcategory] = useState("");
+  const [selectedBadge, setSelectedBadge] = useState("");
+  const [priceMin, setPriceMin] = useState<number | undefined>();
+  const [priceMax, setPriceMax] = useState<number | undefined>();
 
-  const fetchServices = async (categoryId?: string, subcategoryId?: string) => {
+  const fetchServices = async (categoryId?: string, subcategoryId?: string, badge?: string, priceMin?: number, priceMax?: number) => {
     setLoading(true);
     try {
       const params: any = {
@@ -39,6 +42,10 @@ const ServicePage = () => {
       
       if (categoryId) params.categoryId = categoryId;
       if (subcategoryId) params.subcategoryId = subcategoryId;
+      if (badge) params.badge = badge;
+      if (priceMin !== undefined && priceMax !== undefined) {
+        params.price = `${priceMin}-${priceMax}`;
+      }
 
       const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/services/list`, {
         params,
@@ -110,10 +117,17 @@ const ServicePage = () => {
           setSelectedCategory(category);
           setSelectedSubcategory("");
         }
-        fetchServices(categoryId, undefined);
+        fetchServices(categoryId, undefined, selectedBadge, priceMin, priceMax);
       }} onSubcategorySelect={(subcategoryId) => {
         setSelectedSubcategory(subcategoryId);
-        fetchServices(selectedCategory?._id, subcategoryId);
+        fetchServices(selectedCategory?._id, subcategoryId, selectedBadge, priceMin, priceMax);
+      }} onBadgeSelect={(badge) => {
+        setSelectedBadge(badge);
+        fetchServices(selectedCategory?._id, selectedSubcategory || undefined, badge, priceMin, priceMax);
+      }} onPriceChange={(min, max) => {
+        setPriceMin(min);
+        setPriceMax(max);
+        fetchServices(selectedCategory?._id, selectedSubcategory || undefined, selectedBadge, min, max);
       }} />
       <JoinVendorBanner/>
     </main>

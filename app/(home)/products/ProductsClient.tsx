@@ -77,6 +77,9 @@ const page = () => {
     const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
     const [subcategories, setSubcategories] = useState<SubCategory[]>([]);
     const [selectedSubcategory, setSelectedSubcategory] = useState("");
+    const [selectedBadge, setSelectedBadge] = useState("");
+    const [priceMin, setPriceMin] = useState<number | undefined>();
+    const [priceMax, setPriceMax] = useState<number | undefined>();
 
       const prevButton = React.useRef(null);
       const nextButton = React.useRef(null);
@@ -114,7 +117,7 @@ const page = () => {
     }, []);
 
 
-    const fetchProducts = async (q?: string, m?: string, c?: string, categoryId?: string, subcategoryId?: string) => {
+    const fetchProducts = async (q?: string, m?: string, c?: string, categoryId?: string, subcategoryId?: string, badge?: string, priceMin?: number, priceMax?: number) => {
         setLoading(true);
         try {
             const params: any = {
@@ -127,6 +130,10 @@ const page = () => {
             
             if (categoryId) params.categoryId = categoryId;
             if (subcategoryId) params.subcategoryId = subcategoryId;
+            if (badge) params.badge = badge;
+            if (priceMin !== undefined && priceMax !== undefined) {
+                params.price = `${priceMin}-${priceMax}`;
+            }
 
             const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/products/list`, {
                 params,
@@ -316,6 +323,15 @@ const page = () => {
                }}
                onSubcategorySelect={(subcategoryId) => {
                  fetchProducts('', '', '', selectedCategory?._id, subcategoryId);
+               }}
+               onBadgeSelect={(badge) => {
+                 setSelectedBadge(badge);
+                 fetchProducts('', '', '', selectedCategory?._id, selectedSubcategory || undefined, badge, priceMin, priceMax);
+               }}
+               onPriceChange={(min, max) => {
+                 setPriceMin(min);
+                 setPriceMax(max);
+                 fetchProducts('', '', '', selectedCategory?._id, selectedSubcategory || undefined, selectedBadge, min, max);
                }}
                onCategoryFilter={(category, subCategory) => {
                  console.log('Category filter from ProductServices:', category, subCategory);

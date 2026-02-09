@@ -15,6 +15,8 @@ interface BookServicesProps {
   loading?: boolean;
   onCategorySelect?: (categoryId: string) => void;
   onSubcategorySelect?: (subcategoryId: string) => void;
+  onBadgeSelect?: (badge: string) => void;
+  onPriceChange?: (min: number, max: number) => void;
 }
 
 const BookServices: React.FC<BookServicesProps> = ({ 
@@ -25,7 +27,9 @@ const BookServices: React.FC<BookServicesProps> = ({
   selectedCategory,
   loading = false,
   onCategorySelect,
-  onSubcategorySelect
+  onSubcategorySelect,
+  onBadgeSelect,
+  onPriceChange
 }) => {
   const [selectedFilters, setSelectedFilters] = useState({
     category: "",
@@ -58,6 +62,8 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
               }}
               onCategorySelect={onCategorySelect}
               onSubcategorySelect={onSubcategorySelect}
+              onBadgeSelect={onBadgeSelect}
+              onPriceChange={onPriceChange}
             />
           </div>
         </div>
@@ -105,6 +111,8 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
                   rating={service.averageRating}
                   totalRatings={service.averageRating}
                   reviews={service.totalReviews}
+                  badge={(service as any).badge}
+                  price={(service as any).price}
                   />
                 ))}
               </div> 

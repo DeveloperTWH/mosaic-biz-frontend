@@ -1,10 +1,51 @@
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
 import HeroSection from './components/HeroSection';
-import { Mail, MapPinned, PhoneCall } from 'lucide-react';
+import { Mail, MapPinned, PhoneCall, Facebook, Instagram, Linkedin } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { submitContactInquiry, ContactInquiryData } from '@/lib/api/contact';
+import { toast } from 'react-toastify';
 
 export default function ContactUsPage() {
+    const [formData, setFormData] = useState<ContactInquiryData>({
+        firstName: '',
+        lastName: '',
+        email: '',
+        phoneNo: '',
+        subject: '',
+        howCanWeHelp: ''
+    });
+    const [loading, setLoading] = useState(false);
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+
+        try {
+            await submitContactInquiry(formData);
+            toast.success('Thank you for contacting us! We will get back to you soon.');
+            setFormData({
+                firstName: '',
+                lastName: '',
+                email: '',
+                phoneNo: '',
+                subject: '',
+                howCanWeHelp: ''
+            });
+        } catch (error: any) {
+            console.error('Contact form error:', error);
+            toast.error(error.response?.data?.message || 'Failed to submit your inquiry. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
     return (
         <div className="flex flex-col">
             {/* Hero Section */}
@@ -21,43 +62,97 @@ export default function ContactUsPage() {
                         Reach out to Mosaic Biz Hub anytime. We’re here to support your journey, answer your questions, and help your business thrive in the digital world.
                     </p>
 
-                    <form className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <div className="flex flex-col">
-                            <label htmlFor="FirstName" className="text-sm">First Name</label>
-                            <input id="FirstName" type="text" placeholder="Enter First Name" className="input border-[1px] text-sm p-2 text-[#5F5F5F] text-[#5F5F5F] font-montserrat" />
+                            <label htmlFor="firstName" className="text-sm">First Name</label>
+                            <input 
+                                id="firstName" 
+                                name="firstName"
+                                type="text" 
+                                placeholder="Enter First Name" 
+                                value={formData.firstName}
+                                onChange={handleChange}
+                                required
+                                className="input border-[1px] text-sm p-2 text-[#5F5F5F] font-montserrat" 
+                            />
                         </div>
 
                         <div className="flex flex-col">
-                            <label htmlFor="LastName" className="text-sm">Last Name</label>
-                            <input id="LastName" type="text" placeholder="Enter Last Name" className="input border-[1px] text-sm p-2  text-[#5F5F5F] font-montserrat" />
+                            <label htmlFor="lastName" className="text-sm">Last Name</label>
+                            <input 
+                                id="lastName" 
+                                name="lastName"
+                                type="text" 
+                                placeholder="Enter Last Name" 
+                                value={formData.lastName}
+                                onChange={handleChange}
+                                required
+                                className="input border-[1px] text-sm p-2 text-[#5F5F5F] font-montserrat" 
+                            />
                         </div>
 
                         <div className="flex flex-col">
-                            <label htmlFor="Email" className="text-sm">Email</label>
-                            <input id="Email" type="email" placeholder="Enter Email" className="input border-[1px] text-sm p-2 text-[#5F5F5F] font-montserrat" />
+                            <label htmlFor="email" className="text-sm">Email</label>
+                            <input 
+                                id="email" 
+                                name="email"
+                                type="email" 
+                                placeholder="Enter Email" 
+                                value={formData.email}
+                                onChange={handleChange}
+                                required
+                                className="input border-[1px] text-sm p-2 text-[#5F5F5F] font-montserrat" 
+                            />
                         </div>
 
                         <div className="flex flex-col">
-                            <label htmlFor="Phone"className="text-sm">Phone Number</label>
-                            <input id="Phone" type="tel" placeholder="Enter Phone Number" className="input border-[1px] text-sm p-2  text-[#5F5F5F] font-montserrat" />
+                            <label htmlFor="phoneNo" className="text-sm">Phone Number</label>
+                            <input 
+                                id="phoneNo" 
+                                name="phoneNo"
+                                type="tel" 
+                                placeholder="Enter Phone Number" 
+                                value={formData.phoneNo}
+                                onChange={handleChange}
+                                required
+                                className="input border-[1px] text-sm p-2 text-[#5F5F5F] font-montserrat" 
+                            />
                         </div>
 
                         <div className="flex flex-col md:col-span-2">
-                            <label htmlFor="Subject" className="text-sm">Subject</label>
-                            <input id="Subject" type="text" placeholder="Enter Subject" className="input border-[1px] text-sm p-2 text-[#5F5F5F] font-montserrat" />
+                            <label htmlFor="subject" className="text-sm">Subject</label>
+                            <input 
+                                id="subject" 
+                                name="subject"
+                                type="text" 
+                                placeholder="Enter Subject" 
+                                value={formData.subject}
+                                onChange={handleChange}
+                                required
+                                className="input border-[1px] text-sm p-2 text-[#5F5F5F] font-montserrat" 
+                            />
                         </div>
 
                         <div className="flex flex-col md:col-span-2">
-                            <label htmlFor="Message"className="text-sm">How Can We Help You?</label>
-                            <textarea id="Message" placeholder="Enter Message" className="input h-28 border-[1px] text-sm p-2  text-[#5F5F5F] font-montserrat" />
+                            <label htmlFor="howCanWeHelp" className="text-sm">How Can We Help You?</label>
+                            <textarea 
+                                id="howCanWeHelp" 
+                                name="howCanWeHelp"
+                                placeholder="Enter Message" 
+                                value={formData.howCanWeHelp}
+                                onChange={handleChange}
+                                required
+                                className="input h-28 border-[1px] text-sm p-2 text-[#5F5F5F] font-montserrat" 
+                            />
                         </div>
 
                         <div className="md:col-span-2">
                             <button
                                 type="submit"
-                                className="w-full px-20 py-2 text-white bg-[#C7A040] md:w-auto"
+                                disabled={loading}
+                                className="w-full px-20 py-2 text-white bg-[#C7A040] md:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                Submit
+                                {loading ? 'Submitting...' : 'Submit'}
                             </button>
                         </div>
                     </form>
@@ -131,11 +226,25 @@ export default function ContactUsPage() {
                 </div>
 
                 <div className="px-10 py-8 text-white bg-gradient-yellow">
-                    <MapPinned size={40} className='mb-10' />
-                    <h3 className="mb-2 text-lg">LOCATE US:</h3>
+                    <div className="flex items-center gap-3 mb-10">
+                        <Facebook size={20} />
+                        <Instagram size={20} />
+                        <Linkedin size={20} />
+                    </div>
+                    <h3 className="mb-2 text-lg font-bold">SOCIALIZE WITH US:</h3>
                     <hr className="h-[2px] w-[50px] bg-white" />
                     <hr className="h-[2px] w-[50px] bg-white mt-[1px] mb-5" />
-                    <p>Lorem Ipsum Dolor Sit Amet, Consectetur Adipisicing Elit.</p>
+                    <div className="flex gap-4">
+                        <a href="#" className="hover:opacity-80 transition-opacity">
+                            <Facebook size={24} />
+                        </a>
+                        <a href="#" className="hover:opacity-80 transition-opacity">
+                            <Instagram size={24} />
+                        </a>
+                        <a href="#" className="hover:opacity-80 transition-opacity">
+                            <Linkedin size={24} />
+                        </a>
+                    </div>
                 </div>
             </div>
 
@@ -169,56 +278,59 @@ export default function ContactUsPage() {
 
 
             {/* Map Section */}
-            <div className="relative px-4 py-10 my-8 sm:px-8">
-                <div className="absolute bottom-[-10%] left-[0%] w-[50%] h-[80%]  -z-10" />
-
+            {/* <div className="relative px-4 py-10 my-8 sm:px-8">
+                <div className="text-center mb-6">
+                    <h2 className="text-3xl font-bold text-gray-900 mb-4">FIND US ON MAP</h2>
+                    <hr className="h-[2px] w-[100px] bg-green-900 mx-auto" />
+                    <hr className="h-[2px] w-[100px] bg-green-900 mt-[1px] mx-auto" />
+                </div>
+                
                 <iframe
                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2886.478198356483!2d-79.38429378450022!3d43.648409279121854!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x882b34d9c2e4fd33%3A0x60aef9634974e0c0!2sUnion%20Station!5e0!3m2!1sen!2sca!4v1632940851879!5m2!1sen!2sca"
                     width="100%"
                     height="400"
                     allowFullScreen={false}
                     loading="lazy"
-                    className="w-full max-w-5xl mx-auto border "
+                    className="w-full max-w-5xl mx-auto border rounded-lg shadow-lg"
                 ></iframe>
-            </div>
+            </div> */}
 
-            <div className="flex justify-center  bg-[#FFF6E0]  h-[400px]">
+            {/* Newsletter Section */}
+            {/* <div className="flex justify-center bg-[#FFF6E0] h-[400px]">
                 <div className='flex mt-8 h-[80%]'>
                     <Image
-                    src={"/contact/subscribe.png"}
-                    height={250}
-                    width={250 }
-                    alt='subscribe image'
+                        src={"/contact/subscribe.png"}
+                        height={250}
+                        width={250}
+                        alt='subscribe image'
                     />
                 </div>
 
                 <div className='flex flex-col w-[50%] ml-[20%] justify-center gap-5'>
-
-
-
-                    <p className='text-3xl'>SUBSCRIBE NEWSLTTER</p>
-                    <p className='text-sm w-[80%]'>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam laoreet, diam sit amet porta eleifend, turpis justo maximus eros, rhoncus ullamcorper mi tortor.</p>
+                    <h2 className='text-3xl font-bold'>SUBSCRIBE NEWSLETTER</h2>
+                    <hr className="h-[2px] w-[100px] bg-green-900" />
+                    <hr className="h-[2px] w-[100px] bg-green-900 mt-[1px] mb-4" />
+                    <p className='text-sm w-[80%]'>Stay connected with Mosaic Biz Hub by subscribing to our newsletter. Receive the latest news, exclusive promotions, and inspiring stories from minority-owned businesses.</p>
         
                     <div className="flex flex-col">
-                        <label htmlFor="Email" className="text-sm">Email Adress</label>
+                        <label htmlFor="newsletterEmail" className="text-sm mb-2">Email Address</label>
                         <div className='flex flex-row gap-2'>
-                            <input id="Email" type="email" placeholder="Enter Email" className="input w-[400px] border-[1px] text-sm p-2 text-[#5F5F5F] font-montserrat" />
-
-
-                        <div className="md:col-span-2">
+                            <input 
+                                id="newsletterEmail" 
+                                type="email" 
+                                placeholder="Enter Email" 
+                                className="w-[400px] border-[1px] text-sm p-2 text-[#5F5F5F] font-montserrat rounded" 
+                            />
                             <button
-                                type="submit"
-                                className="w-full px-20 py-2 text-white bg-[#C7A040] md:w-auto"
+                                type="button"
+                                className="px-8 py-2 text-white bg-[#C7A040] hover:bg-[#B8943A] transition-colors rounded"
                             >
-                              Subscribe Now
+                                Subscribe Now
                             </button>
                         </div>
-                        </div>
                     </div>
-                
                 </div>
-        
-            </div>
+            </div> */}
         </div>
     );
 }

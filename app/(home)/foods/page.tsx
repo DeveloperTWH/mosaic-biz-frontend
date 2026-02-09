@@ -23,6 +23,9 @@ const FoodSection = () => {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [subcategories, setSubcategories] = useState<SubCategory[]>([]);
   const [selectedSubcategory, setSelectedSubcategory] = useState("");
+  const [selectedBadge, setSelectedBadge] = useState("");
+  const [priceMin, setPriceMin] = useState<number | undefined>();
+  const [priceMax, setPriceMax] = useState<number | undefined>();
 
   const handleSearch = () => {
     console.log({
@@ -32,7 +35,7 @@ const FoodSection = () => {
     });
   }
 
-  const fetchFoods = async (categoryId?: string, subcategoryId?: string) => {
+  const fetchFoods = async (categoryId?: string, subcategoryId?: string, badge?: string, priceMin?: number, priceMax?: number) => {
     setLoading(true);
     try {
       const params: any = {
@@ -45,6 +48,10 @@ const FoodSection = () => {
       
       if (categoryId) params.categoryId = categoryId;
       if (subcategoryId) params.subcategoryId = subcategoryId;
+      if (badge) params.badge = badge;
+      if (priceMin !== undefined && priceMax !== undefined) {
+        params.price = `${priceMin}-${priceMax}`;
+      }
 
       const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/food/list`, {
         params,
@@ -92,13 +99,21 @@ const FoodSection = () => {
       }} />
 
       <BookServices services={services} selectedCategory={selectedCategory} loading={loading} onCategorySelect={(categoryId) => {
-        const category = { _id: categoryId } as Category;
+        const categories = services.map(s => ({ _id: categoryId, name: '' } as Category));
+        const category = categories.find(c => c._id === categoryId) || { _id: categoryId, name: '', description: '', createdAt: '', updatedAt: '', slug: '', __v: 0 } as Category;
         setSelectedCategory(category);
         setSelectedSubcategory("");
-        fetchFoods(categoryId, undefined);
+        fetchFoods(categoryId, undefined, selectedBadge, priceMin, priceMax);
       }} onSubcategorySelect={(subcategoryId) => {
         setSelectedSubcategory(subcategoryId);
-        fetchFoods(selectedCategory?._id, subcategoryId);
+        fetchFoods(selectedCategory?._id, subcategoryId, selectedBadge, priceMin, priceMax);
+      }} onBadgeSelect={(badge) => {
+        setSelectedBadge(badge);
+        fetchFoods(selectedCategory?._id, selectedSubcategory || undefined, badge, priceMin, priceMax);
+      }} onPriceChange={(min, max) => {
+        setPriceMin(min);
+        setPriceMax(max);
+        fetchFoods(selectedCategory?._id, selectedSubcategory || undefined, selectedBadge, min, max);
       }} />
 
       <JoinVendorBanner/>
