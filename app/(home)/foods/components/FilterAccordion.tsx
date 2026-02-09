@@ -7,6 +7,7 @@ interface FilterAccordionProps {
   onFilterChange?: (category: string, subCategory: string) => void;
   selectedCategory?: Category | null;
   onCategoryChange?: (category: Category) => void;
+  onSubcategorySelect?: (subcategoryId: string) => void;
 }
 
 type Section = {
@@ -19,7 +20,7 @@ function valuetext(value: number) {
   return `${value}°C`;
 }
 
-const FilterAccordion: React.FC<FilterAccordionProps> = ({ onFilterChange, selectedCategory: externalSelectedCategory, onCategoryChange }) => {
+const FilterAccordion: React.FC<FilterAccordionProps> = ({ onFilterChange, selectedCategory: externalSelectedCategory, onCategoryChange, onSubcategorySelect }) => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [selectedSubCategory, setSelectedSubCategory] = useState<string | null>(null);
@@ -172,7 +173,11 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({ onFilterChange, selec
                         }
 
                         if (section.title === "Sub Categories") {
+                          const subcategory = subcategories.find(sub => sub.name === item);
                           setSelectedSubCategory(item);
+                          if (subcategory) {
+                            onSubcategorySelect?.(subcategory._id);
+                          }
                           onFilterChange?.(selectedCategory?.name || "", item);
                         }
                       }}

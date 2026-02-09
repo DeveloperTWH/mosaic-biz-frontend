@@ -13,6 +13,8 @@ interface BookServicesProps {
   currentPage?: number;
   itemsPerPage?: number;
   selectedCategory?: Category | null;
+  loading?: boolean;
+  onSubcategorySelect?: (subcategoryId: string) => void;
   onCategoryFilter?: (category: string, subCategory: string) => void;
 }
 
@@ -49,6 +51,8 @@ const ProductSevices: React.FC<BookServicesProps> = ({
   currentPage = 1,
   itemsPerPage = 40,
   selectedCategory,
+  loading = false,
+  onSubcategorySelect,
   onCategoryFilter
 }) => {
   const [selectedFilters, setSelectedFilters] = useState({
@@ -91,7 +95,9 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
                 onFilterChange={(category, subCategory) => {
                   console.log('Category filter clicked:', category, subCategory);
                   onCategoryFilter?.(category, subCategory);
-                }} />
+                }}
+                onSubcategorySelect={onSubcategorySelect}
+              />
 
               {/* Sub-Category Filter */}
               {/* <div>
@@ -164,7 +170,11 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
           </div>
 
           {/* Services Grid - Compact Cards */}
-          {services.length === 0 ? (
+          {loading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1A1F71]"></div>
+            </div>
+          ) : services.length === 0 ? (
             <p className="text-center text-gray-600">No Product found.</p>
           ) : (
             <>

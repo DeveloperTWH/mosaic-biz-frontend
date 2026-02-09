@@ -19,6 +19,7 @@ const FoodSection = () => {
   const [minorityType, setMinorityType] = useState("");
   const [searchLocation, setSearchLocation] = useState("");
   const [services, setServices] = useState<Service[]>([]);
+  const [loading, setLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [subcategories, setSubcategories] = useState<SubCategory[]>([]);
   const [selectedSubcategory, setSelectedSubcategory] = useState("");
@@ -31,20 +32,28 @@ const FoodSection = () => {
     });
   }
 
-  const fetchServices = async () => {
+  const fetchFoods = async (categoryId?: string, subcategoryId?: string) => {
+    setLoading(true);
     try {
-      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/services/list`, {
-        params: {
-          search: searchText,
-          city: searchLocation,
-          minorityType,
-          page: 1,
-          limit: 10,
-        },
+      const params: any = {
+        search: searchText,
+        city: searchLocation,
+        minorityType,
+        page: 1,
+        limit: 10,
+      };
+      
+      if (categoryId) params.categoryId = categoryId;
+      if (subcategoryId) params.subcategoryId = subcategoryId;
+
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/food/list`, {
+        params,
       });
       setServices(res.data.data);
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -60,13 +69,13 @@ const FoodSection = () => {
   };
 
   const handleCategorySelect = (category: Category) => {
-    // setSelectedCategory(category); // Removed - handled by parent
-    // setSelectedSubcategory(""); // Removed - handled by FilterAccordion
-    fetchSubcategories(category._id);
+    setSelectedCategory(category);
+    setSelectedSubcategory("");
+    fetchFoods(category._id, undefined);
   };
   
   useEffect(() => {
-    fetchServices()
+    fetchFoods(undefined, undefined);
   }, [])
 
   return (
@@ -75,13 +84,17 @@ const FoodSection = () => {
 
       <FilterSection onSearch={(filters) => {
         console.log('Filter search triggered:', filters);
-        fetchServices();
+        fetchFoods(selectedCategory?._id, selectedSubcategory || undefined);
       }} selectedCategory={selectedCategory} onCategorySelect={(category) => {
         setSelectedCategory(category);
         setSelectedSubcategory("");
+        fetchFoods(category._id, undefined);
       }} />
 
-      <BookServices services={services} selectedCategory={selectedCategory} />
+      <BookServices services={services} selectedCategory={selectedCategory} loading={loading} onSubcategorySelect={(subcategoryId) => {
+        setSelectedSubcategory(subcategoryId);
+        fetchFoods(selectedCategory?._id, subcategoryId);
+      }} />
 
       <JoinVendorBanner/>
     </div>

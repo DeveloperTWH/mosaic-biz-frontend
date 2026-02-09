@@ -102,23 +102,26 @@ const page = () => {
     }, []);
 
 
-    const fetchProducts = async (q?: string, m?: string, c?: string, categorySlug?: string) => {
+    const fetchProducts = async (q?: string, m?: string, c?: string, categoryId?: string, subcategoryId?: string) => {
         setLoading(true);
         try {
+            const params: any = {
+                search: (q ?? searchText) || "",
+                city: (c ?? searchLocation) || "",
+                minorityType: (m ?? minorityType) || "",
+                page: 1,
+                limit: 10,
+            };
+            
+            if (categoryId) params.categoryId = categoryId;
+            if (subcategoryId) params.subcategoryId = subcategoryId;
+
             const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/products/list`, {
-                params: {
-                    search: (q ?? searchText) || "",
-                    city: (c ?? searchLocation) || "",
-                    minorityType: (m ?? minorityType) || "",
-                    categorySlug: categorySlug || "",
-                    page: 1,
-                    limit: 10,
-                },
+                params,
             });
             setProducts(res.data.data || []);
         } catch (err) {
             console.error("Error fetching products", err);
-            // Set empty array to avoid crashes
             setProducts([]);
         } finally {
             setLoading(false);
@@ -199,11 +202,12 @@ const page = () => {
 
             <FilterSection onSearch={(filters) => {
               console.log('Filter search triggered:', filters);
-              setLoading(true); // Show loading
+              setLoading(true);
               fetchProducts(filters.businessType, filters.minority, filters.location);
             }} selectedCategory={selectedCategory} onCategorySelect={(category) => {
               setSelectedCategory(category);
               setSelectedSubcategory("");
+              fetchProducts('', '', '', category._id);
             }} />
             
             {/* Loading indicator */}
@@ -289,13 +293,12 @@ const page = () => {
              <ProductSevices 
                services={products}
                selectedCategory={selectedCategory}
+               loading={loadingn}
+               onSubcategorySelect={(subcategoryId) => {
+                 fetchProducts('', '', '', selectedCategory?._id, subcategoryId);
+               }}
                onCategoryFilter={(category, subCategory) => {
                  console.log('Category filter from ProductServices:', category, subCategory);
-                 if (category) {
-                   setLoading(true);
-                   const categorySlug = category.toLowerCase().replace(/\s+/g, '-').replace('&', '');
-                   fetchProducts('', '', '', categorySlug);
-                 }
                }}
              />
              <JoinVendorBanner/>
