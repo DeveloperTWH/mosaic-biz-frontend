@@ -1,8 +1,9 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Lock, Plus, Clock, CheckCircle, AlertCircle, FileText, ArrowRight } from "lucide-react";
+import { Lock, Plus, Clock, CheckCircle, AlertCircle, FileText, ArrowRight, Zap } from "lucide-react";
 import Link from "next/link";
+import { canAccessTierSelection } from "@/utils/subscriptionWorkflow";
 
 interface Business {
   _id: string;
@@ -138,9 +139,12 @@ const Page: React.FC = () => {
       
       if (response.data.success) {
         setOnboardingStatus(response.data);
+        console.log("Onboarding Status:", response.data); // Debug log
       }
     } catch (error) {
       console.error("Error fetching onboarding status:", error);
+    } finally {
+      setOnboardingLoading(false);
     }
   };
 
@@ -228,90 +232,145 @@ const Page: React.FC = () => {
   }
 
   return (
-    <div className="container p-6 mx-auto">
-      <h1 className="mb-6 text-3xl font-semibold text-center">Businesses</h1>
+    <div className="container p-6 mx-auto max-w-6xl">
+      {/* Title */}
+      <h1 className="mb-8 text-2xl font-bold text-center text-gray-800 uppercase tracking-wide">
+        Business Profile Status
+      </h1>
 
       {/* Onboarding Status Card (if user has application ID and status) */}
       {!onboardingLoading && hasApplication && onboardingStatus && (
-        <div className="mb-8 p-6 bg-white rounded-xl shadow-lg border border-gray-200">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+        <div className="mb-8">
+          {/* Onboarding Status Header */}
+          <div className="bg-gray-100 rounded-lg p-4 mb-4 flex justify-between items-center">
             <div>
-              <h2 className="text-xl font-bold text-gray-900">Onboarding Status</h2>
-              <p className="text-gray-600">{onboardingStatus.data.businessName}</p>
-              <p className="text-sm text-gray-900">Application ID: {onboardingStatus.data.applicationId}</p>
+              <h2 className="text-lg font-semibold text-gray-800">Onboarding Status</h2>
+              <p className="text-sm text-gray-600">{onboardingStatus.data.businessName}</p>
+              <p className="text-xs text-gray-500">Application ID: {onboardingStatus.data.applicationId}</p>
             </div>
-            <div className={`mt-2 md:mt-0 px-4 py-2 rounded-full font-semibold ${getStatusColor(onboardingStatus.data.details.stage1.status)}`}>
+            <span className="px-4 py-1.5 bg-red-100 text-red-600 text-sm font-medium rounded-full">
               {onboardingStatus.data.status}
-            </div>
+            </span>
           </div>
 
+          {/* Three Stage Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             {/* Stage 1 */}
-            <div className="p-4 border rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                {getStatusIcon(onboardingStatus.data.details.stage1.status, onboardingStatus.data.details.stage1.paymentStatus)}
-                <h3 className="font-semibold">Stage 1: Business Verification</h3>
+            <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+              <h3 className="font-semibold text-indigo-900 mb-4 text-sm border-b border-gray-100 pb-2">
+                Stage 1: Business Verification
+              </h3>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-600">Status :</span>
+                  <span className="px-3 py-1 bg-red-100 text-red-600 text-xs font-medium rounded-full">
+                    {onboardingStatus.data.details.stage1.status === 'rejected' ? 'Rejected' : onboardingStatus.data.details.stage1.status}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-600">Payment :</span>
+                  <span className="px-3 py-1 bg-green-100 text-green-600 text-xs font-medium rounded-full">
+                    {onboardingStatus.data.details.stage1.paymentStatus === 'paid' ? 'Paid' : onboardingStatus.data.details.stage1.paymentStatus}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-600">Points :</span>
+                  <span className="font-semibold text-gray-800">{onboardingStatus.data.details.stage1.points}</span>
+                </div>
               </div>
-              <p className="text-sm">Status: <span className="font-medium">{onboardingStatus.data.details.stage1.status}</span></p>
-              <p className="text-sm">Payment: <span className="font-medium">{onboardingStatus.data.details.stage1.paymentStatus}</span></p>
-              <p className="text-sm">Points <span className="font-medium">{onboardingStatus.data.details.stage1.points}</span></p>
-              
-              {/* Action buttons for Stage 1 */}
-              {onboardingStatus.data.details.stage1.status === "draft" && (
-                <Link href="partners/business/new">
-                  <button className="mt-2 px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
-                    Continue Draft
-                  </button>
-                </Link>
-              )}
-              {onboardingStatus.data.details.stage1.status === "submitted" && (
-                <p className="text-xs text-gray-500 mt-2">Awaiting admin review (24-48 hours)</p>
-              )}
             </div>
 
             {/* Stage 2 */}
-            <div className="p-4 border rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                {getStatusIcon(onboardingStatus.data.details.stage2.status)}
-                <h3 className="font-semibold">Stage 2: Tier Selection</h3>
-              </div>
-              <p className="text-sm">Status: <span className="font-medium">{onboardingStatus.data.details.stage2.status}</span></p>
-              {onboardingStatus.data.details.stage2.status === "pending" && onboardingStatus.data.details.stage1.status === "approved" && (
-                <Link href="/partners/business/new">
-                  <button className="mt-2 px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
-                    Start Stripe Setup
-                  </button>
-                </Link>
-              )}
-            </div>
+<div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+  <h3 className="font-semibold text-indigo-900 mb-4 text-sm border-b border-gray-100 pb-2">
+    Stage 2: Tier Selection
+  </h3>
+  <div className="space-y-3">
+    <div className="flex items-center gap-2">
+      <span className="text-gray-600">Status :</span>
+      <span className="px-3 py-1 bg-yellow-100 text-yellow-600 text-xs font-medium rounded-full">
+        {onboardingStatus.data.details.stage2.status === 'pending' ? 'Pending' : onboardingStatus.data.details.stage2.status}
+      </span>
+    </div>
+    
+    {/* Tier Selection Button - Show when currentStage = 2 only */}
+    {onboardingStatus.data.currentStage === 2 && (
+      <Link href={`/partners/tier-selection?appId=${onboardingStatus.data.applicationId}`}>
+        <button className="w-full mt-3 px-4 py-2 bg-blue-800 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 group">
+          <Zap className="w-4 h-4" />
+          <span>Select Subscription Plan</span>
+          <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+        </button>
+      </Link>
+    )}
+    
+    {/* Locked message when Stage 1 not completed */}
+    {onboardingStatus.data.currentStage < 2 && (
+      <div className="mt-2 p-2 bg-gray-50 rounded flex items-start gap-2">
+        <Lock className="w-3 h-3 text-gray-400 mt-0.5 flex-shrink-0" />
+        <p className="text-xs text-gray-500">Complete Stage 1 first</p>
+      </div>
+    )}
+  </div>
+</div>
 
             {/* Stage 3 */}
-            <div className="p-4 border rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                {getStatusIcon(onboardingStatus.data.details.stage3.status)}
-                <h3 className="font-semibold">Stage 3: Profile Completion</h3>
-              </div>
-              <p className="text-sm">Status: <span className="font-medium">{onboardingStatus.data.details.stage3.status}</span></p>
-              <p className="text-sm">Points: <span className="font-medium">{onboardingStatus.data.details.stage3.totalPoints}</span></p>
-            </div>
+     {/* Stage 3 */}
+<div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+  <h3 className="font-semibold text-indigo-900 mb-4 text-sm border-b border-gray-100 pb-2">
+    Stage 3: Profile Completion
+  </h3>
+  <div className="space-y-2 text-sm">
+    <div className="flex items-center gap-2">
+      <span className="text-gray-600">Status :</span>
+      <span className="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full">
+        {onboardingStatus.data.details.stage3.status === 'not_started' ? 'Not Started' : onboardingStatus.data.details.stage3.status}
+      </span>
+    </div>
+    <div className="flex items-center gap-2">
+      <span className="text-gray-600">Points :</span>
+      <span className="font-semibold text-gray-800">{onboardingStatus.data.details.stage3.totalPoints}</span>
+    </div>
+    
+    {/* Proceed with Business Profile Button - Show when currentStage = 3 */}
+    {onboardingStatus.data.currentStage === 3 && (
+      <div className="mt-4">
+        <Link href={`/partners/business/profile?appId=${onboardingStatus.data.applicationId}`}>
+          <button className="w-full px-4 py-2.5 bg-blue-800 text-white text-xs font-medium rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2 group">
+            <CheckCircle className="w-4 h-4" />
+            <span>Proceed with Business Profile</span>
+            <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+          </button>
+        </Link>
+      </div>
+    )}
+  </div>
+</div>
           </div>
 
-          <div className="p-4 bg-blue-50 rounded-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium text-blue-900">Next Action:</p>
-                <p className="text-blue-700">{onboardingStatus.data.nextAction}</p>
-              </div>
-              {onboardingStatus.data.details.stage1.status === "draft" && (
-                <Link href="partners/business/new">
-                  <button className="flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors">
-                    Continue Application
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                </Link>
-              )}
+          {/* Rejection Alert */}
+          {onboardingStatus.data.details.stage1.status === "rejected" && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-red-700">
+                Your application is rejected due to Not Qualified our Verification Criteria. Our team will contact you for further assistance. Thank you.
+              </p>
             </div>
-          </div>
+          )}
+
+          {/* Action buttons for Stage 1 & 2 */}
+          {onboardingStatus.data.details.stage1.status === "draft" && (
+            <div className="mt-4 flex justify-end">
+              <Link href="partners/business/new">
+                <button className="px-6 py-2 bg-indigo-900 text-white text-sm font-medium rounded-lg hover:bg-indigo-800 transition-colors">
+                  Continue Draft
+                </button>
+              </Link>
+            </div>
+          )}
+          {onboardingStatus.data.details.stage1.status === "submitted" && (
+            <p className="text-xs text-gray-500 mt-4">⏱️ Awaiting admin review (24-48 hours)</p>
+          )}
         </div>
       )}
 

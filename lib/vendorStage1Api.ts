@@ -23,7 +23,7 @@ export const createStage1Payment = async () => {
   try {
     console.log('Making payment API call...');
     
-    const response = await fetch('http://localhost:3001/api/vendor-onboarding/stage1/create-payment', {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/vendor-onboarding/stage1/create-payment`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
