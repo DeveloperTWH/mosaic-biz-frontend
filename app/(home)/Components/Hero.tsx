@@ -40,10 +40,10 @@ const Hero = () => {
         <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center bg-opacity-50 bg-stone-800">
           <div className="w-full max-w-[80%] mx-auto">
             <h1 className="mb-4 text-4xl font-bold text-white uppercase md:text-5xl lg:text-6xl  tracking-tight font-poppins">
-              EMPOWERING MINORITY-OWNED BUSINESSES
+             Your Marketplace for Minority‑Owned Excellence.
             </h1>
             <p className="mb-8 w-[60%] ml-[18%]  ml-10 text-sm text-white  font-poppins">
-              Unlock New Opportunities In The Digital Era, Expand Your Reach, And Connect With A Vibrant Community Of Entrepreneurs Thriving Together.
+             From food to fashion to services, Mosaic Biz Hub connects you to verified businesses and gives entrepreneurs the tools to shine. We provide consumers with a trusted place to shop and vendors the tools to scale.
             </p>
             {isLoggedIn === null && (
               <div className="flex flex-col gap-4 md:flex-row justify-center">

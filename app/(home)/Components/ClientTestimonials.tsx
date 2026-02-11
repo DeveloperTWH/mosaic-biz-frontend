@@ -6,19 +6,19 @@ import { Quote, CircleUserRound, Star, StarHalf, StarOff } from "lucide-react";
 const testimonials = [
   {
     id: 1,
-    name: "Jasmine Brooks",
+    name: "Jasmine R., Founder, Rooted & Radiant Skincare (Gold Vendor)",
     rating: 4.5,
     image: "",
     quote:
-      "Joining Mosaic Biz Hub gave my business a real boost. The exposure helped me reach more local customers, and the support from the community has been amazing. I finally feel seen and valued as a small business owner.",
+      "Before Mosaic Biz Hub, we were just another small brand trying to be seen. Within weeks of joining, we landed three new clients, got featured in a Gold Vendor spotlight, and finally felt like our story mattered. This platform doesn’t just list your business—it amplifies it",
   },
   {
     id: 2,
-    name: "Marcus Taylor",
+    name: "Marcus T., CEO, Legacy Fit Apparel (Platinum Vendor)",
     rating: 3,
     image: "",
     quote:
-      "This platform made it easy for me to connect with clients who care about supporting minority-owned businesses. It's more than a listing — it’s a movement that empowers and uplifts entrepreneurs like me.",
+      "The CRM, push notifications, and analytics helped us double our repeat customers. The strategy call alone was worth the investment. Mosaic Biz Hub gave us the tools and the tribe to scale with purpose.",
   },
 ];
 
@@ -48,7 +48,8 @@ export default function ClientTestimonials() {
           <hr className="h-[2px] w-[100px] mt-[2px] mb-4 bg-gray-700" />
         </div>
         <p className="text-[13px] text-gray-600 max-w-xl mx-auto font-montserrat">
-          Dive into powerful narratives, business tips, and local spotlights curated for our vibrant Mosaic Biz Hub community.
+          <b>Real voices. Real growth. Real impact.</b> <br />
+          At Mosaic Biz Hub, we don’t just connect businesses and buyers—we build bridges of trust, visibility, and community. Here’s what our vendors and customers are saying:
         </p>
       </div>
 

@@ -13,10 +13,10 @@ import "swiper/css/pagination";
 
 
 const data = [
- "Explore a wide range of minority-owned businesses, products, and services all in one place. Easily browse categories, filter by location or business type, and find offerings that align with your needs and values. Mosaic Biz Hub makes it simple to shop with purpose.",
- "Find new and trusted businesses you may not encounter elsewhere. Discover curated vendors, featured listings, and emerging entrepreneurs within your community, all in one inclusive marketplace.",
- "Engage directly with business owners and service providers. Message vendors, book appointments, and build meaningful relationships that go beyond a single transaction.",
- "Every purchase and booking helps strengthen local communities and empower minority-owned businesses. Your support fuels growth, visibility, and long-term success for entrepreneurs who deserve to be seen and supported.",
+ "Navigate through vibrant categories—from beauty and wellness to business services and tech. Filter by identity, location, or industry to find vendors that reflect your values and meet your needs. Every listing is verified, so you can shop with confidence.",
+ "Each vendor profile tells a story. Learn about their mission, culture, and community impact. Discover exclusive offers, seasonal promotions, and featured “Power Brands” that are shaping the future of e-commerce.",
+ "Message vendors directly through our secure platform. Ask questions, request quotes, or follow your favorite brands to get notified about new drops, events, and deals. With in-app messaging and push alerts, staying connected is effortless",
+ "Every purchase fuels economic equity. Leave verified reviews, share your favorite vendors, and participate in loyalty programs that reward both you and the businesses you love. Vendors get access to tools like analytics, CRM, and AI chatbots to grow sustainably",
 
 
 ]
