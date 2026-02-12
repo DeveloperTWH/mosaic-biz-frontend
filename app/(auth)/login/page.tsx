@@ -205,118 +205,122 @@ function LoginContent() {
     </div>
   );
 
-  // return (
-  //   <div className="min-h-screen bg-black flex items-center justify-center bg-[url('/login/footer-bg.jpg')] bg-cover bg-center relative p-1 py-10">
-  //     <div className="fixed z-50 p-2 text-white bg-gray-700 rounded-lg cursor-pointer top-4 right-4" onClick={() => router.push("/")}>
-  //       <X size={20} />
-  //     </div>
+  return (
+    <div className="min-h-screen bg-black flex items-center justify-center bg-[url('/login/footer-bg.jpg')] bg-cover bg-center relative p-1 py-10">
+      <div className="fixed z-50 p-2 text-white bg-gray-700 rounded-lg cursor-pointer top-4 right-4" onClick={() => router.push("/")}>
+        <X size={20} />
+      </div>
 
-  //     <div className="z-10 w-full max-w-md p-8 bg-white shadow-xl rounded-xl">
-  //       <Link href="/">
-  //         <div className="mb-6 text-center">
-  //           <Image src="/logo.png" alt="Logo" width={350} height={100} className="mx-auto" />
-  //         </div>
-  //       </Link>
+      <div className="z-10 w-full max-w-md p-8 bg-white shadow-xl rounded-xl">
+        <Link href="/">
+          <div className="mb-6 text-center">
+            <Image src="/logo.png" alt="Logo" width={350} height={100} className="mx-auto" />
+          </div>
+        </Link>
 
-  //       <div className="mb-4 text-lg font-bold text-center">{title}</div>
+        <div className="mb-4 text-lg font-bold text-center">{title}</div>
 
-  //       <div className="flex justify-center mb-6 border-b border-gray-300">
-  //         <Link
-  //           href={`/login?type=${type}`}
-  //           className={`px-4 py-2 font-semibold ${pathname.includes('/login') ? 'border-b-2 border-black' : 'text-gray-500'}`}
-  //         >
-  //           Sign In
-  //         </Link>
-  //         <Link
-  //           href={`/signup?type=${type}`}
-  //           className={`px-4 py-2 font-semibold ${pathname.includes('/signup') ? 'border-b-2 border-black' : 'text-gray-500'}`}
-  //         >
-  //           Create Account
-  //         </Link>
-  //       </div>
+        <div className="flex justify-center mb-6 border-b border-gray-300">
+          <Link
+            href={`/login?type=${type}`}
+            className={`px-4 py-2 font-semibold ${pathname.includes('/login') ? 'border-b-2 border-black' : 'text-gray-500'}`}
+          >
+            Sign In
+          </Link>
+          <Link
+            href={`/signup?type=${type}`}
+            className={`px-4 py-2 font-semibold ${pathname.includes('/signup') ? 'border-b-2 border-black' : 'text-gray-500'}`}
+          >
+            Create Account
+          </Link>
+        </div>
 
-  //       <form onSubmit={handleSubmit}>
-  //         <label className="block mb-2 text-gray-700">Email</label>
-  //         <input
-  //           type="email"
-  //           name="email"
-  //           required
-  //           value={email}
-  //           onChange={(e) => setEmail(e.target.value)}
-  //           className="w-full p-2 mb-4 border rounded"
-  //         />
+    <form className="space-y-4" onSubmit={handleSubmit}>
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-1">
+      Email
+    </label>
+    <input
+      name="email"
+      type="email"
+      required
+      value={email}
+      onChange={(e) => setEmail(e.target.value)}
+      className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-900"
+    />
+  </div>
 
-  //         <label className="block mb-2 text-gray-700">Password</label>
-  //         <div className="relative">
-  //           <input
-  //             type={showPassword ? "text" : "password"}
-  //             name="password"
-  //             required
-  //             value={password}
-  //             onChange={(e) => setPassword(e.target.value)}
-  //             className="w-full p-2 pr-10 mb-2 border rounded"
-  //             autoCapitalize="none"
-  //             autoComplete="new-password"
-  //             spellCheck="false"
-  //           />
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-1">
+      Password
+    </label>
+    <div className="relative">
+      <input
+        type={showPassword ? "text" : "password"}
+        name="password"
+        required
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-900"
+      />
+      <button
+        type="button"
+        onClick={() => setShowPassword(!showPassword)}
+        className="absolute inset-y-0 right-2 flex items-center text-gray-500"
+      >
+        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+      </button>
+    </div>
+  </div>
 
-  //           <button
-  //             type="button"
-  //             onClick={() => setShowPassword((prev) => !prev)}
-  //             className="absolute inset-y-0 flex items-center text-gray-500 right-2"
-  //             tabIndex={-1}
-  //           >
-  //             {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-  //           </button>
-  //         </div>
+  <div className="flex items-center justify-between text-sm">
+    <label className="flex items-center gap-2 text-gray-600">
+      <input type="checkbox" className="rounded border-gray-300" />
+      Keep Me Signed In
+    </label>
+    <a href="#" className="text-blue-900 font-medium hover:underline">
+      Forget Password
+    </a>
+  </div>
 
-  //         <div className="flex items-center justify-end mb-4 text-sm">
-  //           {/* <label className="flex items-center">
-  //             <input type="checkbox" className="mr-2" />
-  //             Keep Me Signed In
-  //           </label> */}
-  //           <a href="#" className="font-medium text-blue-500">Forget Password ?</a>
-  //         </div>
-
-  //         {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
-
-  //         <button
-  //           type="submit"
-  //           disabled={loading}
-  //           className="bg-[#10A3C9] text-white w-full py-2 font-semibold disabled:opacity-60"
-  //         >
-  //           {loading ? 'Signing In...' : 'Sign In'}
-  //         </button>
-  //       </form>
+  <button
+    type="submit"
+    className="w-full bg-blue-900 text-white py-2 text-[16px] font-montserrat hover:bg-blue-800 transition"
+    disabled={loading}
+  >
+    {loading ? 'Signing In...' : 'Sign In'}
+  </button>
+</form>
 
 
-  //       <div className="flex justify-center mt-4 space-x-4">
-  //         {/* <button
-  //           type="button"
-  //           onClick={handleGoogleLoginRedirect}
-  //           className="w-10 h-10 text-black bg-gray-200 rounded-full"
-  //           aria-label="Continue with Google"
-  //           title="Continue with Google"
-  //         >
-  //           G
-  //         </button> */}
-  //       </div>
 
-  //       <p className="mt-4 text-sm text-center">
-  //         New {type}?{' '}
-  //         <Link href={`/signup?type=${type}`} className="font-bold underline">
-  //           Create Account
-  //         </Link>
-  //       </p>
-  //     </div>
+        <div className="flex justify-center mt-4 space-x-4">
+          {/* <button
+            type="button"
+            onClick={handleGoogleLoginRedirect}
+            className="w-10 h-10 text-black bg-gray-200 rounded-full"
+            aria-label="Continue with Google"
+            title="Continue with Google"
+          >
+            G
+          </button> */}
+        </div>
 
-  //     <footer className="absolute w-full text-sm text-yellow-500 bottom-2">
-  //       <div className="pr-5 w-[80%] mx-auto">
-  //         <p>Copyright 2025. All Rights Reserved.</p>
-  //       </div>
-  //     </footer>
-  //   </div>
-  // )
+        <p className="mt-4 text-sm text-center">
+          New {type}?{' '}
+          <Link href={`/signup?type=${type}`} className="font-bold underline">
+            Create Account
+          </Link>
+        </p>
+      </div>
+
+      <footer className="absolute w-full text-sm text-yellow-500 bottom-2">
+        <div className="pr-5 w-[80%] mx-auto">
+          <p>Copyright 2025. All Rights Reserved.</p>
+        </div>
+      </footer>
+    </div>
+  )
 }
 
 export default function LoginPage() {
