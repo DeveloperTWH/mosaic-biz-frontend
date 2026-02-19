@@ -1,9 +1,11 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Lock, Plus, Clock, CheckCircle, AlertCircle, FileText, ArrowRight, Zap } from "lucide-react";
+import { 
+  Lock, Plus, Clock, CheckCircle, AlertCircle, FileText, 
+  ArrowRight, Zap, Package, CreditCard, Globe, Shield 
+} from "lucide-react";
 import Link from "next/link";
-import { canAccessTierSelection } from "@/utils/subscriptionWorkflow";
 
 interface Business {
   _id: string;
@@ -35,6 +37,18 @@ interface OnboardingStatus {
         status: "not_started" | "in_progress" | "completed";
         totalPoints: number;
       };
+      stage4?: {
+        status: "ready" | "locked";
+        message: string;
+      };
+      stage5?: {
+        status: "not_started" | "in_progress" | "completed";
+        message: string;
+      };
+      stage6?: {
+        status: "not_started" | "in_progress" | "completed";
+        message: string;
+      };
     };
   };
 }
@@ -45,17 +59,6 @@ const Page: React.FC = () => {
   const [onboardingStatus, setOnboardingStatus] = useState<OnboardingStatus | null>(null);
   const [applicationId, setApplicationId] = useState<string | null>(null);
   const [hasApplication, setHasApplication] = useState<boolean>(false);
-  const [connectStatus, setConnectStatus] = useState<
-    Record<
-      string,
-      {
-        onboardingStatus: "not_started" | "in_progress" | "requirements_due" | "completed";
-        chargesEnabled: boolean;
-        payoutsEnabled: boolean;
-      }
-    >
-  >({});
-  const [connectLoadingIds, setConnectLoadingIds] = useState<Record<string, boolean>>({});
   const [onboardingLoading, setOnboardingLoading] = useState(true);
 
   useEffect(() => {
@@ -69,11 +72,8 @@ const Page: React.FC = () => {
         setBusinesses(list);
         setLoading(false);
 
-        // Step 1: First check if user has an application ID
+        // Check if user has an application ID
         checkApplicationId();
-
-        // fetch connect status for each business
-        list.forEach((b) => fetchConnectStatusFor(b._id));
       })
       .catch((error) => {
         console.error("Error fetching business data:", error);
@@ -82,7 +82,7 @@ const Page: React.FC = () => {
       });
   }, []);
 
-  // Step 1: Check if user has an application ID
+  // Check if user has an application ID
   const checkApplicationId = async () => {
     try {
       setOnboardingLoading(true);
@@ -92,27 +92,20 @@ const Page: React.FC = () => {
           withCredentials: true,
           headers: {
             'Content-Type': 'application/json',
-            // Add Authorization header if needed
-            // 'Authorization': `Bearer ${localStorage.getItem('token')}`
           },
         }
       );
       
       if (response.data.success && response.data.applicationId) {
-        // User has an application ID
         setApplicationId(response.data.applicationId);
         setHasApplication(true);
-        
-        // Step 2: Fetch detailed status using the application ID
         fetchOnboardingStatus(response.data.applicationId);
       } else {
-        // No application ID found
         setHasApplication(false);
         setOnboardingStatus(null);
       }
       
     } catch (error: any) {
-      // If 404 or no application found, it's normal - user hasn't started
       if (error.response?.status === 404 || error.code === 'ERR_BAD_REQUEST') {
         setHasApplication(false);
         setOnboardingStatus(null);
@@ -124,7 +117,7 @@ const Page: React.FC = () => {
     }
   };
 
-  // Step 2: Fetch detailed status using application ID
+  // Fetch detailed status using application ID
   const fetchOnboardingStatus = async (appId: string) => {
     try {
       const response = await axios.get(
@@ -139,48 +132,12 @@ const Page: React.FC = () => {
       
       if (response.data.success) {
         setOnboardingStatus(response.data);
-        console.log("Onboarding Status:", response.data); // Debug log
+        console.log("Onboarding Status:", response.data);
       }
     } catch (error) {
       console.error("Error fetching onboarding status:", error);
     } finally {
       setOnboardingLoading(false);
-    }
-  };
-
-  const fetchConnectStatusFor = async (businessId: string) => {
-    try {
-      setConnectLoadingIds((prev) => ({ ...prev, [businessId]: true }));
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/connect/${businessId}/status`,
-        { withCredentials: true }
-      );
-      const d = res.data;
-      setConnectStatus((prev) => ({
-        ...prev,
-        [businessId]: {
-          onboardingStatus: d.onboardingStatus,
-          chargesEnabled: !!d.chargesEnabled,
-          payoutsEnabled: !!d.payoutsEnabled,
-        },
-      }));
-    } catch (e) {
-      console.error("Connect status error:", e);
-    } finally {
-      setConnectLoadingIds((prev) => ({ ...prev, [businessId]: false }));
-    }
-  };
-
-  const startStripeOnboarding = async (businessId: string) => {
-    try {
-      const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/connect/${businessId}/account-link`,
-        {},
-        { withCredentials: true }
-      );
-      if (res.data?.url) window.location.href = res.data.url;
-    } catch (e: any) {
-      alert(e?.message || "Unable to start onboarding");
     }
   };
 
@@ -220,11 +177,6 @@ const Page: React.FC = () => {
     }
   };
 
-  // Sort businesses with approved ones at the top
-  const sortedBusinesses = [...businesses].sort(
-    (a, b) => (b.isApproved ? 1 : 0) - (a.isApproved ? 1 : 0)
-  );
-
   if (loading) {
     return <div className="flex justify-center items-center h-64">
       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
@@ -253,8 +205,8 @@ const Page: React.FC = () => {
             </span>
           </div>
 
-          {/* Three Stage Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          {/* Six Stage Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-4">
             {/* Stage 1 */}
             <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
               <h3 className="font-semibold text-indigo-900 mb-4 text-sm border-b border-gray-100 pb-2">
@@ -263,13 +215,17 @@ const Page: React.FC = () => {
               <div className="space-y-2 text-sm">
                 <div className="flex items-center gap-2">
                   <span className="text-gray-600">Status :</span>
-                  <span className="px-3 py-1 bg-red-100 text-red-600 text-xs font-medium rounded-full">
+                  <span className={`px-3 py-1 text-xs font-medium rounded-full ${getStatusColor(onboardingStatus.data.details.stage1.status)}`}>
                     {onboardingStatus.data.details.stage1.status === 'rejected' ? 'Rejected' : onboardingStatus.data.details.stage1.status}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-gray-600">Payment :</span>
-                  <span className="px-3 py-1 bg-green-100 text-green-600 text-xs font-medium rounded-full">
+                  <span className={`px-3 py-1 text-xs font-medium rounded-full ${
+                    onboardingStatus.data.details.stage1.paymentStatus === 'paid' 
+                      ? 'bg-green-100 text-green-600' 
+                      : 'bg-gray-100 text-gray-600'
+                  }`}>
                     {onboardingStatus.data.details.stage1.paymentStatus === 'paid' ? 'Paid' : onboardingStatus.data.details.stage1.paymentStatus}
                   </span>
                 </div>
@@ -281,71 +237,159 @@ const Page: React.FC = () => {
             </div>
 
             {/* Stage 2 */}
-<div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-  <h3 className="font-semibold text-indigo-900 mb-4 text-sm border-b border-gray-100 pb-2">
-    Stage 2: Tier Selection
-  </h3>
-  <div className="space-y-3">
-    <div className="flex items-center gap-2">
-      <span className="text-gray-600">Status :</span>
-      <span className="px-3 py-1 bg-yellow-100 text-yellow-600 text-xs font-medium rounded-full">
-        {onboardingStatus.data.details.stage2.status === 'pending' ? 'Pending' : onboardingStatus.data.details.stage2.status}
-      </span>
-    </div>
-    
-    {/* Tier Selection Button - Show when currentStage = 2 only */}
-    {onboardingStatus.data.currentStage === 2 && (
-      <Link href={`/partners/tier-selection?appId=${onboardingStatus.data.applicationId}`}>
-        <button className="w-full mt-3 px-4 py-2 bg-blue-800 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 group">
-          <Zap className="w-4 h-4" />
-          <span>Select Subscription Plan</span>
-          <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-        </button>
-      </Link>
-    )}
-    
-    {/* Locked message when Stage 1 not completed */}
-    {onboardingStatus.data.currentStage < 2 && (
-      <div className="mt-2 p-2 bg-gray-50 rounded flex items-start gap-2">
-        <Lock className="w-3 h-3 text-gray-400 mt-0.5 flex-shrink-0" />
-        <p className="text-xs text-gray-500">Complete Stage 1 first</p>
-      </div>
-    )}
-  </div>
-</div>
+            <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+              <h3 className="font-semibold text-indigo-900 mb-4 text-sm border-b border-gray-100 pb-2">
+                Stage 2: Tier Selection
+              </h3>
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-600">Status :</span>
+                  <span className={`px-3 py-1 text-xs font-medium rounded-full ${getStatusColor(onboardingStatus.data.details.stage2.status)}`}>
+                    {onboardingStatus.data.details.stage2.status === 'pending' ? 'Pending' : onboardingStatus.data.details.stage2.status}
+                  </span>
+                </div>
+                
+                {/* Tier Selection Button - Show when currentStage = 2 */}
+                {onboardingStatus.data.currentStage === 2 && (
+                  <Link href={`/partners/tier-selection?appId=${onboardingStatus.data.applicationId}`}>
+                    <button className="w-full mt-3 px-4 py-2 bg-blue-800 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 group">
+                      <Zap className="w-4 h-4" />
+                      <span>Select Plan</span>
+                      <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                    </button>
+                  </Link>
+                )}
+                
+                {/* Locked message when Stage 1 not completed */}
+                {onboardingStatus.data.currentStage < 2 && (
+                  <div className="mt-2 p-2 bg-gray-50 rounded flex items-start gap-2">
+                    <Lock className="w-3 h-3 text-gray-400 mt-0.5 flex-shrink-0" />
+                    <p className="text-xs text-gray-500">Complete Stage 1 first</p>
+                  </div>
+                )}
+              </div>
+            </div>
 
             {/* Stage 3 */}
-     {/* Stage 3 */}
-<div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-  <h3 className="font-semibold text-indigo-900 mb-4 text-sm border-b border-gray-100 pb-2">
-    Stage 3: Profile Completion
-  </h3>
-  <div className="space-y-2 text-sm">
-    <div className="flex items-center gap-2">
-      <span className="text-gray-600">Status :</span>
-      <span className="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full">
-        {onboardingStatus.data.details.stage3.status === 'not_started' ? 'Not Started' : onboardingStatus.data.details.stage3.status}
-      </span>
-    </div>
-    <div className="flex items-center gap-2">
-      <span className="text-gray-600">Points :</span>
-      <span className="font-semibold text-gray-800">{onboardingStatus.data.details.stage3.totalPoints}</span>
-    </div>
-    
-    {/* Proceed with Business Profile Button - Show when currentStage = 3 */}
-    {onboardingStatus.data.currentStage === 3 && (
-      <div className="mt-4">
-        <Link href={`/partners/business/profile?appId=${onboardingStatus.data.applicationId}`}>
-          <button className="w-full px-4 py-2.5 bg-blue-800 text-white text-xs font-medium rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2 group">
-            <CheckCircle className="w-4 h-4" />
-            <span>Proceed with Business Profile</span>
-            <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-          </button>
-        </Link>
-      </div>
-    )}
-  </div>
-</div>
+            <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+              <h3 className="font-semibold text-indigo-900 mb-4 text-sm border-b border-gray-100 pb-2">
+                Stage 3: Profile Completion
+              </h3>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-600">Status :</span>
+                  <span className={`px-3 py-1 text-xs font-medium rounded-full ${getStatusColor(onboardingStatus.data.details.stage3.status)}`}>
+                    {onboardingStatus.data.details.stage3.status === 'not_started' ? 'Not Started' : onboardingStatus.data.details.stage3.status}
+                  </span>
+                </div>
+                
+                {/* Proceed with Business Profile Button - Show when currentStage = 3 */}
+                {onboardingStatus.data.currentStage === 3 && (
+                  <div className="mt-4">
+                    <Link href={`/partners/business-profile`}>
+                      <button className="w-full px-4 py-2.5 bg-blue-800 text-white text-xs font-medium rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2 group">
+                        <CheckCircle className="w-4 h-4" />
+                        <span>Complete Profile</span>
+                        <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                      </button>
+                    </Link>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Stage 4 - Product Creation */}
+            <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+              <h3 className="font-semibold text-green-600 mb-4 text-sm border-b border-gray-100 pb-2">
+                Stage 4: Product Creation
+              </h3>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-600">Status :</span>
+                  <span className={`px-3 py-1 text-xs font-medium rounded-full ${
+                    onboardingStatus.data.currentStage >= 4 ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600'
+                  }`}>
+                    {onboardingStatus.data.currentStage >= 4 ? 'Ready' : 'Locked'}
+                  </span>
+                </div>
+                
+                {/* Product Creation Button - Show when currentStage >= 4 */}
+                {onboardingStatus.data.currentStage >= 4 && (
+                  <div className="mt-4">
+                    <Link href={`/partners/add-product`}>
+                      <button className="w-full px-4 py-2 bg-green-600 text-white text-xs font-medium rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2">
+                        <Package className="w-4 h-4" />
+                        <span>Add Product</span>
+                      </button>
+                    </Link>
+                  </div>
+                )}
+                
+                {/* Locked message when Stage 3 not completed */}
+                {onboardingStatus.data.currentStage < 4 && (
+                  <div className="mt-2 p-2 bg-gray-50 rounded flex items-start gap-2">
+                    <Lock className="w-3 h-3 text-gray-400 mt-0.5 flex-shrink-0" />
+                    <p className="text-xs text-gray-500">Complete Stage 3 first</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Stage 5 - Payout & Bank Setup */}
+            <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+              <h3 className="font-semibold text-purple-600 mb-4 text-sm border-b border-gray-100 pb-2">
+                Stage 5: Payout & Bank
+              </h3>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center gap-2">
+                  <CreditCard className="w-4 h-4 text-purple-500" />
+                  <span className="text-gray-600">Status :</span>
+                  <span className={`px-3 py-1 text-xs font-medium rounded-full ${
+                    onboardingStatus.data.currentStage >= 5 ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600'
+                  }`}>
+                    {onboardingStatus.data.currentStage >= 5 ? 'Ready' : 'Locked'}
+                  </span>
+                </div>
+                
+                {/* Payout Setup Button - ALWAYS VISIBLE */}
+                <div className="mt-4">
+                  <Link href={`/partners/payout-setup`}>
+                    <button className="w-full px-4 py-2 bg-purple-600 text-white text-xs font-medium rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center gap-2">
+                      <CreditCard className="w-4 h-4" />
+                      <span>Setup Payout</span>
+                    </button>
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            {/* Stage 6 - Final Review & Launch */}
+            <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+              <h3 className="font-semibold text-amber-600 mb-4 text-sm border-b border-gray-100 pb-2">
+                Stage 6: Final Review
+              </h3>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-amber-500" />
+                  <span className="text-gray-600">Status :</span>
+                  <span className={`px-3 py-1 text-xs font-medium rounded-full ${
+                    onboardingStatus.data.currentStage >= 6 ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600'
+                  }`}>
+                    {onboardingStatus.data.currentStage >= 6 ? 'Ready' : 'Locked'}
+                  </span>
+                </div>
+                
+                {/* Launch Button - ALWAYS VISIBLE */}
+                <div className="mt-4">
+                  <Link href={`/partners/final-review`}>
+                    <button className="w-full px-4 py-2 bg-amber-600 text-white text-xs font-medium rounded-lg hover:bg-amber-700 transition-colors flex items-center justify-center gap-2">
+                      <Globe className="w-4 h-4" />
+                      <span>Launch Business</span>
+                    </button>
+                  </Link>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Rejection Alert */}
@@ -361,7 +405,7 @@ const Page: React.FC = () => {
           {/* Action buttons for Stage 1 & 2 */}
           {onboardingStatus.data.details.stage1.status === "draft" && (
             <div className="mt-4 flex justify-end">
-              <Link href="partners/business/new">
+              <Link href="/partners/business/new">
                 <button className="px-6 py-2 bg-indigo-900 text-white text-sm font-medium rounded-lg hover:bg-indigo-800 transition-colors">
                   Continue Draft
                 </button>
@@ -384,9 +428,9 @@ const Page: React.FC = () => {
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Start Your Vendor Journey</h2>
             <p className="text-gray-600 mb-6">
               List your business on our platform and start reaching new customers. 
-              Complete our simple 3-step verification process to get started.
+              Complete our simple 6-step verification process to get started.
             </p>
-            <Link href="partners/business/new" passHref>
+            <Link href="/partners/business/new" passHref>
               <button className="px-8 py-3 text-lg font-bold text-white bg-yellow-600 rounded-lg hover:bg-yellow-700 transition-colors duration-300 shadow-lg hover:shadow-xl">
                 Start Vendor Onboarding
               </button>
@@ -394,140 +438,27 @@ const Page: React.FC = () => {
             <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="p-4 bg-white rounded-lg shadow">
                 <div className="w-12 h-12 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
-                  <span className="font-bold text-blue-600">1</span>
+                  <span className="font-bold text-blue-600">1-3</span>
                 </div>
-                <h4 className="font-semibold mb-2">Business Verification</h4>
-                <p className="text-sm text-gray-500">Submit your business details and documents</p>
+                <h4 className="font-semibold mb-2">Setup & Verification</h4>
+                <p className="text-sm text-gray-500">Business verification, profile, and products</p>
               </div>
               <div className="p-4 bg-white rounded-lg shadow">
                 <div className="w-12 h-12 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
-                  <span className="font-bold text-blue-600">2</span>
+                  <span className="font-bold text-blue-600">4-5</span>
                 </div>
-                <h4 className="font-semibold mb-2">Payment Setup</h4>
-                <p className="text-sm text-gray-500">Connect Stripe to receive payments</p>
+                <h4 className="font-semibold mb-2">Payments & Payouts</h4>
+                <p className="text-sm text-gray-500">Setup payment methods and bank details</p>
               </div>
               <div className="p-4 bg-white rounded-lg shadow">
                 <div className="w-12 h-12 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
-                  <span className="font-bold text-blue-600">3</span>
+                  <span className="font-bold text-blue-600">6</span>
                 </div>
-                <h4 className="font-semibold mb-2">Profile Completion</h4>
-                <p className="text-sm text-gray-500">Complete your business profile</p>
+                <h4 className="font-semibold mb-2">Final Review</h4>
+                <p className="text-sm text-gray-500">Final verification and business launch</p>
               </div>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* Existing Businesses Grid */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        {sortedBusinesses.map((business, index) => (
-          <div
-            key={business.slug}
-            className="flex flex-col items-center p-4 overflow-hidden bg-white rounded-lg shadow-lg"
-          >
-            {/* Business logo or name */}
-            <div className="flex items-center justify-center w-24 h-24 mb-4 overflow-hidden bg-gray-200 rounded-full">
-              {business.logo ? (
-                <img
-                  src={business.logo}
-                  alt="Business Logo"
-                  className="object-cover w-full h-full rounded-full shadow-md"
-                />
-              ) : (
-                <span className="text-2xl font-semibold text-gray-600">
-                  {business.businessName.charAt(0)}
-                </span>
-              )}
-            </div>
-
-            {/* Business name */}
-            <h3 className="text-lg font-semibold text-center text-gray-800">
-              {business.businessName}
-            </h3>
-
-            {/* Link or lock icon based on approval */}
-            {(() => {
-              const cs = connectStatus[business._id];
-              const loadingCS = !!connectLoadingIds[business._id];
-              const connected =
-                cs &&
-                cs.onboardingStatus === "completed" &&
-                cs.chargesEnabled &&
-                cs.payoutsEnabled;
-
-              // Approved → go to dashboard
-              if (business.isApproved) {
-                return (
-                  <Link href={`/partners/${business.slug}`} passHref>
-                    <button className="px-6 py-2 mt-4 text-white transition-all duration-300 bg-blue-500 rounded-md hover:bg-blue-600">
-                      Go to Business
-                    </button>
-                  </Link>
-                );
-              }
-
-              // Not approved yet:
-              //  - If not connected: show Connect with Stripe button
-              //  - If connected: show Locked — waiting for admin approval
-              if (!connected) {
-                return (
-                  <div className="w-full mt-4">
-                    <button
-                      onClick={() => startStripeOnboarding(business._id)}
-                      disabled={loadingCS}
-                      className="w-full px-4 py-2 text-white bg-black rounded-md disabled:opacity-50"
-                    >
-                      {loadingCS ? "Checking…" : "Connect with Stripe"}
-                    </button>
-                    {cs && (
-                      <p className="mt-2 text-xs text-gray-500 text-center">
-                        Status: <b>{cs.onboardingStatus}</b> · Charges:{" "}
-                        <b>{String(cs.chargesEnabled)}</b> · Payouts:{" "}
-                        <b>{String(cs.payoutsEnabled)}</b>
-                      </p>
-                    )}
-                  </div>
-                );
-              }
-
-              // Connected but not approved → locked banner
-              return (
-                <div className="flex items-center mt-4 space-x-2 text-gray-600">
-                  <Lock size={20} className="text-gray-500" />
-                  <span
-                    className="text-sm"
-                    title="Waiting for admin approval"
-                  >
-                    Locked — waiting for admin approval
-                  </span>
-                </div>
-              );
-            })()}
-          </div>
-        ))}
-
-        {/* Add New Business Button (only show if there are existing businesses) */}
-        {businesses.length > 0 && (
-          <div className="flex items-center justify-center">
-            <Link href="/partners/business/new" passHref>
-              <button className="flex flex-col items-center justify-center p-6 mt-4 text-white transition-all duration-300 bg-green-500 rounded-lg shadow-lg hover:bg-green-600 w-full h-full">
-                <Plus size={32} className="mb-2" />
-                <span className="font-medium">Add New Business</span>
-              </button>
-            </Link>
-          </div>
-        )}
-      </div>
-
-      {/* Show Become Vendor button if has businesses but no onboarding */}
-      {!onboardingLoading && !hasApplication && businesses.length > 0 && (
-        <div className="mt-8 text-center">
-          <Link href="/vendor/onboarding" passHref>
-            <button className="px-6 py-3 font-bold text-white bg-orange-600 rounded-lg hover:bg-orange-700 transition-colors flex items-center gap-2 mx-auto">
-              <Plus className="w-5 h-5" />
-              Start Vendor Onboarding
-            </button>
-          </Link>
         </div>
       )}
     </div>

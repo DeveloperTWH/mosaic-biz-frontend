@@ -20,10 +20,19 @@ type Section = {
 };
 
 function valuetext(value: number) {
-  return `${value}°C`;
+  return `${value}`;
 }
 
-const FilterAccordion: React.FC<FilterAccordionProps> = ({ onFilterChange, selectedCategory: externalSelectedCategory, onCategoryChange, onCategorySelect, onSubcategorySelect, onBadgeSelect, onPriceChange }) => {
+const FilterAccordion: React.FC<FilterAccordionProps> = ({
+  onFilterChange,
+  selectedCategory: externalSelectedCategory,
+  onCategoryChange,
+  onCategorySelect,
+  onSubcategorySelect,
+  onBadgeSelect,
+  onPriceChange
+}) => {
+
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [selectedSubCategory, setSelectedSubCategory] = useState<string | null>(null);
@@ -47,9 +56,9 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({ onFilterChange, selec
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/categories/products`);
         const data: CategoryResponse = await response.json();
-        setCategories(data.data.productCategories);
+        setCategories(data?.data?.productCategories || []);
       } catch (err) {
-        console.error('Error fetching categories:', err);
+        console.error("Error fetching categories:", err);
       }
     };
     fetchCategories();
@@ -59,9 +68,9 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({ onFilterChange, selec
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/products/subcategories/${categoryId}`);
       const data: SubCategoryResponse = await response.json();
-      setSubcategories(data.data);
+      setSubcategories(data?.data || []);
     } catch (err) {
-      console.error('Error fetching subcategories:', err);
+      console.error("Error fetching subcategories:", err);
       setSubcategories([]);
     }
   };
@@ -77,14 +86,15 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({ onFilterChange, selec
     setOpenIndex((prev) => (prev === index ? null : index));
   };
 
+  // Fixed: Removed totalProducts since it doesn't exist in the type
   const sections: Section[] = [
     {
       title: "Categories",
-      items: categories.map(cat => cat.name),
+      items: categories.map(cat => cat.name), // Just show the name without count
     },
     {
       title: "Sub Categories",
-      items: subcategories.map(sub => sub.name),
+      items: subcategories.map(sub => sub.name), // Just show the name without count
     },
     {
       title: "Select Badge",
@@ -119,15 +129,15 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({ onFilterChange, selec
                 maxHeight: isOpen
                   ? section.type === "price"
                     ? "170px"
-                    : `${section.items?.length! * 44}px`
+                    : "300px" // Fixed height for categories/subcategories
                   : "0px",
+                overflowY: isOpen ? "auto" : "hidden" // Add scroll when open
               }}
             >
               {section.type === "price" ? (
                 <div className="price-section">
                   <Box sx={{ width: 260 }}>
                     <Slider
-                      getAriaLabel={() => "Price range"}
                       value={value}
                       onChange={handleChange}
                       valueLabelDisplay="auto"
@@ -142,7 +152,6 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({ onFilterChange, selec
                     <input
                       type="number"
                       value={priceRange[0]}
-                      placeholder="Min"
                       onChange={(e) => {
                         const newRange: [number, number] = [Number(e.target.value), priceRange[1]];
                         setPriceRange(newRange);
@@ -163,59 +172,64 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({ onFilterChange, selec
                   </div>
                 </div>
               ) : (
-                <ul>
+                <ul style={{ margin: 0, padding: "8px 0" }}>
                   {section.items?.map((item, i) => {
-                    const isSelected = section.title === "Categories" 
-                      ? selectedCategory?.name === item
-                      : section.title === "Sub Categories"
-                      ? selectedSubCategory === item
-                      : section.title === "Select Badge"
-                      ? selectedBadge === item
-                      : false;
-                    
+
+                    const isSelected =
+                      section.title === "Categories"
+                        ? selectedCategory?.name === item // Compare directly since we're now using just the name
+                        : section.title === "Sub Categories"
+                        ? selectedSubCategory === item
+                        : section.title === "Select Badge"
+                        ? selectedBadge === item
+                        : false;
+
                     return (
-                    <li
-                      key={i}
-                      onClick={() => {
-                        if (section.title === "Categories") {
-                          const category = categories.find(cat => cat.name === item);
-                          if (category) {
-                            setSelectedCategory(category);
-                            setSelectedSubCategory(null);
-                            setOpenIndex(1);
-                            fetchSubcategories(category._id);
-                            onCategorySelect?.(category._id);
-                            onFilterChange?.(item, "");
-                          }
-                        }
+                      <li
+                        key={i}
+                        onClick={() => {
 
-                        if (section.title === "Sub Categories") {
-                          const subcategory = subcategories.find(sub => sub.name === item);
-                          setSelectedSubCategory(item);
-                          if (subcategory) {
-                            onSubcategorySelect?.(subcategory._id);
+                          if (section.title === "Categories") {
+                            const category = categories.find(cat => cat.name === item);
+                            if (category) {
+                              setSelectedCategory(category);
+                              setSelectedSubCategory(null);
+                              setOpenIndex(1);
+                              fetchSubcategories(category._id);
+                              onCategorySelect?.(category._id);
+                              onFilterChange?.(category.name, "");
+                            }
                           }
-                          onFilterChange?.(selectedCategory?.name || "", item);
-                        }
 
-                        if (section.title === "Select Badge") {
-                          setSelectedBadge(item);
-                          onBadgeSelect?.(item.toLowerCase());
-                        }
-                      }}
-                      style={{
-                        cursor:
-                          section.title === "Categories" ||
-                          section.title === "Sub Categories"
-                            ? "pointer"
-                            : "default",
-                        backgroundColor: isSelected ? "#C7A040" : "transparent",
-                        color: isSelected ? "white" : "inherit",
-                        fontWeight: isSelected ? "bold" : "normal",
-                      }}
-                    >
-                      {item}
-                    </li>
+                          if (section.title === "Sub Categories") {
+                            const subcategory = subcategories.find(sub => sub.name === item);
+                            if (subcategory) {
+                              setSelectedSubCategory(subcategory.name);
+                              onSubcategorySelect?.(subcategory._id);
+                              onFilterChange?.(selectedCategory?.name || "", subcategory.name);
+                            }
+                          }
+
+                          if (section.title === "Select Badge") {
+                            setSelectedBadge(item);
+                            onBadgeSelect?.(item.toLowerCase());
+                          }
+                        }}
+                        style={{
+                          cursor:
+                            section.title === "Categories" ||
+                            section.title === "Sub Categories"
+                              ? "pointer"
+                              : "default",
+                          backgroundColor: isSelected ? "#C7A040" : "transparent",
+                          color: isSelected ? "white" : "inherit",
+                          fontWeight: isSelected ? "bold" : "normal",
+                          padding: "10px 16px",
+                          listStyle: "none"
+                        }}
+                      >
+                        {item}
+                      </li>
                     );
                   })}
                 </ul>

@@ -549,24 +549,33 @@ function pickRatingCount(p: RankedItem): number {
 }
 
 function pickPrice(p: RankedItem) {
+  // If firstEligible exists, use it. Otherwise, fallback to cover the API price directly
   const fe = p.firstEligible;
-  if (!fe) {
+  if (fe) {
     return {
-      price: 0,
-      salePrice: null as number | null,
-      effective: 0,
-      onSale: false,
-      size: undefined as string | undefined,
-      label: undefined as string | undefined,
-      color: undefined as string | undefined,
+      price: Number(fe.price),
+      salePrice: fe.salePrice ?? null,
+      effective: fe.effectivePrice ?? Number(fe.price),
+      onSale: fe.onSale ?? false,
+      size: fe.size,
+      label: fe.label,
+      color: fe.color,
     };
   }
-  const price = Number(fe.price ?? 0);
-  const salePrice = fe.salePrice == null ? null : Number(fe.salePrice);
-  const onSale = Boolean(fe.onSale && salePrice != null);
-  const effective = onSale ? (salePrice as number) : price;
-  return { price, salePrice, effective, onSale, size: fe.size, label: fe.label, color: fe.color };
+
+  // Fallback: use cover price from API
+  const apiPrice = Number((p as any).price?.$numberDecimal ?? 0);
+  return {
+    price: apiPrice,
+    salePrice: null,
+    effective: apiPrice,
+    onSale: false,
+    size: undefined,
+    label: undefined,
+    color: undefined,
+  };
 }
+
 function pickRating(p: RankedItem): number {
   const raw = p.variantRatingAvg ?? 0;
   const n = typeof raw === "number" ? raw : Number(raw) || 0;

@@ -9,9 +9,12 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@babel/runtime": "^7.28.6",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@mui/material": "^7.3.7",
+    "@mui/system": "^7.3.7",
+    "@mui/utils": "^7.3.7",
     "@next/font": "^14.2.15",
     "@stripe/connect-js": "^3.3.28",
     "@stripe/react-connect-js": "^3.3.26",
@@ -21,6 +24,7 @@
     "@tiptap/react": "^2.23.0",
     "@tiptap/starter-kit": "^2.23.0",
     "axios": "^1.10.0",
+    "canvas-confetti": "^1.9.4",
     "d3": "^7.9.0",
     "dotenv": "^17.2.3",
     "framer-motion": "^12.23.14",
@@ -40,6 +44,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/canvas-confetti": "^1.9.0",
     "@types/d3": "^7.4.3",
     "@types/google.maps": "^3.58.1",
     "@types/js-cookie": "^3.0.6",

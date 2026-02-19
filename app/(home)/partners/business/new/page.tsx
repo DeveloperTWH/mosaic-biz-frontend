@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
+import { useRouter } from 'next/navigation'; // Add this
 
 import {
   saveStage1Draft,
@@ -238,6 +239,8 @@ export default function VendorOnboardingStage1Page() {
   const [uploading, setUploading] = useState<Record<string, boolean>>({});
   const [selectedFiles, setSelectedFiles] = useState<Record<string, File | null>>({});
 
+  const router = useRouter(); // Initialize router
+
   /* ======================================================
      FILE UPLOAD FUNCTIONS
   ====================================================== */
@@ -408,33 +411,46 @@ export default function VendorOnboardingStage1Page() {
     }
   };
 
-  const handlePayAndSubmit = async () => {
-    if (!validateForm()) {
-      toast.error('Please fix all errors before proceeding to payment');
-      return;
-    }
+const handlePayAndSubmit = async () => {
+  if (!validateForm()) {
+    toast.error('Please fix all errors before proceeding to payment');
+    return;
+  }
 
-    try {
-      setLoading(true);
-      await saveStage1Draft(form);
-      const paymentResponse = await createStage1Payment();
+  try {
+    setLoading(true);
+    
+    // Save the draft first
+    await saveStage1Draft(form);
+    
+    // Create payment intent
+    const paymentResponse = await createStage1Payment();
+    
+    if (paymentResponse?.success && paymentResponse.data?.clientSecret) {
+      // Store payment data for the new vendor payment page
+      sessionStorage.setItem('vendorRegistrationPayment', JSON.stringify({
+        clientSecret: paymentResponse.data.clientSecret,
+        amount: paymentResponse.data.amount || 99,
+        currency: paymentResponse.data.currency || 'usd',
+        applicationId: paymentResponse.data.applicationId
+      }));
       
-      if (paymentResponse?.success && paymentResponse.data?.clientSecret) {
-        sessionStorage.setItem('paymentData', JSON.stringify({
-          clientSecret: paymentResponse.data.clientSecret,
-          amount: paymentResponse.data.amount,
-          currency: paymentResponse.data.currency
-        }));
-        location.assign('/payment/checkout');
-      } else {
-        toast.error('Failed to create payment');
-      }
-    } catch (error: any) {
-      toast.error(error.message || 'Payment setup failed');
-    } finally {
-      setLoading(false);
+      toast.success('Redirecting to payment...');
+      
+      // Redirect to the new vendor payment page (NOT /payment/checkout)
+      router.push('/partners/business/payment'); // Use router.push instead of location.assign
+    } else {
+      toast.error('Failed to create payment');
     }
-  };
+  } catch (error: any) {
+    console.error('Payment setup error:', error);
+    toast.error(error.message || 'Payment setup failed');
+  } finally {
+    setLoading(false);
+  }
+};
+
+
 
   /* ======================================================
      MAIN RENDER
@@ -460,6 +476,7 @@ export default function VendorOnboardingStage1Page() {
           <h1 className="text-4xl font-bold text-white mb-2 uppercase tracking-wide">
             Vendor Registration Request
           </h1>
+          <p>A non-refundable $24.99 Business Verification Fee is charged at vendor sign-up to conduct a standard background validation of your business (via our contracted screening provider) and activate your Trust Badge upon approval.</p>
         </div>
 
         {/* Form Container */}
