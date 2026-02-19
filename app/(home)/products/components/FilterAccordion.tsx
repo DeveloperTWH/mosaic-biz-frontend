@@ -86,15 +86,15 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({
     setOpenIndex((prev) => (prev === index ? null : index));
   };
 
-  // Fixed: Removed totalProducts since it doesn't exist in the type
+  // Fixed: Added type assertion to handle totalProducts
   const sections: Section[] = [
     {
       title: "Categories",
-      items: categories.map(cat => cat.name), // Just show the name without count
+      items: categories.map(cat => `${cat.name} (${(cat as any).totalProducts || 0})`),
     },
     {
       title: "Sub Categories",
-      items: subcategories.map(sub => sub.name), // Just show the name without count
+      items: subcategories.map(sub => `${sub.name} (${(sub as any).totalProducts || 0})`),
     },
     {
       title: "Select Badge",
@@ -129,7 +129,7 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({
                 maxHeight: isOpen
                   ? section.type === "price"
                     ? "170px"
-                    : "300px" // Fixed height for categories/subcategories
+                    : "300px" // Fixed height with scroll
                   : "0px",
                 overflowY: isOpen ? "auto" : "hidden" // Add scroll when open
               }}
@@ -175,11 +175,14 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({
                 <ul style={{ margin: 0, padding: "8px 0" }}>
                   {section.items?.map((item, i) => {
 
+                    // Extract the base name without the count for comparison
+                    const itemBaseName = item.split(' (')[0];
+                    
                     const isSelected =
                       section.title === "Categories"
-                        ? selectedCategory?.name === item // Compare directly since we're now using just the name
+                        ? selectedCategory?.name === itemBaseName
                         : section.title === "Sub Categories"
-                        ? selectedSubCategory === item
+                        ? selectedSubCategory === itemBaseName
                         : section.title === "Select Badge"
                         ? selectedBadge === item
                         : false;
@@ -190,7 +193,7 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({
                         onClick={() => {
 
                           if (section.title === "Categories") {
-                            const category = categories.find(cat => cat.name === item);
+                            const category = categories.find(cat => cat.name === itemBaseName);
                             if (category) {
                               setSelectedCategory(category);
                               setSelectedSubCategory(null);
@@ -202,7 +205,7 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({
                           }
 
                           if (section.title === "Sub Categories") {
-                            const subcategory = subcategories.find(sub => sub.name === item);
+                            const subcategory = subcategories.find(sub => sub.name === itemBaseName);
                             if (subcategory) {
                               setSelectedSubCategory(subcategory.name);
                               onSubcategorySelect?.(subcategory._id);
