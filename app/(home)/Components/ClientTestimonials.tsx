@@ -9,6 +9,7 @@ const testimonials = [
     name: "Jasmine R., Founder, Rooted & Radiant Skincare (Gold Vendor)",
     rating: 4.5,
     image: "",
+    heading:"We went from invisible to in demand.",
     quote:
       "Before Mosaic Biz Hub, we were just another small brand trying to be seen. Within weeks of joining, we landed three new clients, got featured in a Gold Vendor spotlight, and finally felt like our story mattered. This platform doesn’t just list your business—it amplifies it",
   },
@@ -17,6 +18,7 @@ const testimonials = [
     name: "Marcus T., CEO, Legacy Fit Apparel (Platinum Vendor)",
     rating: 3,
     image: "",
+    heading:"The Platinum tools paid for themselves in 30 days.",
     quote:
       "The CRM, push notifications, and analytics helped us double our repeat customers. The strategy call alone was worth the investment. Mosaic Biz Hub gave us the tools and the tribe to scale with purpose.",
   },
@@ -60,6 +62,7 @@ export default function ClientTestimonials() {
             className="p-6 mb-6 text-gray-800 transition bg-white shadow-md rounded-xl hover:shadow-xl"
           >
             <Quote className="mb-4 rotate-180 text-custom-yellow" size={64} />
+            <h1 className="mb-6 text-sm font-montserrat">{testimonial.heading}</h1>
             <p className="mb-6 text-sm font-montserrat">{testimonial.quote}</p>
 
             <div className="flex items-center gap-3">
