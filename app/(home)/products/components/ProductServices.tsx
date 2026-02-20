@@ -354,12 +354,12 @@ function ProductCard({ item }: { item: RankedItem }) {
       {/* Product Image - Fixed Height */}
       {images[0] && (
       <div className="relative h-48 overflow-hidden bg-gray-100 flex-shrink-0">
-        <img
-          src={images[0]}
-          alt={title}
-          loading="lazy"
-          className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-        />
+<img
+  src={images[0]}
+  alt={title}
+  loading="lazy"
+  className="w-full h-full object-contain transition-transform duration-500 hover:scale-105"
+/>
         
         {onSale && (
           <div className="absolute top-3 left-3">

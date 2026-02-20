@@ -271,8 +271,7 @@ const page = () => {
                 <hr className="h-[2px] w-[100px] bg-gray-700" />
                 <hr className="h-[2px] w-[100px] mt-[2px] mb-4 bg-gray-700" />
               </div>
-              <h3>What’s Hot. What’s Trusted. What’s Moving</h3>
-            <p className='w-[50%] text-xs text-[#2E2E2E] text-center font-thin   text-montserrat'>Discover top-rated products that customers love—updated in real time</p>
+            <p className='w-[50%] text-xs text-[#2E2E2E] text-center font-thin   text-montserrat'>A dynamic carousel of best-selling items with animated “Top Pick” badges and 5-star ratings.</p>
             </div>
 
             {/* Products Carousel */}

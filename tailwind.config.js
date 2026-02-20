@@ -17,7 +17,9 @@ module.exports = {
         // sans: ["var(--font-josefin)", "sans-serif"], // default body
         // heading: ["var(--font-anton)", "sans-serif"], // headings
         poppins : ["Poppins", "sans-serif"],
-        montserrat : ["Montserrat", "sans-serif"]
+        // montserrat : ["Montserrat", "sans-serif"]
+        montserrat: ["var(--font-montserrat)"],
+        mulish: ["var(--font-mulish)"],
       
       },
     },

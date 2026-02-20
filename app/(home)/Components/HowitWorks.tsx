@@ -114,10 +114,9 @@ We connect conscious consumers with verified, minority-owned businesses through 
               />
             </div>
 
-            <div className="flex flex-col gap-3 text-gray-600 text-xs leading-6 font-inter flex-1">
-              <p>{tabContent[tabClick].description}</p>
-              <p>{tabContent[tabClick].description}</p>
-            </div>
+<div className="flex flex-col gap-3 text-[#5F5F5F] text-base leading-7 font-montserrat font-[500] capitalize flex-1">
+  <p>{tabContent[tabClick].description}</p>
+</div>
           </div>
         </div>
 

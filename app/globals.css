@@ -18,15 +18,22 @@ body {
 }
 
 * {
+  margin: 0;
+  padding: 0;
+  line-height: 28px;
+  letter-spacing: 0%;
+}
+
+/* * {
   @apply font-poppins;
   margin: 0px;
   padding: 0px;
   font-weight: 500;
-  /* font-size: 16px; */
+  font-size: 16px;
   line-height: 28px;
   letter-spacing: 0%;
 
-}
+} */
 
 :root.with-fixed-header {
   --header-h: 64px;

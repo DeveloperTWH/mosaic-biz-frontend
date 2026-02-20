@@ -84,12 +84,12 @@ export default function BrowseServices({ showAllService, onCategorySelect }: Bro
               modules={[Navigation]}
               spaceBetween={40}
               slidesPerView={5}
-              breakpoints={{
-                0: { slidesPerView: 2, spaceBetween: 20 },
-                640: { slidesPerView: 3, spaceBetween: 30 },
-                768: { slidesPerView: 4, spaceBetween: 40 },
-                1024: { slidesPerView: 5, spaceBetween: 50 },
-              }}
+breakpoints={{
+  0: { slidesPerView: 2, spaceBetween: 20 },
+  640: { slidesPerView: 3, spaceBetween: 30 },
+  768: { slidesPerView: 4, spaceBetween: 40 },
+  1024: { slidesPerView: 6, spaceBetween: 40 }, // changed from 5 -> 6
+}}
               navigation={{
                 prevEl: prevButtonRef.current,
                 nextEl: nextButtonRef.current,
