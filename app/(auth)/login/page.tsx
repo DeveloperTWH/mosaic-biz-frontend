@@ -130,25 +130,24 @@ function LoginContent() {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Email
               </label>
-              <input
-                name="email"
-                type="email"
-                // placeholder="you@example.com"
-                className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-900"
-              />
-            </div>
+<input
+  name="email"
+  type="email"
+  required
+  value={email}
+  onChange={(e) => setEmail(e.target.value)}
+  className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-900"
+/>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
-              <input
-                type="password"
-                // placeholder="••••••••"
-                className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-900"
-              />
+<input
+  type={showPassword ? "text" : "password"}
+  name="password"
+  required
+  value={password}
+  onChange={(e) => setPassword(e.target.value)}
+  className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-900"
+/>
             </div>
-
             <div className="flex items-center justify-between text-sm">
               <label className="flex items-center gap-2 text-gray-600">
                 <input type="checkbox" className="rounded border-gray-300" />

@@ -123,7 +123,7 @@ We connect conscious consumers with verified, minority-owned businesses through 
         {/* Learn More Button */}
         <div className="flex justify-center mt-6">
           <Link 
-            href="/how-it-works"
+            href="/how-to-use-this-app"
             className="px-6 py-2 bg-[#1e3a5f] text-white text-xs font-medium hover:bg-[#2a4a6f] transition-colors"
           >
             Learn More

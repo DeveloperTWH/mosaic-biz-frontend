@@ -7,6 +7,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { submitContactInquiry, ContactInquiryData } from '@/lib/api/contact';
 import { toast } from 'react-toastify';
+import ReCAPTCHA from "react-google-recaptcha";
+import { useRef } from "react";
 
 export default function ContactUsPage() {
     const [formData, setFormData] = useState<ContactInquiryData>({
@@ -18,6 +20,7 @@ export default function ContactUsPage() {
         howCanWeHelp: ''
     });
     const [loading, setLoading] = useState(false);
+   const recaptchaRef = useRef<ReCAPTCHA | null>(null);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -29,6 +32,12 @@ export default function ContactUsPage() {
         setLoading(true);
 
         try {
+            const token = recaptchaRef.current?.getValue();
+
+if (!token) {
+  alert("Please verify that you are not a robot.");
+  return;
+}
             await submitContactInquiry(formData);
             toast.success('Thank you for contacting us! We will get back to you soon.');
             setFormData({
@@ -145,6 +154,12 @@ export default function ContactUsPage() {
                                 className="input h-28 border-[1px] text-sm p-2 text-[#5F5F5F] font-montserrat" 
                             />
                         </div>
+                        <div className="md:col-span-2">
+  <ReCAPTCHA
+    sitekey="6LcA_nMsAAAAANFObRTZO__HF5YR4wCW3zxV3KuR"
+    ref={recaptchaRef}
+  />
+</div>
 
                         <div className="md:col-span-2">
                             <button
@@ -226,11 +241,13 @@ export default function ContactUsPage() {
                 </div>
 
                 <div className="px-10 py-8 text-white bg-gradient-yellow">
-                    <div className="flex items-center gap-3 mb-10">
-                        <Facebook size={20} />
-                        <Instagram size={20} />
-                        <Linkedin size={20} />
-                    </div>
+<div className="flex items-center gap-3 mb-10">
+  <img 
+    src="/contact/socialize.png" 
+    alt="Socialize" 
+    className="w-10 h-10 object-contain"
+  />
+</div>
                     <h3 className="mb-2 text-lg font-bold">SOCIALIZE WITH US:</h3>
                     <hr className="h-[2px] w-[50px] bg-white" />
                     <hr className="h-[2px] w-[50px] bg-white mt-[1px] mb-5" />
