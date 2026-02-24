@@ -16,12 +16,12 @@ html,
 body {
   overflow-x: hidden;
 }
-
+/* // commented the linehight and letterpacing from the last comment for size issue */
 * {
   margin: 0;
   padding: 0;
-  line-height: 28px;
-  letter-spacing: 0%;
+  /* line-height: 28px;
+  letter-spacing: 0%; */
 }
 
 /* * {

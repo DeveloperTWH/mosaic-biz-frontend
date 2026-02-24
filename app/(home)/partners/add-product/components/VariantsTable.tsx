@@ -1,12 +1,14 @@
-import React from 'react';
-import { X, Package, DollarSign } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, Package, DollarSign, Image, Upload, Loader } from 'lucide-react';
 import { Variant } from '../types';
+import { toast } from 'react-toastify';
 
 interface Props {
   variants: Variant[];
   onUpdate: (index: number, field: keyof Variant, value: any) => void;
   onUpdateAllShipping: (field: 'standardShipping' | 'overnightShipping' | 'localShipping', value: number) => void;
   onRemove: (index: number) => void;
+  onImageUpload?: (file: File, variantIndex: number) => Promise<string>;
 }
 
 export default function VariantsTable({
@@ -14,13 +16,47 @@ export default function VariantsTable({
   onUpdate,
   onUpdateAllShipping,
   onRemove,
+  onImageUpload,
 }: Props) {
   
+  const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
+
   if (variants.length === 0) {
     return null;
   }
 
   const firstVariant = variants[0];
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, variantIndex: number) => {
+    const file = e.target.files?.[0];
+    if (!file || !onImageUpload) return;
+
+    try {
+      setUploadingIndex(variantIndex);
+      const imageUrl = await onImageUpload(file, variantIndex);
+      
+      // Get current images array or initialize empty array
+      const currentImages = variants[variantIndex].images || [];
+      
+      // Update variant with new image URL
+      onUpdate(variantIndex, 'images', [...currentImages, imageUrl]);
+      
+      toast.success('Image uploaded successfully!');
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast.error('Failed to upload image');
+    } finally {
+      setUploadingIndex(null);
+      // Clear the input
+      e.target.value = '';
+    }
+  };
+
+  const removeVariantImage = (variantIndex: number, imageIndex: number) => {
+    const currentImages = variants[variantIndex].images || [];
+    const updatedImages = currentImages.filter((_, i) => i !== imageIndex);
+    onUpdate(variantIndex, 'images', updatedImages);
+  };
 
   return (
     <div className="bg-white rounded-xl shadow-sm p-6">
@@ -40,7 +76,7 @@ export default function VariantsTable({
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-xs text-gray-500 mb-1">standardShipping</label>
+            <label className="block text-xs text-gray-500 mb-1">Standard Shipping</label>
             <input
               type="number"
               value={firstVariant.standardShipping}
@@ -51,7 +87,7 @@ export default function VariantsTable({
             />
           </div>
           <div>
-            <label className="block text-xs text-gray-500 mb-1">overnightShipping</label>
+            <label className="block text-xs text-gray-500 mb-1">Overnight Shipping</label>
             <input
               type="number"
               value={firstVariant.overnightShipping}
@@ -62,7 +98,7 @@ export default function VariantsTable({
             />
           </div>
           <div>
-            <label className="block text-xs text-gray-500 mb-1">localShipping</label>
+            <label className="block text-xs text-gray-500 mb-1">Local Shipping</label>
             <input
               type="number"
               value={firstVariant.localShipping}
@@ -79,23 +115,80 @@ export default function VariantsTable({
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-200">
+              <th className="text-left py-3 px-2 font-medium text-gray-600">Images</th>
               <th className="text-left py-3 px-2 font-medium text-gray-600">SKU</th>
-              <th className="text-left py-3 px-2 font-medium text-gray-600">attribute1Name</th>
-              <th className="text-left py-3 px-2 font-medium text-gray-600">attribute1Value</th>
-              <th className="text-left py-3 px-2 font-medium text-gray-600">attribute2Name</th>
-              <th className="text-left py-3 px-2 font-medium text-gray-600">attribute2Value</th>
-              <th className="text-left py-3 px-2 font-medium text-gray-600">price</th>
-              <th className="text-left py-3 px-2 font-medium text-gray-600">stock</th>
-              <th className="text-left py-3 px-2 font-medium text-gray-600">availability</th>
-              <th className="text-left py-3 px-2 font-medium text-gray-600">standard</th>
-              <th className="text-left py-3 px-2 font-medium text-gray-600">overnight</th>
-              <th className="text-left py-3 px-2 font-medium text-gray-600">local</th>
+              <th className="text-left py-3 px-2 font-medium text-gray-600">Attribute1 Name</th>
+              <th className="text-left py-3 px-2 font-medium text-gray-600">Attribute1 Value</th>
+              <th className="text-left py-3 px-2 font-medium text-gray-600">Attribute2 Name</th>
+              <th className="text-left py-3 px-2 font-medium text-gray-600">Attribute2 Value</th>
+              <th className="text-left py-3 px-2 font-medium text-gray-600">Price</th>
+              <th className="text-left py-3 px-2 font-medium text-gray-600">Stock</th>
+              <th className="text-left py-3 px-2 font-medium text-gray-600">Availability</th>
+              <th className="text-left py-3 px-2 font-medium text-gray-600">Standard</th>
+              <th className="text-left py-3 px-2 font-medium text-gray-600">Overnight</th>
+              <th className="text-left py-3 px-2 font-medium text-gray-600">Local</th>
               <th className="text-left py-3 px-2 font-medium text-gray-600"></th>
             </tr>
           </thead>
           <tbody>
             {variants.map((variant, index) => (
               <tr key={index} className="border-b border-gray-100 hover:bg-gray-50">
+                <td className="py-2 px-2">
+                  <div className="flex flex-col gap-2">
+                    {/* Image preview */}
+                    <div className="flex flex-wrap gap-1">
+                      {(variant.images || []).map((img, imgIndex) => (
+                        <div key={imgIndex} className="relative group">
+                          <img 
+                            src={img} 
+                            alt={`Variant ${index + 1} - ${imgIndex + 1}`}
+                            className="w-10 h-10 object-cover rounded border border-gray-200"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeVariantImage(index, imgIndex)}
+                            className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                            title="Remove image"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {/* Upload button */}
+                    {onImageUpload && (
+                      <div className="relative">
+                        <input
+                          type="file"
+                          id={`variant-image-${index}`}
+                          accept="image/*"
+                          onChange={(e) => handleImageUpload(e, index)}
+                          className="hidden"
+                          disabled={uploadingIndex === index}
+                        />
+                        <label
+                          htmlFor={`variant-image-${index}`}
+                          className={`flex items-center justify-center gap-1 px-2 py-1 text-xs border border-gray-300 rounded cursor-pointer hover:bg-gray-50 transition-colors ${
+                            uploadingIndex === index ? 'opacity-50 cursor-not-allowed' : ''
+                          }`}
+                        >
+                          {uploadingIndex === index ? (
+                            <>
+                              <Loader className="w-3 h-3 animate-spin" />
+                              Uploading...
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="w-3 h-3" />
+                              Upload Image
+                            </>
+                          )}
+                        </label>
+                      </div>
+                    )}
+                  </div>
+                </td>
                 <td className="py-2 px-2">
                   <input
                     type="text"
@@ -199,6 +292,18 @@ export default function VariantsTable({
           </tbody>
         </table>
       </div>
+
+      {/* Add toast notifications */}
+      <style jsx>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        .animate-spin {
+          animation: spin 1s linear infinite;
+        }
+      `}</style>
     </div>
   );
 }
+

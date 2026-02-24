@@ -69,7 +69,11 @@ const FeaturedProducts: React.FC<Props> = ({ products, loading }) => {
                             key={product._id}
                             className="flex flex-col p-4 bg-white border rounded-lg hover:shadow-lg transition-shadow duration-200 min-h-[350px]"
                         >
-                            <Link href={`/product/${product._id}`} target="_blank">
+                            <div
+  key={product._id}
+  onClick={() => router.push(`/product/${product._id}`)}
+  className="flex flex-col p-4 bg-white border rounded-lg hover:shadow-lg transition-shadow duration-200 min-h-[350px] cursor-pointer"
+>
                                 {/* Clickable area (redirects to product detail) */}
                                 <div
                                     className="cursor-pointer"
@@ -140,7 +144,7 @@ const FeaturedProducts: React.FC<Props> = ({ products, loading }) => {
                                     />
                                 </button>
                             </div> */}
-                            </Link>
+                            </div>
                         </div>
 
                     );

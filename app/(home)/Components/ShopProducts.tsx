@@ -284,9 +284,20 @@ export default function ShopProducts() {
             <hr className="w-20 h-1 bg-green-900" />
             <hr className="w-20 h-1 bg-green-900" />
           </div>
-          <p className="px-2 mb-8 text-sm text-gray-600 sm:text-base sm:px-0 font-montserrat">
-            See what’s trending, what’s new, and what our community is loving right now. Highlighted featured products from verified vendors you can trust
-          </p>
+<p
+  className="px-2 mb-8 text-gray-600 sm:px-0 sm:text-base"
+  style={{
+    fontFamily: 'Montserrat',
+    fontWeight: 400,
+    fontStyle: 'normal', // Regular is 'normal' in CSS
+    fontSize: '14px',
+    lineHeight: '24px',
+    letterSpacing: '0%',
+    textAlign: 'center'
+  }}
+>
+  See what’s trending, what’s new, and what our community is loving right now. Highlighted featured products from verified vendors you can trust
+</p>
         </div>
 
         {/* Products Carousel Section */}

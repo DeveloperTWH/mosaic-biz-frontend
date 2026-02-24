@@ -44,6 +44,7 @@ export default function AddProductPage() {
     updateDiscount,
     handleFileUpload,
     removeImage,
+   handleVariantImageUpload,
   } = useProductForm();
 
   if (loading) {
@@ -106,6 +107,7 @@ export default function AddProductPage() {
                   onUpdate={updateVariant}
                   onUpdateAllShipping={updateAllShipping}
                   onRemove={removeVariant}
+                  onImageUpload={handleVariantImageUpload}
                 />
               )}
             </div>

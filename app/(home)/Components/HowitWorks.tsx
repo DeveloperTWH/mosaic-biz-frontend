@@ -136,22 +136,22 @@ We connect conscious consumers with verified, minority-owned businesses through 
   );
 }
 
-const images = [
-  "https://img.freepik.com/free-photo/cascade-boat-clean-china-natural-rural_1417-1356.jpg",
-  "https://img.freepik.com/free-photo/mountain-covered-with-fogs_400718-5.jpg",
-  "https://img.freepik.com/free-photo/summer-green-water-sunlight-spring-beauty_1417-1246.jpg",
-  "https://images.pexels.com/photos/10337816/pexels-photo-10337816.jpeg",
-];
-
 function FeaturedVendors() {
+  const images = [
+    "/Middle-banner.png",
+    "/Middle-banner.png",
+    "/Middle-banner.png",
+    "/Middle-banner.png",
+  ];
+
   return (
     <section className="w-full py-10 overflow-hidden bg-gray-50">
       <Swiper
         modules={[Autoplay, Pagination]}
-        centeredSlides={true}
-        slidesPerView="auto"
-        spaceBetween={20}
+        slidesPerView={1} // one full slide visible at a time
+        spaceBetween={30} // spacing between slides
         loop
+        centeredSlides={true}
         autoplay={{
           delay: 3000,
           disableOnInteraction: false,
@@ -162,15 +162,15 @@ function FeaturedVendors() {
         className="w-full"
       >
         {images.map((src, index) => (
-          <SwiperSlide key={index} className="!w-[450px]">
-            <div className="relative h-[180px] overflow-hidden rounded-lg shadow-md">
-              <Image
-                src={src}
-                alt={`Slide ${index + 1}`}
-                fill
-                className="object-cover"
-                priority={index === 0}
-              />
+          <SwiperSlide key={index} className="w-full">
+            <div className="relative w-full h-[350px] md:h-[700px] lg:h-[450px] overflow-hidden rounded-lg shadow-md">
+<Image
+  src={src}
+  alt={`Slide ${index + 1}`}
+  fill
+  className="object-contain" // changed from object-cover
+  priority={index === 0}
+/>
             </div>
           </SwiperSlide>
         ))}

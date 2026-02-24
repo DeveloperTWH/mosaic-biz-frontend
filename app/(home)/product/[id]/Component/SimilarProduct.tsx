@@ -150,7 +150,7 @@ export default function SimilarProduct({ productId }: { productId?: string }) {
   return (
     <div className="mt-12">
       <h3 className="mb-4 text-4xl font-bold text-center uppercase heading">
-        SIMILAR PRODUCTS
+        BEST SELLERS
       </h3>
       <hr className="h-[2px] w-[100px] bg-green-900 mx-auto" />
       <hr className="h-[2px] w-[100px] bg-green-900 mx-auto mt-[1px]" />
@@ -318,7 +318,7 @@ export default function SimilarProduct({ productId }: { productId?: string }) {
       <div className="mx-auto text-center">
         <Link
           href="/products"
-          className="inline-block px-8 py-2 text-white rounded bg-custom-orange"
+          className="inline-block px-8 py-2 text-white rounded bg-blue-900"
         >
           Show All Products
         </Link>
