@@ -278,7 +278,7 @@ const Page = () => {
                     className="py-4"
                 >
                     {items?.map((p) => (
-                        <SwiperSlide key={p._id} className="py-4 w-500 h-auto">
+                        <SwiperSlide key={p._id} className="py-4 h-auto flex justify-center">
                             <ProductCard item={p} />
                         </SwiperSlide>
                     ))}
@@ -574,7 +574,7 @@ function ProductCard({ item }: { item: RankedItem }) {
     return (
         <div 
             onClick={handleCardClick}
-            className="bg-green p-2 border-2 border-[#D9D9D9] w-[340px] h-[480px] shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col cursor-pointer"
+            className="bg-green p-2 border-2 border-[#D9D9D9] w-full max-w-[340px] h-[480px] shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col cursor-pointer"
         >
             {/* Product Image - Square (1:1 like 1080x1080) */}
             <div className="relative w-full aspect-square overflow-hidden bg-gray-100 flex-shrink-0">
