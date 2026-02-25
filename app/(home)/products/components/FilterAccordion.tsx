@@ -136,9 +136,9 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({
                     : 400,
                 fontSize:
                   section.title === "Categories" ||
-                  section.title === "Sub Categories" ||
-                  section.title === "Select Badge" ||
-                  section.title === "Price"
+                  section.title === "Sub Categories"
+                    ? "15px"
+                    : section.title === "Select Badge" || section.title === "Price"
                     ? "16px"
                     : "inherit",
                 fontStyle: "normal",
@@ -258,8 +258,9 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({
                               : "inherit",
                           fontSize:
                             section.title === "Categories" ||
-                            section.title === "Sub Categories" ||
-                            section.title === "Select Badge"
+                            section.title === "Sub Categories"
+                              ? "15px"
+                              : section.title === "Select Badge"
                               ? "14px"
                               : "inherit",
                           fontStyle: "normal",
