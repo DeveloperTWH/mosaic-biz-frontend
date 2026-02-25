@@ -112,12 +112,12 @@ function LoginContent() {
       </div>
 
       {/* Right Section */}
-      <div className="flex items-center justify-center bg-[#F7F7F7] px-6 py-10">
-        <div className="w-full max-w-[360px]">
-          <span className="inline-block mb-3 rounded-full bg-[#FFF6E0] px-3 py-1 text-xs font-montserrat font-thin text-[#C7A040]">
+      <div className="flex items-center justify-center bg-white px-6 py-10">
+        <div className="w-full max-w-md">
+          <span className="inline-block mb-2 rounded-full bg-[#FFF6E0] px-2 text-[10px] font-thin font-montserrat text-[#C7A040]">
             {type?.charAt(0).toUpperCase() + type?.slice(1)}
           </span>
-          <h2 className="text-[46px] leading-none font-bold text-gray-900 mb-2 font-poppins">SIGN IN</h2>
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">SIGN IN</h2>
 
 
             <div className="flex flex-col justify-start mb-5">
@@ -127,7 +127,7 @@ function LoginContent() {
 
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
-              <label className="block text-sm font-poppins font-medium text-[#2E2E2E] mb-1">
+              <label className="block text-sm font-medium text-[#9E9E9E] mb-1">
                 Email
               </label>
 <input
@@ -137,36 +137,45 @@ function LoginContent() {
   value={email}
   onChange={(e) => setEmail(e.target.value)}
   placeholder="Enter your email"
-  className="w-full h-10 rounded-[2px] border border-[#D1D5DB] bg-white px-3 text-sm text-[#2E2E2E] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-1 focus:ring-[#1A1F71]"
+  className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-900"
 />
             </div>
             <div>
-              <label className="block text-sm font-poppins font-medium text-[#2E2E2E] mb-1">
+              <label className="block text-sm font-medium text-[#9E9E9E] mb-1">
                 Password
               </label>
-<input
-  type={showPassword ? "text" : "password"}
-  name="password"
-  required
-  value={password}
-  onChange={(e) => setPassword(e.target.value)}
-  placeholder="Enter your password"
-  className="w-full h-10 rounded-[2px] border border-[#D1D5DB] bg-white px-3 text-sm text-[#2E2E2E] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-1 focus:ring-[#1A1F71]"
-/>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  className="w-full rounded-md border border-gray-300 px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-900"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
             </div>
             <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center gap-2 text-[#9CA3AF] font-montserrat">
+              <label className="flex items-center gap-2 text-gray-600 font-montserrat font-thin">
                 <input type="checkbox" className="rounded border-gray-300" />
                 Keep Me Signed In
               </label>
-              <a href="#" className="text-[#2E2E2E] font-semibold underline underline-offset-2">
+              <a href="#" className="text-blue-900 font-medium hover:underline">
                 Forget Password
               </a>
             </div>
 
             <button
               type="submit"
-              className="w-full h-11 bg-[#1A1F71] text-white text-[16px] font-montserrat font-semibold hover:bg-[#20288D] transition"
+              className="w-full bg-blue-900 text-white py-2 text-[16px] hover:bg-blue-800 transition font-montserrat font-extralight"
             >
               {loading ? 'Signing In...' : 'Sign In'}
             </button>
@@ -195,9 +204,9 @@ function LoginContent() {
             </button> */}
           </div>
 
-          <p className="mt-6 text-center text-sm text-[#2E2E2E]">
+          <p className="mt-6 text-center underline text-[16px] text-gray-600">
             New Customer?{" "}
-            <a href={`/signup?type=${type}`} className="font-semibold text-[#2E2E2E]">
+            <a href={`/signup?type=${type}`}>
               Create Account
             </a>
           </p>

@@ -71,7 +71,7 @@ export default function HowItWorks() {
               width={400}
               height={100}
               onClick={() => setTabClick(0)}
-              className="cursor-pointer hover:scale-105 transition-transform w-full h-[70px] object-contain"
+              className="cursor-pointer block w-full h-[70px] object-contain object-left"
             />
 
             <Image
@@ -80,7 +80,7 @@ export default function HowItWorks() {
               width={400}
               height={100}
               onClick={() => setTabClick(1)}
-              className="cursor-pointer hover:scale-105 transition-transform w-full h-[70px] object-contain"
+              className="cursor-pointer block w-full h-[70px] object-contain object-left"
             />
 
             <Image
@@ -89,7 +89,7 @@ export default function HowItWorks() {
               width={400}
               height={100}
               onClick={() => setTabClick(2)}
-              className="cursor-pointer hover:scale-105 transition-transform w-full h-[70px] object-contain"
+              className="cursor-pointer block w-full h-[70px] object-contain object-left"
             />
 
             <Image
@@ -98,7 +98,7 @@ export default function HowItWorks() {
               width={400}
               height={100}
               onClick={() => setTabClick(3)}
-              className="cursor-pointer hover:scale-105 transition-transform w-full h-[70px] object-contain"
+              className="cursor-pointer block w-full h-[70px] object-contain object-left"
             />
           </div>
 
@@ -133,3 +133,4 @@ export default function HowItWorks() {
     </section>
   );
 }
+

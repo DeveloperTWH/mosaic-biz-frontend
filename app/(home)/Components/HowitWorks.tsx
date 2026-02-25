@@ -47,9 +47,9 @@ export default function HowItWorks() {
       <div className="py-4 lg:py-6 max-w-7xl mx-auto px-6">
         {/* Heading - Compact */}
         <div className="text-center mb-4">
-          <h2 className="text-xl md:text-2xl font-bold text-gray-900 font-poppins">
-            HOW IT WORKS
-          </h2>
+<h2 className="text-4xl font-bold text-gray-900 tracking-wide font-poppins uppercase">
+  HOW IT WORKS
+</h2>
 
 <p className="mt-2 text-gray-600 text-[12px] leading-5 max-w-6xl mx-auto font-mulish font-normal">
   Mosaic Biz Hub isn’t just a marketplace, it’s a movement. Our Mosaic creates a multicultural tapestry of unstoppable success, a marketplace of diverse business excellence.
@@ -71,7 +71,7 @@ export default function HowItWorks() {
               width={400}
               height={100}
               onClick={() => setTabClick(0)}
-              className="cursor-pointer hover:scale-105 transition-transform w-full h-[70px] object-contain"
+              className="cursor-pointer block w-full h-[70px] object-contain object-left"
             />
 
             <Image
@@ -80,7 +80,7 @@ export default function HowItWorks() {
               width={400}
               height={100}
               onClick={() => setTabClick(1)}
-              className="cursor-pointer hover:scale-105 transition-transform w-full h-[70px] object-contain"
+              className="cursor-pointer block w-full h-[70px] object-contain object-left"
             />
 
             <Image
@@ -89,7 +89,7 @@ export default function HowItWorks() {
               width={400}
               height={100}
               onClick={() => setTabClick(2)}
-              className="cursor-pointer hover:scale-105 transition-transform w-full h-[70px] object-contain"
+              className="cursor-pointer block w-full h-[70px] object-contain object-left"
             />
 
             <Image
@@ -98,7 +98,7 @@ export default function HowItWorks() {
               width={400}
               height={100}
               onClick={() => setTabClick(3)}
-              className="cursor-pointer hover:scale-105 transition-transform w-full h-[70px] object-contain"
+              className="cursor-pointer block w-full h-[70px] object-contain object-left"
             />
           </div>
 
@@ -179,3 +179,6 @@ function FeaturedVendors() {
     </section>
   );
 }
+
+
+

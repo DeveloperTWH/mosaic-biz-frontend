@@ -574,10 +574,10 @@ function ProductCard({ item }: { item: RankedItem }) {
     return (
         <div 
             onClick={handleCardClick}
-            className="bg-green p-2 border-2 border-[#D9D9D9] w-[340px] aspect-square shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col cursor-pointer"
+            className="bg-green p-2 border-2 border-[#D9D9D9] w-[340px] h-[480px] shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col cursor-pointer"
         >
-            {/* Product Image - Fixed Height */}
-            <div className="relative h-[48%] overflow-hidden bg-gray-100 flex-shrink-0">
+            {/* Product Image - Square (1:1 like 1080x1080) */}
+            <div className="relative w-full aspect-square overflow-hidden bg-gray-100 flex-shrink-0">
                 <img
                     src={images[0]}
                     alt={title}
@@ -649,3 +649,4 @@ function ProductCard({ item }: { item: RankedItem }) {
 }
 
 export default Page;
+

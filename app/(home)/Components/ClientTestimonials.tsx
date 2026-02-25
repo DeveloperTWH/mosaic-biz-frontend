@@ -42,9 +42,9 @@ export default function ClientTestimonials() {
   return (
     <section className="px-5 py-20 text-white md:px-20">
       <div className="mb-12 text-center">
-        <h2 className="mb-1 heading">
-          What Our Clients Say
-        </h2>
+<h2 className="text-4xl font-bold text-gray-900 tracking-wide font-poppins uppercase text-center">
+  WHAT OUR CLIENTS SAY
+</h2>
         <div className="flex flex-col items-center justify-center">
           <hr className="h-[2px] w-[100px] bg-gray-700" />
           <hr className="h-[2px] w-[100px] mt-[2px] mb-4 bg-gray-700" />

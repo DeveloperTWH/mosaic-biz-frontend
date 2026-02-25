@@ -397,9 +397,9 @@ export default function ShopProducts() {
 /* ---------- Featured Product Card ---------- */
 function FeaturedProductCard({ item }: { item: FeaturedProduct }) {
   return (
-    <div className="bg-green p-2 border-2 border-[#D9D9D9] w-full max-w-[360px] aspect-square shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col">
-      {/* Product Image - Fixed Height */}
-      <div className="relative h-[48%] overflow-hidden bg-gray-100 flex-shrink-0">
+    <div className="bg-green p-2 border-2 border-[#D9D9D9] w-full max-w-[360px] h-[480px] shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col">
+      {/* Product Image - Square (1:1 like 1080x1080) */}
+      <div className="relative w-full aspect-square overflow-hidden bg-gray-100 flex-shrink-0">
         <img
           src={item.coverImage}
           alt={item.title}
