@@ -556,7 +556,9 @@ function ProductCard({ item }: { item: RankedItem }) {
     const router = useRouter();
     const href = `/product/${item._id}`;
     const title = pickTitle(item);
-    const description = item.description || "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent vitae.";
+    const description = item.description ?? "";
+    const trimmedDescription =
+        description.length > 100 ? `${description.slice(0, 100).trimEnd()}...` : description;
     const images = gatherImages(item);
     const { price, effective, onSale } = pickPrice(item);
     const rating = pickRating(item);
@@ -574,7 +576,7 @@ function ProductCard({ item }: { item: RankedItem }) {
     return (
         <div 
             onClick={handleCardClick}
-            className="bg-green p-2 border-2 border-[#D9D9D9] w-full max-w-[340px] h-[480px] shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col cursor-pointer"
+            className="bg-green p-2 border-2 border-[#D9D9D9] w-full max-w-[300px] h-[460px] shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col cursor-pointer"
         >
             {/* Product Image - Square (1:1 like 1080x1080) */}
             <div className="relative w-full aspect-square overflow-hidden bg-gray-100 flex-shrink-0">
@@ -595,19 +597,19 @@ function ProductCard({ item }: { item: RankedItem }) {
             </div>
 
             {/* Product Info - Flex grow to fill space */}
-            <div className="p-3 flex flex-col flex-grow">
-                {/* Title - Fixed height */}
-                <h3 className="text-base font-bold text-gray-900 uppercase tracking-tight line-clamp-1 h-7 overflow-hidden font-poppins">
+            <div className="p-3 flex flex-col flex-1">
+                {/* Title */}
+                <h3 className="text-base font-bold text-gray-900 uppercase tracking-tight leading-snug font-poppins line-clamp-2 h-[42px]">
                     {title}
                 </h3>
 
-                {/* Description - Fixed height */}
-                <p className="mb-2 text-xs text-gray-600 leading-relaxed line-clamp-2 h-8 overflow-hidden font-montserrat">
-                    {description}
+                {/* Description */}
+                <p className="mb-2 text-xs text-gray-600 leading-5 font-montserrat h-[40px] overflow-hidden">
+                    {trimmedDescription || "\u00a0"}
                 </p>
 
-                {/* Rating and Reviews - Fixed height */}
-                <div className="flex-shrink-0">
+                {/* Rating and Reviews */}
+                <div className="flex-shrink-0 min-h-[20px]">
                     <div className="flex items-center mb-1">
                         <div className="flex">
                             {[...Array(5)].map((_, i) => (
@@ -626,8 +628,8 @@ function ProductCard({ item }: { item: RankedItem }) {
                     </div>
                 </div>
 
-                {/* Price - Fixed height */}
-                <div className="flex-shrink-0">
+                {/* Price */}
+                <div className="flex-shrink-0 mt-auto">
                     {onSale ? (
                         <div className="flex items-center gap-3">
                             <span className="text-base font-bold text-red-600">

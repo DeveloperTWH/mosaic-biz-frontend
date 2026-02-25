@@ -322,7 +322,9 @@ function pickRating(p: RankedItem): number {
 function ProductCard({ item }: { item: RankedItem }) {
   const href = `/product/${item._id}`;
   const title = pickTitle(item);
-  const description = item.description || "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent vitae.";
+  const description = item.description ?? "";
+  const trimmedDescription =
+    description.length > 100 ? `${description.slice(0, 100).trimEnd()}...` : description;
   const images = gatherImages(item);
   const { price: variantPrice, effective, onSale } = pickPrice(item);
   const rating = pickRating(item);
@@ -350,17 +352,22 @@ function ProductCard({ item }: { item: RankedItem }) {
   const hasHalfStar = fractional >= 0.25 && fractional < 0.75;
 
   return (
-    <div className="bg-green p-3 border-2 border-[#D9D9D9] w-full max-w-[300px] shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col h-[380px]">
-      {/* Product Image - Fixed Height */}
-      {images[0] && (
-      <div className="relative h-48 overflow-hidden bg-gray-100 flex-shrink-0">
-<img
-  src={images[0]}
-  alt={title}
-  loading="lazy"
-  className="w-full h-full object-contain transition-transform duration-500 hover:scale-105"
-/>
-        
+    <div className="bg-green p-2 border-2 border-[#D9D9D9] w-full max-w-[300px] h-[460px] shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col">
+      {/* Product Image - Square (1:1 like Best Sellers) */}
+      <div className="relative w-full aspect-square overflow-hidden bg-gray-100 flex-shrink-0">
+        {images[0] ? (
+          <img
+            src={images[0]}
+            alt={title}
+            loading="lazy"
+            className="w-full h-full object-contain transition-transform duration-500 hover:scale-105"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-xs font-semibold text-gray-500 tracking-wide">
+            NO IMAGE
+          </div>
+        )}
+
         {onSale && (
           <div className="absolute top-3 left-3">
             <span className="px-3 py-1 text-xs font-bold text-white bg-red-600 rounded-full">
@@ -369,30 +376,49 @@ function ProductCard({ item }: { item: RankedItem }) {
           </div>
         )}
       </div>
-      )}
 
-      {/* Product Info - Flex grow to fill space */}
-      <div className="p-4 flex flex-col flex-grow">
+      {/* Product Info */}
+      <div className="p-3 flex flex-col flex-1">
         {/* Badge */}
-        {badge && (
-          <div className="mb-2">
+        <div className="mb-2 h-5">
+          {badge && (
             <span className="px-2 py-1 text-xs font-semibold text-white bg-yellow-600 rounded uppercase">
               {badge}
             </span>
-          </div>
-        )}
-        
-        {/* Title - Fixed height */}
-        <h3 className="text-base font-bold text-gray-900 uppercase tracking-tight line-clamp-1 mb-2 overflow-hidden font-poppins">
+          )}
+        </div>
+
+        {/* Title */}
+        <h3 className="text-base font-bold text-gray-900 uppercase tracking-tight leading-snug font-poppins line-clamp-2 h-[42px]">
           {title}
         </h3>
 
-        {/* Description - Fixed height */}
-        <p className="mb-3 text-xs text-gray-600 leading-relaxed line-clamp-2 overflow-hidden font-montserrat">
-          {description}
+        {/* Description */}
+        <p className="mb-2 text-xs text-gray-600 leading-5 font-montserrat h-[40px] overflow-hidden">
+          {trimmedDescription || "\u00a0"}
         </p>
 
-        {/* Price - Fixed height */}
+        {/* Rating and Reviews */}
+        <div className="flex-shrink-0 min-h-[20px]">
+          <div className="flex items-center mb-1">
+            <div className="flex">
+              {[...Array(5)].map((_, i) => (
+                <Star
+                  key={i}
+                  size={14}
+                  fill={i < fullStars ? "#FBBF24" : i === fullStars && hasHalfStar ? "#FBBF24" : "#E5E7EB"}
+                  stroke={i < fullStars ? "#FBBF24" : i === fullStars && hasHalfStar ? "#FBBF24" : "#D1D5DB"}
+                  className={i < fullStars || (i === fullStars && hasHalfStar) ? "text-yellow-400" : "text-gray-300"}
+                />
+              ))}
+            </div>
+            <p className="text-[10px] ml-2 text-gray-500 font-poppins leading-tight">
+              {ratingCount} Ratings And {reviewCount} Reviews
+            </p>
+          </div>
+        </div>
+
+        {/* Price */}
         <div className="flex-shrink-0 mt-auto">
           {onSale ? (
             <div className="flex items-center gap-2">
@@ -411,9 +437,8 @@ function ProductCard({ item }: { item: RankedItem }) {
         </div>
       </div>
     </div>
-
-
   );
 }
 
 export default ProductSevices;
+

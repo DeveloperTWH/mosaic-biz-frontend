@@ -396,8 +396,12 @@ export default function ShopProducts() {
 
 /* ---------- Featured Product Card ---------- */
 function FeaturedProductCard({ item }: { item: FeaturedProduct }) {
+  const description = item.description ?? "";
+  const trimmedDescription =
+    description.length > 100 ? `${description.slice(0, 100).trimEnd()}...` : description;
+
   return (
-    <div className="bg-green p-2 border-2 border-[#D9D9D9] w-full max-w-[360px] h-[480px] shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col">
+    <div className="bg-green p-2 border-2 border-[#D9D9D9] w-full max-w-[300px] h-[460px] shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col">
       {/* Product Image - Square (1:1 like 1080x1080) */}
       <div className="relative w-full aspect-square overflow-hidden bg-gray-100 flex-shrink-0">
         <img
@@ -415,19 +419,19 @@ function FeaturedProductCard({ item }: { item: FeaturedProduct }) {
       </div>
 
       {/* Product Info - Flex grow to fill space */}
-      <div className="p-3 flex flex-col flex-grow">
-        {/* Title - Fixed height */}
-        <h3 className="text-base font-bold text-gray-900 uppercase tracking-tight line-clamp-1 h-7 overflow-hidden font-poppins">
+      <div className="p-3 flex flex-col flex-1">
+        {/* Title */}
+        <h3 className="text-base font-bold text-gray-900 uppercase tracking-tight leading-snug font-poppins line-clamp-2 h-[42px]">
           {item.title}
         </h3>
 
-        {/* Description - Fixed height */}
-        <p className="mb-2 text-xs text-gray-600 leading-relaxed line-clamp-2 h-8 overflow-hidden font-montserrat">
-          {item.description}
+        {/* Description */}
+        <p className="mb-2 text-xs text-gray-600 leading-5 font-montserrat h-[40px] overflow-hidden">
+          {trimmedDescription || "\u00a0"}
         </p>
 
         {/* Rating */}
-        <div className="flex-shrink-0">
+        <div className="flex-shrink-0 min-h-[20px]">
           <div className="flex items-center mb-1">
             <div className="flex">
               {[...Array(5)].map((_, i) => (
@@ -446,8 +450,8 @@ function FeaturedProductCard({ item }: { item: FeaturedProduct }) {
           </div>
         </div>
 
-        {/* Price - Fixed height */}
-        <div className="flex-shrink-0">
+        {/* Price */}
+        <div className="flex-shrink-0 mt-auto">
           <span className="text-base font-bold text-gray-900">
             ${item.price.toFixed(2)}
           </span>
