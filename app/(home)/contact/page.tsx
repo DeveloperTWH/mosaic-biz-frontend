@@ -241,7 +241,11 @@ if (!token) {
                 </div>
 
                 <div className="px-10 py-8 text-white bg-gradient-yellow">
-                    <Share2 size={40} className='mb-10' />
+<div className="flex items-center gap-3 mb-10">
+  <div className="w-10 h-10 rounded-full bg-white/95 p-1 shadow-sm ring-1 ring-white/80 flex items-center justify-center overflow-hidden">
+<Share2 size={40} className="mb-10" />
+  </div>
+</div>
                     <h3 className="mb-2 text-lg font-bold">SOCIALIZE WITH US:</h3>
                     <hr className="h-[2px] w-[50px] bg-white" />
                     <hr className="h-[2px] w-[50px] bg-white mt-[1px] mb-5" />

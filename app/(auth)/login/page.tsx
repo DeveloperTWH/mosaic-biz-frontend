@@ -176,7 +176,7 @@ function LoginContent() {
           <div className="my-4" />
 
           <div className="flex items-center justify-center gap-4">
-            <button className="h-10 w-10 rounded-full border flex items-center justify-center hover:bg-gray-100">
+            {/* <button className="h-10 w-10 rounded-full border flex items-center justify-center hover:bg-gray-100">
               <Image
               src={"/login/facebookLogo.png"}
               alt={"facebook"}
@@ -192,7 +192,7 @@ function LoginContent() {
               width={40}
               height={40} 
               />
-            </button>
+            </button> */}
           </div>
 
           <p className="mt-6 text-center text-sm text-[#2E2E2E]">
