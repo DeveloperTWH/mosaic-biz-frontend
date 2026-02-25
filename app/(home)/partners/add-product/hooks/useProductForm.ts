@@ -182,8 +182,8 @@ export const useProductForm = () => {
 
   // Generate variants from attributes
   const generateVariants = () => {
-    if (formData.attributes.length < 2) {
-      toast.error('Need at least 2 attributes (e.g., Size and Color) to generate variants');
+    if (formData.attributes.length < 1) {
+      toast.error('Need at least 1 attributes (e.g., Size or Color) to generate variants');
       return;
     }
 

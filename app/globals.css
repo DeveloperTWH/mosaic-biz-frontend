@@ -16,7 +16,20 @@ html,
 body {
   overflow-x: hidden;
 }
-/* // commented the linehight and letterpacing from the last comment for size issue */
+
+/* scaling issue reduced font size  */
+
+@layer base {
+  html {
+    font-size: 14.4px; 
+  }
+
+  body {
+    @apply font-poppins;
+  }
+}
+
+/* // commented the linehight and letterpacing from the last comment for */
 * {
   margin: 0;
   padding: 0;

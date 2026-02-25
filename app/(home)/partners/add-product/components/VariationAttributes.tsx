@@ -48,7 +48,7 @@ export default function VariationAttributes({
     <div className="bg-white border border-gray-200 rounded-md p-5">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-base font-semibold text-gray-900">Product Variations Attributes</h2>
-        {attributes.length >= 2 && (
+        {attributes.length >= 1 && (
           <button
             type="button"
             onClick={onGenerateVariants}
@@ -143,9 +143,9 @@ export default function VariationAttributes({
               Add Another Attribute
             </button>
 
-            {attributes.length < 2 && (
+            {attributes.length < 1 && (
               <p className="text-xs text-amber-600 mt-2">
-                ⚠️ Need at least 2 attributes (e.g., Size and Color) to generate variants
+                ⚠️ Need at least 1 attributes (e.g., Size or Color) to generate variants
               </p>
             )}
           </>
