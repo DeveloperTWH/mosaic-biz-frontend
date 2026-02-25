@@ -84,7 +84,8 @@ breakpoints={{
   0: { slidesPerView: 2, spaceBetween: 20 },
   640: { slidesPerView: 3, spaceBetween: 30 },
   768: { slidesPerView: 4, spaceBetween: 40 },
-  1024: { slidesPerView: 6, spaceBetween: 50 }, // changed from 5 → 6
+  1024: { slidesPerView: 5, spaceBetween: 40 },
+  1280: { slidesPerView: 6, spaceBetween: 40 },
 }}
               navigation={{
                 prevEl: prevButtonRef.current,
@@ -160,3 +161,4 @@ breakpoints={{
     </section>
   );
 }
+

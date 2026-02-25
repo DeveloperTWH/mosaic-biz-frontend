@@ -530,27 +530,39 @@ export default function ProductDetailPage() {
               </button>
             </div>
 
-            {/* Product Description */}
-            {product.description && (
-              <div className="mt-8 pt-6 border-t border-gray-100">
-                <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3">Description</h3>
-                <p className="text-sm text-gray-600 leading-relaxed">{product.description}</p>
-              </div>
-            )}
           </div>
         </div>
 
         {/* Product Details / Specifications */}
-        <div className="mt-12 bg-gray-50 rounded-lg p-6">
-          <h3 className="mb-6 text-lg font-bold text-gray-900 uppercase tracking-wide border-b border-gray-200 pb-3">
+        <div className="mt-10 lg:ml-[calc(50%+1.5rem)] lg:w-[calc(50%-1.5rem)]">
+          <h3 className="mb-3 text-[18px] leading-none font-semibold font-montserrat text-[#c79b44] border-b border-gray-200 pb-2">
             Product Details
           </h3>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            {product.attributes && product.attributes.length > 0 ? (
+          <div className="grid grid-cols-1 gap-2">
+            {product.metaFields && product.metaFields.length > 0 ? (
+              product.metaFields.map((field, i) => (
+                <div key={i} className="flex py-1">
+                  <span className="w-40 text-[14px] font-bold font-montserrat text-[#2E2E2E]">
+                    {field.key
+                      .split(" ")
+                      .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
+                      .join(" ")}
+                  </span>
+                  <span className="text-[14px] font-medium font-montserrat text-[#5F5F5F]">{field.value}</span>
+                </div>
+              ))
+            ) : product.attributes && product.attributes.length > 0 ? (
               product.attributes.map((attr, i) => (
-                <div key={i} className="flex py-3 border-b border-gray-200 last:border-0">
-                  <span className="w-40 text-sm font-semibold text-gray-600 uppercase">{attr.name}</span>
-                  <span className="text-sm text-gray-900 font-medium">{attr.values.join(', ')}</span>
+                <div key={i} className="flex py-1">
+                  <span className="w-40 text-[14px] font-bold font-montserrat text-[#2E2E2E]">
+                    {attr.name
+                      .split(" ")
+                      .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
+                      .join(" ")}
+                  </span>
+                  <span className="text-[14px] font-medium font-montserrat text-[#5F5F5F]">
+                    {Array.isArray(attr.values) ? attr.values.join(", ") : String(attr.values ?? "")}
+                  </span>
                 </div>
               ))
             ) : (
@@ -558,6 +570,14 @@ export default function ProductDetailPage() {
             )}
           </div>
         </div>
+
+        {/* Product Description */}
+        {product.description && (
+          <div className="mt-8 pt-6 border-t border-gray-100 lg:ml-[calc(50%+1.5rem)] lg:w-[calc(50%-1.5rem)]">
+            <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3">Description</h3>
+            <p className="text-sm text-gray-600 leading-relaxed">{product.description}</p>
+          </div>
+        )}
 
         {/* Ratings & Reviews Section */}
         <div className="mt-12 bg-white rounded-lg border border-gray-200 p-6">

@@ -1,9 +1,9 @@
 import React from "react";
 
 type ProductCardProps = {
-  image: string;
+  image?: string;
   title: string;
-  description: string;
+  description?: string;
   rating: number;
   totalRatings: number;
   reviews: number;
@@ -26,21 +26,27 @@ const ProductCard: React.FC<ProductCardProps> = ({
   price,
 }) => {
   return (
-    <div className="product-card h-[380px]">
-      {image && <img src={image} alt={title} className="product-image h-[180px] w-full" />}
+    <div className="product-card h-[380px] flex flex-col overflow-hidden border-2 border-[#D9D9D9] shadow-lg">
+      {image ? (
+        <img src={image} alt={title} className="product-image h-[180px] w-full object-cover flex-shrink-0" />
+      ) : (
+        <div className="h-[180px] w-full bg-gray-100 flex-shrink-0 flex items-center justify-center text-xs font-semibold text-gray-500 tracking-wide">
+          NO IMAGE
+        </div>
+      )}
 
-      <div className="product-content p-4">
+      <div className="product-content p-4 flex flex-col flex-1">
         {/* Badge */}
-        {badge && (
-          <div className="mb-2">
+        <div className="mb-2 h-6">
+          {badge && (
             <span className="px-2 py-1 text-xs font-semibold text-white bg-yellow-600 rounded uppercase">
               {badge}
             </span>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* Title */}
-        <h3 className="product-title text-base font-bold mb-2">{title}</h3>
+        <h3 className="product-title text-base font-bold mb-2 line-clamp-1 h-6">{title}</h3>
 
         {/* Description */}
         <p
@@ -53,18 +59,18 @@ const ProductCard: React.FC<ProductCardProps> = ({
           }}
           title={description}
         >
-        {description}</p>
+        {description || "\u00a0"}</p>
 
         {/* Price */}
-        {price !== undefined && (
-          <div className="mt-auto mb-3">
+        <div className="mb-3 h-7">
+          {price !== undefined && (
             <span className="text-lg font-bold text-gray-900">
               ${price.toFixed(2)}
             </span>
-          </div>
-        )}
+          )}
+        </div>
 
-        <div className="flex justify-center mt-2">
+        <div className="flex justify-center mt-auto">
             <div className="w-[65%] mr-5">
             <HorizontalLine/>
             </div>

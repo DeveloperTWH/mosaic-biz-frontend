@@ -574,15 +574,15 @@ function ProductCard({ item }: { item: RankedItem }) {
     return (
         <div 
             onClick={handleCardClick}
-            className="bg-green p-3 border-2 border-[#D9D9D9] w-[300px] shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col h-[420px] cursor-pointer"
+            className="bg-green p-2 border-2 border-[#D9D9D9] w-[340px] aspect-square shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col cursor-pointer"
         >
             {/* Product Image - Fixed Height */}
-            <div className="relative h-60 overflow-hidden bg-gray-100 flex-shrink-0">
+            <div className="relative h-[48%] overflow-hidden bg-gray-100 flex-shrink-0">
                 <img
                     src={images[0]}
                     alt={title}
                     loading="lazy"
-                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                    className="w-full h-full object-contain transition-transform duration-500 hover:scale-105"
                 />
                 
                 {onSale && (
@@ -595,14 +595,14 @@ function ProductCard({ item }: { item: RankedItem }) {
             </div>
 
             {/* Product Info - Flex grow to fill space */}
-            <div className="p-5 flex flex-col flex-grow">
+            <div className="p-3 flex flex-col flex-grow">
                 {/* Title - Fixed height */}
-                <h3 className="text-lg font-bold text-gray-900 uppercase tracking-tight line-clamp-1 h-9 overflow-hidden font-poppins">
+                <h3 className="text-base font-bold text-gray-900 uppercase tracking-tight line-clamp-1 h-7 overflow-hidden font-poppins">
                     {title}
                 </h3>
 
                 {/* Description - Fixed height */}
-                <p className="mb-3 text-sm text-gray-600 leading-relaxed line-clamp-2 h-10 overflow-hidden font-montserrat">
+                <p className="mb-2 text-xs text-gray-600 leading-relaxed line-clamp-2 h-8 overflow-hidden font-montserrat">
                     {description}
                 </p>
 
@@ -620,7 +620,7 @@ function ProductCard({ item }: { item: RankedItem }) {
                                 />
                             ))}
                         </div>
-                        <p className="text-xs ml-2 text-gray-500 font-poppins">
+                        <p className="text-[10px] ml-2 text-gray-500 font-poppins leading-tight">
                             {ratingCount} Ratings And {reviewCount} Reviews
                         </p>
                     </div>
@@ -630,15 +630,15 @@ function ProductCard({ item }: { item: RankedItem }) {
                 <div className="flex-shrink-0">
                     {onSale ? (
                         <div className="flex items-center gap-3">
-                            <span className="text-xl font-bold text-red-600">
+                            <span className="text-base font-bold text-red-600">
                                 ${effective.toFixed(2)}
                             </span>
-                            <span className="text-base text-gray-500 line-through">
+                            <span className="text-sm text-gray-500 line-through">
                                 ${price.toFixed(2)}
                             </span>
                         </div>
                     ) : (
-                        <span className="text-sm font-bold text-gray-900">
+                        <span className="text-base font-bold text-gray-900">
                             ${price.toFixed(2)}
                         </span>
                     )}

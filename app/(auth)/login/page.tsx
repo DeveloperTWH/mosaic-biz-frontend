@@ -115,7 +115,7 @@ function LoginContent() {
       <div className="flex items-center justify-center bg-[#F7F7F7] px-6 py-10">
         <div className="w-full max-w-[360px]">
           <span className="inline-block mb-3 rounded-full bg-[#FFF6E0] px-3 py-1 text-xs font-montserrat font-thin text-[#C7A040]">
-            {type}
+            {type?.charAt(0).toUpperCase() + type?.slice(1)}
           </span>
           <h2 className="text-[46px] leading-none font-bold text-gray-900 mb-2 font-poppins">SIGN IN</h2>
 

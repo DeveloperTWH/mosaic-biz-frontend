@@ -338,20 +338,20 @@ export default function ShopProducts() {
             <Swiper
               onSwiper={setSwiperRef}
               modules={[Navigation]}
-              spaceBetween={15}
+              spaceBetween={22}
               slidesPerView={1}
               breakpoints={{
                 640: {
                   slidesPerView: 2,
-                  spaceBetween: 15,
+                  spaceBetween: 20,
                 },
                 1024: {
                   slidesPerView: 3,
-                  spaceBetween: 15,
+                  spaceBetween: 22,
                 },
                 1280: {
                   slidesPerView: 4,
-                  spaceBetween: 15,
+                  spaceBetween: 22,
                 },
               }}
               navigation={{
@@ -367,7 +367,7 @@ export default function ShopProducts() {
               className="py-4"
             >
               {items.map((p) => (
-                <SwiperSlide key={p._id} className="py-4 w-500 h-auto">
+                <SwiperSlide key={p._id} className="py-4 h-auto flex justify-center">
                   <FeaturedProductCard item={p} />
                 </SwiperSlide>
               ))}
@@ -397,32 +397,32 @@ export default function ShopProducts() {
 /* ---------- Featured Product Card ---------- */
 function FeaturedProductCard({ item }: { item: FeaturedProduct }) {
   return (
-    <div className="bg-green p-3 border-2 border-[#D9D9D9] w-[300px] shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col h-[420px]">
+    <div className="bg-green p-2 border-2 border-[#D9D9D9] w-full max-w-[360px] aspect-square shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col">
       {/* Product Image - Fixed Height */}
-      <div className="relative h-60 overflow-hidden bg-gray-100 flex-shrink-0">
+      <div className="relative h-[48%] overflow-hidden bg-gray-100 flex-shrink-0">
         <img
           src={item.coverImage}
           alt={item.title}
           loading="lazy"
-          className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+          className="w-full h-full object-contain transition-transform duration-500 hover:scale-105"
         />
         
-        <div className="absolute top-3 left-3">
+        {/* <div className="absolute top-3 left-3">
           <span className="px-3 py-1 text-xs font-bold text-white bg-yellow-600 rounded-full">
             FEATURED
           </span>
-        </div>
+        </div> */}
       </div>
 
       {/* Product Info - Flex grow to fill space */}
-      <div className="p-5 flex flex-col flex-grow">
+      <div className="p-3 flex flex-col flex-grow">
         {/* Title - Fixed height */}
-        <h3 className="text-lg font-bold text-gray-900 uppercase tracking-tight line-clamp-1 h-9 overflow-hidden font-poppins">
+        <h3 className="text-base font-bold text-gray-900 uppercase tracking-tight line-clamp-1 h-7 overflow-hidden font-poppins">
           {item.title}
         </h3>
 
         {/* Description - Fixed height */}
-        <p className="mb-3 text-sm text-gray-600 leading-relaxed line-clamp-2 h-10 overflow-hidden font-montserrat">
+        <p className="mb-2 text-xs text-gray-600 leading-relaxed line-clamp-2 h-8 overflow-hidden font-montserrat">
           {item.description}
         </p>
 
@@ -440,7 +440,7 @@ function FeaturedProductCard({ item }: { item: FeaturedProduct }) {
                 />
               ))}
             </div>
-            <p className="text-xs ml-2 text-gray-500 font-poppins">
+            <p className="text-[10px] ml-2 text-gray-500 font-poppins leading-tight">
               Featured Product
             </p>
           </div>
@@ -448,7 +448,7 @@ function FeaturedProductCard({ item }: { item: FeaturedProduct }) {
 
         {/* Price - Fixed height */}
         <div className="flex-shrink-0">
-          <span className="text-sm font-bold text-gray-900">
+          <span className="text-base font-bold text-gray-900">
             ${item.price.toFixed(2)}
           </span>
         </div>

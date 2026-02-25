@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import HeroSection from './components/HeroSection';
-import { Mail, MapPinned, PhoneCall, Facebook, Instagram, Linkedin } from 'lucide-react';
+import { Mail, MapPinned, PhoneCall, Facebook, Instagram, Linkedin, Share2 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { submitContactInquiry, ContactInquiryData } from '@/lib/api/contact';
@@ -241,13 +241,7 @@ if (!token) {
                 </div>
 
                 <div className="px-10 py-8 text-white bg-gradient-yellow">
-<div className="flex items-center gap-3 mb-10">
-  <img 
-    src="/contact/socialize.png" 
-    alt="Socialize" 
-    className="w-10 h-10 object-contain"
-  />
-</div>
+                    <Share2 size={40} className='mb-10' />
                     <h3 className="mb-2 text-lg font-bold">SOCIALIZE WITH US:</h3>
                     <hr className="h-[2px] w-[50px] bg-white" />
                     <hr className="h-[2px] w-[50px] bg-white mt-[1px] mb-5" />
