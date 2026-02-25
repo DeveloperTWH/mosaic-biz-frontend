@@ -80,11 +80,11 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({ onFilterChange, selec
   const sections: Section[] = [
     {
       title: "Categories",
-      items: categories.map(cat => cat.name),
+      items: categories.map(cat => `${cat.name} (${(cat as any).totalServices || 0})`),
     },
     {
       title: "Sub Categories",
-      items: subcategories.map(sub => sub.name),
+      items: subcategories.map(sub => `${sub.name} (${(sub as any).totalServices || 0})`),
     },
     {
       title: "Select Badge",
@@ -109,6 +109,23 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({ onFilterChange, selec
               type="button"
               className={`accordion-btn ${isOpen ? "active" : ""}`}
               onClick={() => toggleSection(index)}
+              style={{
+                fontFamily:
+                  section.title === "Categories" ||
+                  section.title === "Sub Categories" ||
+                  section.title === "Select Badge" ||
+                  section.title === "Price"
+                    ? "Montserrat, sans-serif"
+                    : "inherit",
+                fontWeight:
+                  section.title === "Categories" ||
+                  section.title === "Sub Categories" ||
+                  section.title === "Select Badge" ||
+                  section.title === "Price"
+                    ? 600
+                    : 400,
+                fontStyle: "normal",
+              }}
             >
               {section.title}
             </button>
@@ -165,10 +182,11 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({ onFilterChange, selec
               ) : (
                 <ul>
                   {section.items?.map((item, i) => {
+                    const itemBaseName = item.split(" (")[0];
                     const isSelected = section.title === "Categories" 
-                      ? selectedCategory?.name === item
+                      ? selectedCategory?.name === itemBaseName
                       : section.title === "Sub Categories"
-                      ? selectedSubCategory === item
+                      ? selectedSubCategory === itemBaseName
                       : section.title === "Select Badge"
                       ? selectedBadge === item
                       : false;
@@ -178,24 +196,24 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({ onFilterChange, selec
                       key={i}
                       onClick={() => {
                         if (section.title === "Categories") {
-                          const category = categories.find(cat => cat.name === item);
+                          const category = categories.find(cat => cat.name === itemBaseName);
                           if (category) {
                             setSelectedCategory(category);
                             setSelectedSubCategory(null);
                             setOpenIndex(1);
                             fetchSubcategories(category._id);
                             onCategorySelect?.(category._id);
-                            onFilterChange?.(item, "");
+                            onFilterChange?.(itemBaseName, "");
                           }
                         }
 
                         if (section.title === "Sub Categories") {
-                          const subcategory = subcategories.find(sub => sub.name === item);
-                          setSelectedSubCategory(item);
+                          const subcategory = subcategories.find(sub => sub.name === itemBaseName);
+                          setSelectedSubCategory(itemBaseName);
                           if (subcategory) {
                             onSubcategorySelect?.(subcategory._id);
                           }
-                          onFilterChange?.(selectedCategory?.name || "", item);
+                          onFilterChange?.(selectedCategory?.name || "", itemBaseName);
                         }
 
                         if (section.title === "Select Badge") {
@@ -212,6 +230,18 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({ onFilterChange, selec
                         backgroundColor: isSelected ? "#C7A040" : "transparent",
                         color: isSelected ? "white" : "inherit",
                         fontWeight: isSelected ? "bold" : "normal",
+                        fontFamily:
+                          section.title === "Categories" ||
+                          section.title === "Sub Categories" ||
+                          section.title === "Select Badge"
+                            ? "Montserrat, sans-serif"
+                            : "inherit",
+                        fontStyle: "normal",
+                        ...(section.title === "Categories" ||
+                        section.title === "Sub Categories" ||
+                        section.title === "Select Badge"
+                          ? { fontWeight: 600 }
+                          : {}),
                       }}
                     >
                       {item}

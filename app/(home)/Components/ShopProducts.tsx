@@ -289,7 +289,7 @@ export default function ShopProducts() {
   style={{
     fontFamily: 'Montserrat',
     fontWeight: 400,
-    fontStyle: 'normal', // Regular is 'normal' in CSS
+    fontStyle: 'normal',
     fontSize: '14px',
     lineHeight: '24px',
     letterSpacing: '0%',
@@ -396,12 +396,10 @@ export default function ShopProducts() {
 
 /* ---------- Featured Product Card ---------- */
 function FeaturedProductCard({ item }: { item: FeaturedProduct }) {
-  const href = `/product/${item._id}`;
-
   return (
-    <div className="bg-white p-4 border-2 border-[#D9D9D9] w-[300px] shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col h-[420px]">
+    <div className="bg-green p-3 border-2 border-[#D9D9D9] w-[300px] shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col h-[420px]">
       {/* Product Image - Fixed Height */}
-      <div className="relative h-48 overflow-hidden bg-gray-100 flex-shrink-0 mb-3">
+      <div className="relative h-60 overflow-hidden bg-gray-100 flex-shrink-0">
         <img
           src={item.coverImage}
           alt={item.title}
@@ -417,9 +415,9 @@ function FeaturedProductCard({ item }: { item: FeaturedProduct }) {
       </div>
 
       {/* Product Info - Flex grow to fill space */}
-      <div className="flex flex-col flex-grow">
+      <div className="p-5 flex flex-col flex-grow">
         {/* Title - Fixed height */}
-        <h3 className="text-lg font-bold text-gray-900 uppercase tracking-tight line-clamp-2 h-12 overflow-hidden font-poppins mb-2">
+        <h3 className="text-lg font-bold text-gray-900 uppercase tracking-tight line-clamp-1 h-9 overflow-hidden font-poppins">
           {item.title}
         </h3>
 
@@ -429,8 +427,8 @@ function FeaturedProductCard({ item }: { item: FeaturedProduct }) {
         </p>
 
         {/* Rating */}
-        <div className="flex-shrink-0 mb-3">
-          <div className="flex items-center">
+        <div className="flex-shrink-0">
+          <div className="flex items-center mb-1">
             <div className="flex">
               {[...Array(5)].map((_, i) => (
                 <Star
@@ -448,11 +446,11 @@ function FeaturedProductCard({ item }: { item: FeaturedProduct }) {
           </div>
         </div>
 
-        {/* Price - Fixed at bottom */}
-        <div className="mt-auto pt-4 border-t border-gray-200">
-          <div className="text-2xl font-bold text-green-600 text-center">
+        {/* Price - Fixed height */}
+        <div className="flex-shrink-0">
+          <span className="text-sm font-bold text-gray-900">
             ${item.price.toFixed(2)}
-          </div>
+          </span>
         </div>
       </div>
     </div>
@@ -505,3 +503,4 @@ function ErrorBlock({ error, onRetry }: { error: string; onRetry: () => void }) 
     </div>
   );
 }
+

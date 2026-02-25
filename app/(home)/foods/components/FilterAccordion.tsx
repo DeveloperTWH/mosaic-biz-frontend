@@ -111,6 +111,23 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({ onFilterChange, selec
               type="button"
               className={`accordion-btn ${isOpen ? "active" : ""}`}
               onClick={() => toggleSection(index)}
+              style={{
+                fontFamily:
+                  section.title === "Categories" ||
+                  section.title === "Sub Categories" ||
+                  section.title === "Select Badge" ||
+                  section.title === "Price"
+                    ? "Montserrat, sans-serif"
+                    : "inherit",
+                fontWeight:
+                  section.title === "Categories" ||
+                  section.title === "Sub Categories" ||
+                  section.title === "Select Badge" ||
+                  section.title === "Price"
+                    ? 600
+                    : 400,
+                fontStyle: "normal",
+              }}
             >
               {section.title}
             </button>
@@ -214,6 +231,18 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({ onFilterChange, selec
                         backgroundColor: isSelected ? "#C7A040" : "transparent",
                         color: isSelected ? "white" : "inherit",
                         fontWeight: isSelected ? "bold" : "normal",
+                        fontFamily:
+                          section.title === "Categories" ||
+                          section.title === "Sub Categories" ||
+                          section.title === "Select Badge"
+                            ? "Montserrat, sans-serif"
+                            : "inherit",
+                        fontStyle: "normal",
+                        ...(section.title === "Categories" ||
+                        section.title === "Sub Categories" ||
+                        section.title === "Select Badge"
+                          ? { fontWeight: 600 }
+                          : {}),
                       }}
                     >
                       {item}

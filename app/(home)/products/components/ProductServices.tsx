@@ -90,7 +90,7 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
       <div className="flex flex-col lg:flex-row gap-6">
 
         {/* Left Sidebar - Filters with Orange Background */}
-        <div className="lg:w-1/4">
+        <div className="w-full lg:w-[300px] lg:flex-none">
         
 
             
@@ -154,7 +154,7 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
         </div>
 
         {/* Right Content - Services Grid */}
-        <div className="lg:w-3/4">
+        <div className="w-full min-w-0 flex-1">
     
           {/* Products Count - Compact */}
           <div className="flex mb-4 flex-row justify-between">

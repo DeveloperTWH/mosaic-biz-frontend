@@ -188,7 +188,8 @@ body {
 
 
 .filter-panel {
-  width: 300px;
+  width: 100%;
+  max-width: 300px;
   height: auto;  /* Change to auto */
   background: #fff6df;
   border-radius: 6px;

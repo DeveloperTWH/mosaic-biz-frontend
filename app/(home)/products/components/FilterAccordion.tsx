@@ -119,6 +119,23 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({
               type="button"
               className={`accordion-btn ${isOpen ? "active" : ""}`}
               onClick={() => toggleSection(index)}
+              style={{
+                fontFamily:
+                  section.title === "Categories" ||
+                  section.title === "Sub Categories" ||
+                  section.title === "Select Badge" ||
+                  section.title === "Price"
+                    ? "Montserrat, sans-serif"
+                    : "inherit",
+                fontWeight:
+                  section.title === "Categories" ||
+                  section.title === "Sub Categories" ||
+                  section.title === "Select Badge" ||
+                  section.title === "Price"
+                    ? 600
+                    : 400,
+                fontStyle: "normal",
+              }}
             >
               {section.title}
             </button>
@@ -136,7 +153,7 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({
             >
               {section.type === "price" ? (
                 <div className="price-section">
-                  <Box sx={{ width: 260 }}>
+                  <Box sx={{ width: "100%" }}>
                     <Slider
                       value={value}
                       onChange={handleChange}
@@ -148,7 +165,7 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({
                     />
                   </Box>
 
-                  <div className="price-inputs justify-space">
+                  <div className="price-inputs justify-between">
                     <input
                       type="number"
                       value={priceRange[0]}
@@ -158,9 +175,8 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({
                         onPriceChange?.(newRange[0], newRange[1]);
                       }}
                     />
-                    <span className="ml-10">to</span>
+                    <span>to</span>
                     <input
-                      className="ml-10"
                       type="number"
                       value={priceRange[1]}
                       onChange={(e) => {
@@ -227,6 +243,18 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({
                           backgroundColor: isSelected ? "#C7A040" : "transparent",
                           color: isSelected ? "white" : "inherit",
                           fontWeight: isSelected ? "bold" : "normal",
+                          fontFamily:
+                            section.title === "Categories" ||
+                            section.title === "Sub Categories" ||
+                            section.title === "Select Badge"
+                              ? "Montserrat, sans-serif"
+                              : "inherit",
+                          fontStyle: "normal",
+                          ...(section.title === "Categories" ||
+                          section.title === "Sub Categories" ||
+                          section.title === "Select Badge"
+                            ? { fontWeight: 600 }
+                            : {}),
                           padding: "10px 16px",
                           listStyle: "none"
                         }}
