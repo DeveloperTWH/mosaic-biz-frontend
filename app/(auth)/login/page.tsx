@@ -84,7 +84,7 @@ function LoginContent() {
   };
 
    return (
-    <div className="min-h-screen grid grid-cols-1 md:grid-cols-2 font-sans">
+    <div className="min-h-screen grid grid-cols-1 md:grid-cols-2">
       <header className="w-full px-0 py-4 flex items-center justify-between bg-white md:bg-transparent absolute top-0 left-20 z-20">
         <span className="text-xl font-bold tracking-wide text-blue-900 md:text-white">
           <img
@@ -127,8 +127,8 @@ function LoginContent() {
 
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
-              <label className="block text-sm font-medium text-[#9E9E9E] mb-1">
-                Email
+              <label className="block text-base font-medium text-gray-700 mb-2 font-poppins">
+                Email <span className="text-red-500">*</span>
               </label>
 <input
   name="email"
@@ -137,12 +137,12 @@ function LoginContent() {
   value={email}
   onChange={(e) => setEmail(e.target.value)}
   placeholder="Enter your email"
-  className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-900"
+  className="w-full rounded-md border border-gray-300 px-6 py-2 font-medium font-poppins focus:outline-none focus:ring-2 focus:ring-blue-900"
 />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#9E9E9E] mb-1">
-                Password
+              <label className="block text-base font-medium text-gray-700 mb-2 font-poppins">
+                Password <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <input
@@ -152,7 +152,7 @@ function LoginContent() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-900"
+                  className="w-full rounded-md border border-gray-300 px-6 py-2 pr-10 font-medium font-poppins focus:outline-none focus:ring-2 focus:ring-blue-900"
                 />
                 <button
                   type="button"
@@ -247,8 +247,8 @@ function LoginContent() {
 
     <form className="space-y-4" onSubmit={handleSubmit}>
   <div>
-    <label className="block text-sm font-medium text-gray-700 mb-1">
-      Email
+    <label className="block text-sm font-medium font-poppins text-gray-700 mb-1">
+      Email <span className="text-red-500">*</span>
     </label>
     <input
       name="email"
@@ -261,8 +261,8 @@ function LoginContent() {
   </div>
 
   <div>
-    <label className="block text-sm font-medium text-gray-700 mb-1">
-      Password
+    <label className="block text-sm font-medium font-poppins text-gray-700 mb-1">
+      Password <span className="text-red-500">*</span>
     </label>
     <div className="relative">
       <input

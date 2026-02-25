@@ -235,7 +235,7 @@ if (isVendor == true)
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-base font-medium text-gray-700 mb-2">
+                  <label className="block text-base font-medium font-poppins text-gray-700 mb-2">
                     First Name <span className="text-red-500">*</span>
                   </label>
                   <input 
@@ -246,7 +246,7 @@ if (isVendor == true)
                   />
                 </div>
                 <div>
-                  <label className="block text-base font-medium text-gray-700 mb-2">
+                  <label className="block text-base font-medium font-poppins text-gray-700 mb-2">
                     Last Name <span className="text-red-500">*</span>
                   </label>
                   <input 
@@ -260,7 +260,7 @@ if (isVendor == true)
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-base font-medium text-gray-700 mb-2">
+                  <label className="block text-base font-medium font-poppins text-gray-700 mb-2">
                     Mobile Number <span className="text-red-500">*</span>
                   </label>
                   <input 
@@ -271,7 +271,7 @@ if (isVendor == true)
                   />
                 </div>
                 <div>
-                  <label className="block text-base font-medium text-gray-700 mb-2">
+                  <label className="block text-base font-medium font-poppins text-gray-700 mb-2">
                     Email Address <span className="text-red-500">*</span>
                   </label>
                   <input 
@@ -285,7 +285,7 @@ if (isVendor == true)
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-base font-medium text-gray-700 mb-2">
+                  <label className="block text-base font-medium font-poppins text-gray-700 mb-2">
                     Password <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
@@ -306,7 +306,7 @@ if (isVendor == true)
                 </div>
 
                 <div>
-                  <label className="block text-base font-medium text-gray-700 mb-2">
+                  <label className="block text-base font-medium font-poppins text-gray-700 mb-2">
                     Confirm Password <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
@@ -438,7 +438,7 @@ Lorem ipsum dolor sit amet consectetur adipisicing elitsed eiusmod tempor enim m
 
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
-                <label className="block text-sm font-medium text-[#9E9E9E] mb-1">
+                <label className="block text-sm font-medium font-poppins text-[#9E9E9E] mb-1">
                   Email
                 </label>
                 <input
@@ -450,7 +450,7 @@ Lorem ipsum dolor sit amet consectetur adipisicing elitsed eiusmod tempor enim m
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-[#9E9E9E] mb-1">
+                <label className="block text-sm font-medium font-poppins text-[#9E9E9E] mb-1">
                   Password
                 </label>
                 <div className="relative">
