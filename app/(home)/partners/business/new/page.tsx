@@ -134,7 +134,7 @@ const initialState: Stage1Form = {
     street: '',
     city: '',
     state: '',
-    country: '',
+    country: 'United States',
     zipCode: '',
   },
   
@@ -215,7 +215,7 @@ const mapDraftToStage1Form = (draft: any): Stage1Form => {
       street: draft?.address?.street || '',
       city: draft?.address?.city || '',
       state: draft?.address?.state || '',
-      country: draft?.address?.country || '',
+      country: draft?.address?.country || 'United States',
       zipCode: draft?.address?.zipCode || '',
     },
     minorityProofDocuments: mapDocs(draft?.minorityProofDocuments, 'minority-proof'),
