@@ -51,6 +51,11 @@ type Document = {
   _id: string;
 };
 
+type VerifiableAsset = {
+  url: string;
+  verified: boolean;
+};
+
 type VerificationChecklist = {
   minorityDocs: boolean;
   taxDocs: boolean;
@@ -60,13 +65,20 @@ type VerificationChecklist = {
   instagram: boolean;
   linkedin: boolean;
   tiktok: boolean;
+  businessProfileImage?: boolean;
+  businessBio?: boolean;
+  refundPolicyDocument?: boolean;
+  termsDocument?: boolean;
+  googleReviewLink?: boolean;
+  communityServiceLink?: boolean;
+  [key: string]: boolean | undefined;
 };
 
 type VendorApplication = {
   _id: string;
   applicationId: string;
   businessName: string;
-  status: "draft" | "submitted" | "under_review" | "approved" | "rejected";
+  status: "draft" | "submitted" | "under_review" | "approved" | "rejected" | "verified";
   totalVerificationPoints: number;
   isMinorityOwned: boolean;
   minorityCategories: string[];
@@ -90,6 +102,12 @@ type VendorApplication = {
   instagram: string;
   linkedin: string | null;
   tiktok: string | null;
+  businessBio?: string;
+  googleReviewLink?: string;
+  communityServiceLink?: string;
+  businessProfileImage?: VerifiableAsset | null;
+  refundPolicyDocument?: VerifiableAsset | null;
+  termsDocument?: VerifiableAsset | null;
   userId: {
     _id: string;
     name: string;
@@ -185,6 +203,60 @@ const verificationTypes = [
     label: "TikTok Account", 
     icon: Music,
     description: "Verify TikTok business account",
+    points: 5,
+    required: false
+  },
+  {
+    key: "business-profile-image",
+    checklistKey: "businessProfileImage",
+    label: "Business Profile Image",
+    icon: Building,
+    description: "Verify business profile image/logo",
+    points: 5,
+    required: false
+  },
+  {
+    key: "business-bio",
+    checklistKey: "businessBio",
+    label: "Business Bio",
+    icon: FileText,
+    description: "Verify business bio content",
+    points: 5,
+    required: false
+  },
+  {
+    key: "refund-policy-document",
+    checklistKey: "refundPolicyDocument",
+    label: "Refund Policy Document",
+    icon: FileCheck,
+    description: "Verify refund policy document",
+    points: 5,
+    required: false
+  },
+  {
+    key: "terms-document",
+    checklistKey: "termsDocument",
+    label: "Terms Document",
+    icon: FileCheck,
+    description: "Verify terms and conditions document",
+    points: 5,
+    required: false
+  },
+  {
+    key: "google-review-link",
+    checklistKey: "googleReviewLink",
+    label: "Google Review Link",
+    icon: ExternalLink,
+    description: "Verify Google review link",
+    points: 5,
+    required: false
+  },
+  {
+    key: "community-service-link",
+    checklistKey: "communityServiceLink",
+    label: "Community Service Link",
+    icon: ExternalLink,
+    description: "Verify community service link",
     points: 5,
     required: false
   },
@@ -341,26 +413,15 @@ export default function ApplicationDetailPage() {
     }
   };
 
-// Replace the existing canFinalize function with this:
-const canFinalize = () => {
-  // Admin can always finalize applications
-  return true;
-};
-
-// And in the verification progress card, always show the finalize button:
-{/* Finalize Button - Always show for admin */}
-<button
-  onClick={() => setShowFinalizeModal(true)}
-  className="w-full py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg font-semibold hover:from-green-600 hover:to-emerald-700 transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
->
-  <CheckCheck className="w-5 h-5" />
-  Finalize Application
-</button>
+  const canFinalize = () => {
+    return true;
+  };
 
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "approved": return "bg-green-100 text-green-800";
+      case "verified": return "bg-green-100 text-green-800";
       case "rejected": return "bg-red-100 text-red-800";
       case "submitted": return "bg-yellow-100 text-yellow-800";
       case "under_review": return "bg-blue-100 text-blue-800";
@@ -368,9 +429,68 @@ const canFinalize = () => {
     }
   };
 
-  const getChecklistStatus = (checklistKey: string) => {
-    if (!application?.verificationChecklist) return false;
-    return application.verificationChecklist[checklistKey as keyof VerificationChecklist];
+  const getChecklistStatus = (checklistKey?: string) => {
+    if (!application?.verificationChecklist || !checklistKey) return false;
+    return Boolean(application.verificationChecklist[checklistKey]);
+  };
+
+  const getFieldVerificationStatus = (field: "businessBio" | "googleReviewLink" | "communityServiceLink") => {
+    if (!application) return false;
+
+    const maybeApp = application as VendorApplication & Record<string, unknown>;
+    const directFlag = maybeApp[`${field}Verified`];
+    if (typeof directFlag === "boolean") {
+      return directFlag;
+    }
+
+    const checklistFlag = application.verificationChecklist?.[field];
+    if (typeof checklistFlag === "boolean") {
+      return checklistFlag;
+    }
+
+    return false;
+  };
+
+  const getVerificationStatus = (verificationType: string, checklistKey?: string) => {
+    if (!application) return false;
+
+    switch (verificationType) {
+      case "business-profile-image":
+        return Boolean(application.businessProfileImage?.verified) || getChecklistStatus(checklistKey);
+      case "refund-policy-document":
+        return Boolean(application.refundPolicyDocument?.verified) || getChecklistStatus(checklistKey);
+      case "terms-document":
+        return Boolean(application.termsDocument?.verified) || getChecklistStatus(checklistKey);
+      case "business-bio":
+        return getFieldVerificationStatus("businessBio");
+      case "google-review-link":
+        return getFieldVerificationStatus("googleReviewLink");
+      case "community-service-link":
+        return getFieldVerificationStatus("communityServiceLink");
+      default:
+        return getChecklistStatus(checklistKey);
+    }
+  };
+
+  const hasVerificationSource = (verificationType: string) => {
+    if (!application) return false;
+
+    switch (verificationType) {
+      case "business-profile-image":
+        return Boolean(application.businessProfileImage?.url);
+      case "business-bio":
+        return Boolean(application.businessBio?.trim());
+      case "refund-policy-document":
+        return Boolean(application.refundPolicyDocument?.url);
+      case "terms-document":
+        return Boolean(application.termsDocument?.url);
+      case "google-review-link":
+        return Boolean(application.googleReviewLink?.trim());
+      case "community-service-link":
+        return Boolean(application.communityServiceLink?.trim());
+      default:
+        return true;
+    }
   };
 
   const openDocument = (type: string, doc: Document, index: number) => {
@@ -388,22 +508,30 @@ const canFinalize = () => {
   };
 
   const getVerificationProgress = () => {
-    if (!application) return { required: 0, optional: 0, totalRequired: 3, totalOptional: 5 };
-    
-    const checklist = application.verificationChecklist;
-    const requiredVerified = ['minorityDocs', 'taxDocs', 'businessLicense'].filter(
-      key => checklist[key as keyof VerificationChecklist]
+    const requiredTypes = verificationTypes.filter((item) => item.required);
+    const optionalTypes = verificationTypes.filter((item) => !item.required);
+
+    if (!application) {
+      return {
+        required: 0,
+        optional: 0,
+        totalRequired: requiredTypes.length,
+        totalOptional: optionalTypes.length
+      };
+    }
+
+    const requiredVerified = requiredTypes.filter((item) =>
+      getVerificationStatus(item.key, item.checklistKey)
     ).length;
-    
-    const optionalVerified = ['website', 'facebook', 'instagram', 'linkedin', 'tiktok'].filter(
-      key => checklist[key as keyof VerificationChecklist]
+    const optionalVerified = optionalTypes.filter((item) =>
+      getVerificationStatus(item.key, item.checklistKey)
     ).length;
-    
+
     return {
       required: requiredVerified,
       optional: optionalVerified,
-      totalRequired: 0,
-      totalOptional: 8
+      totalRequired: requiredTypes.length,
+      totalOptional: optionalTypes.length
     };
   };
 
@@ -686,6 +814,143 @@ const canFinalize = () => {
                   </div>
                 </div>
               )}
+
+              {(application.businessBio ||
+                application.businessProfileImage?.url ||
+                application.refundPolicyDocument?.url ||
+                application.termsDocument?.url ||
+                application.googleReviewLink ||
+                application.communityServiceLink) && (
+                <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-100 p-6">
+                  <h2 className="text-lg font-semibold mb-6 pb-3 border-b flex items-center gap-2">
+                    <Briefcase className="w-5 h-5" />
+                    Business Profile Details
+                  </h2>
+
+                  <div className="space-y-6">
+                    {application.businessBio && (
+                      <div>
+                        <p className="text-sm text-gray-500 mb-2">Business Bio</p>
+                        <p className="text-sm text-gray-800 leading-6 bg-gray-50 border rounded-lg p-4">
+                          {application.businessBio}
+                        </p>
+                      </div>
+                    )}
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {application.businessProfileImage?.url && (
+                        <div className="border rounded-lg p-4 space-y-3">
+                          <div className="flex items-center justify-between">
+                            <p className="font-medium">Business Profile Image</p>
+                            <span className={`px-2 py-1 rounded text-xs font-medium ${
+                              application.businessProfileImage.verified
+                                ? "bg-green-100 text-green-700"
+                                : "bg-yellow-100 text-yellow-700"
+                            }`}>
+                              {application.businessProfileImage.verified ? "Verified" : "Pending"}
+                            </span>
+                          </div>
+                          <img
+                            src={application.businessProfileImage.url}
+                            alt="Business profile"
+                            className="w-full h-32 object-contain bg-gray-50 border rounded-lg"
+                          />
+                          <a
+                            href={application.businessProfileImage.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700"
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                            Open image
+                          </a>
+                        </div>
+                      )}
+
+                      {application.refundPolicyDocument?.url && (
+                        <div className="border rounded-lg p-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <p className="font-medium">Refund Policy Document</p>
+                            <span className={`px-2 py-1 rounded text-xs font-medium ${
+                              application.refundPolicyDocument.verified
+                                ? "bg-green-100 text-green-700"
+                                : "bg-yellow-100 text-yellow-700"
+                            }`}>
+                              {application.refundPolicyDocument.verified ? "Verified" : "Pending"}
+                            </span>
+                          </div>
+                          <a
+                            href={application.refundPolicyDocument.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700"
+                          >
+                            <FileText className="w-4 h-4" />
+                            Open refund policy
+                          </a>
+                        </div>
+                      )}
+
+                      {application.termsDocument?.url && (
+                        <div className="border rounded-lg p-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <p className="font-medium">Terms Document</p>
+                            <span className={`px-2 py-1 rounded text-xs font-medium ${
+                              application.termsDocument.verified
+                                ? "bg-green-100 text-green-700"
+                                : "bg-yellow-100 text-yellow-700"
+                            }`}>
+                              {application.termsDocument.verified ? "Verified" : "Pending"}
+                            </span>
+                          </div>
+                          <a
+                            href={application.termsDocument.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700"
+                          >
+                            <FileText className="w-4 h-4" />
+                            Open terms document
+                          </a>
+                        </div>
+                      )}
+                    </div>
+
+                    {(application.googleReviewLink || application.communityServiceLink) && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {application.googleReviewLink && (
+                          <a
+                            href={application.googleReviewLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50 transition-colors"
+                          >
+                            <ExternalLink className="w-4 h-4 text-blue-600" />
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium">Google Review Link</p>
+                              <p className="text-xs text-gray-500 truncate">{application.googleReviewLink}</p>
+                            </div>
+                          </a>
+                        )}
+                        {application.communityServiceLink && (
+                          <a
+                            href={application.communityServiceLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50 transition-colors"
+                          >
+                            <ExternalLink className="w-4 h-4 text-blue-600" />
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium">Community Service Link</p>
+                              <p className="text-xs text-gray-500 truncate">{application.communityServiceLink}</p>
+                            </div>
+                          </a>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Right Column - Verification & Actions */}
@@ -710,7 +975,7 @@ const canFinalize = () => {
                       <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                         <div 
                           className="h-full bg-green-500 transition-all duration-300"
-                          style={{ width: `${(progress.required / progress.totalRequired) * 100}%` }}
+                          style={{ width: progress.totalRequired ? `${(progress.required / progress.totalRequired) * 100}%` : "0%" }}
                         />
                       </div>
                       {progress.required === progress.totalRequired ? (
@@ -735,7 +1000,7 @@ const canFinalize = () => {
                       <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                         <div 
                           className="h-full bg-blue-500 transition-all duration-300"
-                          style={{ width: `${(progress.optional / progress.totalOptional) * 100}%` }}
+                          style={{ width: progress.totalOptional ? `${(progress.optional / progress.totalOptional) * 100}%` : "0%" }}
                         />
                       </div>
                     </div>
@@ -779,8 +1044,9 @@ const canFinalize = () => {
                 
                 <div className="space-y-4">
                   {verificationTypes.map(({ key, checklistKey, label, icon: Icon, description, points, required }) => {
-                    const isVerified = getChecklistStatus(checklistKey);
+                    const isVerified = getVerificationStatus(key, checklistKey);
                     const isLoading = verifying[key];
+                    const hasSourceData = hasVerificationSource(key);
                     
                     return (
                       <div 
@@ -809,15 +1075,20 @@ const canFinalize = () => {
                                 <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">+{points} pts</span>
                               </div>
                               <p className="text-xs text-gray-500">{description}</p>
+                              {!hasSourceData && !isVerified && (
+                                <p className="text-xs text-amber-600 mt-1">No value provided by vendor yet</p>
+                              )}
                             </div>
                           </div>
                           <div className="flex flex-col items-end gap-2">
                             <span className={`px-2 py-1 rounded text-xs font-medium ${
                               isVerified 
                                 ? "bg-green-100 text-green-700 border border-green-200" 
-                                : "bg-yellow-100 text-yellow-700 border border-yellow-200"
+                                : hasSourceData
+                                  ? "bg-yellow-100 text-yellow-700 border border-yellow-200"
+                                  : "bg-gray-100 text-gray-600 border border-gray-200"
                             }`}>
-                              {isVerified ? "✓ Verified" : "Pending"}
+                              {isVerified ? "Verified" : hasSourceData ? "Pending" : "Not Provided"}
                             </span>
                           </div>
                         </div>
@@ -825,11 +1096,13 @@ const canFinalize = () => {
                         <div className="flex gap-2">
                           <button
                             onClick={() => handleVerifyCategory(key, true)}
-                            disabled={isLoading || isVerified}
+                            disabled={isLoading || isVerified || (!hasSourceData && !isVerified)}
                             className={`flex-1 py-2 rounded-lg flex items-center justify-center gap-2 text-sm font-medium transition-all ${
                               isVerified 
                                 ? "bg-green-100 text-green-700 cursor-default" 
-                                : "bg-green-500 text-white hover:bg-green-600"
+                                : hasSourceData
+                                  ? "bg-green-500 text-white hover:bg-green-600"
+                                  : "bg-gray-100 text-gray-400 cursor-not-allowed"
                             } disabled:opacity-50`}
                           >
                             {isLoading ? (
@@ -837,7 +1110,7 @@ const canFinalize = () => {
                             ) : (
                               <Check className="w-4 h-4" />
                             )}
-                            {isVerified ? "Verified" : "Verify"}
+                            {isVerified ? "Verified" : hasSourceData ? "Verify" : "No Data"}
                           </button>
                           <button
                             onClick={() => handleVerifyCategory(key, false)}
@@ -879,7 +1152,7 @@ const canFinalize = () => {
                             ? "bg-green-100 text-green-700" 
                             : "bg-yellow-100 text-yellow-700"
                         }`}>
-                          {application.verificationChecklist.minorityDocs ? "✓ Verified" : "Pending"}
+                          {application.verificationChecklist.minorityDocs ? "Verified" : "Pending"}
                         </span>
                       </div>
                       <div className="space-y-2">
@@ -900,7 +1173,7 @@ const canFinalize = () => {
                               <span className={`text-xs px-2 py-1 rounded flex-shrink-0 ${
                                 doc.verified ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
                               }`}>
-                                {doc.verified ? "✓ Verified" : "Pending"}
+                                {doc.verified ? "Verified" : "Pending"}
                               </span>
                             </div>
                             <div className="flex items-center gap-2">
@@ -947,7 +1220,7 @@ const canFinalize = () => {
                             ? "bg-green-100 text-green-700" 
                             : "bg-yellow-100 text-yellow-700"
                         }`}>
-                          {application.verificationChecklist.taxDocs ? "✓ Verified" : "Pending"}
+                          {application.verificationChecklist.taxDocs ? "Verified" : "Pending"}
                         </span>
                       </div>
                       <div className="space-y-2">
@@ -968,7 +1241,7 @@ const canFinalize = () => {
                               <span className={`text-xs px-2 py-1 rounded flex-shrink-0 ${
                                 doc.verified ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
                               }`}>
-                                {doc.verified ? "✓ Verified" : "Pending"}
+                                {doc.verified ? "Verified" : "Pending"}
                               </span>
                             </div>
                             <div className="flex items-center gap-2">
@@ -1015,7 +1288,7 @@ const canFinalize = () => {
                             ? "bg-green-100 text-green-700" 
                             : "bg-yellow-100 text-yellow-700"
                         }`}>
-                          {application.verificationChecklist.businessLicense ? "✓ Verified" : "Pending"}
+                          {application.verificationChecklist.businessLicense ? "Verified" : "Pending"}
                         </span>
                       </div>
                       <div className="space-y-2">
@@ -1036,7 +1309,7 @@ const canFinalize = () => {
                               <span className={`text-xs px-2 py-1 rounded flex-shrink-0 ${
                                 doc.verified ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
                               }`}>
-                                {doc.verified ? "✓ Verified" : "Pending"}
+                                {doc.verified ? "Verified" : "Pending"}
                               </span>
                             </div>
                             <div className="flex items-center gap-2">
@@ -1152,7 +1425,7 @@ const canFinalize = () => {
                     ? "bg-green-100 text-green-700" 
                     : "bg-yellow-100 text-yellow-700"
                 }`}>
-                  {selectedDocument.doc.verified ? "✓ Verified" : "Pending"}
+                  {selectedDocument.doc.verified ? "Verified" : "Pending"}
                 </span>
                 
                 {!selectedDocument.doc.verified && (

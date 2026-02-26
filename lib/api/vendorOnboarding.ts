@@ -4,10 +4,26 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 /**
  * Shared JSON headers
- * (Auth handled via cookies, not headers)
+ * (Auth handled via cookies, plus optional bearer token when available)
  */
 const jsonHeaders = {
   "Content-Type": "application/json",
+};
+
+const buildJsonHeaders = () => {
+  if (typeof window === "undefined") {
+    return jsonHeaders;
+  }
+
+  const token = localStorage.getItem("auth_token") || localStorage.getItem("token");
+  if (!token) {
+    return jsonHeaders;
+  }
+
+  return {
+    ...jsonHeaders,
+    Authorization: `Bearer ${token}`,
+  };
 };
 
 /**
@@ -16,8 +32,8 @@ const jsonHeaders = {
 export async function saveStage1Draft(payload: any) {
   const res = await fetch(`${BASE_URL}/api/vendor-onboarding/draft`, {
     method: "POST",
-    headers: jsonHeaders,
-    credentials: "include", // ✅ REQUIRED for cookies
+    headers: buildJsonHeaders(),
+    credentials: "include",
     body: JSON.stringify(payload),
   });
 
@@ -35,8 +51,8 @@ export async function saveStage1Draft(payload: any) {
 export async function getStage1Draft() {
   const res = await fetch(`${BASE_URL}/api/vendor-onboarding/draft`, {
     method: "GET",
-    headers: jsonHeaders,
-    credentials: "include", // ✅ REQUIRED
+    headers: buildJsonHeaders(),
+    credentials: "include",
   });
 
   const data = await res.json();
@@ -53,10 +69,10 @@ export async function getStage1Draft() {
 export async function createStage1Payment() {
   const res = await fetch(`${BASE_URL}/api/vendor-onboarding/stage1/create-payment`, {
     method: "POST",
-    headers: jsonHeaders,
-    credentials: "include", // ✅ REQUIRED
+    headers: buildJsonHeaders(),
+    credentials: "include",
   });
- 
+
   const data = await res.json();
   if (!res.ok) {
     throw new Error(data.message || "Payment creation failed");
@@ -65,15 +81,14 @@ export async function createStage1Payment() {
   return data; // Return full response instead of data.data
 }
 
-
 /**
  * Submit Stage-1 onboarding for admin review
  */
 export async function submitStage1() {
   const res = await fetch(`${BASE_URL}/api/vendor-onboarding/submit`, {
     method: "POST",
-    headers: jsonHeaders,
-    credentials: "include", // ✅ REQUIRED
+    headers: buildJsonHeaders(),
+    credentials: "include",
   });
 
   const data = await res.json();
@@ -91,7 +106,7 @@ export async function submitStage1() {
 export async function getOnboardingData() {
   const res = await fetch(`${BASE_URL}/api/vendor-onboarding/onboarding-data`, {
     method: "GET",
-    headers: jsonHeaders,
+    headers: buildJsonHeaders(),
     credentials: "include",
   });
 
@@ -133,7 +148,7 @@ export async function updateBusinessProfile(payload: {
 }) {
   const res = await fetch(`${BASE_URL}/api/vendor-onboarding/business-profile`, {
     method: "PUT",
-    headers: jsonHeaders,
+    headers: buildJsonHeaders(),
     credentials: "include",
     body: JSON.stringify(payload),
   });

@@ -3,9 +3,12 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation'; // Add this
+import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
 
 import {
   saveStage1Draft,
+  getStage1Draft,
   createStage1Payment,
   submitStage1
 } from '@/lib/api/vendorOnboarding';
@@ -146,6 +149,92 @@ const initialState: Stage1Form = {
   declarationAccepted: false,
 };
 
+const minorityOnlyMessage =
+  'At this time, we are prioritizing the onboarding of Minority-Owned Businesses. We appreciate your interest and will certainly get in touch if our requirements change and we open applications to a broader range of partners.';
+
+const mapDraftToStage1Form = (draft: any): Stage1Form => {
+  const mapDocs = (docs: any[] = [], fallbackType: string): Document[] =>
+    docs
+      .map((doc) => ({
+        type: doc?.type || fallbackType,
+        url: doc?.url || '',
+        verified: Boolean(doc?.verified),
+      }))
+      .filter((doc) => Boolean(doc.url));
+
+  const paymentStatusRaw = draft?.verificationPayment?.status;
+  const paymentStatus: VerificationPayment['status'] =
+    paymentStatusRaw === 'paid' || paymentStatusRaw === 'completed'
+      ? 'completed'
+      : paymentStatusRaw === 'failed'
+      ? 'failed'
+      : 'pending';
+
+  return {
+    businessName: draft?.businessName || '',
+    isMinorityOwned:
+      typeof draft?.isMinorityOwned === 'boolean'
+        ? draft.isMinorityOwned
+        : initialState.isMinorityOwned,
+    minorityCategories: Array.isArray(draft?.minorityCategories) ? draft.minorityCategories : [],
+    otherMinorityCategory: draft?.otherMinorityCategory || '',
+    hasEIN: typeof draft?.hasEIN === 'boolean' ? draft.hasEIN : initialState.hasEIN,
+    einNumber: draft?.einNumber || '',
+    ssnLast9: draft?.ssnLast9 || '',
+    hasBusinessLicense:
+      typeof draft?.hasBusinessLicense === 'boolean'
+        ? draft.hasBusinessLicense
+        : initialState.hasBusinessLicense,
+    businessOwnershipType: (draft?.ownershipType || '') as OwnershipType,
+    yearsInBusiness: draft?.yearsInBusiness || '',
+    isFranchise: typeof draft?.isFranchise === 'boolean' ? draft.isFranchise : initialState.isFranchise,
+    franchiseName: draft?.franchiseName || '',
+    businessType: (draft?.businessType || '') as BusinessType,
+    hasThirdPartyBooking:
+      typeof draft?.usesThirdPartyBooking === 'boolean'
+        ? draft.usesThirdPartyBooking
+        : initialState.hasThirdPartyBooking,
+    hasPhysicalLocation:
+      typeof draft?.hasPhysicalLocation === 'boolean'
+        ? draft.hasPhysicalLocation
+        : initialState.hasPhysicalLocation,
+    numberOfEmployees: draft?.employeesCount || '',
+    websiteUrl: draft?.website || '',
+    facebookUrl: draft?.facebook || '',
+    instagramUrl: draft?.instagram || '',
+    linkedinUrl: draft?.linkedin || '',
+    tiktokUrl: draft?.tiktok || '',
+    primaryContactName: draft?.primaryContactName || '',
+    primaryContactDesignation: draft?.primaryContactDesignation || '',
+    contactEmail:
+      draft?.primaryEmail || draft?.secondaryBusinessEmail || draft?.businessEmail || '',
+    businessEmail: draft?.businessEmail || draft?.secondaryBusinessEmail || '',
+    contactPhone:
+      draft?.primaryPhone || draft?.businessPhone || draft?.alternatePhone || '',
+    address: {
+      street: draft?.address?.street || '',
+      city: draft?.address?.city || '',
+      state: draft?.address?.state || '',
+      country: draft?.address?.country || '',
+      zipCode: draft?.address?.zipCode || '',
+    },
+    minorityProofDocuments: mapDocs(draft?.minorityProofDocuments, 'minority-proof'),
+    taxDocuments: mapDocs(draft?.taxDocuments, 'tax-doc'),
+    businessLicenseDocuments: mapDocs(draft?.businessLicenseDocuments, 'business-license'),
+    verificationPayment: {
+      status: paymentStatus,
+    },
+    acceptedTerms:
+      typeof draft?.acceptedTerms === 'boolean'
+        ? draft.acceptedTerms
+        : initialState.acceptedTerms,
+    declarationAccepted:
+      typeof draft?.declarationAccepted === 'boolean'
+        ? draft.declarationAccepted
+        : initialState.declarationAccepted,
+  };
+};
+
 /* ======================================================
    HELPER FUNCTIONS FOR FILE UPLOAD
 ====================================================== */
@@ -240,6 +329,23 @@ export default function VendorOnboardingStage1Page() {
   const [selectedFiles, setSelectedFiles] = useState<Record<string, File | null>>({});
 
   const router = useRouter(); // Initialize router
+
+  useEffect(() => {
+    const loadDraft = async () => {
+      try {
+        const draft = await getStage1Draft();
+        if (draft) {
+          setForm(mapDraftToStage1Form(draft));
+        }
+      } catch (error: any) {
+        if (error?.message && !/failed to load draft/i.test(error.message)) {
+          console.error('Error loading draft:', error);
+        }
+      }
+    };
+
+    loadDraft();
+  }, []);
 
   /* ======================================================
      FILE UPLOAD FUNCTIONS
@@ -352,6 +458,12 @@ export default function VendorOnboardingStage1Page() {
   const validateForm = (): boolean => {
     const errors: Record<string, string> = {};
 
+    if (!form.isMinorityOwned) {
+      errors.isMinorityOwned = minorityOnlyMessage;
+      setFormErrors(errors);
+      return false;
+    }
+
     // Basic Business Info
     if (!form.businessName.trim()) errors.businessName = 'Business name is required';
 
@@ -400,6 +512,11 @@ export default function VendorOnboardingStage1Page() {
   };
 
   const saveDraft = async () => {
+    if (!form.isMinorityOwned) {
+      toast.error(minorityOnlyMessage);
+      return;
+    }
+
     try {
       setLoading(true);
       await saveStage1Draft(form);
@@ -412,6 +529,11 @@ export default function VendorOnboardingStage1Page() {
   };
 
 const handlePayAndSubmit = async () => {
+  if (!form.isMinorityOwned) {
+    toast.error(minorityOnlyMessage);
+    return;
+  }
+
   if (!validateForm()) {
     toast.error('Please fix all errors before proceeding to payment');
     return;
@@ -468,6 +590,15 @@ const handlePayAndSubmit = async () => {
       }}
     >
       <div className="max-w-4xl mx-auto px-4">
+        <div className="pt-4">
+          <Link
+            href="/partners"
+            className="inline-flex items-center gap-2 rounded-lg bg-white/95 px-3 py-2 text-sm font-medium text-[#1e3a5f] shadow-sm transition hover:bg-white"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Partners
+          </Link>
+        </div>
         {/* Header */}
         <div className="mb-8 text-center pt-8">
           <span className="inline-block px-6 py-2 bg-[#c9a227] text-white text-sm font-medium rounded-full mb-4">
@@ -521,6 +652,14 @@ const handlePayAndSubmit = async () => {
                   <span className="ml-2 text-gray-700">No</span>
                 </label>
               </div>
+              {!form.isMinorityOwned && (
+                <div className="mt-4 p-4 rounded-lg border border-amber-200 bg-amber-50">
+                  <p className="text-sm text-amber-800">{minorityOnlyMessage}</p>
+                </div>
+              )}
+              {formErrors.isMinorityOwned && (
+                <p className="mt-2 text-sm text-red-600">{formErrors.isMinorityOwned}</p>
+              )}
             </div>
 
             {form.isMinorityOwned && (
@@ -641,6 +780,8 @@ const handlePayAndSubmit = async () => {
             )}
           </div>
 
+          {form.isMinorityOwned && (
+            <>
           <hr className="border-gray-200 my-8" />
 
           {/* Legal & Tax Section */}
@@ -973,6 +1114,9 @@ const handlePayAndSubmit = async () => {
             </div>
           </div>
 
+            </>
+          )}
+
           {/* Action Buttons */}
           <div className="flex flex-col md:flex-row justify-center items-center gap-4 mt-12">
             <button
@@ -982,13 +1126,21 @@ const handlePayAndSubmit = async () => {
             >
               Clear Response
             </button>
-            
+
+            <button
+              onClick={saveDraft}
+              className="w-full md:w-auto px-8 py-3 bg-[#1e3a5f] text-white rounded-lg hover:bg-[#162b46] transition-colors font-medium min-w-[160px]"
+              disabled={loading || !form.isMinorityOwned}
+            >
+              {loading ? 'Saving...' : form.isMinorityOwned ? 'Save Draft' : 'Save Disabled'}
+            </button>
+             
             <button
               onClick={handlePayAndSubmit}
               className="w-full md:w-auto px-8 py-3 bg-[#c9a227] text-white rounded-lg hover:bg-[#b8921f] transition-colors font-medium min-w-[160px]"
-              disabled={loading}
+              disabled={loading || !form.isMinorityOwned}
             >
-              {loading ? 'Processing...' : 'Proceed To Payment'}
+              {loading ? 'Processing...' : form.isMinorityOwned ? 'Proceed To Payment' : 'Proceeding Stopped'}
             </button>
           </div>
         </div>

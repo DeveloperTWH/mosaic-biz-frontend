@@ -88,7 +88,7 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({ onFilterChange, selec
     },
     {
       title: "Select Badge",
-      items: ["Gold", "Silver", "Bronze"],
+      items: ["Silver", "Gold", "Platinum", "Diamond"],
     },
     {
       title: "Price",
