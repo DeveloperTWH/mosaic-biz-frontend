@@ -181,25 +181,47 @@ export const useProductForm = () => {
   };
 
   // Generate variants from attributes
-  const generateVariants = () => {
-    if (formData.attributes.length < 1) {
-      toast.error('Need at least 1 attributes (e.g., Size or Color) to generate variants');
+const generateVariants = () => {
+  if (formData.attributes.length < 1) {
+    toast.error('Need at least 1 attribute (e.g., Size or Color) to generate variants');
+    return;
+  }
+
+  for (const attr of formData.attributes) {
+    if (attr.attributeValues.length === 0) {
+      toast.error(`Add values for "${attr.attributeName || 'attribute'}" before generating variants`);
       return;
     }
+  }
 
-    for (const attr of formData.attributes) {
-      if (attr.attributeValues.length === 0) {
-        toast.error(`Add values for "${attr.attributeName || 'attribute'}" before generating variants`);
-        return;
-      }
+  const attr1 = formData.attributes[0];
+  const attr2 = formData.attributes[1]; // may be undefined
+
+  const newVariants: Variant[] = [];
+  let variantIndex = 0;
+
+  // ✅ If only ONE attribute
+  if (!attr2) {
+    for (const val1 of attr1.attributeValues) {
+      newVariants.push({
+        sku: generateSKU(val1, '', variantIndex),
+        attribute1Name: attr1.attributeName,
+        attribute1Value: val1,
+        attribute2Name: '',
+        attribute2Value: '',
+        price: 0.0,
+        stock: 0,
+        availability: 0,
+        standardShipping: 0,
+        overnightShipping: 0,
+        localShipping: 0,
+        images: []
+      });
+      variantIndex++;
     }
-
-    const attr1 = formData.attributes[0];
-    const attr2 = formData.attributes[1];
-
-    const newVariants: Variant[] = [];
-    let variantIndex = 0;
-
+  } 
+  // ✅ If TWO attributes
+  else {
     for (const val1 of attr1.attributeValues) {
       for (const val2 of attr2.attributeValues) {
         newVariants.push({
@@ -208,21 +230,65 @@ export const useProductForm = () => {
           attribute1Value: val1,
           attribute2Name: attr2.attributeName,
           attribute2Value: val2,
-          price: 129.00,
-          stock: 24,
-          availability: 24,
+          price: 0.0,
+          stock: 0,
+          availability: 0,
           standardShipping: 0,
           overnightShipping: 0,
           localShipping: 0,
-          images: [] // Initialize empty images array
+          images: []
         });
         variantIndex++;
       }
     }
+  }
 
-    setFormData(prev => ({ ...prev, variants: newVariants, hasVariants: true }));
-    toast.success(`Generated ${newVariants.length} variants`);
-  };
+  setFormData(prev => ({ ...prev, variants: newVariants, hasVariants: true }));
+  toast.success(`Generated ${newVariants.length} variants`);
+};
+
+  // const generateVariants = () => {
+  //   if (formData.attributes.length < 1) {
+  //     toast.error('Need at least 1 attributes (e.g., Size or Color) to generate variants');
+  //     return;
+  //   }
+
+  //   for (const attr of formData.attributes) {
+  //     if (attr.attributeValues.length === 0) {
+  //       toast.error(`Add values for "${attr.attributeName || 'attribute'}" before generating variants`);
+  //       return;
+  //     }
+  //   }
+
+  //   const attr1 = formData.attributes[0];
+  //   const attr2 = formData.attributes[1];
+
+  //   const newVariants: Variant[] = [];
+  //   let variantIndex = 0;
+
+  //   for (const val1 of attr1.attributeValues) {
+  //     for (const val2 of attr2.attributeValues) {
+  //       newVariants.push({
+  //         sku: generateSKU(val1, val2, variantIndex),
+  //         attribute1Name: attr1.attributeName,
+  //         attribute1Value: val1,
+  //         attribute2Name: attr2.attributeName,
+  //         attribute2Value: val2,
+  //         price: 129.00,
+  //         stock: 24,
+  //         availability: 24,
+  //         standardShipping: 0,
+  //         overnightShipping: 0,
+  //         localShipping: 0,
+  //         images: [] // Initialize empty images array
+  //       });
+  //       variantIndex++;
+  //     }
+  //   }
+
+  //   setFormData(prev => ({ ...prev, variants: newVariants, hasVariants: true }));
+  //   toast.success(`Generated ${newVariants.length} variants`);
+  // };
 
   // Update variant
   const updateVariant = (index: number, field: keyof Variant, value: any) => {
@@ -249,13 +315,38 @@ export const useProductForm = () => {
   };
 
   // Toggle hasVariants
-  const toggleHasVariants = (value: boolean) => {
-    setFormData(prev => ({
-      ...prev,
-      hasVariants: value,
-      variants: value ? prev.variants : []
-    }));
-  };
+const toggleHasVariants = (value: boolean) => {
+  setFormData(prev => ({
+    ...prev,
+    hasVariants: value,
+    variants: value
+      ? prev.variants
+      : [
+          {
+            sku: '',
+            attribute1Name: '',
+            attribute1Value: '',
+            attribute2Name: '',
+            attribute2Value: '',
+            price: 0,
+            stock: 0,
+            availability: 0,
+            standardShipping: 0,
+            overnightShipping: 0,
+            localShipping: 0,
+            images: [],
+          },
+        ],
+  }));
+};
+
+  // const toggleHasVariants = (value: boolean) => {
+  //   setFormData(prev => ({
+  //     ...prev,
+  //     hasVariants: value,
+  //     variants: value ? prev.variants : []
+  //   }));
+  // };
 
   // Meta fields
   const addMetaField = () => {

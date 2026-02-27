@@ -356,10 +356,10 @@ const Page: React.FC = () => {
           </div>
 
           {onboardingStatus.data.currentStage >= 4 ? (
-            <Link href="/partners/add-product">
+            <Link href="/partners/products">
               <button className="w-full md:w-auto px-5 py-2.5 bg-blue-900 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2">
                 <Package className="w-4 h-4" />
-                Add Product
+                Manage Products
                 <ArrowRight className="w-4 h-4" />
               </button>
             </Link>

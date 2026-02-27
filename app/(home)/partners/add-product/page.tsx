@@ -101,15 +101,15 @@ export default function AddProductPage() {
               />
 
               {/* Variants Table */}
-              {formData.hasVariants && variants.length > 0 && (
-                <VariantsTable
-                  variants={variants}
-                  onUpdate={updateVariant}
-                  onUpdateAllShipping={updateAllShipping}
-                  onRemove={removeVariant}
-                  onImageUpload={handleVariantImageUpload}
-                />
-              )}
+{variants.length > 0 && (
+  <VariantsTable
+    variants={variants}
+    onUpdate={updateVariant}
+    onUpdateAllShipping={updateAllShipping}
+    onRemove={removeVariant}
+    onImageUpload={handleVariantImageUpload}
+  />
+)}
             </div>
 
             {/* Right Column - Images */}

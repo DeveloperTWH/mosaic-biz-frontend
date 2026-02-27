@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation'; // Add this
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
+import TermsModal from "../../final-review/components/TermsModal";
 
 import {
   saveStage1Draft,
@@ -327,6 +328,17 @@ export default function VendorOnboardingStage1Page() {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [uploading, setUploading] = useState<Record<string, boolean>>({});
   const [selectedFiles, setSelectedFiles] = useState<Record<string, File | null>>({});
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalType, setModalType] = useState<"terms" | "privacy" | "directory">("terms");
+
+  const openModal = (type: "terms" | "privacy" | "directory") => {
+    setModalType(type);
+    setModalOpen(true);
+  };
+
+    const closeModal = () => {
+    setModalOpen(false);
+  };
 
   const router = useRouter(); // Initialize router
 
@@ -511,22 +523,28 @@ export default function VendorOnboardingStage1Page() {
     return Object.keys(errors).length === 0;
   };
 
-  const saveDraft = async () => {
-    if (!form.isMinorityOwned) {
-      toast.error(minorityOnlyMessage);
-      return;
-    }
+const saveDraft = async () => {
+  if (!form.isMinorityOwned) {
+    toast.error(minorityOnlyMessage);
+    return;
+  }
 
-    try {
-      setLoading(true);
-      await saveStage1Draft(form);
-      toast.success('Draft saved successfully');
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to save draft');
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Add the same validation as handlePayAndSubmit
+  if (!validateForm()) {
+    toast.error('Please fix all errors before saving draft');
+    return;
+  }
+
+  try {
+    setLoading(true);
+    await saveStage1Draft(form);
+    toast.success('Draft saved successfully');
+  } catch (error: any) {
+    toast.error(error.message || 'Failed to save draft');
+  } finally {
+    setLoading(false);
+  }
+};
 
 const handlePayAndSubmit = async () => {
   if (!form.isMinorityOwned) {
@@ -653,9 +671,15 @@ const handlePayAndSubmit = async () => {
                 </label>
               </div>
               {!form.isMinorityOwned && (
-                <div className="mt-4 p-4 rounded-lg border border-amber-200 bg-amber-50">
-                  <p className="text-sm text-amber-800">{minorityOnlyMessage}</p>
-                </div>
+    <div className="flex flex-col items-center mt-6 p-6 rounded-lg border border-blue-300 bg-blue-50 text-center">
+      <p className="text-sm text-red-800">{minorityOnlyMessage}</p>
+      <button
+        onClick={() => router.push("/")}
+        className="mt-4 px-6 py-2 bg-blue-900 text-white font-semibold rounded hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-300 transition"
+      >
+       Okay I understand
+      </button>
+    </div>
               )}
               {formErrors.isMinorityOwned && (
                 <p className="mt-2 text-sm text-red-600">{formErrors.isMinorityOwned}</p>
@@ -906,7 +930,7 @@ const handlePayAndSubmit = async () => {
                   value={form.primaryContactDesignation}
                   onChange={e => update('primaryContactDesignation', e.target.value)}
                 >
-                  <option value="">-- Select Designation --</option>
+                  <option value="">-- Select--</option>
                   <option value="Owner">Owner</option>
                   <option value="Manager">Manager</option>
                   <option value="Director">Director</option>
@@ -1068,7 +1092,7 @@ const handlePayAndSubmit = async () => {
                   value={form.businessOwnershipType}
                   onChange={e => update('businessOwnershipType', e.target.value as OwnershipType)}
                 >
-                  <option value="">-- Select Designation --</option>
+                  <option value="">-- Select--</option>
                   <option value="Limited Liability Company">Limited Liability Company (LLC)</option>
                   <option value="Sole Proprietor">Sole Proprietor</option>
                   <option value="S-Corporation">S-Corporation</option>
@@ -1096,7 +1120,7 @@ const handlePayAndSubmit = async () => {
                   value={form.businessType}
                   onChange={e => update('businessType', e.target.value as BusinessType)}
                 >
-                  <option value="">Select business type</option>
+                  <option value="">Select</option>
                   <option value="product">Product-based</option>
                   <option value="service">Service-based</option>
                   <option value="food">Food & Beverage</option>
@@ -1122,53 +1146,96 @@ const handlePayAndSubmit = async () => {
           <hr className="border-gray-200 my-8" />
 
           {/* Terms & Conditions Section */}
-          <div className="mb-8">
-            <div className="space-y-4">
-              <label className="flex items-start cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="sr-only"
-                  checked={form.acceptedTerms}
-                  onChange={e => update('acceptedTerms', e.target.checked)}
-                />
-                <div className={`w-4 h-4 border-2 rounded flex items-center justify-center mr-3 mt-0.5 ${form.acceptedTerms ? 'bg-[#1e3a5f] border-[#1e3a5f]' : 'border-gray-300'}`}>
-                  {form.acceptedTerms && (
-                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                    </svg>
-                  )}
-                </div>
-                <span className="text-gray-700 text-sm">
-                  I Agree To The Terms & Conditions (Pop Up, Check-Off, Provide Initials)
-                </span>
-              </label>
+<div className="mb-8">
+  <div className="space-y-4">
+    <label className="flex items-start cursor-pointer">
+      <input
+        type="checkbox"
+        className="sr-only"
+        checked={form.acceptedTerms}
+        onChange={e => update('acceptedTerms', e.target.checked)}
+      />
+      <div className={`w-4 h-4 border-2 rounded flex items-center justify-center mr-3 mt-0.5 ${form.acceptedTerms ? 'bg-[#1e3a5f] border-[#1e3a5f]' : 'border-gray-300'}`}>
+        {form.acceptedTerms && (
+          <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+          </svg>
+        )}
+      </div>
+      <span className="text-gray-700 text-sm">
+        I Agree To The{" "}
+        <button
+          type="button"
+          onClick={() => openModal("terms")}
+          className="text-[#1e3a5f] hover:underline font-medium"
+        >
+          Terms & Conditions
+        </button>{" "}
+        (Pop Up, Check-Off, Provide Initials)
+      </span>
+    </label>
 
-              <label className="flex items-start cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="sr-only"
-                  checked={form.declarationAccepted}
-                  onChange={e => update('declarationAccepted', e.target.checked)}
-                />
-                <div className={`w-4 h-4 border-2 rounded flex items-center justify-center mr-3 mt-0.5 ${form.declarationAccepted ? 'bg-[#1e3a5f] border-[#1e3a5f]' : 'border-gray-300'}`}>
-                  {form.declarationAccepted && (
-                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                    </svg>
-                  )}
-                </div>
-                <span className="text-gray-700 text-sm">
-                  The Information Provided Above Is Accurate To My Knowledge.
-                </span>
-              </label>
-            </div>
-          </div>
+    <label className="flex items-start cursor-pointer">
+      <input
+        type="checkbox"
+        className="sr-only"
+        checked={form.declarationAccepted}
+        onChange={e => update('declarationAccepted', e.target.checked)}
+      />
+      <div className={`w-4 h-4 border-2 rounded flex items-center justify-center mr-3 mt-0.5 ${form.declarationAccepted ? 'bg-[#1e3a5f] border-[#1e3a5f]' : 'border-gray-300'}`}>
+        {form.declarationAccepted && (
+          <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+          </svg>
+        )}
+      </div>
+      <span className="text-gray-700 text-sm">
+        The Information Provided Above Is Accurate To My Knowledge.
+      </span>
+    </label>
+  </div>
+</div>
 
             </>
           )}
+<TermsModal 
+  isOpen={modalOpen} 
+  onClose={closeModal} 
+  type={modalType} 
+/>
 
+{/* actions button updated */}
+{form.isMinorityOwned && (
+  <div className="flex flex-col md:flex-row justify-center items-center gap-4 mt-12">
+    <button
+      onClick={() => setForm(initialState)}
+      className="w-full md:w-auto px-8 py-3 bg-gray-400 text-white rounded-lg hover:bg-gray-500 transition-colors font-medium min-w-[160px]"
+      disabled={loading}
+    >
+      Clear Response
+    </button>
+
+    <button
+      onClick={saveDraft}
+      className="w-full md:w-auto px-8 py-3 bg-[#1e3a5f] text-white rounded-lg hover:bg-[#162b46] transition-colors font-medium min-w-[160px]"
+      disabled={loading}
+    >
+      {loading ? 'Saving...' : 'Save Draft'}
+    </button>
+
+    <button
+      onClick={handlePayAndSubmit}
+      className="w-full md:w-auto px-8 py-3 bg-[#c9a227] text-white rounded-lg hover:bg-[#b8921f] transition-colors font-medium min-w-[160px]"
+      disabled={loading}
+    >
+      {loading ? 'Processing...' : 'Proceed To Payment'}
+    </button>
+  </div>
+)}
+      
           {/* Action Buttons */}
-          <div className="flex flex-col md:flex-row justify-center items-center gap-4 mt-12">
+
+          {/* <div className="flex flex-col md:flex-row justify-center items-center gap-4 mt-12">
             <button
               onClick={() => setForm(initialState)}
               className="w-full md:w-auto px-8 py-3 bg-gray-400 text-white rounded-lg hover:bg-gray-500 transition-colors font-medium min-w-[160px]"
@@ -1192,7 +1259,7 @@ const handlePayAndSubmit = async () => {
             >
               {loading ? 'Processing...' : form.isMinorityOwned ? 'Proceed To Payment' : 'Proceeding Stopped'}
             </button>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

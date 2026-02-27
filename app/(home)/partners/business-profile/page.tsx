@@ -242,26 +242,26 @@ export default function BusinessProfilePage() {
       
       // Set prefilled non-editable data
       setPrefilledData({
-        businessName: data.businessName || 'Lorem Ipsum Company Ltd.',
-        businessEmail: data.secondaryBusinessEmail || data.businessEmail || 'info@loremipsum.com',
-        businessPhone: data.businessPhone || data.primaryPhone || '604-993-2850',
+        businessName: data.businessName || '',
+        businessEmail: data.secondaryBusinessEmail || data.businessEmail || '',
+        businessPhone: data.businessPhone || data.primaryPhone || '',
         address: data.address || {
-          street: '3538 Robinson St',
-          city: 'Vancouver',
-          state: 'British Columbia',
-          country: 'Canada',
-          zipCode: 'v5b 2c3'
+          street: '',
+          city: '',
+          state: '',
+          country: '',
+          zipCode: ''
         },
-        ownershipType: data.ownershipType || 'Sole Proprietor',
+        ownershipType: data.ownershipType || '',
         businessType: data.businessType || '',
-        yearsInBusiness: data.yearsInBusiness || '2020',
+        yearsInBusiness: data.yearsInBusiness || '',
         employeesCount: data.employeesCount || '',
-        minorityCategories: data.minorityCategories || ['Asian'],
+        minorityCategories: data.minorityCategories || [''],
         establishedDate: data.yearsInBusiness || '',
-        firstName: data.firstName || 'satish',
-        lastName: data.lastName || 'donerao',
-        primaryEmail: data.primaryEmail || 'doneraosatish@gmail.com',
-        primaryPhone: data.primaryPhone || '934-567-8901'
+        firstName: data.firstName || '',
+        lastName: data.lastName || '',
+        primaryEmail: data.primaryEmail || '',
+        primaryPhone: data.primaryPhone || ''
       });
 
       // Set editable form data
@@ -270,7 +270,7 @@ export default function BusinessProfilePage() {
         language: data.language || '',
         
         // Business Information
-        licenseNumber: data.licenseNumber || '5789 2456 47812',
+        licenseNumber: data.licenseNumber || '',
         businessBio: data.businessBio || '',
         characterLimit: data.characterLimit || TIER_CHARACTER_LIMITS.standard,
         businessProfileImage: data.businessProfileImage || { url: '', verified: false },
