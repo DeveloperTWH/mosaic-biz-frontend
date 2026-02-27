@@ -1205,15 +1205,15 @@ const handlePayAndSubmit = async () => {
 />
 
 {/* actions button updated */}
-{form.isMinorityOwned && (
+ {form.isMinorityOwned && (
   <div className="flex flex-col md:flex-row justify-center items-center gap-4 mt-12">
-    <button
+    {/* <button
       onClick={() => setForm(initialState)}
       className="w-full md:w-auto px-8 py-3 bg-gray-400 text-white rounded-lg hover:bg-gray-500 transition-colors font-medium min-w-[160px]"
       disabled={loading}
     >
       Clear Response
-    </button>
+    </button> */}
 
     <button
       onClick={saveDraft}
@@ -1229,6 +1229,27 @@ const handlePayAndSubmit = async () => {
       disabled={loading}
     >
       {loading ? 'Processing...' : 'Proceed To Payment'}
+    </button>
+
+    {/* New Submit Button */}
+    <button
+      onClick={async () => {
+        try {
+          setLoading(true);
+          const response = await submitStage1();
+          alert('Submission successful!');
+          console.log(response);
+        } catch (error: any) {
+          console.error(error);
+          alert(error.message || 'Submission failed');
+        } finally {
+          setLoading(false);
+        }
+      }}
+      className="w-full md:w-auto px-8 py-3 bg-blue-900 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium min-w-[160px]"
+      disabled={loading}
+    >
+      {loading ? 'Submitting...' : 'Submit'}
     </button>
   </div>
 )}
