@@ -379,15 +379,6 @@ function ProductCard({ item }: { item: RankedItem }) {
 
       {/* Product Info */}
       <div className="p-3 flex flex-col flex-1">
-        {/* Badge */}
-        <div className="mb-2 h-5">
-          {badge && (
-            <span className="px-2 py-1 text-xs font-semibold text-white bg-yellow-600 rounded uppercase">
-              {badge}
-            </span>
-          )}
-        </div>
-
         {/* Title */}
         <h3 className="text-base font-bold text-gray-900 uppercase tracking-tight leading-snug font-poppins line-clamp-2 h-[42px]">
           {title}
@@ -435,6 +426,24 @@ function ProductCard({ item }: { item: RankedItem }) {
             </span>
           )}
         </div>
+
+        {/* Earned Badge Section (Bottom Like First Card) */}
+<div className="mt-3 bg-gray-100 rounded px-4 py-2 flex justify-between items-center min-h-[52px]">
+  <span className="text-gray-600 text-sm font-semibold">
+    Earned Badge:
+  </span>
+
+  {badge ? (
+    <img
+      src={`/badge/${badge.replace(/\s+/g, "-").toLowerCase()}.png`}
+      alt={`${badge} badge`}
+      className="h-12 object-contain"
+    />
+  ) : (
+    <div className="h-14 w-[90px]" />
+  )}
+</div>
+
       </div>
     </div>
   );

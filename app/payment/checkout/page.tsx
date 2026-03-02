@@ -312,7 +312,7 @@ function CheckoutContent() {
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
           <h1 style={{ fontSize: '1.5rem', fontWeight: 600, color: '#111827', marginBottom: '0.5rem' }}>
-            Confirm your plan details and complete payment securely
+            Activate Your Plan
           </h1>
         </div>
 
@@ -347,7 +347,7 @@ function CheckoutContent() {
               </div>
               <div style={{ textAlign: 'right' }}>
                 <span style={{ fontSize: '1.875rem', fontWeight: 700, color: '#1e3a8a' }}>${selectedPlan.price}</span>
-                <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>/Month</span>
+                <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>/Year</span>
               </div>
             </div>
           </div>

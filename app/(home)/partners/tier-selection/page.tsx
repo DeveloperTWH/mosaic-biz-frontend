@@ -86,7 +86,10 @@ const TierSelectionContent: React.FC = () => {
     }
 
     setTimeout(() => {
-      router.push(`/payment/checkout?subscriptionId=${data.data.subscriptionId}`);
+      // router.push(`/payment/checkout?subscriptionId=${data.data.subscriptionId}`);
+      router.push(`/partners/tier-selection/checkout?subscriptionId=${data.data.subscriptionId}`);
+
+
     }, 2000);
   };
 
@@ -168,8 +171,12 @@ const TierSelectionContent: React.FC = () => {
       <div className="max-w-6xl mx-auto">
         {/* Simple Title */}
         <div className="mb-12 text-center">
-          <h1 className="text-3xl font-bold text-gray-900">Choose Your Plan</h1>
-          <p className="text-gray-600 mt-2">Select a subscription plan to get started</p>
+          <h1 className="text-3xl font-poppins font-extrabold text-gray-900">
+  FIND YOUR PERFECT PLAN
+</h1>
+          <p className="text-gray-600 mt-2 font-montserrat font-normal">
+  Compare features and choose a tier that scales with you
+</p>
         </div>
 
         {/* Plans Grid - Using TierCard Component */}
