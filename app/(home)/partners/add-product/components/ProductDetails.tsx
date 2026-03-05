@@ -1,5 +1,6 @@
 import React from 'react';
 import { ProductFormData, Business, Category, Subcategory } from '../types';
+import RichTextEditor from './RichTextEditor';
 
 interface Props {
   formData: ProductFormData;
@@ -103,11 +104,9 @@ export default function ProductDetails({
           <label className="block text-xs font-medium text-gray-600 mb-1">
             Product Description
           </label>
-          <textarea
+          <RichTextEditor
             value={formData.productDescription}
-            onChange={(e) => onInputChange('productDescription', e.target.value)}
-            rows={3}
-            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-[#c9a227] focus:border-[#c9a227] resize-none"
+            onChange={(value) => onInputChange('productDescription', value)}
             placeholder="Enter product description"
           />
           {errors.productDescription && <p className="mt-1 text-xs text-red-600">{errors.productDescription}</p>}

@@ -46,7 +46,7 @@ export default function FinalReviewPage() {
   }, []);
 
 const steps = [
-  { number: "01", title: "Business Verification", status: "completed", link: "/partners/business-verification" },
+  { number: "01", title: "Business Verification", status: "completed", link: "/partners/business/new" },
   { number: "02", title: "Tier / Subscription Selection", status: "completed", link: "/partners/tier-selection" },
   { number: "03", title: "Subscription Payment", status: "completed", link: "/partners/payment" },
   { number: "04", title: "Business Profile Setup", status: "completed", link: "/partners/business-profile" },

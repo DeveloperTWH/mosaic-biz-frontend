@@ -21,6 +21,8 @@
     "@stripe/react-stripe-js": "^3.10.0",
     "@stripe/stripe-js": "^7.9.0",
     "@tiptap/extension-image": "^2.23.0",
+    "@tiptap/extension-text-align": "^2.23.0",
+    "@tiptap/extension-underline": "^2.23.0",
     "@tiptap/react": "^2.23.0",
     "@tiptap/starter-kit": "^2.23.0",
     "axios": "^1.10.0",

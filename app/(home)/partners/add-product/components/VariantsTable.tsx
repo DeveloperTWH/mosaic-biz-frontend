@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 
 interface Props {
   variants: Variant[];
+  hasVariants: boolean;
   onUpdate: (index: number, field: keyof Variant, value: any) => void;
   onUpdateAllShipping: (
     field: 'standardShipping' | 'overnightShipping' | 'localShipping',
@@ -16,6 +17,7 @@ interface Props {
 
 export default function VariantsTable({
   variants,
+  hasVariants,
   onUpdate,
   onUpdateAllShipping,
   onRemove,
@@ -75,32 +77,33 @@ export default function VariantsTable({
         </span>
       </div>
 
-      {/* Bulk Shipping */}
-      <div className="mb-4 p-4 bg-gray-50 rounded-lg">
-        <h3 className="text-sm font-medium text-gray-700 mb-3">Bulk Update Shipping</h3>
+      {hasVariants && (
+        <div className="mb-4 p-4 bg-gray-50 rounded-lg">
+          <h3 className="text-sm font-medium text-gray-700 mb-3">Bulk Update Shipping</h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {(['standardShipping', 'overnightShipping', 'localShipping'] as const).map(
-            (field) => (
-              <div key={field}>
-                <label className="block text-xs text-gray-500 mb-1">
-                  {field.replace('Shipping', '')}
-                </label>
-                <input
-                  type="number"
-                  value={firstVariant[field]}
-                  onChange={(e) =>
-                    onUpdateAllShipping(field, parseFloat(e.target.value))
-                  }
-                  className="w-full px-3 py-1 border border-gray-300 rounded-md text-sm"
-                  step="0.01"
-                  min="0"
-                />
-              </div>
-            )
-          )}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {(['standardShipping', 'overnightShipping', 'localShipping'] as const).map(
+              (field) => (
+                <div key={field}>
+                  <label className="block text-xs text-gray-500 mb-1">
+                    {field.replace('Shipping', '')}
+                  </label>
+                  <input
+                    type="number"
+                    value={firstVariant[field]}
+                    onChange={(e) =>
+                      onUpdateAllShipping(field, parseFloat(e.target.value))
+                    }
+                    className="w-full px-3 py-1 border border-gray-300 rounded-md text-sm"
+                    step="0.01"
+                    min="0"
+                  />
+                </div>
+              )
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
@@ -123,8 +126,8 @@ export default function VariantsTable({
                 </>
               )}
 
+              <th className="py-3 px-2 text-left">slashed Price</th>
               <th className="py-3 px-2 text-left">Price</th>
-              <th className="py-3 px-2 text-left">Stock</th>
               <th className="py-3 px-2 text-left">Availability</th>
               <th className="py-3 px-2 text-left">Standard</th>
               <th className="py-3 px-2 text-left">Overnight</th>
@@ -248,6 +251,28 @@ export default function VariantsTable({
                   </div>
                 </td>
 
+                {/* Sale Price */}
+                <td className="py-2 px-2">
+                  <div className="relative w-24">
+                    <DollarSign className="absolute left-1 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400" />
+                    <input
+                      type="number"
+                      value={variant.salePrice ?? ''}
+                      onChange={(e) =>
+                        onUpdate(
+                          index,
+                          'salePrice',
+                          e.target.value === '' ? undefined : parseFloat(e.target.value)
+                        )
+                      }
+                      className="w-full pl-5 pr-1 py-1 border rounded text-sm"
+                      step="0.01"
+                      min="0"
+                      placeholder="Optional"
+                    />
+                  </div>
+                </td>
+
                 {/* Stock */}
                 <td className="py-2 px-2">
                   <input
@@ -255,18 +280,6 @@ export default function VariantsTable({
                     value={variant.stock}
                     onChange={(e) =>
                       onUpdate(index, 'stock', parseInt(e.target.value))
-                    }
-                    className="w-16 px-2 py-1 border rounded text-sm"
-                  />
-                </td>
-
-                {/* Availability */}
-                <td className="py-2 px-2">
-                  <input
-                    type="number"
-                    value={variant.availability}
-                    onChange={(e) =>
-                      onUpdate(index, 'availability', parseInt(e.target.value))
                     }
                     className="w-16 px-2 py-1 border rounded text-sm"
                   />

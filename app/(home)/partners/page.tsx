@@ -23,6 +23,7 @@ interface Business {
   slug: string;
   isApproved: boolean;
   isActive: boolean;
+  listingType?: "product" | "service" | "food";
 }
 
 interface OnboardingStatus {
@@ -211,6 +212,30 @@ const Page: React.FC = () => {
     return ((current - 1) / (onboardingSteps.length - 1)) * 100;
   }, [onboardingStatus]);
 
+  const listingManagement = useMemo(() => {
+    const primaryBusiness = businesses.find((b) => b.isActive) ?? businesses[0];
+    const listingType = primaryBusiness?.listingType;
+
+    if (listingType === "service") {
+      return {
+        label: "Manage Services",
+        href: "/partners/services",
+      };
+    }
+
+    if (listingType === "food") {
+      return {
+        label: "Manage Foods",
+        href: "/partners/foods",
+      };
+    }
+
+    return {
+      label: "Manage Products",
+      href: "/partners/products",
+    };
+  }, [businesses]);
+
   const renderSelectedStageCard = () => {
     if (!onboardingStatus) return null;
 
@@ -356,10 +381,10 @@ const Page: React.FC = () => {
           </div>
 
           {onboardingStatus.data.currentStage >= 4 ? (
-            <Link href="/partners/products">
+            <Link href={listingManagement.href}>
               <button className="w-full md:w-auto px-5 py-2.5 bg-blue-900 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2">
                 <Package className="w-4 h-4" />
-                Manage Products
+                {listingManagement.label}
                 <ArrowRight className="w-4 h-4" />
               </button>
             </Link>

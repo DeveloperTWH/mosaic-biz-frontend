@@ -121,6 +121,22 @@ const validateFile = (file: File, type: 'image' | 'document'): { isValid: boolea
     if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
       return { isValid: false, error: 'Only JPG, PNG, GIF, WEBP images allowed' };
     }
+    
+    // Validate image dimensions
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        if (img.width !== 500 || img.height !== 500) {
+          resolve({ isValid: false, error: 'Logo must be exactly 500x500 pixels' });
+        } else {
+          resolve({ isValid: true });
+        }
+      };
+      img.onerror = () => {
+        resolve({ isValid: false, error: 'Invalid image file' });
+      };
+      img.src = URL.createObjectURL(file);
+    }) as any;
   } else {
     const ALLOWED_DOC_TYPES = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
     if (!ALLOWED_DOC_TYPES.includes(file.type)) {
@@ -378,7 +394,7 @@ const validateForm = (): boolean => {
 
     // Validate file based on type
     const fileType = uploadType === 'profile' ? 'image' : 'document';
-    const validation = validateFile(file, fileType);
+    const validation = await validateFile(file, fileType);
     
     if (!validation.isValid) {
       toast.error(validation.error);
@@ -680,6 +696,7 @@ const validateForm = (): boolean => {
   {errors.businessProfileImage && (
     <p className="mt-1 text-xs text-red-600">{errors.businessProfileImage}</p>
   )}
+  <p className="mt-1 text-xs text-gray-500">Logo size must be 500x500 pixels</p>
   {formData.businessProfileImage?.url && (
     <div className="mt-2 flex items-center gap-2">
       <a

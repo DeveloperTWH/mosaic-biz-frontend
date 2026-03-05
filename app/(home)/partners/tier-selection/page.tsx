@@ -196,7 +196,7 @@ const TierSelectionContent: React.FC = () => {
         {/* Back Link */}
         <div className="text-center">
           <Link href="/partners" className="text-gray-600 hover:text-gray-900 font-medium">
-            ← Back to Partners
+            ← Back to Dashboard
           </Link>
         </div>
       </div>

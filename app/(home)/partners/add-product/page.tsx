@@ -104,6 +104,7 @@ export default function AddProductPage() {
 {variants.length > 0 && (
   <VariantsTable
     variants={variants}
+    hasVariants={formData.hasVariants}
     onUpdate={updateVariant}
     onUpdateAllShipping={updateAllShipping}
     onRemove={removeVariant}

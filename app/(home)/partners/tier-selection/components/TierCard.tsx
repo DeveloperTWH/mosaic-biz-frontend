@@ -101,78 +101,76 @@ const TierCard: React.FC<TierCardProps> = ({
   const monthlyPrice = (plan.price / 12).toFixed(2);
 
   return (
-    <div
-      className={`relative rounded-2xl border-2 transition-all duration-300 overflow-hidden ${config.borderColor} ${isSelected ? 'shadow-lg' : ''} hover:shadow-xl bg-white flex flex-col h-full`}
-    >
-      {/* Recommended Badge */}
-      {badge && (
-        <div className="absolute -top-0 right-0 overflow-hidden w-32 h-32 z-10">
-          <div className="absolute top-0 right-0 transform translate-x-8 -translate-y-2 rotate-45 bg-gradient-to-r from-[#9333EA] to-[#C026D3] text-white text-xs font-bold py-1.5 px-10 shadow-md tracking-wider uppercase">
-            {badge}
+    <div className="h-full w-full max-w-sm mx-auto">
+      <div
+        className={`relative rounded-2xl border-2 transition-all duration-300 overflow-hidden ${config.borderColor} ${isSelected ? 'shadow-lg' : ''} hover:shadow-xl bg-white flex flex-col h-full min-w-[320px] w-full`}
+      >
+        {/* Recommended Badge - Smaller text, properly contained */}
+        {badge && (
+          <div className="absolute top-0 right-0 z-20 w-24 h-24 overflow-hidden">
+            <div className="absolute top-4 -right-6 transform rotate-45 bg-gradient-to-r from-[#9333EA] to-[#C026D3] text-white text-[7px] font-bold py-1 px-8 shadow-md tracking-wider uppercase whitespace-nowrap">
+              {badge}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Header Section */}
-      <div className={`${config.headerBg} p-6 pb-8`}>
-        <h3 className="text-2xl font-bold text-[#1E3A8A] mb-1">
-          {config.title}
-          <span className="text-lg font-normal text-[#1E3A8A]"> - {config.subtitle}</span>
-        </h3>
-        <p className="text-gray-600 text-sm leading-relaxed mb-4">
-          {config.description}
-        </p>
-
-        {/* Price - from API divided by 12 */}
-        <div className="mt-4">
-          <div className="flex items-baseline gap-1">
-
-                        <span className="text-4xl font-bold text-[#1E3A8A]">
-              ${config.price}
-            </span>
-            {/* <span className="text-4xl font-bold text-[#1E3A8A]">
-              ${monthlyPrice}
-            </span> */}
-            <span className="text-gray-600 text-sm">
-              /Month (Billed Annually)
-            </span>
-          </div>
-        </div>
-
-        {/* Button */}
-        <button
-          onClick={() => onSelect(plan._id)}
-          disabled={isLoading}
-          className={`w-full mt-6 py-3 px-4 rounded-lg font-semibold text-white transition-all duration-200 ${config.buttonBg} ${config.buttonHover} ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-        >
-          {isLoading ? 'Processing...' : 'Choose Plan'}
-        </button>
-      </div>
-
-      {/* Features Section - Static hardcoded content */}
-      <div className="p-6 pt-6 flex-1 flex flex-col">
-        <p className="text-sm font-semibold text-[#1E3A8A] mb-4">
-          {config.featuresTitle}
-        </p>
-        <ul className="space-y-3 flex-1">
-          {config.features.map((feature, index) => (
-            <li
-              key={index}
-              className="flex items-start gap-3 text-sm text-gray-700"
-            >
-              <div className={`w-5 h-5 rounded-full ${config.checkColor} flex items-center justify-center flex-shrink-0 mt-0.5`}>
-                <Check className="w-3 h-3 text-white" strokeWidth={3} />
-              </div>
-              <span className="leading-relaxed">{feature}</span>
-            </li>
-          ))}
-        </ul>
-
-        {/* Footer Text */}
-        <div className="mt-6 pt-4 border-t border-gray-100">
-          <p className="text-sm text-gray-500 italic leading-relaxed">
-            {config.footerText}
+        {/* Header Section */}
+        <div className={`${config.headerBg} p-6 pb-8`}>
+          <h3 className="text-2xl font-bold text-[#1E3A8A] mb-1">
+            {config.title}
+            <span className="text-lg font-normal text-[#1E3A8A]"> - {config.subtitle}</span>
+          </h3>
+          <p className="text-gray-600 text-sm leading-relaxed mb-4">
+            {config.description}
           </p>
+
+          {/* Price - from API divided by 12 */}
+          <div className="mt-4">
+            <div className="flex items-baseline gap-1">
+              <span className="text-4xl font-bold text-[#1E3A8A]">
+                ${config.price}
+              </span>
+              <span className="text-gray-600 text-sm">
+                /Month (Billed Annually)
+              </span>
+            </div>
+          </div>
+
+          {/* Button */}
+          <button
+            onClick={() => onSelect(plan._id)}
+            disabled={isLoading}
+            className={`w-full mt-6 py-3 px-4 rounded-lg font-semibold text-white transition-all duration-200 ${config.buttonBg} ${config.buttonHover} ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+          >
+            {isLoading ? 'Processing...' : 'Choose Plan'}
+          </button>
+        </div>
+
+        {/* Features Section - Static hardcoded content */}
+        <div className="p-6 pt-6 flex-1 flex flex-col">
+          <p className="text-sm font-semibold text-[#1E3A8A] mb-4">
+            {config.featuresTitle}
+          </p>
+          <ul className="space-y-3 flex-1">
+            {config.features.map((feature, index) => (
+              <li
+                key={index}
+                className="flex items-start gap-3 text-sm text-gray-700"
+              >
+                <div className={`w-5 h-5 rounded-full ${config.checkColor} flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                  <Check className="w-3 h-3 text-white" strokeWidth={3} />
+                </div>
+                <span className="leading-relaxed">{feature}</span>
+              </li>
+            ))}
+          </ul>
+
+          {/* Footer Text */}
+          <div className="mt-6 pt-4 border-t border-gray-100">
+            <p className="text-sm text-gray-500 italic leading-relaxed">
+              {config.footerText}
+            </p>
+          </div>
         </div>
       </div>
     </div>

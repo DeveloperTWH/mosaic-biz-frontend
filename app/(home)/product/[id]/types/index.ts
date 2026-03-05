@@ -104,6 +104,9 @@ export interface ProductDetailItem {
   variants: Variant[];
   brand?: string;
   specifications?: Array<{ key: string; value: string }>;
+  weight?: string;
+  netQuantity?: string;
+  genericName?: string;
 }
 
 // ============================================

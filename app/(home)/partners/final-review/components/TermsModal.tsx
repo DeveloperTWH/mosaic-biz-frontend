@@ -1,6 +1,6 @@
   "use client";
-  import React, { useState } from "react";
-  import { X, Check } from "lucide-react";
+  import React from "react";
+  import { X } from "lucide-react";
 
   interface TermsModalProps {
     isOpen: boolean;
@@ -9,21 +9,12 @@
   }
 
   export default function TermsModal({ isOpen, onClose, type }: TermsModalProps) {
-    const [acknowledged, setAcknowledged] = useState(false);
-
     if (!isOpen) return null;
 
     const titles = {
       terms: "Terms and Conditions of Service",
       privacy: "Privacy Policy",
       directory: "Mosaic Biz Hub Directory Policy"
-    };
-
-    const handleAcknowledge = () => {
-      if (acknowledged) {
-        onClose();
-        setAcknowledged(false);
-      }
     };
 
     const content = {
@@ -455,31 +446,14 @@
             {content[type]}
           </div>
 
-          {/* Acknowledgement Footer */}
+          {/* Footer */}
           <div className="sticky bottom-0 bg-gray-50 border-t border-gray-200 px-6 py-4">
-            <div className="flex items-center justify-between">
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={acknowledged}
-                  onChange={(e) => setAcknowledged(e.target.checked)}
-                  className="w-4 h-4 rounded border-gray-300 text-[#1e3a5f] focus:ring-[#1e3a5f]"
-                />
-                <span className="text-sm text-gray-600">
-                  I have read and acknowledge the {titles[type]}
-                </span>
-              </label>
+            <div className="flex justify-end">
               <button
-                onClick={handleAcknowledge}
-                disabled={!acknowledged}
-                className={`px-6 py-2 rounded-md transition-colors flex items-center gap-2 ${
-                  acknowledged
-                    ? 'bg-[#1e3a5f] text-white hover:bg-[#152a45] cursor-pointer'
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                }`}
+                onClick={onClose}
+                className="px-6 py-2 rounded-md transition-colors bg-[#1e3a5f] text-white hover:bg-[#152a45]"
               >
-                <Check className="w-4 h-4" />
-                Acknowledge & Close
+                Close
               </button>
             </div>
           </div>

@@ -99,9 +99,16 @@ export default function ImageUpload({
                 id="gallery-upload"
                 className="hidden"
                 accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) onGalleryUpload(file);
+                multiple
+                onChange={async (e) => {
+                  const files = Array.from(e.target.files || []);
+                  if (files.length === 0) return;
+
+                  for (const file of files) {
+                    await onGalleryUpload(file);
+                  }
+
+                  e.target.value = '';
                 }}
               />
               <label htmlFor="gallery-upload" className="cursor-pointer">

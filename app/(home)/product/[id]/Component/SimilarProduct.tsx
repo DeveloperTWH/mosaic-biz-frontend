@@ -60,6 +60,10 @@ function ratingCount(p: RankedItem) {
   return isFinite(n) ? n : 0;
 }
 
+function stripHtml(html: string): string {
+  return html.replace(/<[^>]*>/g, '');
+}
+
 /* ---------- data hook ---------- */
 function useSimilar(productId?: string) {
   const [items, setItems] = React.useState<RankedItem[] | null>(null);
@@ -265,17 +269,17 @@ export default function SimilarProduct({ productId }: { productId?: string }) {
                       </h3>
                       <p
                         className="mb-2 text-xs text-gray-600"
-                        title={p.description || ""}
+                        title={stripHtml(p.description || "")}
                         style={{
                           display: "-webkit-box",
-                          WebkitLineClamp: 2,        // clamp to 2 lines; bump to 3 if you prefer
+                          WebkitLineClamp: 2,
                           WebkitBoxOrient: "vertical",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
                           wordBreak: "break-word",
                         }}
                       >
-                        {p.description || ""}
+                        {stripHtml(p.description || "")}
                       </p>
 
 

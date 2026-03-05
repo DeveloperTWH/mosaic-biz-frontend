@@ -552,13 +552,18 @@ function pickRating(p: RankedItem): number {
     return Math.max(0, Math.min(5, n));
 }
 
+function stripHtml(html: string): string {
+    return html.replace(/<[^>]*>/g, '');
+}
+
 function ProductCard({ item }: { item: RankedItem }) {
     const router = useRouter();
     const href = `/product/${item._id}`;
     const title = pickTitle(item);
     const description = item.description ?? "";
+    const strippedDescription = stripHtml(description);
     const trimmedDescription =
-        description.length > 100 ? `${description.slice(0, 100).trimEnd()}...` : description;
+        strippedDescription.length > 100 ? `${strippedDescription.slice(0, 100).trimEnd()}...` : strippedDescription;
     const images = gatherImages(item);
     const { price, effective, onSale } = pickPrice(item);
     const rating = pickRating(item);

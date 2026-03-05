@@ -14,8 +14,8 @@ export interface Variant {
   attribute2Name: string;
   attribute2Value: string;
   price: number;
+  salePrice?: number;
   stock: number;
-  availability: number;
   standardShipping: number;
   overnightShipping: number;
   localShipping: number;

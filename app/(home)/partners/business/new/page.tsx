@@ -614,7 +614,7 @@ const handlePayAndSubmit = async () => {
             className="inline-flex items-center gap-2 rounded-lg bg-white/95 px-3 py-2 text-sm font-medium text-[#1e3a5f] shadow-sm transition hover:bg-white"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to Partners
+            Back to dashboard
           </Link>
         </div>
         {/* Header */}

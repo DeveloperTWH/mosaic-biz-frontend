@@ -210,8 +210,8 @@ const generateVariants = () => {
         attribute2Name: '',
         attribute2Value: '',
         price: 0.0,
+        salePrice: undefined,
         stock: 0,
-        availability: 0,
         standardShipping: 0,
         overnightShipping: 0,
         localShipping: 0,
@@ -231,8 +231,8 @@ const generateVariants = () => {
           attribute2Name: attr2.attributeName,
           attribute2Value: val2,
           price: 0.0,
+          salePrice: undefined,
           stock: 0,
-          availability: 0,
           standardShipping: 0,
           overnightShipping: 0,
           localShipping: 0,
@@ -329,8 +329,8 @@ const toggleHasVariants = (value: boolean) => {
             attribute2Name: '',
             attribute2Value: '',
             price: 0,
+            salePrice: undefined,
             stock: 0,
-            availability: 0,
             standardShipping: 0,
             overnightShipping: 0,
             localShipping: 0,
@@ -422,9 +422,12 @@ const toggleHasVariants = (value: boolean) => {
 
       // Update form data with file URL
       if (type === 'feature') {
-        handleInputChange('featureImage', data.fileUrl);
+        setFormData(prev => ({ ...prev, featureImage: data.fileUrl }));
       } else {
-        handleInputChange('galleryImages', [...formData.galleryImages, data.fileUrl]);
+        setFormData(prev => ({
+          ...prev,
+          galleryImages: [...prev.galleryImages, data.fileUrl],
+        }));
       }
 
       toast.success('File uploaded successfully!');
@@ -493,19 +496,6 @@ const toggleHasVariants = (value: boolean) => {
     if (!formData.businessId) newErrors.businessId = 'Business is required';
     if (!formData.categoryId) newErrors.categoryId = 'Category is required';
     if (!formData.subCategoryId) newErrors.subCategoryId = 'Subcategory is required';
-    
-    if (formData.hasVariants) {
-      if (formData.variants.length === 0) {
-        newErrors.variants = 'At least one variant is required';
-      } else {
-        for (let i = 0; i < formData.variants.length; i++) {
-          const v = formData.variants[i];
-          if (!v.price || v.price <= 0) {
-            newErrors[`variant_${i}_price`] = `Variant ${i + 1} price is required`;
-          }
-        }
-      }
-    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -542,16 +532,28 @@ const toggleHasVariants = (value: boolean) => {
         amount: formData.discount.discountValue,
         minCartValue: formData.discount.costValue > 0 ? formData.discount.costValue : undefined
       } : undefined,
-      variants: formData.variants.map(variant => ({
-        attributes: {
-          [variant.attribute1Name]: variant.attribute1Value,
-          [variant.attribute2Name]: variant.attribute2Value
-        },
-        price: variant.price,
-        stock: variant.stock,
-        images: variant.images && variant.images.length > 0 ? variant.images : [defaultVariantImage],
-        sku: variant.sku
-      })),
+      variants: formData.variants.map(variant => {
+        const attributes: Record<string, string> = {};
+
+        if (variant.attribute1Name?.trim() && variant.attribute1Value?.trim()) {
+          attributes[variant.attribute1Name] = variant.attribute1Value;
+        }
+        if (variant.attribute2Name?.trim() && variant.attribute2Value?.trim()) {
+          attributes[variant.attribute2Name] = variant.attribute2Value;
+        }
+
+        return {
+          attributes,
+          price: variant.price,
+          salePrice:
+            variant.salePrice !== undefined && variant.salePrice > 0
+              ? variant.salePrice
+              : undefined,
+          stock: variant.stock,
+          images: variant.images && variant.images.length > 0 ? variant.images : [defaultVariantImage],
+          sku: variant.sku
+        };
+      }),
       isPublished: true
     };
   };
@@ -592,13 +594,20 @@ const toggleHasVariants = (value: boolean) => {
       router.push(`/partners/products/`);
       
     } catch (error: any) {
-      console.error('Error creating product:', error);
-      console.error('Error response:', error.response?.data);
-      
-      const errorMessage = error.response?.data?.error || 
-                          error.response?.data?.message || 
-                          'Failed to create product';
-      toast.error(errorMessage);
+  console.error('Error creating product:', error);
+  console.error('Error response:', error.response?.data);
+
+  const backendError = error.response?.data;
+
+  let errorMessage = 'Failed to create product';
+
+  if (backendError?.error?.message) {
+    errorMessage = backendError.error.message;
+  } else if (backendError?.message) {
+    errorMessage = backendError.message;
+  }
+
+  toast.error(errorMessage);
     } finally {
       setSaving(false);
     }
