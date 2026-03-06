@@ -132,6 +132,7 @@ export async function updateBusinessProfile(payload: {
   businessBio?: string;
   characterLimit?: number;
   businessProfileImage?: { url: string; verified: boolean };
+  featureBanner?: { url: string; verified: boolean };
   businessEmail?: string;
   businessPhone?: string;
   alternatePhone?: string;

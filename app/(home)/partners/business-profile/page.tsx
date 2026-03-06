@@ -63,6 +63,10 @@ interface FormData {
     url: string;
     verified: boolean;
   };
+  featureBanner: {
+    url: string;
+    verified: boolean;
+  };
   
   // Contact Information
   alternatePhone: string;
@@ -92,10 +96,6 @@ interface FormErrors {
   [key: string]: string;
 }
 
-interface UploadProgress {
-  [key: string]: boolean;
-}
-
 interface SelectedFile {
   name: string;
   type: string;
@@ -109,7 +109,11 @@ const TIER_CHARACTER_LIMITS = {
 };
 
 // Validate file
-const validateFile = (file: File, type: 'image' | 'document'): { isValid: boolean; error?: string } => {
+const validateFile = async (
+  file: File,
+  type: 'image' | 'document',
+  uploadType?: 'profile' | 'banner' | 'refund' | 'terms'
+): Promise<{ isValid: boolean; error?: string }> => {
   const MAX_SIZE = 5 * 1024 * 1024; // 5MB
   
   if (file.size > MAX_SIZE) {
@@ -118,25 +122,33 @@ const validateFile = (file: File, type: 'image' | 'document'): { isValid: boolea
   
   if (type === 'image') {
     const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type.toLowerCase())) {
       return { isValid: false, error: 'Only JPG, PNG, GIF, WEBP images allowed' };
     }
-    
-    // Validate image dimensions
-    return new Promise((resolve) => {
-      const img = new Image();
-      img.onload = () => {
-        if (img.width !== 500 || img.height !== 500) {
-          resolve({ isValid: false, error: 'Logo must be exactly 500x500 pixels' });
-        } else {
-          resolve({ isValid: true });
-        }
-      };
-      img.onerror = () => {
-        resolve({ isValid: false, error: 'Invalid image file' });
-      };
-      img.src = URL.createObjectURL(file);
-    }) as any;
+
+    // Keep logo rule strict: exact 500x500.
+    if (uploadType === 'profile') {
+      return new Promise((resolve) => {
+        const img = new Image();
+        const objectUrl = URL.createObjectURL(file);
+
+        img.onload = () => {
+          URL.revokeObjectURL(objectUrl);
+          if (img.width !== 500 || img.height !== 500) {
+            resolve({ isValid: false, error: 'Logo must be exactly 500x500 pixels' });
+          } else {
+            resolve({ isValid: true });
+          }
+        };
+
+        img.onerror = () => {
+          URL.revokeObjectURL(objectUrl);
+          resolve({ isValid: false, error: 'Invalid image file' });
+        };
+
+        img.src = objectUrl;
+      });
+    }
   } else {
     const ALLOWED_DOC_TYPES = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
     if (!ALLOWED_DOC_TYPES.includes(file.type)) {
@@ -219,6 +231,7 @@ export default function BusinessProfilePage() {
     businessBio: '',
     characterLimit: TIER_CHARACTER_LIMITS.standard,
     businessProfileImage: { url: '', verified: false },
+    featureBanner: { url: '', verified: false },
     
     // Contact Information
     alternatePhone: '',
@@ -290,6 +303,7 @@ export default function BusinessProfilePage() {
         businessBio: data.businessBio || '',
         characterLimit: data.characterLimit || TIER_CHARACTER_LIMITS.standard,
         businessProfileImage: data.businessProfileImage || { url: '', verified: false },
+        featureBanner: data.featureBanner || { url: '', verified: false },
         
         // Contact Information
         alternatePhone: data.alternatePhone || '',
@@ -360,6 +374,7 @@ const validateForm = (): boolean => {
         businessBio: formData.businessBio,
         characterLimit: formData.characterLimit,
         businessProfileImage: formData.businessProfileImage,
+        featureBanner: formData.featureBanner,
         alternatePhone: formData.alternatePhone,
         website: formData.website,
         facebook: formData.facebook,
@@ -386,15 +401,15 @@ const validateForm = (): boolean => {
   // ============ FILE UPLOAD HANDLERS - SAME AS STAGE 1 ============
   
   const handleFileSelect = async (
-    uploadType: 'profile' | 'refund' | 'terms',
+    uploadType: 'profile' | 'banner' | 'refund' | 'terms',
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     // Validate file based on type
-    const fileType = uploadType === 'profile' ? 'image' : 'document';
-    const validation = await validateFile(file, fileType);
+    const fileType = (uploadType === 'profile' || uploadType === 'banner') ? 'image' : 'document';
+    const validation = await validateFile(file, fileType, uploadType);
     
     if (!validation.isValid) {
       toast.error(validation.error);
@@ -408,6 +423,7 @@ const validateForm = (): boolean => {
       
       // Map to document type for backend
       const documentType = uploadType === 'profile' ? 'business-profile' : 
+                          uploadType === 'banner' ? 'feature-banner' :
                           uploadType === 'refund' ? 'refund-policy' : 'terms-service';
       
       // Get upload URL
@@ -426,6 +442,9 @@ const validateForm = (): boolean => {
       switch (uploadType) {
         case 'profile':
           handleInputChange('businessProfileImage', newDoc);
+          break;
+        case 'banner':
+          handleInputChange('featureBanner', newDoc);
           break;
         case 'refund':
           handleInputChange('refundPolicyDocument', newDoc);
@@ -450,10 +469,13 @@ const validateForm = (): boolean => {
     }
   };
 
-  const removeDocument = (uploadType: 'profile' | 'refund' | 'terms') => {
+  const removeDocument = (uploadType: 'profile' | 'banner' | 'refund' | 'terms') => {
     switch (uploadType) {
       case 'profile':
         handleInputChange('businessProfileImage', { url: '', verified: false });
+        break;
+      case 'banner':
+        handleInputChange('featureBanner', { url: '', verified: false });
         break;
       case 'refund':
         handleInputChange('refundPolicyDocument', { url: '', verified: false });
@@ -709,6 +731,64 @@ const validateForm = (): boolean => {
         View uploaded logo
       </a>
     </div>
+  )}
+</div>
+
+              {/* Feature Banner */}
+<div>
+  <label className="block text-xs font-medium text-gray-500 mb-1">
+    Feature Banner
+  </label>
+  <div className="flex items-center gap-4">
+    <div className="flex-1 px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 text-sm">
+      {selectedFiles['banner'] ? selectedFiles['banner']?.name : 
+       formData.featureBanner?.url ? 'Banner uploaded' : 'No file chosen'}
+    </div>
+    <input
+      type="file"
+      id="banner-upload"
+      className="hidden"
+      accept="image/*,.jpg,.jpeg,.png"
+      onChange={(e) => handleFileSelect('banner', e)}
+      disabled={uploading['banner']}
+    />
+    <label
+      htmlFor="banner-upload"
+      className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors cursor-pointer font-medium flex items-center gap-2 text-sm"
+    >
+      {uploading['banner'] ? (
+        <Loader className="w-4 h-4 animate-spin" />
+      ) : (
+        <Upload className="w-4 h-4" />
+      )}
+      {uploading['banner'] ? 'Uploading...' : '+ Upload Image'}
+    </label>
+    {formData.featureBanner?.url && (
+      <button
+        type="button"
+        onClick={() => removeDocument('banner')}
+        className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+      >
+        <X className="w-4 h-4" />
+      </button>
+      
+    )}
+  </div>
+     <p className="mt-1 text-xs text-gray-500">Preffred size be 2200 x 1000 pixels</p>
+  {formData.featureBanner?.url && (
+    <div className="mt-2 flex items-center gap-2">
+      <a
+        href={formData.featureBanner.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-xs text-blue-600 hover:underline flex items-center gap-1"
+      >
+        <ImageIcon className="w-3 h-3" />
+        View uploaded banner
+      </a>
+      
+    </div>
+    
   )}
 </div>
             </div>

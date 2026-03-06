@@ -3,12 +3,14 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import ClientTestimonials from "../../../Components/ClientTestimonials";
 
 type VendorBusiness = {
   _id: string;
   businessName: string;
   description?: string;
   logo?: string;
+  coverImage?: string;
   email?: string;
   phone?: string;
   listingType?: string;
@@ -138,6 +140,14 @@ export default function ProductVendorProfilePage() {
   const [minority, setMinority] = useState("");
   const [sort, setSort] = useState("price_asc");
   const [apiTotal, setApiTotal] = useState(0);
+  const [revealedFields, setRevealedFields] = useState<
+    Record<"call" | "email" | "address" | "website", boolean>
+  >({
+    call: false,
+    email: false,
+    address: false,
+    website: false,
+  });
 
   useEffect(() => {
     if (!businessId) {
@@ -212,6 +222,13 @@ export default function ProductVendorProfilePage() {
   const safeAverageRating = toNumber(profile?.metrics?.averageRating);
   const safeReviewCount = toNumber(profile?.metrics?.reviewCount);
   const badgeImage = getBadgeImage(profile?.badge);
+  const businessAddress = formatAddress(vendorDetails ?? undefined);
+  const websiteValue = (vendorDetails?.website || "").trim();
+  const bannerImage = profile?.coverImage || profile?.logo || "";
+
+  const toggleReveal = (field: "call" | "email" | "address" | "website") => {
+    setRevealedFields((prev) => ({ ...prev, [field]: !prev[field] }));
+  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -240,7 +257,7 @@ export default function ProductVendorProfilePage() {
       </div>
 
       <div className="w-full bg-[#1A1F71] py-6 text-center text-white pb-10">
-        <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-12">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12">
           <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-6">
             <div className="flex-[3] min-w-0">
               <label className="block text-left text-[14px] font-medium text-white font-poppins">
@@ -292,101 +309,191 @@ export default function ProductVendorProfilePage() {
           </div>
         </div>
       ) : error ? (
-        <div className="max-w-6xl px-4 py-10 mx-auto">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12 py-10">
           <div className="p-4 text-red-700 bg-red-50 border border-red-200 rounded">{error}</div>
         </div>
       ) : (
-        <div className="max-w-6xl px-4 py-8 mx-auto lg:px-6">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6">
-            <div className="relative min-h-[320px] rounded border border-gray-200 bg-gradient-to-br from-[#d6ece1] via-[#f0e5d4] to-[#dce5ef] overflow-hidden">
-              {profile?.logo ? (
-                <img
-                  src={profile.logo}
-                  alt={profile.businessName}
-                  className="absolute inset-0 w-full h-full object-contain p-8"
-                />
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center text-4xl font-bold text-[#1e3a5f]">
-                  {profile?.businessName?.charAt(0)?.toUpperCase() || "V"}
-                </div>
-              )}
-              {badgeImage && (
-                <div className="absolute right-3 bottom-3 bg-white/95 rounded-lg border border-gray-200 shadow-sm p-2">
+            <div className="relative min-h-[400px] rounded border border-gray-200 bg-gradient-to-br from-[#d6ece1] via-[#f0e5d4] to-[#dce5ef] overflow-visible">
+              <div className="absolute inset-0 rounded overflow-hidden">
+                {bannerImage ? (
                   <img
-                    src={badgeImage}
-                    alt={`${profile?.badge || "Business"} badge`}
-                    className="w-14 h-14 object-contain"
+                    src={bannerImage}
+                    alt={profile?.businessName || "Vendor cover"}
+                    className="absolute inset-0 w-full h-full object-cover"
                   />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center text-4xl font-bold text-[#1e3a5f]">
+                    {profile?.businessName?.charAt(0)?.toUpperCase() || "V"}
+                  </div>
+                )}
+              </div>
+              {badgeImage && (
+                <div className="absolute right-8 -bottom-10 z-20">
+                  <div className="relative w-24 h-24 drop-shadow-[0_10px_12px_rgba(0,0,0,0.22)]">
+                    <div
+                      className="absolute inset-0 bg-white border border-gray-200"
+                      style={{
+                        clipPath: "polygon(25% 6%, 75% 6%, 98% 50%, 75% 94%, 25% 94%, 2% 50%)",
+                      }}
+                    />
+                    <div
+                      className="absolute inset-[10px] bg-[#f8f9fb]"
+                      style={{
+                        clipPath: "polygon(25% 6%, 75% 6%, 98% 50%, 75% 94%, 25% 94%, 2% 50%)",
+                      }}
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center p-3">
+                      <img
+                        src={badgeImage}
+                        alt={`${profile?.badge || "Business"} badge`}
+                        className="w-full h-full object-contain scale-110"
+                      />
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
 
-            <div className="border border-gray-200 p-5 bg-white">
-              <div className="flex items-start gap-3">
-                <div className="w-11 h-11 rounded-md border border-gray-200 bg-gray-50 overflow-hidden shrink-0 flex items-center justify-center">
+            <div className=" p-5 bg-white">
+              <div className="flex items-center gap-2 pb-3 ">
+                <div className="w-[100px] h-[100px] rounded border bg-gray-50 overflow-hidden shrink-0 flex items-center justify-center">
                   {profile?.logo ? (
-                    <img
-                      src={profile.logo}
-                      alt={profile.businessName}
-                      className="w-full h-full object-contain p-1"
-                    />
+<img
+  src={profile.logo}
+  alt={profile.businessName}
+  className="w-full h-full object-contain p-1"
+/>
                   ) : (
-                    <span className="text-sm font-bold text-[#1e3a5f]">
+                    <span className="text-[10px] font-bold text-[#1e3a5f]">
                       {profile?.businessName?.charAt(0)?.toUpperCase() || "V"}
                     </span>
                   )}
                 </div>
-                <div>
+                {/* <div>
+                  <p className="text-[10px] tracking-[0.12em] font-semibold text-[#b79a4a] uppercase">
+                    {(profile?.listingType || "Business").replace("-", " ")}
+                  </p>
                   <h2 className="text-sm font-semibold uppercase tracking-wide text-[#1A1F71]">
                     Business Details
                   </h2>
-                  <p className="text-xs text-gray-500 mt-0.5">{profile?.businessName || "Vendor"}</p>
-                </div>
+                </div> */}
               </div>
-              <div className="mt-4 space-y-2 text-sm">
-                <p>
-                  <span className="font-semibold text-gray-900">Brand Name: </span>
-                  <span className="text-gray-700">{profile?.businessName || "N/A"}</span>
-                </p>
-                <p>
-                  <span className="font-semibold text-gray-900">Category: </span>
-                  <span className="text-gray-700">{profile?.listingType || "N/A"}</span>
-                </p>
-                <p>
-                  <span className="font-semibold text-gray-900">Established In: </span>
-                  <span className="text-gray-700">{vendorDetails?.yearsInBusiness || "N/A"}</span>
-                </p>
-                <p>
-                  <span className="font-semibold text-gray-900">Location: </span>
-                  <span className="text-gray-700">{formatAddress(vendorDetails ?? undefined)}</span>
-                </p>
-                <p>
-                  <span className="font-semibold text-gray-900">Call Us: </span>
-                  <span className="text-gray-700">{profile?.phone || "N/A"}</span>
-                </p>
-                <p>
-                  <span className="font-semibold text-gray-900">Email: </span>
-                  <span className="text-gray-700">{profile?.email || "N/A"}</span>
-                </p>
-                <p>
-                  <span className="font-semibold text-gray-900">Website: </span>
-                  <span className="text-gray-700">{vendorDetails?.website || "N/A"}</span>
-                </p>
-                <p>
-                  <span className="font-semibold text-gray-900">Badge: </span>
-                  <span className="text-gray-700">{profile?.badge || "N/A"}</span>
-                </p>
+              <div className="mt-3 space-y-1.5 text-[12px]">
+                <div className="grid grid-cols-[96px_1fr] gap-2">
+                  <span className="font-montserrat font-bold text-gray-900">
+  Brand Name
+</span>
+                  <span className="font-montserrat font-medium text-gray-700">
+  {profile?.businessName || "N/A"}
+</span>
+                </div>
+                <div className="grid grid-cols-[96px_1fr] gap-2">
+                  <span className="font-montserrat font-bold text-gray-900">Category</span>
+                  <span className="font-montserrat font-medium text-gray-700">{profile?.listingType || "N/A"}</span>
+                </div>
+                <div className="grid grid-cols-[96px_1fr] gap-2">
+                  <span className="font-montserrat font-bold text-gray-900">Established In</span>
+                  <span className="font-montserrat font-medium text-gray-700">{vendorDetails?.yearsInBusiness || "N/A"}</span>
+                </div>
+                <div className="grid grid-cols-[96px_1fr] gap-2">
+                  <span className="font-montserrat font-bold text-gray-900">Location</span>
+                  <span className="font-montserrat font-medium text-gray-700">
+                    {vendorDetails?.address?.city || vendorDetails?.address?.state || "N/A"}
+                  </span>
+                </div>
+                <div className="grid grid-cols-[96px_1fr] gap-2">
+                  <span className="font-montserrat font-bold text-gray-900">Call us</span>
+                  {profile?.phone ? (
+                    revealedFields.call ? (
+                      <span className="font-montserrat font-medium text-gray-700">{profile.phone}</span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => toggleReveal("call")}
+                        className="text-left text-[#1A1F71] underline hover:text-[#0d1150]"
+                      >
+                        Click to reveal
+                      </button>
+                    )
+                  ) : (
+                    <span className="text-gray-500">N/A</span>
+                  )}
+                </div>
+                <div className="grid grid-cols-[96px_1fr] gap-2">
+                  <span className="font-montserrat font-bold text-gray-900">Email us</span>
+                  {profile?.email ? (
+                    revealedFields.email ? (
+                      <span className="font-montserrat font-medium text-gray-700 break-all">{profile.email}</span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => toggleReveal("email")}
+                        className="text-left text-[#1A1F71] underline hover:text-[#0d1150]"
+                      >
+                        Click to reveal
+                      </button>
+                    )
+                  ) : (
+                    <span className="font-montserrat font-medium text-gray-500">N/A</span>
+                  )}
+                </div>
+                <div className="grid grid-cols-[96px_1fr] gap-2">
+                  <span className="font-montserrat font-bold text-gray-900">Address</span>
+                  {businessAddress !== "Not available" ? (
+                    revealedFields.address ? (
+                      <span className="font-montserrat font-medium text-gray-700">{businessAddress}</span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => toggleReveal("address")}
+                        className="text-left text-[#1A1F71] underline hover:text-[#0d1150]"
+                      >
+                        Click to reveal
+                      </button>
+                    )
+                  ) : (
+                    <span className="text-gray-500">N/A</span>
+                  )}
+                </div>
+                <div className="grid grid-cols-[96px_1fr] gap-2">
+                  <span className="font-montserrat font-bold text-gray-900">Website</span>
+                  {websiteValue ? (
+                    revealedFields.website ? (
+                      <a
+                        href={websiteValue.startsWith("http") ? websiteValue : `https://${websiteValue}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="font-montserrat font-medium text-gray-700"
+                      >
+                        {websiteValue}
+                      </a>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => toggleReveal("website")}
+                        className="text-left text-[#1A1F71] underline hover:text-[#0d1150]"
+                      >
+                        Click to reveal
+                      </button>
+                    )
+                  ) : (
+                    <span className="text-gray-500">N/A</span>
+                  )}
+                </div>
               </div>
             </div>
           </div>
 
           <div className="mt-8">
-            <h2 className="text-3xl font-semibold text-gray-900">
-              {profile?.businessName || "Vendor"}
-            </h2>
-            <p className="mt-4 text-sm text-gray-700 leading-6">
-              {vendorDetails?.businessBio || "No business description available."}
-            </p>
+          <h2 className="font-poppins text-[40px] font-bold text-gray-900">
+  {profile?.businessName || "Vendor"}
+</h2>
+
+<p className="mt-2 font-montserrat font-medium text-gray-600">
+  {vendorDetails?.businessBio || "No business description available."}
+</p>
           </div>
 
           <div className="mt-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -410,7 +517,7 @@ export default function ProductVendorProfilePage() {
           {filteredProducts.length === 0 ? (
             <p className="py-10 text-center text-gray-600">No products found for this vendor.</p>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-4">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mt-4">
               {filteredProducts.map((item) => {
                 const effectivePrice =
                   item.salePrice != null && item.salePrice > 0 && item.salePrice < item.price
@@ -421,9 +528,9 @@ export default function ProductVendorProfilePage() {
                   <Link
                     key={item._id}
                     href={`/product/${item._id}`}
-                    className="p-2 border-2 border-[#D9D9D9] w-full shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden flex flex-col"
+                    className="p-1.5 border border-[#D9D9D9] w-full shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col"
                   >
-                    <div className="relative w-full aspect-square overflow-hidden bg-gray-100 flex-shrink-0">
+                    <div className="relative w-full aspect-[4/3] overflow-hidden bg-gray-100 flex-shrink-0">
                       <img
                         src={item.image}
                         alt={item.title}
@@ -432,31 +539,31 @@ export default function ProductVendorProfilePage() {
                       />
                     </div>
 
-                    <div className="p-3 flex flex-col flex-1">
-                      <h3 className="text-base font-bold text-gray-900 uppercase tracking-tight leading-snug font-poppins line-clamp-2 h-[42px]">
+                    <div className="p-2 flex flex-col flex-1">
+                      <h3 className="text-sm font-bold text-gray-900 uppercase tracking-tight leading-snug font-poppins line-clamp-2 h-[36px]">
                         {item.title}
                       </h3>
 
-                      <p className="mb-2 text-xs text-gray-600 leading-5 font-montserrat h-[40px] overflow-hidden">
+                      <p className="mb-1.5 text-[11px] text-gray-600 leading-4 font-montserrat h-[32px] overflow-hidden">
                         {item.description || "\u00a0"}
                       </p>
 
-                      <p className="text-[11px] text-gray-500 mb-2">
+                      <p className="text-[10px] text-gray-500 mb-1.5">
                         {item.reviewCount} Ratings & Reviews
                       </p>
 
                       <div className="mt-auto">
                         {item.salePrice != null && item.salePrice < item.price ? (
                           <div className="flex items-center gap-2">
-                            <span className="text-lg font-bold text-red-600">
+                            <span className="text-base font-bold text-red-600">
                               ${effectivePrice.toFixed(2)}
                             </span>
-                            <span className="text-sm text-gray-500 line-through">
+                            <span className="text-xs text-gray-500 line-through">
                               ${item.price.toFixed(2)}
                             </span>
                           </div>
                         ) : (
-                          <span className="text-lg font-bold text-gray-900">
+                          <span className="text-base font-bold text-gray-900">
                             ${effectivePrice.toFixed(2)}
                           </span>
                         )}
@@ -467,6 +574,7 @@ export default function ProductVendorProfilePage() {
               })}
             </div>
           )}
+          <ClientTestimonials />
         </div>
       )}
     </div>
