@@ -1,8 +1,11 @@
 export interface ChildService {
+  _id?: string;
   name: string;
   description: string;
-  durationMinutes: number;
+  duration?: string;
+  durationMinutes?: number;
   price: number;
+  image?: string;
 }
 
 export interface BusinessHour {
@@ -13,6 +16,7 @@ export interface BusinessHour {
 
 export interface Service {
   _id: string;
+  parentServiceId?: string;
   title: string;
   description: string;
   categoryId: { _id: string; name: string } | null;

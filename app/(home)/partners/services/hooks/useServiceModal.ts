@@ -4,6 +4,58 @@ import { Service, ChildService, BusinessHour } from '../types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
+const parseDurationToMinutes = (duration: unknown): number => {
+  if (typeof duration === 'number' && Number.isFinite(duration)) {
+    return duration;
+  }
+
+  if (typeof duration !== 'string') {
+    return 60;
+  }
+
+  const match = duration.match(/(\d+(\.\d+)?)/);
+  if (!match) {
+    return 60;
+  }
+
+  const value = parseFloat(match[1]);
+  return /hour/i.test(duration) ? Math.round(value * 60) : Math.round(value);
+};
+
+const normalizeBusinessHours = (hours: any[] = []) => {
+  return hours.map((hour) => {
+    if (typeof hour.hours === 'string') {
+      return {
+        day: hour.day,
+        hours: hour.hours,
+        closed: Boolean(hour.closed),
+      };
+    }
+
+    const openTime = hour.openTime || '00:00';
+    const closeTime = hour.closeTime || '00:00';
+
+    return {
+      day: hour.day,
+      hours: `${openTime} - ${closeTime}`,
+      closed: hour.isOpen === undefined ? Boolean(hour.closed) : !hour.isOpen,
+    };
+  });
+};
+
+const normalizeService = (service: Service): Service => {
+  return {
+    ...service,
+    services: (service.services || []).map((childService: any) => ({
+      ...childService,
+      durationMinutes: parseDurationToMinutes(
+        childService.duration ?? childService.durationMinutes
+      ),
+    })),
+    businessHours: normalizeBusinessHours(service.businessHours as any[]),
+  };
+};
+
 export const useServiceModal = () => {
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [loading, setLoading] = useState(false);
@@ -25,7 +77,7 @@ export const useServiceModal = () => {
       
       const data = await response.json();
       if (data.service) {
-        setSelectedService(data.service);
+        setSelectedService(normalizeService(data.service));
       } else {
         toast.error('Failed to load service details');
       }
@@ -53,7 +105,7 @@ export const useServiceModal = () => {
       
       const data = await response.json();
       if (data.service) {
-        setSelectedService(data.service);
+        setSelectedService(normalizeService(data.service));
       } else {
         toast.error('Failed to load service for editing');
       }

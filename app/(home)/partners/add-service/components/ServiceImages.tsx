@@ -5,7 +5,7 @@ interface Props {
   coverImage: string;
   galleryImages: string[];
   onCoverUpload: (file: File) => Promise<void>;
-  onGalleryUpload: (file: File) => Promise<void>;
+  onGalleryUpload: (files: File[]) => Promise<void>;
   onRemoveCover: () => void;
   onRemoveGallery: (index: number) => void;
   uploading: Record<string, boolean>;
@@ -73,9 +73,11 @@ export default function ServiceImages({
             id="gallery-upload"
             className="hidden"
             accept="image/*"
+            multiple
             onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) onGalleryUpload(file);
+              const files = e.target.files ? Array.from(e.target.files) : [];
+              if (files.length > 0) onGalleryUpload(files);
+              e.currentTarget.value = '';
             }}
           />
           <label 

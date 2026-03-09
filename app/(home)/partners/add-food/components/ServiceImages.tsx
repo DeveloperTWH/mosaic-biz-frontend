@@ -1,0 +1,181 @@
+import React from 'react';
+import { X, Image as ImageIcon } from 'lucide-react';
+
+interface Props {
+  coverImage: string;
+  galleryImages: string[];
+  menuImage: string;
+  onCoverUpload: (file: File) => Promise<void>;
+  onGalleryUpload: (files: File[]) => Promise<void>;
+  onMenuUpload: (file: File) => Promise<void>;
+  onRemoveCover: () => void;
+  onRemoveGallery: (index: number) => void;
+  onRemoveMenu: () => void;
+  onCoverUrlChange: (value: string) => void;
+  onMenuUrlChange: (value: string) => void;
+  uploading: Record<string, boolean>;
+  uploadProgress: Record<string, number>;
+}
+
+export default function ServiceImages({
+  coverImage,
+  galleryImages,
+  menuImage,
+  onCoverUpload,
+  onGalleryUpload,
+  onMenuUpload,
+  onRemoveCover,
+  onRemoveGallery,
+  onRemoveMenu,
+  onCoverUrlChange,
+  onMenuUrlChange,
+  uploading,
+  uploadProgress,
+}: Props) {
+  return (
+    <div className="bg-gray-100 border border-gray-200 rounded-md p-5 space-y-6">
+      <div>
+        <h2 className="text-base font-semibold text-gray-900 mb-4 border-l-4 border-[#c9a227] pl-3">
+          Feature Banner Image
+        </h2>
+        {coverImage ? (
+          <div className="relative w-full h-48 bg-gray-200 rounded-lg overflow-hidden">
+            <img src={coverImage} alt="Cover" className="w-full h-full object-cover" />
+            <button
+              type="button"
+              onClick={onRemoveCover}
+              className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        ) : (
+          <div className="w-full h-48 bg-gray-200 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
+            <input
+              type="file"
+              id="cover-upload"
+              className="hidden"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) onCoverUpload(file);
+                e.currentTarget.value = '';
+              }}
+            />
+            <label htmlFor="cover-upload" className="cursor-pointer flex flex-col items-center">
+              <ImageIcon className="w-12 h-12 text-gray-400 mb-2" />
+            </label>
+          </div>
+        )}
+        {/* <input
+          type="text"
+          value={coverImage}
+          onChange={(e) => onCoverUrlChange(e.target.value)}
+          placeholder="Or paste cover image URL"
+          className="w-full mt-2 px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-[#c9a227] focus:border-[#c9a227]"
+        /> */}
+        {uploading.cover ? (
+          <p className="mt-1 text-xs text-gray-500">Uploading... {uploadProgress.cover || 0}%</p>
+        ) : null}
+      </div>
+
+      <div>
+        <h3 className="text-sm font-semibold text-gray-900 mb-1 border-l-4 border-[#c9a227] pl-3">
+          Food Gallery
+        </h3>
+        <p className="text-xs text-gray-500 mb-3 pl-4">Max 5 images allowed based on your subscription plan.</p>
+        <div className="mb-3">
+          <input
+            type="file"
+            id="gallery-upload"
+            className="hidden"
+            accept="image/*"
+            multiple
+            onChange={(e) => {
+              const files = e.target.files ? Array.from(e.target.files) : [];
+              if (files.length > 0) onGalleryUpload(files);
+              e.currentTarget.value = '';
+            }}
+          />
+          <label
+            htmlFor="gallery-upload"
+            className="inline-block px-6 py-2 bg-[#c9a227] text-white text-sm rounded cursor-pointer hover:bg-[#b8921f]"
+          >
+            Add Photo
+          </label>
+        </div>
+
+        <div className="flex flex-wrap gap-3">
+          {galleryImages.map((img, index) => (
+            <div key={`${img}-${index}`} className="relative w-20 h-20 bg-gray-200 rounded-lg overflow-hidden">
+              <img src={img} alt={`Gallery ${index + 1}`} className="w-full h-full object-cover" />
+              <button
+                type="button"
+                onClick={() => onRemoveGallery(index)}
+                className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-0.5 hover:bg-red-600"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </div>
+          ))}
+
+          {galleryImages.length < 5 ? (
+            <div className="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
+              <label htmlFor="gallery-upload" className="cursor-pointer">
+                <ImageIcon className="w-6 h-6 text-gray-400" />
+              </label>
+            </div>
+          ) : null}
+        </div>
+        {uploading.gallery ? (
+          <p className="mt-1 text-xs text-gray-500">Uploading... {uploadProgress.gallery || 0}%</p>
+        ) : null}
+      </div>
+
+      <div>
+        <h3 className="text-sm font-semibold text-gray-900 mb-1 border-l-4 border-[#c9a227] pl-3">
+          Menu Image
+        </h3>
+        {menuImage ? (
+          <div className="relative w-full h-40 bg-gray-200 rounded-lg overflow-hidden">
+            <img src={menuImage} alt="Menu" className="w-full h-full object-cover" />
+            <button
+              type="button"
+              onClick={onRemoveMenu}
+              className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        ) : (
+          <div className="w-full h-40 bg-gray-200 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
+            <input
+              type="file"
+              id="menu-upload"
+              className="hidden"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) onMenuUpload(file);
+                e.currentTarget.value = '';
+              }}
+            />
+            <label htmlFor="menu-upload" className="cursor-pointer flex flex-col items-center">
+              <ImageIcon className="w-10 h-10 text-gray-400 mb-2" />
+            </label>
+          </div>
+        )}
+        {/* <input
+          type="text"
+          value={menuImage}
+          onChange={(e) => onMenuUrlChange(e.target.value)}
+          placeholder="Or paste menu image URL"
+          className="w-full mt-2 px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-[#c9a227] focus:border-[#c9a227]"
+        /> */}
+        {uploading.menu ? (
+          <p className="mt-1 text-xs text-gray-500">Uploading... {uploadProgress.menu || 0}%</p>
+        ) : null}
+      </div>
+    </div>
+  );
+}

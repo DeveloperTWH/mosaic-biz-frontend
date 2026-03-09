@@ -14,6 +14,31 @@ export const useServices = (businessId: string) => {
     sortBy: 'newest'
   });
 
+  const mapChildServicesForListing = (apiServices: Service[]): Service[] => {
+    return apiServices.flatMap((parentService) => {
+      const childServices = Array.isArray(parentService.services) ? parentService.services : [];
+
+      if (childServices.length === 0) {
+        return [{ ...parentService, parentServiceId: parentService._id }];
+      }
+
+      return childServices.map((childService, index) => ({
+        ...parentService,
+        _id: childService._id || `${parentService._id}-${index}`,
+        parentServiceId: parentService._id,
+        coverImage: childService.image || parentService.coverImage,
+        title: childService.name || parentService.title,
+        description: childService.description || parentService.description,
+        price: typeof childService.price === 'number' ? childService.price : parentService.price,
+        duration:
+          childService.duration ||
+          (typeof childService.durationMinutes === 'number'
+            ? `${childService.durationMinutes} minutes`
+            : parentService.duration),
+      }));
+    });
+  };
+
   const fetchServices = async () => {
     if (!businessId) return;
     
@@ -30,8 +55,9 @@ export const useServices = (businessId: string) => {
       
       const data = await response.json();
       if (data.services) {
-        setServices(data.services);
-        setFilteredServices(data.services);
+        const mappedServices = mapChildServicesForListing(data.services);
+        setServices(mappedServices);
+        setFilteredServices(mappedServices);
       }
     } catch (error) {
       console.error('Error fetching services:', error);
@@ -53,7 +79,8 @@ export const useServices = (businessId: string) => {
 
     if (filters.search) {
       result = result.filter(s => 
-        s.title.toLowerCase().includes(filters.search.toLowerCase())
+        s.title.toLowerCase().includes(filters.search.toLowerCase()) ||
+        s.description.toLowerCase().includes(filters.search.toLowerCase())
       );
     }
 

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Check } from 'lucide-react';
 import { SubscriptionPlanResponse } from '@/types/subscription-response';
 
@@ -19,9 +19,11 @@ const TierCard: React.FC<TierCardProps> = ({
   onSelect,
   badge,
 }) => {
-  // Determine colors and content based on plan name
+  const [showMore, setShowMore] = useState(false);
+
   const getPlanConfig = () => {
     const name = plan.name.toLowerCase();
+
     if (name === 'gold' || name === 'standard') {
       return {
         headerBg: 'bg-[#FDF8F0]',
@@ -30,7 +32,7 @@ const TierCard: React.FC<TierCardProps> = ({
         checkColor: 'bg-[#D4AF37]',
         borderColor: isSelected ? 'border-[#D4AF37]' : 'border-[#E5E7EB]',
         title: 'Gold Tier',
-        price:39.99,
+        price: 39.99,
         subtitle: 'Growth & Visibility',
         description: 'For growing brands ready to scale visibility and engagement.',
         featuresTitle: 'Everything in Silver, plus:',
@@ -42,11 +44,15 @@ const TierCard: React.FC<TierCardProps> = ({
           'Product Catalog Upload (CSV)',
           'In-Platform Messaging (Web + App)',
           'Push Notifications to Followers',
-          '+ Read More Features'
+          'Advanced Marketplace Placement',
+          'Priority Customer Support',
+          'SEO Optimization Tools',
         ],
-        footerText: 'Ideal for businesses ready to grow their audience and convert visibility into revenue.',
+        footerText:
+          'Ideal for businesses ready to grow their audience and convert visibility into revenue.',
       };
     }
+
     if (name === 'platinum' || name === 'premium') {
       return {
         headerBg: 'bg-[#F3F4F6]',
@@ -55,22 +61,28 @@ const TierCard: React.FC<TierCardProps> = ({
         checkColor: 'bg-[#D4AF37]',
         borderColor: isSelected ? 'border-[#1E3A8A]' : 'border-[#E5E7EB]',
         title: 'Platinum Tier',
-        price:79.99,
+        price: 79.99,
         subtitle: 'Accelerated Reach & Automation',
-        description: 'For Established Brands Ready To Dominate Their Niche And Automate Growth.',
+        description:
+          'For Established Brands Ready To Dominate Their Niche And Automate Growth.',
         featuresTitle: 'Everything in Gold, plus:',
         features: [
           'Premium Profile (1000 characters)',
           '20 Products / 10 Services',
-          '7 Images per Product + Video Upload + PDF Upload',
+          '7 Images per Product',
+          'Video Upload',
+          'PDF Upload',
           'Up to 5 Testimonial Videos',
-          'Full CRM with Messaging + Automated Reminders',
-          '+ Read More Features',
+          'Full CRM with Messaging',
+          'Automated Reminders',
+          'Advanced Analytics Dashboard',
+          'AI Customer Recommendations',
+          'Featured Marketplace Placement',
         ],
         footerText: 'Built for brands ready to lead, scale, and leave a legacy.',
       };
     }
-    // Silver (default)
+
     return {
       headerBg: 'bg-[#F3F4F6]',
       buttonBg: 'bg-[#1E3A8A]',
@@ -78,9 +90,10 @@ const TierCard: React.FC<TierCardProps> = ({
       checkColor: 'bg-[#D4AF37]',
       borderColor: isSelected ? 'border-[#1E3A8A]' : 'border-[#E5E7EB]',
       title: 'Silver Tier',
-       price:19.99,
+      price: 19.99,
       subtitle: 'Essential Listing',
-      description: 'For start-ups, small size businesses and side hustlers ready to be discovered.',
+      description:
+        'For start-ups, small size businesses and side hustlers ready to be discovered.',
       featuresTitle: 'Features:',
       features: [
         'Verified Vendor Profile (300 characters)',
@@ -90,82 +103,103 @@ const TierCard: React.FC<TierCardProps> = ({
         'Generic Contact Form',
         'Silver Trust Badge',
         'Standard Marketplace Placement',
+        'Basic Search Visibility',
+        'Customer Messaging',
       ],
-      footerText: 'Perfect for building your digital footprint and gaining early traction.',
+      footerText:
+        'Perfect for building your digital footprint and gaining early traction.',
     };
   };
 
   const config = getPlanConfig();
-
-  // Calculate monthly price from annual price
-  const monthlyPrice = (plan.price / 12).toFixed(2);
+  const visibleFeatures = showMore
+    ? config.features
+    : config.features.slice(0, 6);
 
   return (
     <div className="h-full w-full max-w-sm mx-auto">
       <div
-        className={`relative rounded-2xl border-2 transition-all duration-300 overflow-hidden ${config.borderColor} ${isSelected ? 'shadow-lg' : ''} hover:shadow-xl bg-white flex flex-col h-full min-w-[320px] w-full`}
+        className={`relative rounded-2xl border-2 transition-all duration-300 overflow-hidden ${config.borderColor} ${
+          isSelected ? 'shadow-lg' : ''
+        } hover:shadow-xl bg-white flex flex-col h-full min-w-[320px]`}
       >
-        {/* Recommended Badge - Smaller text, properly contained */}
+        {/* Badge */}
         {badge && (
           <div className="absolute top-0 right-0 z-20 w-24 h-24 overflow-hidden">
-            <div className="absolute top-4 -right-6 transform rotate-45 bg-gradient-to-r from-[#9333EA] to-[#C026D3] text-white text-[7px] font-bold py-1 px-8 shadow-md tracking-wider uppercase whitespace-nowrap">
+            <div className="absolute top-6 -right-6 transform rotate-45 bg-gradient-to-r from-[#9333EA] to-[#C026D3] text-white text-[7px] font-bold py-1 px-8 shadow-md tracking-wider uppercase whitespace-nowrap">
               {badge}
             </div>
           </div>
         )}
 
-        {/* Header Section */}
-        <div className={`${config.headerBg} p-6 pb-8`}>
-          <h3 className="text-2xl font-bold text-[#1E3A8A] mb-1">
-            {config.title}
-            <span className="text-lg font-normal text-[#1E3A8A]"> - {config.subtitle}</span>
-          </h3>
-          <p className="text-gray-600 text-sm leading-relaxed mb-4">
-            {config.description}
-          </p>
+        {/* Header */}
+        <div
+          className={`${config.headerBg} p-6 flex flex-col justify-between`}
+          style={{ minHeight: '280px' }} /* Fixed minimum height for all headers */
+        >
+          <div>
+            <h3 className="text-2xl font-bold text-[#1E3A8A] mb-1">
+              {config.title}
+              <span className="text-2px font-normal text-[#1E3A8A]"> - {config.subtitle}</span>
+            </h3>
 
-          {/* Price - from API divided by 12 */}
-          <div className="mt-4">
+            <p className="text-gray-600 text-sm leading-relaxed mb-2">
+              {config.description}
+            </p>
+
             <div className="flex items-baseline gap-1">
-              <span className="text-4xl font-bold text-[#1E3A8A]">
-                ${config.price}
-              </span>
+              <span className="text-3xl sm:text-4xl font-bold text-[#1E3A8A]">${config.price}</span>
               <span className="text-gray-600 text-sm">
                 /Month (Billed Annually)
               </span>
             </div>
           </div>
 
-          {/* Button */}
+          {/* Choose Plan Button - Always at the bottom of header */}
           <button
             onClick={() => onSelect(plan._id)}
             disabled={isLoading}
-            className={`w-full mt-6 py-3 px-4 rounded-lg font-semibold text-white transition-all duration-200 ${config.buttonBg} ${config.buttonHover} ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+            className={`w-full mt-4 py-3 px-4 rounded-lg font-semibold text-white transition-all duration-200 ${config.buttonBg} ${config.buttonHover} ${
+              isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+            }`}
           >
             {isLoading ? 'Processing...' : 'Choose Plan'}
           </button>
         </div>
 
-        {/* Features Section - Static hardcoded content */}
-        <div className="p-6 pt-6 flex-1 flex flex-col">
+        {/* Features */}
+        <div className="p-6 flex flex-col flex-1">
           <p className="text-sm font-semibold text-[#1E3A8A] mb-4">
             {config.featuresTitle}
           </p>
-          <ul className="space-y-3 flex-1">
-            {config.features.map((feature, index) => (
+
+          <ul className="space-y-3">
+            {visibleFeatures.map((feature, index) => (
               <li
                 key={index}
                 className="flex items-start gap-3 text-sm text-gray-700"
               >
-                <div className={`w-5 h-5 rounded-full ${config.checkColor} flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                <div
+                  className={`w-5 h-5 rounded-full ${config.checkColor} flex items-center justify-center flex-shrink-0 mt-0.5`}
+                >
                   <Check className="w-3 h-3 text-white" strokeWidth={3} />
                 </div>
-                <span className="leading-relaxed">{feature}</span>
+                <span>{feature}</span>
               </li>
             ))}
           </ul>
 
-          {/* Footer Text */}
+          {/* Dynamic Read More */}
+          {config.features.length > 6 && (
+            <button
+              onClick={() => setShowMore(!showMore)}
+              className="text-[#1E3A8A] text-sm font-semibold mt-3 hover:underline text-left"
+            >
+              {showMore ? 'Show Less' : '+ Read More Features'}
+            </button>
+          )}
+
+          {/* Footer */}
           <div className="mt-6 pt-4 border-t border-gray-100">
             <p className="text-sm text-gray-500 italic leading-relaxed">
               {config.footerText}

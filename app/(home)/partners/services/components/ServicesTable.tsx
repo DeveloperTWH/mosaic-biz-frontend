@@ -34,12 +34,13 @@ export default function ServicesTable({ services, onView, onEdit, onDelete }: Pr
               <th className="px-4 py-3 text-left text-xs font-medium text-white uppercase">Service</th>
               <th className="px-4 py-3 text-left text-xs font-medium text-white uppercase">Category</th>
               {/* <th className="px-4 py-3 text-left text-xs font-medium text-white uppercase">Subservises</th> */}
-              <th className="px-4 py-3 text-left text-xs font-medium text-white uppercase">Status</th>
               <th className="px-4 py-3 text-left text-xs font-medium text-white uppercase">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {services.map((service, index) => (
+            {services.map((service, index) => {
+              const actionId = service.parentServiceId || service._id;
+              return (
               <tr key={service._id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                 <td className="px-4 py-4">
                   <div className="flex items-center gap-3">
@@ -65,23 +66,22 @@ export default function ServicesTable({ services, onView, onEdit, onDelete }: Pr
                 {/* <td className="px-4 py-4">
                   <span className="text-sm text-gray-900">{service.services?.length || 0}</span>
                 </td> */}
-                <td className="px-4 py-4">{getStatusBadge(service.isPublished)}</td>
                 <td className="px-4 py-4">
                   <div className="flex items-center gap-2">
                     <button 
-                      onClick={() => onView(service._id)} 
+                      onClick={() => onView(actionId)} 
                       className="w-8 h-8 flex items-center justify-center bg-blue-100 hover:bg-blue-200 rounded transition-colors"
                     >
                       <Eye className="w-4 h-4 text-blue-600" />
                     </button>
                     <button 
-                      onClick={() => onEdit(service._id)} 
+                      onClick={() => onEdit(actionId)} 
                       className="w-8 h-8 flex items-center justify-center bg-yellow-100 hover:bg-yellow-200 rounded transition-colors"
                     >
                       <Edit2 className="w-4 h-4 text-yellow-600" />
                     </button>
                     <button 
-                      onClick={() => onDelete(service._id)} 
+                      onClick={() => onDelete(actionId)} 
                       className="w-8 h-8 flex items-center justify-center bg-red-100 hover:bg-red-200 rounded transition-colors"
                     >
                       <Trash2 className="w-4 h-4 text-red-600" />
@@ -89,7 +89,8 @@ export default function ServicesTable({ services, onView, onEdit, onDelete }: Pr
                   </div>
                 </td>
               </tr>
-            ))}
+              );
+            })}
           </tbody>
         </table>
       </div>

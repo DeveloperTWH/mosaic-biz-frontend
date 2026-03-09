@@ -99,20 +99,17 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
                 <div className="flex justify-between items-start mb-3">
                   <span className="text-gray-700 font-medium">{plan.name} Plan</span>
                   <span className="text-2xl font-bold text-blue-900">
-                    ${plan.price}
+                    ${plan.price}/yr
                   </span>
                 </div>
-                <p className="text-sm text-gray-600">
-                  Billed annually
-                </p>
-                <div className="mt-3 pt-3 border-t border-gray-200">
+                {/* <div className="mt-3 pt-3 border-t border-gray-200">
                   <div className="text-xs text-gray-600 space-y-1">
                     <p>✓ {plan.limits.productListings} Product Listings</p>
                     <p>✓ {plan.limits.serviceListings} Service Listings</p>
                     <p>✓ {plan.limits.foodListings} Food Listings</p>
                     <p>✓ Priority Support</p>
                   </div>
-                </div>
+                </div> */}
               </div>
 
               <p className="text-sm text-gray-600 mb-6">

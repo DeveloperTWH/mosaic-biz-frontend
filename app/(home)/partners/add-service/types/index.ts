@@ -7,6 +7,7 @@ export interface ChildService {
   description: string;
   durationMinutes: number;
   price: number;
+  image?: string;
 }
 
 export interface BusinessHour {
@@ -21,6 +22,8 @@ export interface Location {
 
 export interface ServiceFormData {
   // Core fields
+  title?: string;
+  description?: string;
   categoryId: string;
   subcategoryId: string;
   businessId: string;
@@ -158,6 +161,7 @@ export interface SubService {
   description: string;
   durationMinutes: number;
   price: number;
+  image?: string;
 }
 
 // Legacy form data (if you still need it)

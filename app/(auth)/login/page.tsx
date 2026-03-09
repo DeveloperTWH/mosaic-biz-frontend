@@ -173,6 +173,12 @@ function LoginContent() {
               </a>
             </div>
 
+            {error && (
+  <div className="p-2 text-sm text-red-600 bg-red-100 border border-red-300 rounded">
+    {error}
+  </div>
+)}
+
             <button
               type="submit"
               className="w-full bg-blue-900 text-white py-2 text-[16px] hover:bg-blue-800 transition font-montserrat font-extralight"

@@ -14,6 +14,8 @@ import {
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const initialFormData: ServiceFormData = {
+  title: '',
+  description: '',
   categoryId: '',
   subcategoryId: '',
   businessId: '',
@@ -30,6 +32,53 @@ const initialFormData: ServiceFormData = {
 
 const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 const defaultHours = '09:00 AM - 06:00 PM';
+
+const normalizeLocationAddress = (location: unknown): string => {
+  if (typeof location === 'string') {
+    return location;
+  }
+
+  if (location && typeof location === 'object' && 'address' in location) {
+    return String((location as { address?: unknown }).address || '');
+  }
+
+  return '';
+};
+
+const normalizeBusinessHours = (hours: any[] = []) => {
+  const hoursMap = new Map(
+    hours.map((hour) => [hour.day, hour])
+  );
+
+  return daysOfWeek.map((day) => {
+    const hour = hoursMap.get(day);
+
+    if (!hour) {
+      return {
+        day,
+        hours: defaultHours,
+        closed: true,
+      };
+    }
+
+    if (typeof hour.hours === 'string') {
+      return {
+        day,
+        hours: hour.hours,
+        closed: Boolean(hour.closed),
+      };
+    }
+
+    const openTime = hour.openTime || '00:00';
+    const closeTime = hour.closeTime || '00:00';
+
+    return {
+      day,
+      hours: `${openTime} - ${closeTime}`,
+      closed: hour.isOpen === undefined ? Boolean(hour.closed) : !hour.isOpen,
+    };
+  });
+};
 
 export const useServiceForm = () => {
   const router = useRouter();
@@ -76,8 +125,44 @@ export const useServiceForm = () => {
       // Fetch service categories
       await fetchCategories();
       
-      if (businessRes.data.businesses?.length === 1) {
-        handleInputChange('businessId', businessRes.data.businesses[0]._id);
+      const businessId = businessRes.data.businesses?.[0]?._id;
+      if (businessId) {
+        handleInputChange('businessId', businessId);
+        
+        // Fetch existing service data
+        try {
+          const serviceRes = await axios.get(
+            `${API_BASE_URL}/api/service/business-service/${businessId}`,
+            { withCredentials: true }
+          );
+          
+          if (serviceRes.data.service) {
+            const service = serviceRes.data.service;
+            const normalizedBusinessId =
+              typeof service.businessId === 'string'
+                ? service.businessId
+                : service.businessId?._id || businessId;
+
+            setFormData({
+              title: service.title || '',
+              description: service.description || '',
+              categoryId: service.categoryId?._id || '',
+              subcategoryId: service.subcategoryId?._id || '',
+              businessId: normalizedBusinessId,
+              coverImage: service.coverImage || '',
+              images: service.images || [],
+              location: { address: normalizeLocationAddress(service.location) },
+              businessHours: normalizeBusinessHours(service.businessHours),
+              bookingToolLink: service.bookingToolLink || '',
+              // Keep child services empty on add page to avoid duplicate re-submission
+              services: [],
+              isPublished: Boolean(service.isPublished)
+            });
+          }
+        } catch (err) {
+          // No existing service, continue with empty form
+          console.log('No existing service found');
+        }
       }
       
     } catch (error) {
@@ -135,7 +220,7 @@ export const useServiceForm = () => {
   const addChildService = () => {
     setFormData(prev => ({
       ...prev,
-      services: [...prev.services, { name: '', description: '', durationMinutes: 60, price: 0 }]
+      services: [...prev.services, { name: '', description: '', durationMinutes: 60, price: 0, image: '' }]
     }));
   };
 
@@ -150,6 +235,59 @@ export const useServiceForm = () => {
       ...prev,
       services: prev.services.filter((_, i) => i !== index)
     }));
+  };
+
+  const handleChildServiceImageUpload = async (index: number, file: File): Promise<void> => {
+    const uploadKey = `child-${index}`;
+
+    try {
+      setUploading(prev => ({ ...prev, [uploadKey]: true }));
+      setUploadProgress(prev => ({ ...prev, [uploadKey]: 0 }));
+
+      const interval = setInterval(() => {
+        setUploadProgress(prev => ({
+          ...prev,
+          [uploadKey]: Math.min((prev[uploadKey] || 0) + 10, 90)
+        }));
+      }, 200);
+
+      const response = await fetch(
+        `${API_BASE_URL}/api/service/upload-url?fileName=${encodeURIComponent(file.name)}&fileType=${encodeURIComponent(file.type)}&documentType=service-gallery`,
+        {
+          method: 'GET',
+          credentials: 'include',
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to get upload URL');
+      }
+
+      const { uploadUrl, fileUrl } = await response.json();
+
+      await fetch(uploadUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': file.type },
+        body: file,
+      });
+
+      clearInterval(interval);
+      setUploadProgress(prev => ({ ...prev, [uploadKey]: 100 }));
+      updateChildService(index, 'image', fileUrl);
+      toast.success('service image uploaded successfully!');
+    } catch (error: any) {
+      console.error(' image upload error:', error);
+      toast.error(`Image upload failed: ${error.message}`);
+    } finally {
+      setUploading(prev => ({ ...prev, [uploadKey]: false }));
+      setTimeout(() => {
+        setUploadProgress(prev => ({ ...prev, [uploadKey]: 0 }));
+      }, 2000);
+    }
+  };
+
+  const removeChildServiceImage = (index: number) => {
+    updateChildService(index, 'image', '');
   };
 
   // Business Hours
@@ -200,7 +338,10 @@ export const useServiceForm = () => {
       if (type === 'cover') {
         handleInputChange('coverImage', fileUrl);
       } else {
-        handleInputChange('images', [...formData.images, fileUrl]);
+        setFormData(prev => ({
+          ...prev,
+          images: [...prev.images, fileUrl]
+        }));
       }
 
       toast.success('File uploaded successfully!');
@@ -227,15 +368,9 @@ export const useServiceForm = () => {
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
-    
     if (!formData.categoryId) newErrors.categoryId = 'Category is required';
     if (!formData.subcategoryId) newErrors.subcategoryId = 'Subcategory is required';
     
-    // Optional: Validate at least one child service
-    if (formData.services.length === 0) {
-      newErrors.services = 'At least one service option is required';
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -251,47 +386,71 @@ export const useServiceForm = () => {
     try {
       setSaving(true);
       
-      // ✅ Updated payload to match the new backend structure
-      const payload = {
-        categoryId: formData.categoryId,
-        subcategoryId: formData.subcategoryId,
-        businessId: formData.businessId,
-        bookingToolLink: formData.bookingToolLink || '',
-        services: formData.services,
-        coverImage: formData.coverImage || '',
-        images: formData.images || [],
-        businessHours: formData.businessHours || [],
-        location: formData.location?.address || '', // Send just the address string
-        isPublished: formData.isPublished
-      };
-      
-      console.log('Submitting payload:', payload); // For debugging
-      
-      const response = await axios.post(
-        `${API_BASE_URL}/api/service`,
-        payload,
-        { 
-          withCredentials: true,
-          headers: { 'Content-Type': 'application/json' }
-        }
-      );
+      // Check if parent service exists
+      let parentExists = false;
+      try {
+        const checkRes = await axios.get(
+          `${API_BASE_URL}/api/service/business-service/${formData.businessId}`,
+          { withCredentials: true }
+        );
+        parentExists = !!checkRes.data.service;
+      } catch (err) {
+        parentExists = false;
+      }
 
-      toast.success('Service created successfully!');
+      // Step 1: Create/Update parent service if needed
+      if (!parentExists) {
+        const parentPayload = {
+          title: formData.title || 'Service',
+          description: formData.description || 'Service description',
+          categoryId: formData.categoryId,
+          subcategoryId: formData.subcategoryId,
+          businessId: formData.businessId,
+          coverImage: formData.coverImage || '',
+          images: formData.images || [],
+          location: { address: formData.location?.address || '' },
+          businessHours: formData.businessHours || [],
+          bookingToolLink: formData.bookingToolLink || ''
+        };
+        
+        await axios.post(
+          `${API_BASE_URL}/api/service/parent`,
+          parentPayload,
+          { withCredentials: true }
+        );
+        // toast.success('Parent service created!');
+      }
+
+      // Step 2: Add child services
+      if (formData.services.length > 0) {
+        const childPayload = {
+          businessId: formData.businessId,
+          childServices: formData.services.map(s => ({
+            name: s.name,
+            price: s.price,
+            duration: `${s.durationMinutes} minutes`,
+            description: s.description,
+            image: s.image || ''
+          }))
+        };
+
+        await axios.post(
+          `${API_BASE_URL}/api/service/add-child-services`,
+          childPayload,
+          { withCredentials: true }
+        );
+        toast.success('services added!');
+      }
+
+      toast.success('Service saved successfully!');
       router.push('/partners/services');
       
     } catch (error: any) {
       console.error('Error creating service:', error);
-      
-      // Show more detailed error message
       const errorMessage = error.response?.data?.error || 
                           error.response?.data?.message || 
                           'Failed to create service';
       toast.error(errorMessage);
-      
-      // Log full error for debugging
-      if (error.response?.data) {
-        console.error('Server response:', error.response.data);
-      }
     } finally {
       setSaving(false);
     }
@@ -314,6 +473,8 @@ export const useServiceForm = () => {
     addChildService,
     updateChildService,
     removeChildService,
+    handleChildServiceImageUpload,
+    removeChildServiceImage,
     // Business Hours
     businessHours: formData.businessHours,
     updateBusinessHour,

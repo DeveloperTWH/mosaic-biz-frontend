@@ -18,12 +18,23 @@ export default function ServiceDetailsPage() {
 
   const fetchService = async () => {
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/api/services/${params.serviceId}`,
+      // First try to get businessId
+      const businessRes = await fetch(
+        `${API_BASE_URL}/api/business/my`,
         { credentials: 'include' }
       );
-      const data = await response.json();
-      setService(data.service);
+      const businessData = await businessRes.json();
+      const businessId = businessData.businesses?.[0]?._id;
+
+      if (businessId) {
+        // Use the new API to get service with child services
+        const response = await fetch(
+          `${API_BASE_URL}/api/service/business-service/${businessId}`,
+          { credentials: 'include' }
+        );
+        const data = await response.json();
+        setService(data.service);
+      }
     } catch (error) {
       console.error('Error fetching service:', error);
     } finally {
@@ -70,7 +81,9 @@ export default function ServiceDetailsPage() {
               <h2 className="text-lg font-semibold mb-2">Service Options</h2>
               {service.services.map((s: any, i: number) => (
                 <div key={i} className="border-t pt-2 mt-2">
-                  <p><span className="font-medium">{s.name}</span> - ${s.price} / {s.durationMinutes}min</p>
+                  <p>
+                    <span className="font-medium">{s.name}</span> - ${s.price} / {s.duration || `${s.durationMinutes} min`}
+                  </p>
                   <p className="text-sm text-gray-600">{s.description}</p>
                 </div>
               ))}

@@ -9,6 +9,7 @@ type ProductCardProps = {
   reviews: number;
   badge?: string;
   price?: number;
+  logo?: string;
 };
 
 const HorizontalLine = () => {
@@ -24,14 +25,20 @@ const ProductCard: React.FC<ProductCardProps> = ({
   reviews,
   badge,
   price,
+  logo,
 }) => {
   return (
     <div className="product-card h-[420px] flex flex-col overflow-hidden border-2 border-[#D9D9D9] shadow-lg">
-      {image ? (
-        <img src={image} alt={title} className="product-image h-[180px] w-full object-cover flex-shrink-0" />
-      ) : (
-        <div className="h-[180px] w-full bg-gray-100 flex-shrink-0" />
-      )}
+      <div className="relative h-[180px] w-full flex-shrink-0">
+        {image ? (
+          <img src={image} alt={title} className="product-image h-full w-full object-cover" />
+        ) : (
+          <div className="h-full w-full bg-gray-100" />
+        )}
+        {logo && (
+          <img src={logo} alt="Business Logo" className="absolute bottom-2 right-2 h-12 w-12 object-contain bg-white rounded-full p-1 shadow-md" />
+        )}
+      </div>
 
       <div className="product-content p-4 flex flex-col flex-1">
         {/* Title */}
@@ -51,14 +58,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           {description || "\u00a0"}
         </p>
 
-        {/* Price */}
-        <div className="mb-3 h-7">
-          {price !== undefined && (
-            <span className="text-lg font-bold text-gray-900">
-              ${price.toFixed(2)}
-            </span>
-          )}
-        </div>
+
 
         <div className="flex justify-center mt-auto">
           <div className="w-[65%] mr-5">
