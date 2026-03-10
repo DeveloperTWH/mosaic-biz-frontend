@@ -161,7 +161,7 @@ export default function VariantsTable({
                       ))}
                     </div>
 
-                    {onImageUpload && (
+                    {onImageUpload && (variant.images || []).length < 1 && (
                       <div>
                         <input
                           type="file"

@@ -118,6 +118,7 @@ export default function AddProductPage() {
               <ImageUpload
                 featureImage={formData.featureImage}
                 galleryImages={formData.galleryImages}
+                errors={errors}
                 onFeatureUpload={(file) => handleFileUpload('feature', file)}
                 onGalleryUpload={(file) => handleFileUpload('gallery', file)}
                 onRemoveFeature={() => removeImage('feature')}

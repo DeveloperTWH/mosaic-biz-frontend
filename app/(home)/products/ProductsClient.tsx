@@ -77,6 +77,9 @@ const Page = () => {
     const [selectedBadge, setSelectedBadge] = useState("");
     const [priceMin, setPriceMin] = useState<number | undefined>();
     const [priceMax, setPriceMax] = useState<number | undefined>();
+    const [totalProducts, setTotalProducts] = useState(0);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
 
     const prevButton = React.useRef(null);
     const nextButton = React.useRef(null);
@@ -114,12 +117,13 @@ const Page = () => {
     const fetchProducts = async (q?: string, m?: string, c?: string, categoryId?: string, subcategoryId?: string, badge?: string, priceMin?: number, priceMax?: number) => {
         setLoading(true);
         try {
+            const defaultLimit = 10;
             const params: any = {
                 search: (q ?? searchText) || "",
                 city: (c ?? searchLocation) || "",
                 minorityType: (m ?? minorityType) || "",
                 page: 1,
-                limit: 10,
+                limit: defaultLimit,
             };
             
             if (categoryId) params.categoryId = categoryId;
@@ -132,10 +136,17 @@ const Page = () => {
             const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/products/list`, {
                 params,
             });
-            setProducts(res.data.data || []);
+            const responseData = res.data || {};
+            const apiProducts = Array.isArray(responseData.data) ? responseData.data : [];
+            setProducts(apiProducts);
+            setTotalProducts(Number(responseData.total ?? apiProducts.length ?? 0));
+            setCurrentPage(Number(responseData.page ?? params.page ?? 1));
+            setItemsPerPage(Number(responseData.pageSize ?? responseData.limit ?? params.limit ?? defaultLimit));
         } catch (err) {
             console.error("Error fetching products", err);
             setProducts([]);
+            setTotalProducts(0);
+            setCurrentPage(1);
         } finally {
             setLoading(false);
         }
@@ -287,6 +298,9 @@ const Page = () => {
 
             <ProductSevices 
                 services={products}
+                totalProducts={totalProducts}
+                currentPage={currentPage}
+                itemsPerPage={itemsPerPage}
                 selectedCategory={selectedCategory}
                 loading={loadingn}
                 onCategorySelect={(categoryId) => {

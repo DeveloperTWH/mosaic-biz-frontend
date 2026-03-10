@@ -58,6 +58,7 @@ export default function ImageGallerySection({
             onChange={async (e) => {
               const file = e.target.files?.[0];
               if (file) await onCoverUpload(file);
+              e.target.value = '';
             }}
           />
           <label
@@ -104,6 +105,7 @@ export default function ImageGallerySection({
                   await onGalleryUpload(files[i]);
                 }
               }
+              e.target.value = '';
             }}
           />
           <label

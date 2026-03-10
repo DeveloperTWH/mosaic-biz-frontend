@@ -3,7 +3,12 @@ import { Save, Loader, Upload } from 'lucide-react';
 
 interface Props {
   variant: any;
-  productAttributes: Array<{ name: string; values: string[] }>;
+  showAttribute1: boolean;
+  showAttribute2: boolean;
+  attribute1Name: string;
+  attribute2Name: string;
+  attribute1Options: string[];
+  attribute2Options: string[];
   onSave: () => void;
   onCancel: () => void;
   onChange: (updated: any) => void;
@@ -14,7 +19,12 @@ interface Props {
 
 export default function EditVariantForm({
   variant,
-  productAttributes,
+  showAttribute1,
+  showAttribute2,
+  attribute1Name,
+  attribute2Name,
+  attribute1Options,
+  attribute2Options,
   onSave,
   onCancel,
   onChange,
@@ -38,6 +48,24 @@ export default function EditVariantForm({
     return [...new Set(values)];
   };
 
+  const handleShippingChange = (
+    field: 'standard' | 'overnight' | 'local',
+    value: number
+  ) => {
+    onChange({
+      ...variant,
+      shipping: {
+        standard: variant.shipping?.standard ?? 0,
+        overnight: variant.shipping?.overnight ?? 0,
+        local: variant.shipping?.local ?? 0,
+        [field]: value
+      }
+    });
+  };
+
+  const uniqueAttribute1Options = getUniqueValues(attribute1Options);
+  const uniqueAttribute2Options = getUniqueValues(attribute2Options);
+
   return (
     <tr className="bg-yellow-50">
       <td className="px-4 py-3">
@@ -50,38 +78,64 @@ export default function EditVariantForm({
       </td>
       
       {/* Attribute 1 */}
-      <td className="px-4 py-3">
-        <span className="text-xs text-gray-500">{productAttributes[0]?.name || ''}</span>
-      </td>
-      <td className="px-4 py-3">
-        <select
-          value={variant.attributes[productAttributes[0]?.name] || ''}
-          onChange={(e) => handleAttributeChange(productAttributes[0]?.name, e.target.value)}
-          className="w-24 px-2 py-1 text-xs border border-gray-300 rounded"
-        >
-          <option value="">Select</option>
-          {productAttributes[0]?.values && getUniqueValues(productAttributes[0].values).map((val, idx) => (
-            <option key={`attr1-${idx}-${val}`} value={val}>{val}</option>
-          ))}
-        </select>
-      </td>
+      {showAttribute1 && (
+        <>
+          <td className="px-4 py-3">
+            <span className="text-xs text-gray-500">{attribute1Name}</span>
+          </td>
+          <td className="px-4 py-3">
+            {uniqueAttribute1Options.length > 0 ? (
+              <select
+                value={variant.attributes?.[attribute1Name] || ''}
+                onChange={(e) => handleAttributeChange(attribute1Name, e.target.value)}
+                className="w-24 px-2 py-1 text-xs border border-gray-300 rounded"
+              >
+                <option value="">Select</option>
+                {uniqueAttribute1Options.map((val, idx) => (
+                  <option key={`attr1-${idx}-${val}`} value={val}>{val}</option>
+                ))}
+              </select>
+            ) : (
+              <input
+                type="text"
+                value={variant.attributes?.[attribute1Name] || ''}
+                onChange={(e) => handleAttributeChange(attribute1Name, e.target.value)}
+                className="w-24 px-2 py-1 text-xs border border-gray-300 rounded"
+              />
+            )}
+          </td>
+        </>
+      )}
 
       {/* Attribute 2 */}
-      <td className="px-4 py-3">
-        <span className="text-xs text-gray-500">{productAttributes[1]?.name || ''}</span>
-      </td>
-      <td className="px-4 py-3">
-        <select
-          value={variant.attributes[productAttributes[1]?.name] || ''}
-          onChange={(e) => handleAttributeChange(productAttributes[1]?.name, e.target.value)}
-          className="w-24 px-2 py-1 text-xs border border-gray-300 rounded"
-        >
-          <option value="">Select</option>
-          {productAttributes[1]?.values && getUniqueValues(productAttributes[1].values).map((val, idx) => (
-            <option key={`attr2-${idx}-${val}`} value={val}>{val}</option>
-          ))}
-        </select>
-      </td>
+      {showAttribute2 && (
+        <>
+          <td className="px-4 py-3">
+            <span className="text-xs text-gray-500">{attribute2Name}</span>
+          </td>
+          <td className="px-4 py-3">
+            {uniqueAttribute2Options.length > 0 ? (
+              <select
+                value={variant.attributes?.[attribute2Name] || ''}
+                onChange={(e) => handleAttributeChange(attribute2Name, e.target.value)}
+                className="w-24 px-2 py-1 text-xs border border-gray-300 rounded"
+              >
+                <option value="">Select</option>
+                {uniqueAttribute2Options.map((val, idx) => (
+                  <option key={`attr2-${idx}-${val}`} value={val}>{val}</option>
+                ))}
+              </select>
+            ) : (
+              <input
+                type="text"
+                value={variant.attributes?.[attribute2Name] || ''}
+                onChange={(e) => handleAttributeChange(attribute2Name, e.target.value)}
+                className="w-24 px-2 py-1 text-xs border border-gray-300 rounded"
+              />
+            )}
+          </td>
+        </>
+      )}
 
       <td className="px-4 py-3">
         <input
@@ -123,8 +177,38 @@ export default function EditVariantForm({
         </select>
       </td>
       <td className="px-4 py-3">
+        <input
+          type="number"
+          value={variant.shipping?.standard ?? 0}
+          onChange={(e) => handleShippingChange('standard', parseFloat(e.target.value) || 0)}
+          className="w-20 px-2 py-1 text-xs border border-gray-300 rounded"
+          step="0.01"
+          min="0"
+        />
+      </td>
+      <td className="px-4 py-3">
+        <input
+          type="number"
+          value={variant.shipping?.overnight ?? 0}
+          onChange={(e) => handleShippingChange('overnight', parseFloat(e.target.value) || 0)}
+          className="w-20 px-2 py-1 text-xs border border-gray-300 rounded"
+          step="0.01"
+          min="0"
+        />
+      </td>
+      <td className="px-4 py-3">
+        <input
+          type="number"
+          value={variant.shipping?.local ?? 0}
+          onChange={(e) => handleShippingChange('local', parseFloat(e.target.value) || 0)}
+          className="w-20 px-2 py-1 text-xs border border-gray-300 rounded"
+          step="0.01"
+          min="0"
+        />
+      </td>
+      <td className="px-4 py-3">
         <div className="flex items-center gap-1">
-          {variant.images.map((img: string, imgIdx: number) => (
+          {(variant.images || []).map((img: string, imgIdx: number) => (
             <img key={`img-${variant._id}-${imgIdx}`} src={img} alt="" className="w-6 h-6 object-cover rounded" />
           ))}
           <input

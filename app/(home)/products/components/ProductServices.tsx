@@ -50,7 +50,7 @@ type RankedItem = {
 
 const ProductSevices: React.FC<BookServicesProps> = ({ 
   services, 
-  totalProducts = 72,
+  totalProducts = 0,
   currentPage = 1,
   itemsPerPage = 40,
   selectedCategory,
@@ -67,8 +67,9 @@ const ProductSevices: React.FC<BookServicesProps> = ({
     badge: ""
   });
 
-  const startItem = (currentPage - 1) * itemsPerPage + 1;
-  const endItem = Math.min(currentPage * itemsPerPage, totalProducts);
+  const safeTotalProducts = Number(totalProducts) || 0;
+  const startItem = safeTotalProducts === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
+  const endItem = safeTotalProducts === 0 ? 0 : Math.min(currentPage * itemsPerPage, safeTotalProducts);
 
 const handleFilterChange = (filterType: keyof typeof selectedFilters, value: string) => {
   setSelectedFilters(prev => ({
@@ -160,7 +161,7 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
           <div className="flex mb-4 flex-row justify-between">
    
             <p className="text-sm text-gray-600">
-              (Showing {startItem} – {endItem} Products Of {totalProducts} Products)
+              (Showing {startItem} – {endItem} Products Of {safeTotalProducts} Products)
             </p>
 
                           {/* Sort By Section - Compact */}
@@ -322,6 +323,33 @@ function stripHtml(html: string): string {
   return html.replace(/<[^>]*>/g, '');
 }
 
+function pickBadgeValue(item: any): string | null {
+  const rawBadge =
+    item?.badge ??
+    item?.businessDetails?.badge ??
+    item?.businessId?.badge ??
+    null;
+
+  if (typeof rawBadge !== "string") return null;
+  const trimmed = rawBadge.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+function buildBadgeImagePath(badge: string): string {
+  const compact = badge.toLowerCase().replace(/[\s_-]+/g, "");
+  const knownBadges: Record<string, string> = {
+    silver: "silver",
+    gold: "gold",
+    platinum: "platinum",
+    diamond: "diamond",
+  };
+
+  if (knownBadges[compact]) {
+    return `/badge/${knownBadges[compact]}.png`;
+  }
+
+  return `/badge/${badge.replace(/\s+/g, "-").toLowerCase()}.png`;
+}
 
 function ProductCard({ item }: { item: RankedItem }) {
   const href = `/product/${item._id}`;
@@ -335,7 +363,8 @@ function ProductCard({ item }: { item: RankedItem }) {
   const rating = pickRating(item);
   const ratingCount = pickRatingCount(item);
   const reviewCount = 5;
-  const badge = (item as any).badge || null;
+  const badge = pickBadgeValue(item as any);
+  const badgeImagePath = badge ? buildBadgeImagePath(badge) : null;
   
   // Get price from item.price or fallback to variant price
   let displayPrice = 0;
@@ -357,7 +386,9 @@ function ProductCard({ item }: { item: RankedItem }) {
   const hasHalfStar = fractional >= 0.25 && fractional < 0.75;
 
   return (
-    <div className="bg-green p-2 border-2 border-[#D9D9D9] w-full max-w-[300px] h-[460px] shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col">
+
+    <Link href={href} className="block">
+    <div className="bg-green p-2 border-2 border-[#D9D9D9] w-full max-w-[300px] h-[460px] shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col cursor-pointer">
       {/* Product Image - Square (1:1 like Best Sellers) */}
       <div className="relative w-full aspect-square overflow-hidden bg-gray-100 flex-shrink-0">
         {images[0] ? (
@@ -440,9 +471,14 @@ function ProductCard({ item }: { item: RankedItem }) {
 
   {badge ? (
 <img
-  src={`/badge/${badge.replace(/\s+/g, "-").toLowerCase()}.png`}
+  src={badgeImagePath || "/badge.png"}
   alt={`${badge} badge`}
   className="h-12 object-contain"
+  onError={(e) => {
+    const img = e.currentTarget;
+    if (img.src.endsWith("/badge.png")) return;
+    img.src = "/badge.png";
+  }}
 />
   ) : (
     <div className="h-14 w-[90px]" />
@@ -451,8 +487,10 @@ function ProductCard({ item }: { item: RankedItem }) {
 
       </div>
     </div>
+    </Link>
   );
 }
 
 export default ProductSevices;
+
 

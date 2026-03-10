@@ -423,11 +423,21 @@ const toggleHasVariants = (value: boolean) => {
       // Update form data with file URL
       if (type === 'feature') {
         setFormData(prev => ({ ...prev, featureImage: data.fileUrl }));
+        setErrors(prev => {
+          const next = { ...prev };
+          delete next.featureImage;
+          return next;
+        });
       } else {
         setFormData(prev => ({
           ...prev,
           galleryImages: [...prev.galleryImages, data.fileUrl],
         }));
+        setErrors(prev => {
+          const next = { ...prev };
+          delete next.galleryImages;
+          return next;
+        });
       }
 
       toast.success('File uploaded successfully!');
@@ -496,6 +506,8 @@ const toggleHasVariants = (value: boolean) => {
     if (!formData.businessId) newErrors.businessId = 'Business is required';
     if (!formData.categoryId) newErrors.categoryId = 'Category is required';
     if (!formData.subCategoryId) newErrors.subCategoryId = 'Subcategory is required';
+    if (!formData.featureImage.trim()) newErrors.featureImage = 'Cover image is required';
+    if (!formData.galleryImages.length) newErrors.galleryImages = 'At least one gallery image is required';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -551,7 +563,12 @@ const toggleHasVariants = (value: boolean) => {
               : undefined,
           stock: variant.stock,
           images: variant.images && variant.images.length > 0 ? variant.images : [defaultVariantImage],
-          sku: variant.sku
+          sku: variant.sku,
+          shipping: {
+            standard: variant.standardShipping || 0,
+            overnight: variant.overnightShipping || 0,
+            local: variant.localShipping || 0
+          }
         };
       }),
       isPublished: true

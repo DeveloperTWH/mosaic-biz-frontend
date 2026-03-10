@@ -4,6 +4,7 @@ import { Upload, X, Image as ImageIcon, Plus } from 'lucide-react';
 interface Props {
   featureImage: string;
   galleryImages: string[];
+  errors?: Record<string, string>;
   onFeatureUpload: (file: File) => Promise<void>;
   onGalleryUpload: (file: File) => Promise<void>;
   onRemoveFeature: () => void;
@@ -15,6 +16,7 @@ interface Props {
 export default function ImageUpload({
   featureImage,
   galleryImages,
+  errors,
   onFeatureUpload,
   onGalleryUpload,
   onRemoveFeature,
@@ -68,6 +70,9 @@ export default function ImageUpload({
               </label>
             </div>
           )}
+          {errors?.featureImage && (
+            <p className="mt-2 text-xs text-red-600">{errors.featureImage}</p>
+          )}
         </div>
 
         {/* Product Gallery */}
@@ -119,6 +124,9 @@ export default function ImageUpload({
           <p className="text-xs text-gray-400 mt-2">
            maximum 5 image allowed baced on your subscription plan
           </p>
+          {errors?.galleryImages && (
+            <p className="mt-2 text-xs text-red-600">{errors.galleryImages}</p>
+          )}
         </div>
       </div>
     </div>

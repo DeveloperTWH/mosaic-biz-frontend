@@ -45,6 +45,20 @@ export default function EditProductModal({ product, onClose, onSave }: Props) {
   // Variants state
   const [variants, setVariants] = useState<any[]>([]);
 
+  const parseNumber = (value: unknown): number => {
+    if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
+    if (typeof value === 'string') {
+      const parsed = parseFloat(value);
+      return Number.isFinite(parsed) ? parsed : 0;
+    }
+    if (value && typeof value === 'object' && '$numberDecimal' in (value as Record<string, unknown>)) {
+      const parsed = parseFloat(String((value as Record<string, unknown>).$numberDecimal));
+      return Number.isFinite(parsed) ? parsed : 0;
+    }
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  };
+
   // Initialize form with product data
   useEffect(() => {
     if (product) {
@@ -71,10 +85,15 @@ export default function EditProductModal({ product, onClose, onSave }: Props) {
           _id: v._id,
           attributes: v.attributes,
           sku: v.sku,
-          price: typeof v.price === 'object' ? parseFloat(JSON.stringify(v.price)) : Number(v.price),
-          salePrice: v.salePrice ? (typeof v.salePrice === 'object' ? parseFloat(JSON.stringify(v.salePrice)) : Number(v.salePrice)) : undefined,
+          price: parseNumber(v.price),
+          salePrice: v.salePrice !== undefined && v.salePrice !== null ? parseNumber(v.salePrice) : undefined,
           stock: v.stock || 0,
           images: v.images || [],
+          shipping: {
+            standard: parseNumber(v.shipping?.standard ?? product.shipping?.standard),
+            overnight: parseNumber(v.shipping?.overnight ?? product.shipping?.overnight),
+            local: parseNumber(v.shipping?.local ?? product.shipping?.local)
+          },
           isPublished: v.isPublished
         })));
       }
@@ -123,7 +142,7 @@ export default function EditProductModal({ product, onClose, onSave }: Props) {
       const data = await response.json();
       if (data.success) {
         toast.success('Variant updated successfully');
-        setVariants(variants.map(v => v._id === variantId ? { ...v, ...updatedData } : v));
+        setVariants(prev => prev.map(v => v._id === variantId ? { ...v, ...updatedData } : v));
       } else {
         toast.error(data.error || 'Failed to update variant');
       }
@@ -162,16 +181,21 @@ export default function EditProductModal({ product, onClose, onSave }: Props) {
             uploading={uploading}
             onCoverUpload={async (file: File) => {
               const url = await handleFileUpload('cover', file);
-              setProductForm({ ...productForm, coverImage: url });
+              setProductForm(prev => ({ ...prev, coverImage: url }));
             }}
             onGalleryUpload={async (file: File) => {
-              await handleFileUpload('gallery', file);
+              const url = await handleFileUpload('gallery', file);
+              setProductForm(prev => ({
+                ...prev,
+                galleryImages: [...prev.galleryImages, url]
+              }));
             }}
-            onRemoveCover={() => setProductForm({ ...productForm, coverImage: '' })}
+            onRemoveCover={() => setProductForm(prev => ({ ...prev, coverImage: '' }))}
             onRemoveGallery={(index) => {
-              const newGallery = [...productForm.galleryImages];
-              newGallery.splice(index, 1);
-              setProductForm({ ...productForm, galleryImages: newGallery });
+              setProductForm(prev => ({
+                ...prev,
+                galleryImages: prev.galleryImages.filter((_, i) => i !== index)
+              }));
             }}
             onImageClick={setSelectedImage}
           />
@@ -224,10 +248,10 @@ export default function EditProductModal({ product, onClose, onSave }: Props) {
             loadingVariantId={variantLoading}
           />
 
-          <ShippingSection
+          {/* <ShippingSection
             shipping={productForm.shipping}
             onChange={(shipping) => setProductForm({ ...productForm, shipping })}
-          />
+          /> */}
 
           {productForm.metaFields.length > 0 && (
             <MetaFieldsSection

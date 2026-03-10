@@ -26,7 +26,7 @@ export default function DiscountSection({ discount, onChange }: Props) {
           </select>
         </div>
         <div>
-          <label className="block text-xs text-gray-500 mb-1">Amount</label>
+          <label className="block text-xs text-gray-500 mb-1">Value</label>
           <input
             type="number"
             value={discount.amount}

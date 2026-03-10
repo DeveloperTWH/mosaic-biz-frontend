@@ -24,11 +24,26 @@ export default function ViewProductModal({ product, onClose, onEdit, onDelete }:
     return price.toFixed(2);
   };
 
+  const fallbackAttribute1Name =
+    (product.variants || []).map((v) => Object.keys(v.attributes || {})[0]).find(Boolean) || '';
+  const fallbackAttribute2Name =
+    (product.variants || []).map((v) => Object.keys(v.attributes || {})[1]).find(Boolean) || '';
+
+  const attribute1Name = (product.attributes?.[0]?.name || fallbackAttribute1Name || '').trim();
+  const attribute2Name = (product.attributes?.[1]?.name || fallbackAttribute2Name || '').trim();
+
+  const showAttribute1 = Boolean(attribute1Name);
+  const showAttribute2 = Boolean(attribute2Name);
+
   const getVariantAttributes = (variant: ProductVariant) => {
-    const entries = Object.entries(variant.attributes || {});
+    const attrs = variant.attributes || {};
+    const entries = Object.entries(attrs);
+    const resolvedFirstAttr = attribute1Name || entries[0]?.[0] || '';
+    const resolvedSecondAttr = attribute2Name || entries[1]?.[0] || '';
+
     return {
-      firstValue: entries[0]?.[1] || '-',
-      secondValue: entries[1]?.[1] || '-'
+      firstValue: resolvedFirstAttr ? attrs[resolvedFirstAttr] || '-' : '',
+      secondValue: resolvedSecondAttr ? attrs[resolvedSecondAttr] || '-' : ''
     };
   };
 
@@ -86,6 +101,23 @@ export default function ViewProductModal({ product, onClose, onEdit, onDelete }:
             </div>
           </div>
 
+          {/* Gallery Images */}
+          {product.galleryImages && product.galleryImages.length > 0 && (
+            <div>
+              <h3 className="text-xs text-gray-500 uppercase mb-2">Gallery Images</h3>
+              <div className="flex flex-wrap gap-3">
+                {product.galleryImages.map((img, idx) => (
+                  <img
+                    key={`gallery-${idx}`}
+                    src={img}
+                    alt={`Gallery ${idx + 1}`}
+                    className="w-20 h-20 object-cover rounded-lg border border-gray-200"
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Description */}
           <div>
             <h3 className="text-xs text-gray-500 uppercase mb-2">Description of your products</h3>
@@ -123,12 +155,21 @@ export default function ViewProductModal({ product, onClose, onEdit, onDelete }:
                 <table className="w-full text-xs border border-gray-200 rounded">
                   <thead className="bg-gray-400">
                     <tr>
-                      <th className="px-3 py-2 text-left text-xs font-medium text-white">Attribute 1</th>
-                      <th className="px-3 py-2 text-left text-xs font-medium text-white">Attribute 2</th>
-                      <th className="px-3 py-2 text-left text-xs font-medium text-white">Product Price ($)</th>
-                      <th className="px-3 py-2 text-left text-xs font-medium text-white">Slashed Price ($)</th>
+                      <th className="px-3 py-2 text-left text-xs font-medium text-white">SKU</th>
+                      {showAttribute1 && (
+                        <th className="px-3 py-2 text-left text-xs font-medium text-white">Attribute Name</th>
+                      )}
+                      {showAttribute2 && (
+                        <th className="px-3 py-2 text-left text-xs font-medium text-white">Attribute Name</th>
+                      )}
+                      <th className="px-3 py-2 text-left text-xs font-medium text-white">Old Price</th>
+                      <th className="px-3 py-2 text-left text-xs font-medium text-white">New Price</th>
                       <th className="px-3 py-2 text-left text-xs font-medium text-white">Availability</th>
-                      <th className="px-3 py-2 text-left text-xs font-medium text-white">Standard</th>
+                      {/* <th className="px-3 py-2 text-left text-xs font-medium text-white">Status</th> */}
+                      <th className="px-3 py-2 text-left text-xs font-medium text-white">Standard Shipping</th>
+                      <th className="px-3 py-2 text-left text-xs font-medium text-white">Overnight Shipping</th>
+                      <th className="px-3 py-2 text-left text-xs font-medium text-white">Local Shipping</th>
+                      <th className="px-3 py-2 text-left text-xs font-medium text-white">Image</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
@@ -136,8 +177,13 @@ export default function ViewProductModal({ product, onClose, onEdit, onDelete }:
                       const { firstValue, secondValue } = getVariantAttributes(variant);
                       return (
                         <tr key={variant._id} className={vidx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                          <td className="px-3 py-2 text-gray-900">{firstValue}</td>
-                          <td className="px-3 py-2 text-gray-900">{secondValue}</td>
+                          <td className="px-3 py-2 font-mono text-gray-700">{variant.sku || '-'}</td>
+                          {showAttribute1 && (
+                            <td className="px-3 py-2 text-gray-900">{firstValue}</td>
+                          )}
+                          {showAttribute2 && (
+                            <td className="px-3 py-2 text-gray-900">{secondValue}</td>
+                          )}
                           <td className="px-3 py-2 font-medium text-gray-900">${formatPrice(variant.price)}</td>
                           <td className="px-3 py-2 text-gray-500">
                             {variant.salePrice ? `$${formatPrice(variant.salePrice)}` : '-'}
@@ -149,7 +195,32 @@ export default function ViewProductModal({ product, onClose, onEdit, onDelete }:
                               {variant.stock || 0}
                             </span>
                           </td>
-                          <td className="px-3 py-2 text-gray-600">{variant.stock || 0}</td>
+                          {/* <td className="px-3 py-2">
+                            <span className={`px-2 py-0.5 text-xs rounded-full ${
+                              variant.isPublished ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+                            }`}>
+                              {variant.isPublished ? 'Active' : 'Draft'}
+                            </span>
+                          </td> */}
+                          <td className="px-3 py-2 text-gray-600">
+                            ${formatPrice(variant.shipping?.standard ?? product.shipping?.standard ?? 0)}
+                          </td>
+                          <td className="px-3 py-2 text-gray-600">
+                            ${formatPrice(variant.shipping?.overnight ?? product.shipping?.overnight ?? 0)}
+                          </td>
+                          <td className="px-3 py-2 text-gray-600">
+                            ${formatPrice(variant.shipping?.local ?? product.shipping?.local ?? 0)}
+                          </td>
+                          <td className="px-3 py-2">
+                            <div className="flex items-center gap-1">
+                              {(variant.images || []).slice(0, 2).map((img, imgIdx) => (
+                                <img key={imgIdx} src={img} alt="" className="w-6 h-6 object-cover rounded" />
+                              ))}
+                              {(variant.images || []).length > 2 && (
+                                <span className="text-xs text-gray-500">+{(variant.images || []).length - 2}</span>
+                              )}
+                            </div>
+                          </td>
                         </tr>
                       );
                     })}
@@ -160,7 +231,7 @@ export default function ViewProductModal({ product, onClose, onEdit, onDelete }:
           )}
 
           {/* Shipping Options */}
-          {product.shipping && (
+          {/* {product.shipping && (
             <div>
               <h3 className="text-sm font-semibold text-gray-900 mb-2 border-l-4 border-[#c9a227] pl-3">Shipping Options</h3>
               <div className="grid grid-cols-3 gap-4">
@@ -175,6 +246,42 @@ export default function ViewProductModal({ product, onClose, onEdit, onDelete }:
                 <div className="bg-gray-50 p-3 rounded-md">
                   <p className="text-xs text-gray-500">Local</p>
                   <p className="text-lg font-semibold text-gray-900">${formatPrice(product.shipping.local)}</p>
+                </div>
+              </div>
+            </div>
+          )} */}
+
+          {/* Meta Fields */}
+          {product.metaFields && product.metaFields.length > 0 && (
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900 mb-2 border-l-4 border-[#c9a227] pl-3">Meta Fields</h3>
+              <div className="space-y-2">
+                {product.metaFields.map((field, idx) => (
+                  <div key={`meta-${idx}`} className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-md px-3 py-2">
+                    <p className="text-xs font-medium text-gray-700">{field.key}</p>
+                    <p className="text-xs text-gray-600">{field.value}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Discount */}
+          {product.discount && (
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900 mb-2 border-l-4 border-[#c9a227] pl-3">Discount</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="bg-gray-50 p-3 rounded-md">
+                  <p className="text-xs text-gray-500">Type</p>
+                  <p className="text-sm font-medium text-gray-900 capitalize">{product.discount.type || '-'}</p>
+                </div>
+                <div className="bg-gray-50 p-3 rounded-md">
+                  <p className="text-xs text-gray-500">Amount</p>
+                  <p className="text-sm font-medium text-gray-900">{product.discount.amount ?? 0}</p>
+                </div>
+                <div className="bg-gray-50 p-3 rounded-md">
+                  <p className="text-xs text-gray-500">Min Cart Value</p>
+                  <p className="text-sm font-medium text-gray-900">{product.discount.minCartValue ?? 0}</p>
                 </div>
               </div>
             </div>

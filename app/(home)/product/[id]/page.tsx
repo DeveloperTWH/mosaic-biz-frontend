@@ -117,9 +117,15 @@ export default function ProductDetailPage() {
         });
       });
       setSelectedVariant(matchingVariant || null);
-      if (matchingVariant?.images && matchingVariant.images.length > 0) {
-        setMainImage(matchingVariant.images[0]);
-      }
+      // if (matchingVariant?.images && matchingVariant.images.length > 0) {
+      //   setMainImage(matchingVariant.images[0]);
+      // }
+   const firstImage =
+  matchingVariant?.images?.[0] ||
+  product?.galleryImages?.[0] ||
+  product?.coverImage;
+
+setMainImage(firstImage);
     }
   }, [selectedAttributes, product]);
 
@@ -200,6 +206,11 @@ export default function ProductDetailPage() {
   const handleSearch = () => {
     console.log('Filter search triggered:', { businessType, location, minority });
   };
+
+  const productImages = [
+  ...(selectedVariant?.images || []),
+  ...(product?.galleryImages || [])
+];
 
   return (
     <div className="min-h-screen bg-white">
@@ -309,7 +320,8 @@ export default function ProductDetailPage() {
           <div className="lg:w-[45%]">
             <div className="relative w-full aspect-square bg-gray-50 rounded overflow-hidden border border-gray-100">
               <img
-                src={mainImage || product.coverImage}
+                // src={mainImage || product.coverImage}
+                src={mainImage || productImages[0] || product.coverImage}
                 alt={product.title}
                 className="absolute inset-0 object-cover w-full h-full"
               />
@@ -329,7 +341,29 @@ export default function ProductDetailPage() {
             </div>
 
             {/* Thumbnails */}
-            {selectedVariant?.images && selectedVariant.images.length > 0 && (
+{productImages.length > 0 && (
+  <div className="flex gap-2 mt-3 flex-wrap">
+    {productImages.map((img: string, i: number) => (
+      <button
+        key={i}
+        onClick={() => setMainImage(img)}
+        className={`w-[80px] h-[80px] border-2 rounded overflow-hidden transition-all ${
+          mainImage === img
+            ? "border-[#c79b44]"
+            : "border-gray-200 hover:border-gray-300"
+        }`}
+      >
+        <img
+          src={img}
+          alt={`thumb-${i}`}
+          className="object-cover w-full h-full"
+        />
+      </button>
+    ))}
+  </div>
+)}
+
+            {/* {selectedVariant?.images && selectedVariant.images.length > 0 && (
               <div className="flex gap-2 mt-3">
                 {selectedVariant.images.map((img: string, i: number) => (
                   <button
@@ -341,7 +375,7 @@ export default function ProductDetailPage() {
                   </button>
                 ))}
               </div>
-            )}
+            )} */}
           </div>
 
           {/* RIGHT: Info */}
@@ -378,7 +412,7 @@ export default function ProductDetailPage() {
                   </svg>
                 ))}
               </div>
-              <span className="text-xs text-gray-500 underline cursor-pointer">160 Ratings & 5 Reviews</span>
+              <span className="text-xs text-gray-500 underline cursor-pointer"> 0 Ratings & 0 Reviews</span>
             </div>
 
             {/* Price */}
@@ -680,7 +714,7 @@ export default function ProductDetailPage() {
               </h3>
               <div className="flex items-center gap-6">
                 <div className="text-center">
-                  <div className="text-5xl font-bold text-gray-900">4.5</div>
+                  <div className="text-5xl font-bold text-gray-900">0</div>
                   <div className="flex items-center justify-center gap-0.5 mt-1">
                     {[1, 2, 3, 4, 5].map(star => (
                       <svg key={star} className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 24 24">
@@ -688,7 +722,7 @@ export default function ProductDetailPage() {
                       </svg>
                     ))}
                   </div>
-                  <p className="mt-1 text-xs text-gray-500">160 Ratings & 5 Reviews</p>
+                  <p className="mt-1 text-xs text-gray-500">0 Ratings & 0 Reviews</p>
                 </div>
               </div>
               <button className="mt-4 px-7 py-2.5 font-semibold text-white bg-[#1e3a5f] rounded hover:bg-[#152a45] transition-colors uppercase tracking-wide text-xs">

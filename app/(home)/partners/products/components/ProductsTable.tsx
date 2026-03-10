@@ -22,7 +22,7 @@ export default function ProductsTable({
     { key: 'product', label: 'Product Name' },
     { key: 'category', label: 'Category' },
     { key: 'subcategory', label: 'Sub Category' },
-    { key: 'sku', label: 'SKU' },
+    // { key: 'sku', label: 'SKU' },
     { key: 'stock', label: 'Stock' },
     { key: 'status', label: 'Status' },
     { key: 'price', label: 'Price' },
@@ -93,9 +93,9 @@ export default function ProductsTable({
                     <td className="py-4 px-4 text-gray-600">
                       {product.subcategoryId?.name || '-'}
                     </td>
-                    <td className="py-4 px-4 text-gray-600 font-mono text-xs">
+                    {/* <td className="py-4 px-4 text-gray-600 font-mono text-xs">
                       {displaySku}
-                    </td>
+                    </td> */}
                     <td className="py-4 px-4">
                       <span className={`font-medium ${
                         safeStock < 10 ? 'text-red-600' : 'text-gray-900'

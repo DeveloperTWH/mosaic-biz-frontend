@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Package, Edit2, Save, Loader, Upload } from 'lucide-react';
+import { Package, Edit2 } from 'lucide-react';
 import NewVariantForm from '../forms/NewVariantForm';
 import EditVariantForm from '../forms/EditVariantForm';
 
@@ -11,6 +11,11 @@ interface Variant {
   salePrice?: number;
   stock: number;
   images: string[];
+  shipping?: {
+    standard?: number;
+    overnight?: number;
+    local?: number;
+  };
   isPublished: boolean;
 }
 
@@ -37,13 +42,33 @@ export default function VariantsSection({
   const [editingVariantId, setEditingVariantId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<any>(null);
 
+  const fallbackAttribute1Name =
+    variants.map(v => Object.keys(v.attributes || {})[0]).find(Boolean) || '';
+  const fallbackAttribute2Name =
+    variants.map(v => Object.keys(v.attributes || {})[1]).find(Boolean) || '';
+
+  const attribute1Name = (productAttributes[0]?.name || fallbackAttribute1Name || '').trim();
+  const attribute2Name = (productAttributes[1]?.name || fallbackAttribute2Name || '').trim();
+
+  const showAttribute1 = Boolean(attribute1Name);
+  const showAttribute2 = Boolean(attribute2Name);
+
+  const attribute1Options =
+    productAttributes.find((attr) => attr.name === attribute1Name)?.values || [];
+  const attribute2Options =
+    productAttributes.find((attr) => attr.name === attribute2Name)?.values || [];
+
   const getVariantAttributes = (variant: Variant) => {
-    const entries = Object.entries(variant.attributes || {});
+    const attrs = variant.attributes || {};
+    const entries = Object.entries(attrs);
+    const resolvedFirstAttr = attribute1Name || entries[0]?.[0] || '';
+    const resolvedSecondAttr = attribute2Name || entries[1]?.[0] || '';
+
     return {
-      firstAttr: entries[0]?.[0] || '',
-      firstValue: entries[0]?.[1] || '-',
-      secondAttr: entries[1]?.[0] || '',
-      secondValue: entries[1]?.[1] || '-'
+      firstAttr: resolvedFirstAttr,
+      firstValue: resolvedFirstAttr ? attrs[resolvedFirstAttr] || '-' : '',
+      secondAttr: resolvedSecondAttr,
+      secondValue: resolvedSecondAttr ? attrs[resolvedSecondAttr] || '-' : ''
     };
   };
 
@@ -110,15 +135,26 @@ export default function VariantsSection({
           <thead className="bg-gray-50">
             <tr>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">SKU</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Attribute 1</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Value</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Attribute 2</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Value</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Price ($)</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sale Price</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Stock</th>
+              {showAttribute1 && (
+                <>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Attribute name</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Value</th>
+                </>
+              )}
+              {showAttribute2 && (
+                <>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Attribute name</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Value</th>
+                </>
+              )}
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Old Price</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">New Price</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Avalibility</th>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Images</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Std Ship</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Overnight</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Local</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Image</th>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
             </tr>
           </thead>
@@ -132,7 +168,6 @@ export default function VariantsSection({
                   <EditVariantForm
                     key={variant._id}
                     variant={editForm}
-                    productAttributes={productAttributes}
                     onSave={async () => {
                       await onUpdateVariant(variant._id, editForm);
                       cancelEditing();
@@ -140,6 +175,12 @@ export default function VariantsSection({
                     onCancel={cancelEditing}
                     onChange={setEditForm}
                     onImageUpload={handleEditVariantImageUpload}
+                    showAttribute1={showAttribute1}
+                    showAttribute2={showAttribute2}
+                    attribute1Name={attribute1Name}
+                    attribute2Name={attribute2Name}
+                    attribute1Options={attribute1Options}
+                    attribute2Options={attribute2Options}
                     uploading={uploading[`variant-${idx}`]}
                     loading={loadingVariantId === variant._id}
                   />
@@ -149,18 +190,26 @@ export default function VariantsSection({
               return (
                 <tr key={variant._id} className="hover:bg-gray-50">
                   <td className="px-4 py-3 font-mono text-xs text-gray-600">{variant.sku}</td>
-                  <td className="px-4 py-3 text-xs text-gray-500">{firstAttr}</td>
-                  <td className="px-4 py-3">
-                    <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded text-xs font-medium">
-                      {firstValue}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-xs text-gray-500">{secondAttr}</td>
-                  <td className="px-4 py-3">
-                    <span className="px-2 py-1 bg-green-50 text-green-700 rounded text-xs font-medium">
-                      {secondValue}
-                    </span>
-                  </td>
+                  {showAttribute1 && (
+                    <>
+                      <td className="px-4 py-3 text-xs text-gray-500">{firstAttr}</td>
+                      <td className="px-4 py-3">
+                        <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded text-xs font-medium">
+                          {firstValue}
+                        </span>
+                      </td>
+                    </>
+                  )}
+                  {showAttribute2 && (
+                    <>
+                      <td className="px-4 py-3 text-xs text-gray-500">{secondAttr}</td>
+                      <td className="px-4 py-3">
+                        <span className="px-2 py-1 bg-green-50 text-green-700 rounded text-xs font-medium">
+                          {secondValue}
+                        </span>
+                      </td>
+                    </>
+                  )}
                   <td className="px-4 py-3 font-medium">${formatPrice(variant.price)}</td>
                   <td className="px-4 py-3 text-gray-500">
                     {variant.salePrice ? `$${formatPrice(variant.salePrice)}` : '-'}
@@ -177,13 +226,16 @@ export default function VariantsSection({
                       {variant.isPublished ? 'Active' : 'Draft'}
                     </span>
                   </td>
+                  <td className="px-4 py-3 text-gray-600">{formatPrice(variant.shipping?.standard)}</td>
+                  <td className="px-4 py-3 text-gray-600">{formatPrice(variant.shipping?.overnight)}</td>
+                  <td className="px-4 py-3 text-gray-600">{formatPrice(variant.shipping?.local)}</td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1">
-                      {variant.images.slice(0, 2).map((img, imgIdx) => (
+                      {(variant.images || []).slice(0, 2).map((img, imgIdx) => (
                         <img key={imgIdx} src={img} alt="" className="w-6 h-6 object-cover rounded" />
                       ))}
-                      {variant.images.length > 2 && (
-                        <span className="text-xs text-gray-500">+{variant.images.length - 2}</span>
+                      {(variant.images || []).length > 2 && (
+                        <span className="text-xs text-gray-500">+{(variant.images || []).length - 2}</span>
                       )}
                     </div>
                   </td>
