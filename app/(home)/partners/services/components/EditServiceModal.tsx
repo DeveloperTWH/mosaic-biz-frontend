@@ -28,6 +28,12 @@ export default function EditServiceModal({ service, onClose, onSave }: Props) {
   const [price, setPrice] = useState(service.price);
   const [duration, setDuration] = useState(service.duration);
   const [coverImage, setCoverImage] = useState(service.coverImage);
+  const [galleryImages] = useState<string[]>(
+    service.images ||
+      (service as any).galleryImages ||
+      (service as any).serviceImages ||
+      []
+  );
   const [bookingToolLink, setBookingToolLink] = useState(service.bookingToolLink || '');
   const [isPublished, setIsPublished] = useState(service.isPublished);
   
@@ -69,6 +75,24 @@ export default function EditServiceModal({ service, onClose, onSave }: Props) {
   const handleSubmit = async () => {
     try {
       setSaving(true);
+
+      const normalizedServices = childServices
+        .map((item) => ({
+          ...item,
+          name: (item.name || '').trim(),
+          description: item.description || '',
+          durationMinutes:
+            typeof item.durationMinutes === 'number' && Number.isFinite(item.durationMinutes)
+              ? item.durationMinutes
+              : item.duration
+              ? parseInt(String(item.duration), 10) || 60
+              : 60,
+          price:
+            typeof item.price === 'number' && Number.isFinite(item.price)
+              ? item.price
+              : 0,
+        }))
+        .filter((item) => item.name.length > 0);
       
       const payload = {
         title,
@@ -78,8 +102,9 @@ export default function EditServiceModal({ service, onClose, onSave }: Props) {
         price,
         duration,
         coverImage,
+        images: galleryImages,
         bookingToolLink,
-        services: childServices,
+        services: normalizedServices,
         businessHours,
         isPublished
       };
@@ -127,7 +152,7 @@ export default function EditServiceModal({ service, onClose, onSave }: Props) {
           
           {/* Basic Info */}
           <div className="grid grid-cols-2 gap-4 mb-4">
-            <div>
+            {/* <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
               <input
                 type="text"
@@ -146,10 +171,10 @@ export default function EditServiceModal({ service, onClose, onSave }: Props) {
                 step="0.01"
                 min="0"
               />
-            </div>
+            </div> */}
           </div>
 
-          <div className="mb-4">
+          {/* <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
             <textarea
               value={description}
@@ -180,16 +205,44 @@ export default function EditServiceModal({ service, onClose, onSave }: Props) {
                 placeholder="https://calendly.com/ ..."
               />
             </div>
-          </div>
+          </div> */}
 
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Cover Image URL</label>
-            <input
+            <label className="block text-sm font-medium text-gray-700 mb-1">Cover Image</label>
+            {/* <input
               type="text"
               value={coverImage}
               onChange={(e) => setCoverImage(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-[#c9a227] focus:border-[#c9a227]"
-            />
+            /> */}
+            {coverImage ? (
+              <div className="mt-3 w-full max-w-sm h-40 overflow-hidden rounded-md border border-gray-200 bg-gray-100">
+                <img
+                  src={coverImage}
+                  alt="Cover preview"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            ) : null}
+          </div>
+
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2">Gallery Images</label>
+            {galleryImages.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {galleryImages.map((img, index) => (
+                  <div key={`${img}-${index}`} className="w-20 h-20 overflow-hidden rounded border border-gray-200 bg-gray-100">
+                    <img
+                      src={img}
+                      alt={`Gallery ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500">No gallery images available.</p>
+            )}
           </div>
 
           <div className="mb-6">
@@ -207,12 +260,12 @@ export default function EditServiceModal({ service, onClose, onSave }: Props) {
           {/* Child Services Section */}
           <div className="border-t border-gray-200 pt-4 mb-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Service Options</h3>
+              <h3 className="text-lg font-semibold">Services</h3>
               <button
                 onClick={addChildService}
                 className="px-3 py-1 bg-[#c9a227] text-white text-sm rounded-md hover:bg-[#b8921f] flex items-center gap-1"
               >
-                <Plus className="w-4 h-4" /> Add Option
+                <Plus className="w-4 h-4" /> Add Service
               </button>
             </div>
 
@@ -248,6 +301,24 @@ export default function EditServiceModal({ service, onClose, onSave }: Props) {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
                   />
                 </div>
+                <div className="mb-3">
+                  {/* <label className="block text-xs text-gray-500 mb-1">Image URL</label>
+                  <input
+                    type="text"
+                    value={service.image || ''}
+                    onChange={(e) => updateChildService(index, 'image', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                  /> */}
+                  {service.image ? (
+                    <div className="mt-2 w-24 h-24 overflow-hidden rounded border border-gray-200 bg-gray-100">
+                      <img
+                        src={service.image}
+                        alt={`${service.name || 'Service'} image`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ) : null}
+                </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs text-gray-500 mb-1">Duration (minutes)</label>
@@ -271,7 +342,7 @@ export default function EditServiceModal({ service, onClose, onSave }: Props) {
             ))}
 
             {childServices.length === 0 && (
-              <p className="text-center text-gray-500 py-4">No service options added</p>
+              <p className="text-center text-gray-500 py-4">No service added</p>
             )}
           </div>
 

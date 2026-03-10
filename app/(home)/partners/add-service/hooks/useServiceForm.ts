@@ -45,6 +45,28 @@ const normalizeLocationAddress = (location: unknown): string => {
   return '';
 };
 
+const parseDurationToMinutes = (duration: unknown): number => {
+  if (typeof duration === 'number' && Number.isFinite(duration)) {
+    return Math.max(1, Math.round(duration));
+  }
+
+  if (typeof duration !== 'string') {
+    return 60;
+  }
+
+  const match = duration.match(/(\d+(\.\d+)?)/);
+  if (!match) {
+    return 60;
+  }
+
+  const value = parseFloat(match[1]);
+  if (!Number.isFinite(value)) {
+    return 60;
+  }
+
+  return /hour/i.test(duration) ? Math.max(1, Math.round(value * 60)) : Math.max(1, Math.round(value));
+};
+
 const normalizeBusinessHours = (hours: any[] = []) => {
   const hoursMap = new Map(
     hours.map((hour) => [hour.day, hour])
@@ -95,6 +117,7 @@ export const useServiceForm = () => {
   // Upload states
   const [uploading, setUploading] = useState<Record<string, boolean>>({});
   const [uploadProgress, setUploadProgress] = useState<Record<string, number>>({});
+  const isUploading = Object.values(uploading).some(Boolean);
 
   useEffect(() => {
     fetchInitialData();
@@ -377,6 +400,11 @@ export const useServiceForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (Object.values(uploading).some(Boolean)) {
+      toast.error('Please wait until all images finish uploading.');
+      return;
+    }
     
     if (!validateForm()) {
       toast.error('Please fill in all required fields');
@@ -388,37 +416,72 @@ export const useServiceForm = () => {
       
       // Check if parent service exists
       let parentExists = false;
+      let existingParentService: any = null;
+      let parentServiceId: string | null = null;
       try {
         const checkRes = await axios.get(
           `${API_BASE_URL}/api/service/business-service/${formData.businessId}`,
           { withCredentials: true }
         );
-        parentExists = !!checkRes.data.service;
+        existingParentService = checkRes.data.service || null;
+        parentExists = !!existingParentService;
+        parentServiceId = existingParentService?._id || null;
       } catch (err) {
         parentExists = false;
       }
 
-      // Step 1: Create/Update parent service if needed
+      // Step 1: Create or update parent service, so gallery images are always persisted
+      const locationAddress = formData.location?.address || '';
+      const normalizeServicesForUpdate = (services: any[] = []) =>
+        services
+          .map((child) => ({
+            ...child,
+            name: String(child?.name || '').trim(),
+            durationMinutes: parseDurationToMinutes(
+              child?.durationMinutes ?? child?.duration
+            ),
+          }))
+          .filter((child) => child.name.length > 0);
+
+      const parentPayload = {
+        title: formData.title || 'Service',
+        description: formData.description || 'Service description',
+        categoryId: formData.categoryId,
+        subcategoryId: formData.subcategoryId,
+        businessId: formData.businessId,
+        coverImage: formData.coverImage || '',
+        images: formData.images || [],
+        location: { address: locationAddress },
+        businessHours: formData.businessHours || [],
+        bookingToolLink: formData.bookingToolLink || '',
+        isPublished: Boolean(formData.isPublished),
+      };
+
+      const parentUpdatePayloadBase = {
+        ...parentPayload,
+        location: locationAddress,
+      };
+
       if (!parentExists) {
-        const parentPayload = {
-          title: formData.title || 'Service',
-          description: formData.description || 'Service description',
-          categoryId: formData.categoryId,
-          subcategoryId: formData.subcategoryId,
-          businessId: formData.businessId,
-          coverImage: formData.coverImage || '',
-          images: formData.images || [],
-          location: { address: formData.location?.address || '' },
-          businessHours: formData.businessHours || [],
-          bookingToolLink: formData.bookingToolLink || ''
-        };
-        
-        await axios.post(
+        const createRes = await axios.post(
           `${API_BASE_URL}/api/service/parent`,
           parentPayload,
           { withCredentials: true }
         );
+        parentServiceId = createRes.data?.service?._id || null;
         // toast.success('Parent service created!');
+      } else if (existingParentService?._id) {
+        await axios.put(
+          `${API_BASE_URL}/api/service/${existingParentService._id}`,
+          {
+            ...parentUpdatePayloadBase,
+            // Preserve parent-specific fields expected by update route
+            price: existingParentService.price ?? 0,
+            duration: existingParentService.duration ?? '60 minutes',
+            services: normalizeServicesForUpdate(existingParentService.services || []),
+          },
+          { withCredentials: true }
+        );
       }
 
       // Step 2: Add child services
@@ -440,6 +503,28 @@ export const useServiceForm = () => {
           { withCredentials: true }
         );
         toast.success('services added!');
+      }
+
+      // Final sync: ensure cover/gallery images remain persisted after child-service updates
+      if (parentServiceId) {
+        const latestParentRes = await axios.get(
+          `${API_BASE_URL}/api/service/${parentServiceId}`,
+          { withCredentials: true }
+        );
+        const latestParent = latestParentRes.data?.service || {};
+
+        await axios.put(
+          `${API_BASE_URL}/api/service/${parentServiceId}`,
+          {
+            ...parentUpdatePayloadBase,
+            price: latestParent.price ?? existingParentService?.price ?? 0,
+            duration: latestParent.duration ?? existingParentService?.duration ?? '60 minutes',
+            services: normalizeServicesForUpdate(
+              latestParent.services || existingParentService?.services || []
+            ),
+          },
+          { withCredentials: true }
+        );
       }
 
       toast.success('Service saved successfully!');
@@ -465,6 +550,7 @@ export const useServiceForm = () => {
     categories,
     subcategories,
     uploading,
+    isUploading,
     uploadProgress,
     handleInputChange,
     handleSubmit,

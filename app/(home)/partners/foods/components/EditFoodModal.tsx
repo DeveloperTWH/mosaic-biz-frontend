@@ -28,7 +28,7 @@ export default function EditFoodModal({ food, onClose, onSave }: Props) {
       setLoading(true);
       
       const response = await fetch(
-        `${API_BASE_URL}/api/food/${food._id}`,
+        `${API_BASE_URL}/api/food/update-food/${food._id}`,
         {
           method: 'PUT',
           credentials: 'include',
