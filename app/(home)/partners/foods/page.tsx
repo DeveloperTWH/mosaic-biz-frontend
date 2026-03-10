@@ -130,95 +130,179 @@ export default function FoodsPage() {
       </div>
 
       {/* View Modal */}
-      {modalType === 'view' && selectedFood && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg max-w-3xl w-full overflow-hidden">
-            {/* Header */}
-            <div className="bg-[#c9a227] px-6 py-4 flex items-center justify-between">
-              <h2 className="text-white font-semibold text-lg">View Food Details</h2>
-              <button onClick={closeModal} className="text-white hover:text-gray-200">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            
-            {/* Content */}
-            <div className="p-6">
-              <div className="flex gap-6">
-                {/* Left - Image */}
-                <div className="w-48 h-48 flex-shrink-0">
-                  {selectedFood.coverImage ? (
-                    <img 
-                      src={selectedFood.coverImage} 
-                      alt={selectedFood.title} 
-                      className="w-full h-full object-cover rounded-lg" 
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center text-gray-400">
-                      No Image
-                    </div>
-                  )}
-                </div>
-
-                {/* Right - Details */}
-                <div className="flex-1 space-y-4">
-                  {/* Top Row */}
-                  <div className="grid grid-cols-3 gap-6">
-                    <div>
-                      <p className="text-xs text-gray-500 uppercase mb-1">Food Name</p>
-                      <p className="font-semibold text-gray-900">{selectedFood.title}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500 uppercase mb-1">Preparation Time</p>
-                      <p className="font-semibold text-gray-900">{selectedFood.preparationTime}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500 uppercase mb-1">Price</p>
-                      <p className="font-semibold text-gray-900">${selectedFood.price.toFixed(2)}</p>
-                    </div>
-                  </div>
-
-                  {/* Description */}
-                  <div>
-                    <p className="text-xs text-gray-500 uppercase mb-2">Description</p>
-                    <p className="text-sm text-gray-600 leading-relaxed">{selectedFood.description}</p>
-                  </div>
-
-                  {/* Category Info */}
-                  <div className="grid grid-cols-2 gap-6 pt-2">
-                    <div>
-                      <p className="text-xs text-gray-500 uppercase mb-1">Category</p>
-                      <p className="text-sm text-gray-700">{selectedFood.categoryId?.name || '-'}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500 uppercase mb-1">Subcategory</p>
-                      <p className="text-sm text-gray-700">{selectedFood.subcategoryId?.name || '-'}</p>
-                    </div>
-                  </div>
-                </div>
+{modalType === 'view' && selectedFood && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-y-auto">
+    <div className="bg-white rounded-lg max-w-4xl w-full my-8">
+      {/* Header */}
+      <div className="bg-[#c9a227] px-6 py-4 flex items-center justify-between sticky top-0">
+        <h2 className="text-white font-semibold text-lg">View Food Details</h2>
+        <button onClick={closeModal} className="text-white hover:text-gray-200">
+          <X className="w-5 h-5" />
+        </button>
+      </div>
+      
+      {/* Content */}
+      <div className="p-6 max-h-[calc(100vh-200px)] overflow-y-auto">
+        {/* Main Info Row with Image */}
+        <div className="flex gap-6 mb-8">
+          {/* Left - Image */}
+          <div className="w-48 h-48 flex-shrink-0">
+            {selectedFood.coverImage ? (
+              <img 
+                src={selectedFood.coverImage} 
+                alt={selectedFood.title} 
+                className="w-full h-full object-cover rounded-lg" 
+              />
+            ) : (
+              <div className="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center text-gray-400">
+                No Image
               </div>
-            </div>
+            )}
+          </div>
+        </div>
 
-            {/* Footer Buttons */}
-            <div className="px-6 pb-6 flex gap-3">
-              <button 
-                onClick={() => {
-                  closeModal();
-                  openEditModal(selectedFood._id);
-                }}
-                className="px-6 py-2 bg-blue-900 text-white text-sm font-medium rounded hover:bg-blue-800"
-              >
-                Edit Information
-              </button>
-              <button 
-                onClick={closeModal}
-                className="px-6 py-2 bg-gray-400 text-white text-sm font-medium rounded hover:bg-gray-500"
-              >
-                Cancel
-              </button>
+        {/* Business Information Card */}
+        <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6">
+          <h3 className="font-semibold text-gray-800 mb-3">Business Information</h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-xs text-gray-500 uppercase mb-1">Business Name</p>
+              <p className="font-medium text-gray-900">{(selectedFood as any).businessName || 'N/A'}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 uppercase mb-1">Category</p>
+              <p className="font-medium text-gray-900">
+                {typeof selectedFood.categoryId === 'object' 
+                  ? (selectedFood.categoryId as any)?.name 
+                  : selectedFood.categoryId || 'N/A'}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 uppercase mb-1">Subcategory</p>
+              <p className="font-medium text-gray-900">
+                {typeof selectedFood.subcategoryId === 'object' 
+                  ? (selectedFood.subcategoryId as any)?.name 
+                  : selectedFood.subcategoryId || 'N/A'}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 uppercase mb-1">Food Type</p>
+              <p className="font-medium text-gray-900">{(selectedFood as any).foodType || 'N/A'}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 uppercase mb-1">Brand</p>
+              <p className="font-medium text-gray-900">{(selectedFood as any).brand || 'N/A'}</p>
             </div>
           </div>
         </div>
-      )}
+
+        {/* Business Hours Card */}
+        {(selectedFood as any).businessHours && (selectedFood as any).businessHours.length > 0 && (
+          <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6">
+            <h3 className="font-semibold text-gray-800 mb-3">Business Hours</h3>
+            <div className="grid grid-cols-2 gap-2">
+              {(selectedFood as any).businessHours.map((day: any, index: number) => (
+                <div key={day._id || index} className="flex justify-between text-sm py-1 border-b border-gray-200 last:border-0">
+                  <span className="font-medium text-gray-700">{day.day}:</span>
+                  <span className={day.closed ? 'text-red-500' : 'text-gray-600'}>
+                    {day.closed ? 'Closed' : day.hours}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Additional Images */}
+        {selectedFood.images && selectedFood.images.length > 0 && (
+          <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6">
+            <h3 className="font-semibold text-gray-800 mb-3">Additional Images</h3>
+            <div className="grid grid-cols-4 gap-3">
+              {selectedFood.images.map((image: string, index: number) => (
+                <div key={index} className="relative w-24 h-24 border rounded-md overflow-hidden">
+                  <img 
+                    src={image} 
+                    alt={`Food ${index + 1}`} 
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = 'https://via.placeholder.com/150?text=Invalid+Image';
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Menu Image */}
+        {(selectedFood as any).menuImage && (
+          <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6">
+            <h3 className="font-semibold text-gray-800 mb-3">Menu Image</h3>
+            <div className="relative w-32 h-32 border rounded-md overflow-hidden">
+              <img 
+                src={(selectedFood as any).menuImage} 
+                alt="Menu" 
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = 'https://via.placeholder.com/150?text=Invalid+Image';
+                }}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Booking Tool Link */}
+        {(selectedFood as any).bookingToolLink && (
+          <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6">
+            <h3 className="font-semibold text-gray-800 mb-3">Booking Information</h3>
+            <a 
+              href={(selectedFood as any).bookingToolLink} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-[#c9a227] hover:underline break-all"
+            >
+              {(selectedFood as any).bookingToolLink}
+            </a>
+          </div>
+        )}
+
+        {/* Meta Fields */}
+        {(selectedFood as any).metaFields && (selectedFood as any).metaFields.length > 0 && (
+          <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+            <h3 className="font-semibold text-gray-800 mb-3">Additional Information</h3>
+            <div className="grid grid-cols-2 gap-4">
+              {(selectedFood as any).metaFields.map((field: any, index: number) => (
+                <div key={field._id || index}>
+                  <p className="text-xs text-gray-500 uppercase mb-1">{field.key}</p>
+                  <p className="text-sm text-gray-900">{field.value}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Footer Buttons */}
+      <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex gap-3 sticky bottom-0">
+        <button 
+          onClick={() => {
+            closeModal();
+            openEditModal(selectedFood._id);
+          }}
+          className="px-6 py-2 bg-[#c9a227] text-white text-sm font-medium rounded hover:bg-[#b8921f] transition-colors"
+        >
+          Edit Information
+        </button>
+        <button 
+          onClick={closeModal}
+          className="px-6 py-2 bg-gray-500 text-white text-sm font-medium rounded hover:bg-gray-600 transition-colors"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
       {/* Edit Modal - You'll need to create EditFoodModal component similarly */}
       {modalType === 'edit' && selectedFood && (
