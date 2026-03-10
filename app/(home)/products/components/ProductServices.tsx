@@ -439,11 +439,11 @@ function ProductCard({ item }: { item: RankedItem }) {
   </span>
 
   {badge ? (
-    <img
-      src={`/badge/${badge.replace(/\s+/g, "-").toLowerCase()}.png`}
-      alt={`${badge} badge`}
-      className="h-12 object-contain"
-    />
+<img
+  src={`/badge/${badge.replace(/\s+/g, "-").toLowerCase()}.png`}
+  alt={`${badge} badge`}
+  className="h-12 object-contain"
+/>
   ) : (
     <div className="h-14 w-[90px]" />
   )}

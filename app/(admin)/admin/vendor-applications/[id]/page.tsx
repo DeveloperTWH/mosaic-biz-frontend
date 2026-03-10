@@ -134,33 +134,33 @@ type VendorApplication = {
 };
 
 const verificationTypes = [
-  { 
-    key: "minority-proof", 
-    checklistKey: "minorityDocs",
-    label: "Minority Proof Documents", 
-    icon: Users,
-    description: "Verify minority ownership documents",
-    points: 10,
-    required: true
-  },
-  { 
-    key: "tax-doc", 
-    checklistKey: "taxDocs",
-    label: "Tax Documents", 
-    icon: FileText,
-    description: "Verify EIN/SSN documents",
-    points: 10,
-    required: true
-  },
-  { 
-    key: "business-license", 
-    checklistKey: "businessLicense",
-    label: "Business License", 
-    icon: Shield,
-    description: "Verify business license documents",
-    points: 10,
-    required: true
-  },
+  // { 
+  //   key: "minority-proof", 
+  //   checklistKey: "minorityDocs",
+  //   label: "Minority Proof Documents", 
+  //   icon: Users,
+  //   description: "Verify minority ownership documents",
+  //   points: 10,
+  //   required: true
+  // },
+  // { 
+  //   key: "tax-doc", 
+  //   checklistKey: "taxDocs",
+  //   label: "Tax Documents", 
+  //   icon: FileText,
+  //   description: "Verify EIN/SSN documents",
+  //   points: 10,
+  //   required: true
+  // },
+  // { 
+  //   key: "business-license", 
+  //   checklistKey: "businessLicense",
+  //   label: "Business License", 
+  //   icon: Shield,
+  //   description: "Verify business license documents",
+  //   points: 10,
+  //   required: true
+  // },
   { 
     key: "website", 
     checklistKey: "website",
@@ -1041,6 +1041,228 @@ export default function ApplicationDetailPage() {
                   <CheckSquare className="w-5 h-5" />
                   Verification Checklist
                 </h2>
+
+                              <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-100 p-6">
+                <h2 className="text-lg font-semibold mb-6 pb-3 border-b flex items-center gap-2">
+                  <FileCheck className="w-5 h-5" />
+                  Document Verification
+                </h2>
+                
+                <div className="space-y-6">
+                  {/* Minority Documents */}
+                  {application.minorityProofDocuments.length > 0 && (
+                    <div>
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="font-semibold text-gray-700 flex items-center gap-2">
+                          <Shield className="w-4 h-4" />
+                          Minority Proof Documents ({application.minorityProofDocuments.length})
+                        </h3>
+                        <span className={`px-2 py-1 rounded text-xs font-medium ${
+                          application.verificationChecklist.minorityDocs 
+                            ? "bg-green-100 text-green-700" 
+                            : "bg-yellow-100 text-yellow-700"
+                        }`}>
+                          {application.verificationChecklist.minorityDocs ? "Verified" : "Pending"}
+                        </span>
+                      </div>
+                      <div className="space-y-2">
+                        {application.minorityProofDocuments.map((doc, index) => (
+                          <div 
+                            key={doc._id} 
+                            className={`flex items-center justify-between p-3 rounded-lg border ${
+                              doc.verified 
+                                ? "border-green-200 bg-green-50" 
+                                : "border-gray-200 bg-gray-50"
+                            }`}
+                          >
+                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                              <FileText className={`w-4 h-4 ${doc.verified ? "text-green-500" : "text-gray-500"}`} />
+                              <span className={`text-sm truncate ${doc.verified ? "text-green-800" : "text-gray-800"}`}>
+                                Minority Proof Document {index + 1}
+                              </span>
+                              <span className={`text-xs px-2 py-1 rounded flex-shrink-0 ${
+                                doc.verified ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
+                              }`}>
+                                {doc.verified ? "Verified" : "Pending"}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => openDocument('minorityProofDocuments', doc, index)}
+                                className="p-1.5 hover:bg-gray-200 rounded transition-colors"
+                                title="View Document"
+                              >
+                                <Eye className="w-4 h-4 text-blue-600" />
+                              </button>
+                              <button
+                                onClick={() => handleVerifyDocument('minority-proof', index, true)}
+                                disabled={verifying[`minority-proof_${index}`] || doc.verified}
+                                className={`p-1.5 rounded transition-colors ${
+                                  doc.verified 
+                                    ? "bg-green-100 text-green-700" 
+                                    : "bg-green-500 text-white hover:bg-green-600"
+                                } disabled:opacity-50`}
+                                title="Verify Document"
+                              >
+                                {verifying[`minority-proof_${index}`] ? (
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                  <Check className="w-4 h-4" />
+                                )}
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Tax Documents */}
+                  {application.taxDocuments.length > 0 && (
+                    <div>
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="font-semibold text-gray-700 flex items-center gap-2">
+                          <FileText className="w-4 h-4" />
+                          Tax Documents ({application.taxDocuments.length})
+                        </h3>
+                        <span className={`px-2 py-1 rounded text-xs font-medium ${
+                          application.verificationChecklist.taxDocs 
+                            ? "bg-green-100 text-green-700" 
+                            : "bg-yellow-100 text-yellow-700"
+                        }`}>
+                          {application.verificationChecklist.taxDocs ? "Verified" : "Pending"}
+                        </span>
+                      </div>
+                      <div className="space-y-2">
+                        {application.taxDocuments.map((doc, index) => (
+                          <div 
+                            key={doc._id} 
+                            className={`flex items-center justify-between p-3 rounded-lg border ${
+                              doc.verified 
+                                ? "border-green-200 bg-green-50" 
+                                : "border-gray-200 bg-gray-50"
+                            }`}
+                          >
+                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                              <FileText className={`w-4 h-4 ${doc.verified ? "text-green-500" : "text-gray-500"}`} />
+                              <span className={`text-sm truncate ${doc.verified ? "text-green-800" : "text-gray-800"}`}>
+                                Tax Document {index + 1}
+                              </span>
+                              <span className={`text-xs px-2 py-1 rounded flex-shrink-0 ${
+                                doc.verified ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
+                              }`}>
+                                {doc.verified ? "Verified" : "Pending"}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => openDocument('taxDocuments', doc, index)}
+                                className="p-1.5 hover:bg-gray-200 rounded transition-colors"
+                                title="View Document"
+                              >
+                                <Eye className="w-4 h-4 text-blue-600" />
+                              </button>
+                              <button
+                                onClick={() => handleVerifyDocument('tax-doc', index, true)}
+                                disabled={verifying[`tax-doc_${index}`] || doc.verified}
+                                className={`p-1.5 rounded transition-colors ${
+                                  doc.verified 
+                                    ? "bg-green-100 text-green-700" 
+                                    : "bg-green-500 text-white hover:bg-green-600"
+                                } disabled:opacity-50`}
+                                title="Verify Document"
+                              >
+                                {verifying[`tax-doc_${index}`] ? (
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                  <Check className="w-4 h-4" />
+                                )}
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Business License Documents */}
+                  {application.businessLicenseDocuments.length > 0 && (
+                    <div>
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="font-semibold text-gray-700 flex items-center gap-2">
+                          <Briefcase className="w-4 h-4" />
+                          Business License Documents ({application.businessLicenseDocuments.length})
+                        </h3>
+                        <span className={`px-2 py-1 rounded text-xs font-medium ${
+                          application.verificationChecklist.businessLicense 
+                            ? "bg-green-100 text-green-700" 
+                            : "bg-yellow-100 text-yellow-700"
+                        }`}>
+                          {application.verificationChecklist.businessLicense ? "Verified" : "Pending"}
+                        </span>
+                      </div>
+                      <div className="space-y-2">
+                        {application.businessLicenseDocuments.map((doc, index) => (
+                          <div 
+                            key={doc._id} 
+                            className={`flex items-center justify-between p-3 rounded-lg border ${
+                              doc.verified 
+                                ? "border-green-200 bg-green-50" 
+                                : "border-gray-200 bg-gray-50"
+                            }`}
+                          >
+                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                              <FileText className={`w-4 h-4 ${doc.verified ? "text-green-500" : "text-gray-500"}`} />
+                              <span className={`text-sm truncate ${doc.verified ? "text-green-800" : "text-gray-800"}`}>
+                                Business License {index + 1}
+                              </span>
+                              <span className={`text-xs px-2 py-1 rounded flex-shrink-0 ${
+                                doc.verified ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
+                              }`}>
+                                {doc.verified ? "Verified" : "Pending"}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => openDocument('businessLicenseDocuments', doc, index)}
+                                className="p-1.5 hover:bg-gray-200 rounded transition-colors"
+                                title="View Document"
+                              >
+                                <Eye className="w-4 h-4 text-blue-600" />
+                              </button>
+                              <button
+                                onClick={() => handleVerifyDocument('business-license', index, true)}
+                                disabled={verifying[`business-license_${index}`] || doc.verified}
+                                className={`p-1.5 rounded transition-colors ${
+                                  doc.verified 
+                                    ? "bg-green-100 text-green-700" 
+                                    : "bg-green-500 text-white hover:bg-green-600"
+                                } disabled:opacity-50`}
+                                title="Verify Document"
+                              >
+                                {verifying[`business-license_${index}`] ? (
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                  <Check className="w-4 h-4" />
+                                )}
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {application.minorityProofDocuments.length === 0 && 
+                   application.taxDocuments.length === 0 && 
+                   application.businessLicenseDocuments.length === 0 && (
+                    <div className="text-center py-4 text-gray-500">
+                      <FileText className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                      <p className="text-sm">No documents uploaded yet</p>
+                    </div>
+                  )}
+                </div>
+              </div>
                 
                 <div className="space-y-4">
                   {verificationTypes.map(({ key, checklistKey, label, icon: Icon, description, points, required }) => {

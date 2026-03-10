@@ -120,31 +120,46 @@ export default function ProductsPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Added Products</h1>
-            <p className="text-sm text-gray-600 mt-1">
-              Manage your products
-            </p>
-          </div>
-          <button
-            onClick={() => router.push('/partners/add-product')}
-            className="px-4 py-2 bg-[#c9a227] text-white text-sm font-medium rounded-md hover:bg-[#b8921f] transition-colors flex items-center gap-2"
-          >
-            <Plus className="w-4 h-4" />
-            Add Product
-          </button>
-        </div>
+ {/* Header */}
+<div className="mb-6 flex justify-between items-start">
+  {/* Left: title */}
+  <div>
+    <h1 className="text-2xl font-bold text-gray-900">Added Products</h1>
+    <p className="text-sm text-gray-600 mt-1">
+      Manage your products
+    </p>
+  </div>
 
+  {/* Right: buttons stacked vertically */}
+  <div className="flex flex-col gap-2">
+    <button
+      onClick={() => router.push('/partners/add-product')}
+      className="px-4 py-2 bg-[#c9a227] text-white text-sm font-medium rounded-md hover:bg-[#b8921f] transition-colors flex items-center gap-2"
+    >
+      <Plus className="w-4 h-4" />
+      Add Product
+    </button>
+
+    <button
+      onClick={() => router.push('/partners/final-review')}
+      className="px-4 py-1 bg-blue-900 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
+    >
+      Go Live
+    </button>
+  </div>
+</div>
         {/* Filters */}
         <ProductFilters
           filters={filters}
           onFilterChange={updateFilter}
           totalProducts={products.length}
         />
+        
+        
 
         {/* Products Table */}
         <div className="mt-4">
+          
           <ProductsTable
             products={products}
             onView={handleViewProduct}

@@ -3,7 +3,14 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import axios from "axios";
-import { ChevronDown, Check } from "lucide-react";
+import { 
+  ChevronDown, ChevronUp, Check, X, Eye, 
+  Building2, FileText, Calendar, DollarSign,
+  User, Globe, Link as LinkIcon, MapPin, Clock,
+  Phone, Mail, Award, CheckCircle, XCircle,
+  Briefcase, Users, CalendarDays, FileCheck,
+  BadgeCheck, Store, Image as ImageIcon
+} from "lucide-react";
 import TermsModal from "./components/TermsModal";
 import Congratulations from "./components/Congratulations";
 
@@ -11,6 +18,102 @@ interface Business {
   _id: string;
   businessName: string;
   logo?: string;
+}
+
+interface OnboardingData {
+  businessName: string;
+  status: string;
+  applicationId: string;
+  currentStage: number;
+  details: {
+    stage1: {
+      status: string;
+      points: number;
+      paymentStatus: string;
+    };
+    stage2: {
+      status: string;
+      plan: string | null;
+      amount: number | null;
+      subscribedAt: string | null;
+    };
+    stage3: {
+      status: string;
+      isComplete: boolean;
+      hasLogo: boolean;
+      hasBio: boolean;
+      businessName?: string;
+      businessEmail?: string;
+      businessPhone?: string;
+      businessBio?: string;
+      logo?: string;
+    };
+    stage4: {
+      status: string;
+      message: string;
+    };
+  };
+}
+
+// Extended interfaces for detailed data
+interface BusinessVerificationDetails {
+  businessName: string;
+  businessType: string;
+  ownershipType: string;
+  yearsInBusiness: string;
+  employeesCount: string;
+  einNumber: string;
+  ssnLast9: string;
+  hasBusinessLicense: boolean;
+  licenseNumber: string;
+  isMinorityOwned: boolean;
+  minorityCategories: string[];
+  otherMinorityCategory: string;
+  address: {
+    street: string;
+    city: string;
+    state: string;
+    country: string;
+    zipCode: string;
+  };
+  primaryContactName: string;
+  primaryContactDesignation: string;
+  contactEmail: string;
+  businessEmail: string;
+  contactPhone: string;
+  documents: {
+    minorityProof: Array<{ url: string; verified: boolean }>;
+    taxDocs: Array<{ url: string; verified: boolean }>;
+    businessLicense: Array<{ url: string; verified: boolean }>;
+  };
+  verificationPoints: number;
+  paymentStatus: string;
+  submittedAt: string;
+  status: string;
+}
+
+interface BusinessProfileDetails {
+  businessName: string;
+  businessBio: string;
+  logo: string;
+  featureBanner: string;
+  businessEmail: string;
+  businessPhone: string;
+  alternatePhone: string;
+  website: string;
+  facebook: string;
+  instagram: string;
+  twitter: string;
+  linkedin: string;
+  tiktok: string;
+  language: string;
+  googleReviewLink: string;
+  communityServiceLink: string;
+  businessHours?: Array<{ day: string; hours: string; closed?: boolean }>;
+  location?: string;
+  hasLogo: boolean;
+  hasBio: boolean;
+  isComplete: boolean;
 }
 
 export default function FinalReviewPage() {
@@ -21,39 +124,214 @@ export default function FinalReviewPage() {
   const [modalType, setModalType] = useState<"terms" | "privacy" | "directory">("terms");
   const [showCongratulations, setShowCongratulations] = useState(false);
   const [business, setBusiness] = useState<Business | null>(null);
+  const [onboardingData, setOnboardingData] = useState<OnboardingData | null>(null);
+  const [verificationDetails, setVerificationDetails] = useState<BusinessVerificationDetails | null>(null);
+  const [profileDetails, setProfileDetails] = useState<BusinessProfileDetails | null>(null);
   const [loading, setLoading] = useState(true);
+  
+  // Accordion state
+  const [expandedStep, setExpandedStep] = useState<number | null>(null);
+  const [selectedDoc, setSelectedDoc] = useState<string | null>(null);
 
-  // Fetch business data
+  // Fetch business data and onboarding status
   useEffect(() => {
-    const fetchBusiness = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get(
+        setLoading(true);
+        
+        // First, get application ID
+        const appIdResponse = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/vendor-onboarding/applicationId`,
+          { withCredentials: true }
+        );
+        
+        if (appIdResponse.data.success && appIdResponse.data.applicationId) {
+          const appId = appIdResponse.data.applicationId;
+          
+          // Fetch onboarding status using application ID
+          const statusResponse = await axios.get(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/vendor-onboarding/status/${appId}`,
+            { withCredentials: true }
+          );
+          
+          if (statusResponse.data.success) {
+            setOnboardingData(statusResponse.data.data);
+          }
+
+          // Fetch detailed onboarding data
+          const detailedResponse = await axios.get(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/vendor-onboarding/onboarding-data`,
+            { withCredentials: true }
+          );
+          
+          if (detailedResponse.data.success) {
+            const data = detailedResponse.data.data;
+            
+            // Set verification details
+            setVerificationDetails({
+              businessName: data.businessName || '',
+              businessType: data.businessType || 'Not specified',
+              ownershipType: data.ownershipType || 'Not specified',
+              yearsInBusiness: data.yearsInBusiness || 'Not specified',
+              employeesCount: data.employeesCount || 'Not specified',
+              einNumber: data.einNumber || 'Not provided',
+              ssnLast9: data.ssnLast9 ? '••••••' + data.ssnLast9.slice(-4) : 'Not provided',
+              hasBusinessLicense: data.hasBusinessLicense || false,
+              licenseNumber: data.licenseNumber || 'Not provided',
+              isMinorityOwned: data.isMinorityOwned || false,
+              minorityCategories: data.minorityCategories || [],
+              otherMinorityCategory: data.otherMinorityCategory || '',
+              address: data.address || {
+                street: '', city: '', state: '', country: '', zipCode: ''
+              },
+              primaryContactName: data.primaryContactName || '',
+              primaryContactDesignation: data.primaryContactDesignation || '',
+              contactEmail: data.contactEmail || data.primaryEmail || '',
+              businessEmail: data.businessEmail || data.secondaryBusinessEmail || '',
+              contactPhone: data.contactPhone || data.primaryPhone || '',
+              documents: {
+                minorityProof: data.minorityProofDocuments || [],
+                taxDocs: data.taxDocuments || [],
+                businessLicense: data.businessLicenseDocuments || []
+              },
+              verificationPoints: data.totalVerificationPoints || 0,
+              paymentStatus: data.verificationPayment?.status || 'pending',
+              submittedAt: data.submittedAt || data.createdAt,
+              status: data.status || 'pending'
+            });
+
+            // Set profile details
+            setProfileDetails({
+              businessName: data.businessName || '',
+              businessBio: data.businessBio || '',
+              logo: data.businessProfileImage?.url || '',
+              featureBanner: data.featureBanner?.url || '',
+              businessEmail: data.businessEmail || data.primaryEmail || '',
+              businessPhone: data.businessPhone || data.primaryPhone || '',
+              alternatePhone: data.alternatePhone || '',
+              website: data.website || '',
+              facebook: data.facebook || '',
+              instagram: data.instagram || '',
+              twitter: data.twitter || '',
+              linkedin: data.linkedin || '',
+              tiktok: data.tiktok || '',
+              language: data.language || 'English',
+              googleReviewLink: data.googleReviewLink || '',
+              communityServiceLink: data.communityServiceLink || '',
+              businessHours: data.businessHours || [],
+              location: data.location?.address || '',
+              hasLogo: !!data.businessProfileImage?.url,
+              hasBio: !!data.businessBio,
+              isComplete: !!(data.businessProfileImage?.url && data.businessBio)
+            });
+          }
+        }
+        
+        // Fetch business details
+        const businessResponse = await axios.get(
           `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/business/my`,
           { withCredentials: true }
         );
         
-        if (response.data.businesses?.length > 0) {
-          setBusiness(response.data.businesses[0]);
+        if (businessResponse.data.businesses?.length > 0) {
+          setBusiness(businessResponse.data.businesses[0]);
         }
+        
       } catch (error) {
-        console.error("Error fetching business:", error);
+        console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchBusiness();
+    fetchData();
   }, []);
 
-const steps = [
-  { number: "01", title: "Business Verification", status: "completed", link: "/partners/business/new" },
-  { number: "02", title: "Tier / Subscription Selection", status: "completed", link: "/partners/tier-selection" },
-  { number: "03", title: "Subscription Payment", status: "completed", link: "/partners/payment" },
-  { number: "04", title: "Business Profile Setup", status: "completed", link: "/partners/business-profile" },
-  { number: "05", title: "Product / Service Creation", status: "completed", link: "/partners/products" },
-  { number: "06", title: "Payout & Bank Setup", status: "incompleted", link: "/partners/payout-setup" },
-];
+  // Determine step status based on onboarding data
+  const getStepStatus = (stepNumber: number) => {
+    if (!onboardingData) return "pending";
+    
+    switch(stepNumber) {
+      case 1: // Business Verification
+        return onboardingData.details.stage1.status === "submitted" || 
+               onboardingData.details.stage1.status === "verified" 
+               ? "completed" : "pending";
+      case 2: // Tier / Subscription Selection
+        return onboardingData.details.stage2.status === "active" 
+               ? "completed" : "pending";
+      case 3: // Subscription Payment
+        return onboardingData.details.stage1.paymentStatus === "paid" 
+               ? "completed" : "pending";
+      case 4: // Business Profile Setup
+        return onboardingData.details.stage3.isComplete 
+               ? "completed" : "pending";
+      case 5: // Product / Service Creation
+        return onboardingData.currentStage && onboardingData.currentStage >= 4 ? "completed" : "pending";
+      case 6: // Payout & Bank Setup
+        return "incompleted";
+      default:
+        return "pending";
+    }
+  };
 
+  const toggleStep = (stepNumber: number) => {
+    setExpandedStep(expandedStep === stepNumber ? null : stepNumber);
+  };
+
+  const steps = [
+    { 
+      number: "01", 
+      title: "Business Verification", 
+      status: getStepStatus(1), 
+      link: "/partners/business/new",
+      details: onboardingData ? {
+        points: onboardingData.details.stage1.points,
+        paymentStatus: onboardingData.details.stage1.paymentStatus
+      } : null
+    },
+    { 
+      number: "02", 
+      title: "Tier / Subscription Selection", 
+      status: getStepStatus(2), 
+      link: "/partners/tier-selection",
+      details: onboardingData ? {
+        plan: onboardingData.details.stage2.plan,
+        amount: onboardingData.details.stage2.amount
+      } : null
+    },
+    { 
+      number: "03", 
+      title: "Subscription Payment", 
+      status: getStepStatus(3), 
+      link: "/partners/tier-selection/success",
+      details: onboardingData ? {
+        status: onboardingData.details.stage1.paymentStatus,
+        date: onboardingData.details.stage2.subscribedAt
+      } : null
+    },
+    { 
+      number: "04", 
+      title: "Business Profile Setup", 
+      status: getStepStatus(4), 
+      link: "/partners/business-profile",
+      details: onboardingData ? {
+        hasLogo: onboardingData.details.stage3.hasLogo,
+        hasBio: onboardingData.details.stage3.hasBio
+      } : null
+    },
+    { 
+      number: "05", 
+      title: "Product / Service Creation", 
+      status: getStepStatus(5), 
+      link: "/partners/products" 
+    },
+    { 
+      number: "06", 
+      title: "Payout & Bank Setup", 
+      status: "incompleted", 
+      link: "/partners/payout-setup" 
+    },
+  ];
 
   const openModal = (type: "terms" | "privacy" | "directory") => {
     setModalType(type);
@@ -74,7 +352,6 @@ const steps = [
     );
   }
 
-  // If showing congratulations, render that component
   if (showCongratulations) {
     return <Congratulations business={business} />;
   }
@@ -89,44 +366,478 @@ const steps = [
           <p className="text-gray-500 mt-2 text-sm">
             review and submit the profile
           </p>
+          {onboardingData && (
+            <p className="text-xs text-gray-400 mt-1">
+              Application ID: {onboardingData.applicationId}
+            </p>
+          )}
         </div>
 
-        {/* Steps List */}
+        {/* Steps List with Accordion */}
         <div className="space-y-3 mb-8">
           {steps.map((step, index) => (
             <div 
               key={index} 
-              className="bg-[#f5f5f0] rounded-lg p-4 flex items-center justify-between"
+              className="bg-[#f5f5f0] rounded-lg overflow-hidden"
             >
-              <div className="flex items-center gap-4 flex-1">
-                {/* Number Badge */}
-                <span className="w-8 h-8 rounded-md bg-[#c9a227] flex items-center justify-center text-sm font-bold text-white">
-                  {step.number}
-                </span>
-                
-                {/* Title */}
-                <span className="font-semibold text-gray-800 text-sm">
-                  {step.title}
-                </span>
+              {/* Step Header - Always Visible */}
+              <div className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-100 transition-colors"
+                   onClick={() => toggleStep(index + 1)}>
+                <div className="flex items-center gap-4 flex-1">
+                  {/* Number Badge */}
+                  <span className="w-8 h-8 rounded-md bg-[#c9a227] flex items-center justify-center text-sm font-bold text-white">
+                    {step.number}
+                  </span>
+                  
+                  {/* Title */}
+                  <span className="font-semibold text-gray-800 text-sm">
+                    {step.title}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  {/* Status Badge */}
+                  <span className={`text-xs px-3 py-1 rounded-full border ${
+                    step.status === 'completed' 
+                      ? 'border-green-500 text-green-600 bg-green-50' 
+                      : step.status === 'incompleted'
+                      ? 'border-red-400 text-red-500 bg-red-50'
+                      : 'border-yellow-400 text-yellow-600 bg-yellow-50'
+                  }`}>
+                    {step.status === 'completed' ? 'Completed' : 
+                     step.status === 'incompleted' ? 'Incompleted' : 'Pending'}
+                  </span>
+                  
+                  {/* Expand/Collapse Arrow */}
+                  {expandedStep === index + 1 ? (
+                    <ChevronUp className="w-5 h-5 text-gray-400" />
+                  ) : (
+                    <ChevronDown className="w-5 h-5 text-gray-400" />
+                  )}
+                </div>
               </div>
 
-              <div className="flex items-center gap-3">
-                {/* Status Badge */}
-                <span className={`text-xs px-3 py-1 rounded-full border ${
-                  step.status === 'completed' 
-                    ? 'border-green-500 text-green-600 bg-green-50' 
-                    : 'border-red-400 text-red-500 bg-red-50'
-                }`}>
-                  {step.status === 'completed' ? 'Completed' : 'Incompleted'}
-                </span>
-                
-                {/* Manage Link with Chevron */}
-                <Link href={step.link}>
-                  <button className="p-1 hover:bg-gray-200 rounded transition-colors">
-                    <ChevronDown className="w-5 h-5 text-gray-400" />
-                  </button>
-                </Link>
-              </div>
+              {/* Expanded Content - White background, shows when step is expanded */}
+              {expandedStep === index + 1 && (
+                <div className="bg-white px-4 pb-4 pt-3 border-t border-gray-200">
+                  {/* Step 1 - Business Verification Details - FILLED WITH ALL DATA */}
+                  {step.number === "01" && verificationDetails && (
+                    <div className="space-y-4">
+                      {/* Business Information Section */}
+                      <div>
+                        <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                          <Building2 className="w-4 h-4 text-[#c9a227]" />
+                          Business Information
+                        </h4>
+                        <div className="grid grid-cols-2 gap-3 bg-gray-50 p-3 rounded-lg">
+                          <div>
+                            <p className="text-xs text-gray-500">Business Name</p>
+                            <p className="text-sm font-medium">{verificationDetails.businessName}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500">Business Type</p>
+                            <p className="text-sm">{verificationDetails.businessType}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500">Ownership Type</p>
+                            <p className="text-sm">{verificationDetails.ownershipType}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500">Years in Business</p>
+                            <p className="text-sm">{verificationDetails.yearsInBusiness}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500">Employees</p>
+                            <p className="text-sm">{verificationDetails.employeesCount}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500">EIN</p>
+                            <p className="text-sm font-mono">{verificationDetails.einNumber}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500">License Number</p>
+                            <p className="text-sm">{verificationDetails.licenseNumber}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500">Has Business License</p>
+                            <p className="text-sm">
+                              {verificationDetails.hasBusinessLicense ? (
+                                <span className="text-green-600 flex items-center gap-1">
+                                  <CheckCircle className="w-3 h-3" /> Yes
+                                </span>
+                              ) : (
+                                <span className="text-gray-400">No</span>
+                              )}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Minority Status Section */}
+                      {verificationDetails.isMinorityOwned && (
+                        <div>
+                          <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                            <Award className="w-4 h-4 text-[#c9a227]" />
+                            Minority Status
+                          </h4>
+                          <div className="bg-gray-50 p-3 rounded-lg">
+                            <div className="flex flex-wrap gap-2 mb-2">
+                              {verificationDetails.minorityCategories.map((cat, idx) => (
+                                <span key={idx} className="px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs">
+                                  {cat}
+                                </span>
+                              ))}
+                            </div>
+                            {verificationDetails.otherMinorityCategory && (
+                              <p className="text-xs text-gray-600">
+                                Other: {verificationDetails.otherMinorityCategory}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Address Section */}
+                      <div>
+                        <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                          <MapPin className="w-4 h-4 text-[#c9a227]" />
+                          Address
+                        </h4>
+                        <div className="bg-gray-50 p-3 rounded-lg">
+                          <p className="text-sm">{verificationDetails.address.street}</p>
+                          <p className="text-sm">
+                            {verificationDetails.address.city}, {verificationDetails.address.state} {verificationDetails.address.zipCode}
+                          </p>
+                          <p className="text-sm">{verificationDetails.address.country}</p>
+                        </div>
+                      </div>
+
+                      {/* Contact Information */}
+                      <div>
+                        <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                          <User className="w-4 h-4 text-[#c9a227]" />
+                          Primary Contact
+                        </h4>
+                        <div className="grid grid-cols-2 gap-3 bg-gray-50 p-3 rounded-lg">
+                          <div>
+                            <p className="text-xs text-gray-500">Name</p>
+                            <p className="text-sm">{verificationDetails.primaryContactName}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500">Designation</p>
+                            <p className="text-sm">{verificationDetails.primaryContactDesignation}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500">Contact Email</p>
+                            <p className="text-sm">{verificationDetails.contactEmail}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500">Business Email</p>
+                            <p className="text-sm">{verificationDetails.businessEmail}</p>
+                          </div>
+                          <div className="col-span-2">
+                            <p className="text-xs text-gray-500">Phone</p>
+                            <p className="text-sm">{verificationDetails.contactPhone}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Documents Section */}
+                      <div>
+                        <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                          <FileText className="w-4 h-4 text-[#c9a227]" />
+                          Uploaded Documents
+                        </h4>
+                        <div className="space-y-3">
+                          {/* Minority Proof Documents */}
+                          {verificationDetails.documents.minorityProof.length > 0 && (
+                            <div className="bg-gray-50 p-3 rounded-lg">
+                              <p className="text-xs font-medium text-gray-600 mb-2">Minority Proof Documents</p>
+                              <div className="space-y-2">
+                                {verificationDetails.documents.minorityProof.map((doc, idx) => (
+                                  <button
+                                    key={idx}
+                                    onClick={() => window.open(doc.url, '_blank')}
+                                    className="flex items-center justify-between w-full p-2 bg-white rounded border hover:border-blue-300 transition-colors"
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      <FileText className="w-4 h-4 text-blue-500" />
+                                      <span className="text-xs truncate max-w-[200px]">
+                                        {doc.url.split('/').pop()}
+                                      </span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                      {doc.verified && (
+                                        <span className="text-xs text-green-600 flex items-center gap-1">
+                                          <CheckCircle className="w-3 h-3" /> Verified
+                                        </span>
+                                      )}
+                                      <Eye className="w-4 h-4 text-gray-400 hover:text-blue-600" />
+                                    </div>
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Tax Documents */}
+                          {verificationDetails.documents.taxDocs.length > 0 && (
+                            <div className="bg-gray-50 p-3 rounded-lg">
+                              <p className="text-xs font-medium text-gray-600 mb-2">Tax Documents</p>
+                              <div className="space-y-2">
+                                {verificationDetails.documents.taxDocs.map((doc, idx) => (
+                                  <button
+                                    key={idx}
+                                    onClick={() => window.open(doc.url, '_blank')}
+                                    className="flex items-center justify-between w-full p-2 bg-white rounded border hover:border-blue-300 transition-colors"
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      <FileText className="w-4 h-4 text-red-500" />
+                                      <span className="text-xs truncate max-w-[200px]">
+                                        {doc.url.split('/').pop()}
+                                      </span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                      {doc.verified && (
+                                        <span className="text-xs text-green-600 flex items-center gap-1">
+                                          <CheckCircle className="w-3 h-3" /> Verified
+                                        </span>
+                                      )}
+                                      <Eye className="w-4 h-4 text-gray-400 hover:text-blue-600" />
+                                    </div>
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Business License Documents */}
+                          {verificationDetails.documents.businessLicense.length > 0 && (
+                            <div className="bg-gray-50 p-3 rounded-lg">
+                              <p className="text-xs font-medium text-gray-600 mb-2">Business License Documents</p>
+                              <div className="space-y-2">
+                                {verificationDetails.documents.businessLicense.map((doc, idx) => (
+                                  <button
+                                    key={idx}
+                                    onClick={() => window.open(doc.url, '_blank')}
+                                    className="flex items-center justify-between w-full p-2 bg-white rounded border hover:border-blue-300 transition-colors"
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      <FileText className="w-4 h-4 text-green-500" />
+                                      <span className="text-xs truncate max-w-[200px]">
+                                        {doc.url.split('/').pop()}
+                                      </span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                      {doc.verified && (
+                                        <span className="text-xs text-green-600 flex items-center gap-1">
+                                          <CheckCircle className="w-3 h-3" /> Verified
+                                        </span>
+                                      )}
+                                      <Eye className="w-4 h-4 text-gray-400 hover:text-blue-600" />
+                                    </div>
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Verification Summary */}
+                      <div className="mt-2 pt-2 border-t border-gray-200">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <BadgeCheck className="w-4 h-4 text-blue-600" />
+                            <span className="text-xs text-gray-600">Verification Points:</span>
+                            <span className="text-sm font-semibold text-blue-600">{verificationDetails.verificationPoints}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <DollarSign className="w-4 h-4 text-green-600" />
+                            <span className="text-xs text-gray-600">Payment:</span>
+                            <span className={`text-xs font-medium capitalize ${
+                              verificationDetails.paymentStatus === 'paid' ? 'text-green-600' : 'text-yellow-600'
+                            }`}>
+                              {verificationDetails.paymentStatus}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step 4 - Business Profile Details - FILLED WITH ALL DATA */}
+                  {step.number === "04" && profileDetails && (
+                    <div className="space-y-4">
+                      {/* Logo and Banner Section */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <h4 className="text-xs font-medium text-gray-500 mb-2 flex items-center gap-1">
+                            <ImageIcon className="w-3 h-3" /> Business Logo
+                          </h4>
+                          {profileDetails.logo ? (
+                            <img 
+                              src={profileDetails.logo} 
+                              alt="Business Logo" 
+                              className="w-24 h-24 object-cover rounded-lg border cursor-pointer hover:opacity-90 transition-opacity"
+                              onClick={() => setSelectedDoc(profileDetails.logo)}
+                            />
+                          ) : (
+                            <div className="w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center">
+                              <span className="text-xs text-gray-400">No Logo</span>
+                            </div>
+                          )}
+                        </div>
+                        <div>
+                          <h4 className="text-xs font-medium text-gray-500 mb-2 flex items-center gap-1">
+                            <ImageIcon className="w-3 h-3" /> Feature Banner
+                          </h4>
+                          {profileDetails.featureBanner ? (
+                            <img 
+                              src={profileDetails.featureBanner} 
+                              alt="Feature Banner" 
+                              className="w-24 h-24 object-cover rounded-lg border cursor-pointer hover:opacity-90 transition-opacity"
+                              onClick={() => setSelectedDoc(profileDetails.featureBanner)}
+                            />
+                          ) : (
+                            <div className="w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center">
+                              <span className="text-xs text-gray-400">No Banner</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Business Information */}
+                      <div>
+                        <h4 className="text-xs font-medium text-gray-500 mb-2">Business Information</h4>
+                        <div className="bg-gray-50 p-3 rounded-lg space-y-2">
+                          <div>
+                            <p className="text-xs text-gray-500">Business Name</p>
+                            <p className="text-sm font-medium">{profileDetails.businessName}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500">Business Bio</p>
+                            <p className="text-sm text-gray-700">{profileDetails.businessBio || 'Not provided'}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500">Language</p>
+                            <p className="text-sm">{profileDetails.language}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Contact Information */}
+                      <div>
+                        <h4 className="text-xs font-medium text-gray-500 mb-2">Contact Information</h4>
+                        <div className="grid grid-cols-2 gap-3 bg-gray-50 p-3 rounded-lg">
+                          <div>
+                            <p className="text-xs text-gray-500 flex items-center gap-1">
+                              <Mail className="w-3 h-3" /> Email
+                            </p>
+                            <p className="text-sm">{profileDetails.businessEmail || 'Not provided'}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 flex items-center gap-1">
+                              <Phone className="w-3 h-3" /> Phone
+                            </p>
+                            <p className="text-sm">{profileDetails.businessPhone || 'Not provided'}</p>
+                          </div>
+                          <div className="col-span-2">
+                            <p className="text-xs text-gray-500 flex items-center gap-1">
+                              <Phone className="w-3 h-3" /> Alternate Phone
+                            </p>
+                            <p className="text-sm">{profileDetails.alternatePhone || 'Not provided'}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step 2 - Tier Selection Details */}
+                  {step.number === "02" && step.details && step.details.plan && (
+                    <div className="space-y-3">
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <p className="text-xs text-gray-500">Selected Plan</p>
+                          <p className="font-medium">{step.details.plan}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-500">Amount</p>
+                          <p className="font-medium">${step.details.amount}</p>
+                        </div>
+                      </div>
+                      <div className="flex justify-end">
+                        <Link href={step.link}>
+                          <button className="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1">
+                            Change Plan
+                            <ChevronDown className="w-3 h-3 rotate-[-90deg]" />
+                          </button>
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step 3 - Payment Details */}
+                  {step.number === "03" && step.details && step.details.status && (
+                    <div className="space-y-3">
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <p className="text-xs text-gray-500">Payment Status</p>
+                          <p className="font-medium capitalize">{step.details.status}</p>
+                        </div>
+                        {step.details.date && (
+                          <div>
+                            <p className="text-xs text-gray-500">Payment Date</p>
+                            <p className="font-medium">{new Date(step.details.date).toLocaleDateString()}</p>
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex justify-end">
+                        <Link href={step.link}>
+                          <button className="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1">
+                            View Payment Details
+                            <ChevronDown className="w-3 h-3 rotate-[-90deg]" />
+                          </button>
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step 5 - Product Creation */}
+                  {step.number === "05" && (
+                    <div className="space-y-3">
+                      <p className="text-sm text-gray-600">
+                       Manage Your  Products Or services
+                      </p>
+                      <div className="flex justify-end">
+                        <Link href={step.link}>
+                          <button className="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1">
+                            {onboardingData?.currentStage && onboardingData.currentStage >= 4 ? 'Manage Products' : 'Create Products'}
+                            <ChevronDown className="w-3 h-3 rotate-[-90deg]" />
+                          </button>
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step 6 - Payout Setup */}
+                  {step.number === "06" && (
+                    <div className="space-y-3">
+                      <p className="text-sm text-gray-600">
+                        Payout and bank setup is required to receive payments.
+                      </p>
+                      <div className="flex justify-end">
+                        <Link href={step.link}>
+                          <button className="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1">
+                            Setup Payout
+                            <ChevronDown className="w-3 h-3 rotate-[-90deg]" />
+                          </button>
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -212,6 +923,19 @@ const steps = [
         onClose={() => setModalOpen(false)}
         type={modalType}
       />
+
+      {/* Image Preview Modal */}
+      {selectedDoc && (
+        <div className="fixed inset-0 bg-black bg-opacity-90 z-[70] flex items-center justify-center p-4">
+          <button
+            onClick={() => setSelectedDoc(null)}
+            className="absolute top-4 right-4 text-white hover:text-gray-300"
+          >
+            <X className="w-8 h-8" />
+          </button>
+          <img src={selectedDoc} alt="Preview" className="max-h-full max-w-full object-contain" />
+        </div>
+      )}
     </div>
   );
 }

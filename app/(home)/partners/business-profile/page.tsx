@@ -389,6 +389,7 @@ const validateForm = (): boolean => {
       });
 
       toast.success('Business profile updated successfully!');
+      router.push('/partners');
       
     } catch (error: any) {
       console.error('Error saving profile:', error);
@@ -1123,13 +1124,13 @@ const validateForm = (): boolean => {
 
           {/* Form Actions */}
           <div className="flex items-center justify-end gap-3">
-            <button
+            {/* <button
               type="button"
               onClick={() => router.push('/partners')}
               className="px-5 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium"
             >
               Continue The Onboarding process
-            </button>
+            </button> */}
             <button
               type="submit"
               disabled={saving}

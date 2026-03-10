@@ -126,12 +126,12 @@ export default function VariantsTable({
                 </>
               )}
 
-              <th className="py-3 px-2 text-left">slashed Price</th>
-              <th className="py-3 px-2 text-left">Price</th>
+              <th className="py-3 px-2 text-left">Old Price</th>
+              <th className="py-3 px-2 text-left">New Price</th>
               <th className="py-3 px-2 text-left">Availability</th>
-              <th className="py-3 px-2 text-left">Standard</th>
-              <th className="py-3 px-2 text-left">Overnight</th>
-              <th className="py-3 px-2 text-left">Local</th>
+              <th className="py-3 px-2 text-left">Standard shippiing</th>
+              <th className="py-3 px-2 text-left">Overnigh shippingt</th>
+              <th className="py-3 px-2 text-left">Local shipping</th>
               <th className="py-3 px-2 text-left"></th>
             </tr>
           </thead>
@@ -268,7 +268,6 @@ export default function VariantsTable({
                       className="w-full pl-5 pr-1 py-1 border rounded text-sm"
                       step="0.01"
                       min="0"
-                      placeholder="Optional"
                     />
                   </div>
                 </td>
@@ -318,6 +317,7 @@ export default function VariantsTable({
           </tbody>
         </table>
       </div>
+      
     </div>
   );
 }

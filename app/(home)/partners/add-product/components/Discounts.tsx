@@ -29,7 +29,7 @@ export default function Discounts({ discount, onUpdate }: Props) {
 
         <div>
           <label className="block text-xs font-medium text-gray-600 mb-1">
-            Value ($)
+            Value (%)
           </label>
           <input
             type="number"
@@ -44,7 +44,7 @@ export default function Discounts({ discount, onUpdate }: Props) {
 
         <div>
           <label className="block text-xs font-medium text-gray-600 mb-1">
-            Credit: Cart Value ($)
+             Cart Value ($)
           </label>
           <input
             type="number"

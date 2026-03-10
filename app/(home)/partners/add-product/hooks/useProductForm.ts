@@ -521,7 +521,7 @@ const toggleHasVariants = (value: boolean) => {
         overnight: formData.variants[0]?.overnightShipping || 0,
         local: formData.variants[0]?.localShipping || 0
       },
-      coverImage: formData.featureImage || 'https://via.placeholder.com/600x400?text=Cover+Image',
+      coverImage: formData.featureImage || '',
       galleryImages: formData.galleryImages,
       metaFields: formData.metaFields.map(field => ({
         key: field.metaFieldName,
