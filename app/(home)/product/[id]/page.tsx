@@ -437,23 +437,29 @@ setMainImage(firstImage);
               <span className="text-xs text-gray-500 underline cursor-pointer"> 0 Ratings & 0 Reviews</span>
             </div>
 
-            {/* Price */}
-            <div className="flex items-baseline gap-3 pb-3 border-b border-gray-200">
-<span
-  className="text-3xl text-gray-900"
-  style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600 }}
->
-  ${price.current > 0 ? price.current.toFixed(2) : '0.00'}
-</span>
-              {price.onSale && (
-                <>
-                  <span className="text-base text-gray-400 line-through">${price.original.toFixed(2)}</span>
-                  {price.discount > 0 && (
-                    <span className="text-sm font-semibold text-green-600">{price.discount}% OFF</span>
-                  )}
-                </>
-              )}
-            </div>
+            {/* Price (hide when 0) */}
+            {price.current > 0 && (
+              <div className="flex items-baseline gap-3 pb-3 border-b border-gray-200">
+                <span
+                  className="text-3xl text-gray-900"
+                  style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600 }}
+                >
+                  ${price.current.toFixed(2)}
+                </span>
+                {price.onSale && (
+                  <>
+                    <span className="text-base text-gray-400 line-through">
+                      ${price.original.toFixed(2)}
+                    </span>
+                    {price.discount > 0 && (
+                      <span className="text-sm font-semibold text-green-600">
+                        {price.discount}% OFF
+                      </span>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
 
             {/* Attributes */}
             {attributeGroups.size > 0 && (
