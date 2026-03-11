@@ -5,6 +5,7 @@ import { Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { AlertCircle, Loader, CheckCircle, Lock, ArrowLeft } from 'lucide-react';
+import { FaCcVisa, FaCcMastercard, FaCcAmex } from "react-icons/fa";
 import Link from 'next/link';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
@@ -501,10 +502,11 @@ function VendorBusinessPaymentContent() {
                   justifyContent: 'center',
                   gap: '1rem'
                 }}>
-                  <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>We accept:</span>
-                  <img src="/images/visa.svg" alt="Visa" style={{ height: '20px' }} />
-                  <img src="/images/mastercard.svg" alt="Mastercard" style={{ height: '20px' }} />
-                  <img src="/images/amex.svg" alt="American Express" style={{ height: '20px' }} />
+<span style={{ fontSize: '0.75rem', color: '#6b7280' }}>We accept:</span>
+
+<FaCcVisa size={40} />
+<FaCcMastercard size={40} />
+<FaCcAmex size={40} />
                 </div>
 
                 <div style={{ 
@@ -517,7 +519,7 @@ function VendorBusinessPaymentContent() {
                   gap: '1rem',
                   flexWrap: 'wrap'
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  {/* <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <Lock size={12} style={{ color: '#9ca3af' }} />
                     <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>256-bit SSL</span>
                   </div>
@@ -527,7 +529,7 @@ function VendorBusinessPaymentContent() {
                       <path d="M4 6L5.5 7.5L8 4.5" stroke="#9ca3af" strokeWidth="1"/>
                     </svg>
                     <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>PCI Compliant</span>
-                  </div>
+                  </div> */}
                 </div>
               </>
             )}

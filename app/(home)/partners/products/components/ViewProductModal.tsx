@@ -119,12 +119,17 @@ export default function ViewProductModal({ product, onClose, onEdit, onDelete }:
           )}
 
           {/* Description */}
-          <div>
-            <h3 className="text-xs text-gray-500 uppercase mb-2">Description of your products</h3>
-            <p className="text-xs text-gray-600 leading-relaxed">
-              {product.description}
-            </p>
-          </div>
+
+{/* Description */}
+<div>
+  <h3 className="text-xs text-gray-500 uppercase mb-2">
+    Description of your products
+  </h3>
+  <div
+    className="text-xs text-gray-600 leading-relaxed"
+    dangerouslySetInnerHTML={{ __html: product.description || '' }}
+  />
+</div>
 
           {/* Attribute Values */}
           {product.attributes && product.attributes.length > 0 && (

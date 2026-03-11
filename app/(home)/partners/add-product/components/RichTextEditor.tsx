@@ -29,7 +29,8 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
     content: value || '<p></p>',
     editorProps: {
       attributes: {
-        class: 'prose prose-sm max-w-none focus:outline-none min-h-[150px] px-4 py-3 text-sm',
+        class:
+          'tiptap-editor max-w-none focus:outline-none min-h-[150px] px-4 py-3 text-sm font-normal',
       },
     },
     onUpdate: ({ editor }) => {
@@ -38,10 +39,12 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
   });
 
   useEffect(() => {
-    if (editor && value && value !== editor.getHTML()) {
-      editor.commands.setContent(value, false);
+    if (!editor) return;
+    const nextHtml = value || '<p></p>';
+    if (nextHtml !== editor.getHTML()) {
+      editor.commands.setContent(nextHtml, false);
     }
-  }, []);
+  }, [editor, value]);
 
   if (!editor) return null;
 

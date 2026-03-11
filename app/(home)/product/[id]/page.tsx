@@ -212,6 +212,28 @@ setMainImage(firstImage);
   ...(product?.galleryImages || [])
 ];
 
+  const toNumber = (value: unknown): number => {
+    if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
+    if (typeof value === 'string') {
+      const parsed = parseFloat(value);
+      return Number.isFinite(parsed) ? parsed : 0;
+    }
+    if (value && typeof value === 'object' && '$numberDecimal' in (value as Record<string, unknown>)) {
+      const parsed = parseFloat(String((value as Record<string, unknown>).$numberDecimal));
+      return Number.isFinite(parsed) ? parsed : 0;
+    }
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  };
+
+  const formatMoney = (value: unknown): string => toNumber(value).toFixed(2);
+
+  const resolvedShipping = {
+    standard: selectedVariant?.shipping?.standard ?? product?.shipping?.standard ?? 0,
+    overnight: selectedVariant?.shipping?.overnight ?? product?.shipping?.overnight ?? 0,
+    local: selectedVariant?.shipping?.local ?? product?.shipping?.local ?? 0
+  };
+
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
@@ -398,7 +420,7 @@ setMainImage(firstImage);
             {/* Product Title */}
 <h1
   className="text-[22px] leading-snug text-gray-900"
-  style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600 , fontSize: '42px' }}
+  style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600 , fontSize: '36px' }}
 >
   {product.title}
 </h1>
@@ -450,7 +472,7 @@ setMainImage(firstImage);
                             <span className="font-normal text-gray-500 ml-2">{currentValue}</span>
                           )}
                         </p>
-                        <ChevronDown className="w-4 h-4 text-gray-400" />
+                        {/* <ChevronDown className="w-4 h-4 text-gray-400" /> */}
                       </div>
 
                       <div className="flex flex-wrap gap-2">
@@ -493,6 +515,26 @@ setMainImage(firstImage);
                 })}
               </div>
             )}
+
+            {/* Choose Your Shipping */}
+            <div className="pt-2">
+              <p className="text-sm font-semibold text-gray-800">Choose Your Shipping</p>
+              <p className="text-xs text-gray-500">Choose your shipping</p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-2">
+                <div className="bg-gray-50 p-3 rounded-md border border-gray-200">
+                  <p className="text-xs text-gray-500">Standard</p>
+                  <p className="text-sm font-semibold text-gray-900">${formatMoney(resolvedShipping.standard)}</p>
+                </div>
+                <div className="bg-gray-50 p-3 rounded-md border border-gray-200">
+                  <p className="text-xs text-gray-500">Overnight</p>
+                  <p className="text-sm font-semibold text-gray-900">${formatMoney(resolvedShipping.overnight)}</p>
+                </div>
+                <div className="bg-gray-50 p-3 rounded-md border border-gray-200">
+                  <p className="text-xs text-gray-500">Local</p>
+                  <p className="text-sm font-semibold text-gray-900">${formatMoney(resolvedShipping.local)}</p>
+                </div>
+              </div>
+            </div>
 
             {/* Action Buttons */}
             <div className="flex gap-3 pt-2">

@@ -169,11 +169,14 @@ export default function VariantsSection({
                     key={variant._id}
                     variant={editForm}
                     onSave={async () => {
-                      await onUpdateVariant(variant._id, editForm);
                       cancelEditing();
                     }}
                     onCancel={cancelEditing}
-                    onChange={setEditForm}
+                    onChange={(updated) => {
+                      setEditForm(updated);
+                      // keep parent `variants` state in-sync so the modal's single Save button persists everything
+                      onUpdateVariant(variant._id, updated);
+                    }}
                     onImageUpload={handleEditVariantImageUpload}
                     showAttribute1={showAttribute1}
                     showAttribute2={showAttribute2}

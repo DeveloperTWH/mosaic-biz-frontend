@@ -12,7 +12,7 @@ import 'swiper/css/pagination';
 /* ---------- types ---------- */
 type RankedItem = {
   _id: string;
-  description?: string
+  description?: string;
   slug?: string;
   title: string;
   coverImage?: string;
@@ -23,11 +23,13 @@ type RankedItem = {
     label?: string;
     color?: string;
     size?: string;
-    price: number;
-    salePrice: number | null;
-    onSale: boolean;
-    effectivePrice: number;
+    price?: number | { $numberDecimal: string };
+    salePrice?: number | { $numberDecimal: string } | null;
+    onSale?: boolean;
+    effectivePrice?: number;
   };
+  price?: number | { $numberDecimal: string };
+  salePrice?: number | { $numberDecimal: string } | null;
 };
 
 type RankedResponse = {
@@ -51,10 +53,12 @@ function pickImage(p: RankedItem) {
   const dedup = Array.from(new Set(arr));
   return dedup[0] || '/ShopProduct/Aria-SK6-Helmet 1.png';
 }
+
 function ratingNum(p: RankedItem) {
   const n = Number(p.variantRatingAvg ?? 0);
   return Math.max(0, Math.min(5, isFinite(n) ? n : 0));
 }
+
 function ratingCount(p: RankedItem) {
   const n = Number(p.variantRatingCount ?? 0);
   return isFinite(n) ? n : 0;
@@ -62,6 +66,14 @@ function ratingCount(p: RankedItem) {
 
 function stripHtml(html: string): string {
   return html.replace(/<[^>]*>/g, '');
+}
+
+// Helper to convert number or Mongo $numberDecimal
+function getPriceNumber(v?: number | { $numberDecimal: string } | null) {
+  if (v == null) return 0;
+  if (typeof v === 'number') return v;
+  if ('$numberDecimal' in v) return Number(v.$numberDecimal);
+  return 0;
 }
 
 /* ---------- data hook ---------- */
@@ -110,21 +122,18 @@ function useSimilar(productId?: string) {
 
 /* ---------- component ---------- */
 export default function SimilarProduct({ productId }: { productId?: string }) {
-  // If parent doesn’t pass productId, read from route param (expects ObjectId).
   const params = useParams();
   const idFromRoute = (params as any)?.id as string | undefined;
   const effectiveId = productId || idFromRoute;
 
   const { items, error, loading, reload } = useSimilar(effectiveId);
 
-  // Equal height for all visible slides
   const eqRef = React.useRef<HTMLDivElement | null>(null);
   const equalizeHeights = React.useCallback(() => {
     const root = eqRef.current;
     if (!root) return;
     const cards = root.querySelectorAll<HTMLElement>('.similar-card');
     if (!cards.length) return;
-    // reset, measure, set
     cards.forEach((c) => (c.style.height = 'auto'));
     let max = 0;
     cards.forEach((c) => (max = Math.max(max, c.offsetHeight)));
@@ -145,11 +154,7 @@ export default function SimilarProduct({ productId }: { productId?: string }) {
     equalizeHeights();
   }, [equalizeHeights]);
 
-
-  if (!effectiveId || !isValidObjectId(effectiveId)) {
-    // No valid ObjectId — don’t render widget
-    return null;
-  }
+  if (!effectiveId || !isValidObjectId(effectiveId)) return null;
 
   return (
     <div className="mt-12">
@@ -221,15 +226,19 @@ export default function SimilarProduct({ productId }: { productId?: string }) {
               {items.map((p) => {
                 const img = pickImage(p);
                 const href = `/product/${p._id}`;
+
                 const r = ratingNum(p);
                 const full = Math.floor(r);
                 const hasHalf = r % 1 >= 0.25 && r % 1 < 0.75;
                 const empty = 5 - full - (hasHalf ? 1 : 0);
+
                 const fe = p.firstEligible;
-                const price = Number(fe?.price ?? 0);
-                const sale = fe?.salePrice == null ? null : Number(fe.salePrice);
-                const onSale = !!fe?.onSale && sale != null;
-                const effective = onSale ? (sale as number) : price;
+
+                // --- FIXED PRICE HANDLING ---
+                const price = getPriceNumber(fe?.price ?? p.price);
+                const sale = getPriceNumber(fe?.salePrice ?? p.salePrice ?? null);
+                const onSale = !!fe?.onSale && sale > 0;
+                const effective = onSale ? sale : price;
 
                 return (
                   <SwiperSlide key={p._id}>
@@ -269,29 +278,53 @@ export default function SimilarProduct({ productId }: { productId?: string }) {
                       </h3>
                       <p
                         className="mb-2 text-xs text-gray-600"
-                        title={stripHtml(p.description || "")}
+                        title={stripHtml(p.description || '')}
                         style={{
-                          display: "-webkit-box",
+                          display: '-webkit-box',
                           WebkitLineClamp: 2,
-                          WebkitBoxOrient: "vertical",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          wordBreak: "break-word",
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          wordBreak: 'break-word',
                         }}
                       >
-                        {stripHtml(p.description || "")}
+                        {stripHtml(p.description || '')}
                       </p>
 
-
                       <div className="flex items-center mb-2 space-x-0.5 text-yellow-500">
-                        {Array(full).fill(0).map((_, idx) => (
-                          <Star key={`f-${idx}`} size={12} fill="currentColor" stroke="currentColor" className="text-yellow-400" />
-                        ))}
-                        {hasHalf && <StarHalf size={12} fill="currentColor" stroke="currentColor" className="text-yellow-400" />}
-                        {Array(empty).fill(0).map((_, idx) => (
-                          <Star key={`e-${idx}`} size={12} fill="none" stroke="gray" className="text-gray-300" />
-                        ))}
-                        {ratingCount(p) > 0 && <span className="ml-2 text-[11px] text-gray-500">({ratingCount(p)})</span>}
+                        {Array(full)
+                          .fill(0)
+                          .map((_, idx) => (
+                            <Star
+                              key={`f-${idx}`}
+                              size={12}
+                              fill="currentColor"
+                              stroke="currentColor"
+                              className="text-yellow-400"
+                            />
+                          ))}
+                        {hasHalf && (
+                          <StarHalf
+                            size={12}
+                            fill="currentColor"
+                            stroke="currentColor"
+                            className="text-yellow-400"
+                          />
+                        )}
+                        {Array(empty)
+                          .fill(0)
+                          .map((_, idx) => (
+                            <Star
+                              key={`e-${idx}`}
+                              size={12}
+                              fill="none"
+                              stroke="gray"
+                              className="text-gray-300"
+                            />
+                          ))}
+                        {ratingCount(p) > 0 && (
+                          <span className="ml-2 text-[11px] text-gray-500">({ratingCount(p)})</span>
+                        )}
                       </div>
 
                       <div className="flex items-baseline gap-2 mt-auto">
@@ -320,15 +353,11 @@ export default function SimilarProduct({ productId }: { productId?: string }) {
       </div>
 
       <div className="mx-auto text-center">
-        <Link
-          href="/products"
-          className="inline-block px-8 py-2 text-white rounded bg-blue-900"
-        >
+        <Link href="/products" className="inline-block px-8 py-2 text-white rounded bg-blue-900">
           Show All Products
         </Link>
       </div>
 
-      {/* Pagination dot tweaks (marketplace look) */}
       <style jsx global>{`
         .similar-swiper .swiper-pagination-bullets {
           bottom: 6px !important;

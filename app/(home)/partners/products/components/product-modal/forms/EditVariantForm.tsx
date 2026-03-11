@@ -247,7 +247,7 @@ export default function EditVariantForm({
             ) : (
               <Save className="w-3 h-3" />
             )}
-            Save
+            Done
           </button>
           <button
             onClick={onCancel}
