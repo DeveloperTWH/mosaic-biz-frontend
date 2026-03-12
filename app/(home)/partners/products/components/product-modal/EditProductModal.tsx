@@ -123,18 +123,17 @@ export default function EditProductModal({ product, onClose, onSave }: Props) {
     };
   };
 
-  const handleAddVariant = async (newVariant: any) => {
+  const handleAddVariant = () => {
     const tempId = `temp-${Date.now()}`;
     setVariants([
       ...variants,
       {
-        sku: `VAR-${Date.now()}`,
+        sku: '',
         price: 0,
         stock: 0,
         images: [],
         shipping: { standard: 0, overnight: 0, local: 0 },
         isPublished: true,
-        ...newVariant,
         _id: tempId
       }
     ]);
@@ -147,68 +146,34 @@ export default function EditProductModal({ product, onClose, onSave }: Props) {
     );
   };
 
+  const handleRemoveVariant = (variantId: string) => {
+    setVariants((prev) => prev.filter((v) => v._id !== variantId));
+  };
+
   const handleSaveAll = async () => {
     try {
       setLoading(true);
 
-      // 1) Update base product fields
+      // Update product + variants in a single request (backend upserts variants)
+      const variantsPayload = variants.map((v) => {
+        const basePayload = toVariantPayload(v);
+        const isExistingId = typeof v?._id === 'string' && !v._id.startsWith('temp-');
+        return isExistingId ? { _id: v._id, ...basePayload } : basePayload;
+      });
+
+      if (variantsPayload.some((v) => !String((v as any)?.sku || '').trim())) {
+        throw new Error('Please enter SKU for all variants before saving.');
+      }
+
       const productRes = await fetch(`${API_BASE_URL}/api/product/${product._id}`, {
         method: 'PUT',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(productForm)
+        body: JSON.stringify({ ...productForm, variants: variantsPayload })
       });
       const productData = await productRes.json();
-      if (!(productData.success || productData.message)) {
+      if (!productRes.ok || !productData.success) {
         throw new Error(productData.error || 'Failed to update product');
-      }
-
-      // 2) Persist variants on the same click (single "Save Changes")
-      const existingVariants = variants.filter(
-        (v) => typeof v?._id === 'string' && !v._id.startsWith('temp-')
-      );
-      const newVariants = variants.filter(
-        (v) => typeof v?._id !== 'string' || v._id.startsWith('temp-')
-      );
-
-      const updateResults = await Promise.allSettled(
-        existingVariants.map(async (v) => {
-          const res = await fetch(
-            `${API_BASE_URL}/api/product/update-variant/${product._id}/${v._id}`,
-            {
-              method: 'PUT',
-              credentials: 'include',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(toVariantPayload(v))
-            }
-          );
-
-          const data = await res.json();
-          if (!data.success) {
-            throw new Error(data.error || `Failed to update variant ${v.sku || v._id}`);
-          }
-        })
-      );
-
-      const updateFailures = updateResults.filter((r) => r.status === 'rejected');
-      if (updateFailures.length > 0) {
-        throw new Error(
-          `Failed to update ${updateFailures.length} variant(s). Please review and try again.`
-        );
-      }
-
-      if (newVariants.length > 0) {
-        const res = await fetch(`${API_BASE_URL}/api/product/add-variants/${product._id}`, {
-          method: 'POST',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ variants: newVariants.map((v) => toVariantPayload(v)) })
-        });
-
-        const data = await res.json();
-        if (!data.success) {
-          throw new Error(data.error || 'Failed to add new variants');
-        }
       }
 
       toast.success(productData.message || 'Saved changes successfully');
@@ -302,8 +267,9 @@ export default function EditProductModal({ product, onClose, onSave }: Props) {
             productAttributes={productForm.attributes}
             onAddVariant={handleAddVariant}
             onUpdateVariant={handleVariantLocalUpdate}
-            onVariantImageUpload={async (file: File, index: number) => {
-              return await handleFileUpload('variant', file, index);
+            onRemoveVariant={handleRemoveVariant}
+            onVariantImageUpload={async (file: File, variantKey: string) => {
+              return await handleFileUpload('variant', file, variantKey);
             }}
             uploading={uploading}
             loadingVariantId={null}

@@ -83,9 +83,10 @@ type VendorApplication = {
   isMinorityOwned: boolean;
   minorityCategories: string[];
   hasEIN: boolean;
-  einNumber: string;
-  ssnLast9: string;
   hasBusinessLicense: boolean;
+  einNumber: string;
+  licenseNumber:string;
+  ssnLast9: string;
   yearsInBusiness: string;
   isFranchise: boolean;
   franchiseName: string | null;
@@ -273,6 +274,11 @@ export default function ApplicationDetailPage() {
       fetchApplicationDetails();
     }
   }, [applicationId]);
+
+const normalizeUrl = (url?: string) => {
+  if (!url) return undefined;
+  return url.startsWith('http://') || url.startsWith('https://') ? url : `https://${url}`;
+};
 
   const fetchApplicationDetails = async () => {
     try {
@@ -473,6 +479,15 @@ export default function ApplicationDetailPage() {
     }
   };
 
+  const getDocumentCategoryVerified = (
+    checklistKey: keyof VerificationChecklist,
+    docs?: Document[] | null
+  ) => {
+    const checklistVerified = Boolean(application?.verificationChecklist?.[checklistKey]);
+    const allDocsVerified = Boolean(docs?.length) && docs!.every((doc) => Boolean(doc.verified));
+    return checklistVerified || allDocsVerified;
+  };
+
   const getVerificationProgress = () => {
     if (!application) {
       return {
@@ -483,24 +498,39 @@ export default function ApplicationDetailPage() {
       };
     }
 
-    // Filter verification types to only those that have values
-    const availableVerificationTypes = baseVerificationTypes.filter(type => type.hasValue(application));
-    
-    const requiredTypes = availableVerificationTypes.filter((item) => item.required);
-    const optionalTypes = availableVerificationTypes.filter((item) => !item.required);
+    const requiredDocumentCategories = [
+      {
+        key: "minorityDocs" as const,
+        applicable: Boolean(application.isMinorityOwned),
+        verified: getDocumentCategoryVerified("minorityDocs", application.minorityProofDocuments),
+      },
+      {
+        key: "taxDocs" as const,
+        applicable: true,
+        verified: getDocumentCategoryVerified("taxDocs", application.taxDocuments),
+      },
+      {
+        key: "businessLicense" as const,
+        applicable: true,
+        verified: getDocumentCategoryVerified("businessLicense", application.businessLicenseDocuments),
+      },
+    ].filter((item) => item.applicable);
 
-    const requiredVerified = requiredTypes.filter((item) =>
-      getVerificationStatus(item.key, item.checklistKey)
-    ).length;
-    const optionalVerified = optionalTypes.filter((item) =>
+    // Optional verification types are the non-document items that have values
+    const optionalVerificationTypes = baseVerificationTypes.filter((type) =>
+      type.hasValue(application)
+    );
+
+    const requiredVerified = requiredDocumentCategories.filter((item) => item.verified).length;
+    const optionalVerified = optionalVerificationTypes.filter((item) =>
       getVerificationStatus(item.key, item.checklistKey)
     ).length;
 
     return {
       required: requiredVerified,
       optional: optionalVerified,
-      totalRequired: requiredTypes.length,
-      totalOptional: optionalTypes.length
+      totalRequired: requiredDocumentCategories.length,
+      totalOptional: optionalVerificationTypes.length
     };
   };
 
@@ -636,12 +666,12 @@ export default function ApplicationDetailPage() {
                         {application.hasEIN ? `EIN: ${application.einNumber}` : application.ssnLast9 ? `SSN: ${application.ssnLast9}` : "Not provided"}
                       </p>
                     </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Business License</p>
-                      <p className="font-medium mt-1">
-                        {application.hasBusinessLicense ? "Yes" : "No"}
-                      </p>
-                    </div>
+  <div>
+  <p className="text-sm text-gray-500">Business License</p>
+  <p className="font-medium mt-1">
+    {application.licenseNumber ? application.licenseNumber : "Not provided"}
+  </p>
+</div>
                     <div>
                       <p className="text-sm text-gray-500">Physical Location</p>
                       <p className="font-medium mt-1">
@@ -751,73 +781,95 @@ export default function ApplicationDetailPage() {
               </div>
 
               {/* Online Presence Card - Only show if any social media exists */}
-              {(application.website || application.facebook || application.instagram || 
-                application.linkedin || application.tiktok) && (
-                <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-100 p-6">
-                  <h2 className="text-lg font-semibold mb-6 pb-3 border-b">Online Presence</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {application.website && (
-                      <a href={application.website} target="_blank" rel="noopener noreferrer"
-                         className="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50 transition-colors">
-                        <Globe className="w-5 h-5 text-blue-500" />
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium">Website</p>
-                          <p className="text-xs text-gray-500 truncate">{application.website}</p>
-                        </div>
-                        <ExternalLink className="w-4 h-4 text-gray-400 ml-auto" />
-                      </a>
-                    )}
-                    
-                    {application.facebook && (
-                      <a href={application.facebook} target="_blank" rel="noopener noreferrer"
-                         className="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50 transition-colors">
-                        <Facebook className="w-5 h-5 text-blue-700" />
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium">Facebook</p>
-                          <p className="text-xs text-gray-500 truncate">{application.facebook}</p>
-                        </div>
-                        <ExternalLink className="w-4 h-4 text-gray-400 ml-auto" />
-                      </a>
-                    )}
-                    
-                    {application.instagram && (
-                      <a href={application.instagram} target="_blank" rel="noopener noreferrer"
-                         className="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50 transition-colors">
-                        <Instagram className="w-5 h-5 text-pink-600" />
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium">Instagram</p>
-                          <p className="text-xs text-gray-500 truncate">{application.instagram}</p>
-                        </div>
-                        <ExternalLink className="w-4 h-4 text-gray-400 ml-auto" />
-                      </a>
-                    )}
-                    
-                    {application.linkedin && (
-                      <a href={application.linkedin} target="_blank" rel="noopener noreferrer"
-                         className="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50 transition-colors">
-                        <Linkedin className="w-5 h-5 text-blue-800" />
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium">LinkedIn</p>
-                          <p className="text-xs text-gray-500 truncate">{application.linkedin}</p>
-                        </div>
-                        <ExternalLink className="w-4 h-4 text-gray-400 ml-auto" />
-                      </a>
-                    )}
-                    
-                    {application.tiktok && (
-                      <a href={application.tiktok} target="_blank" rel="noopener noreferrer"
-                         className="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50 transition-colors">
-                        <Music className="w-5 h-5 text-black" />
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium">TikTok</p>
-                          <p className="text-xs text-gray-500 truncate">{application.tiktok}</p>
-                        </div>
-                        <ExternalLink className="w-4 h-4 text-gray-400 ml-auto" />
-                      </a>
-                    )}
-                  </div>
-                </div>
-              )}
+{(application.website || application.facebook || application.instagram || 
+  application.linkedin || application.tiktok) && (
+  <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-100 p-6">
+    <h2 className="text-lg font-semibold mb-6 pb-3 border-b">Online Presence</h2>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      
+      {application.website && (
+        <a
+          href={normalizeUrl(application.website)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50 transition-colors"
+        >
+          <Globe className="w-5 h-5 text-blue-500" />
+          <div className="flex-1 min-w-0">
+            <p className="font-medium">Website</p>
+            <p className="text-xs text-gray-500 truncate">{application.website}</p>
+          </div>
+          <ExternalLink className="w-4 h-4 text-gray-400 ml-auto" />
+        </a>
+      )}
+
+      {application.facebook && (
+        <a
+          href={normalizeUrl(application.facebook)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50 transition-colors"
+        >
+          <Facebook className="w-5 h-5 text-blue-700" />
+          <div className="flex-1 min-w-0">
+            <p className="font-medium">Facebook</p>
+            <p className="text-xs text-gray-500 truncate">{application.facebook}</p>
+          </div>
+          <ExternalLink className="w-4 h-4 text-gray-400 ml-auto" />
+        </a>
+      )}
+
+      {application.instagram && (
+        <a
+          href={normalizeUrl(application.instagram)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50 transition-colors"
+        >
+          <Instagram className="w-5 h-5 text-pink-600" />
+          <div className="flex-1 min-w-0">
+            <p className="font-medium">Instagram</p>
+            <p className="text-xs text-gray-500 truncate">{application.instagram}</p>
+          </div>
+          <ExternalLink className="w-4 h-4 text-gray-400 ml-auto" />
+        </a>
+      )}
+
+      {application.linkedin && (
+        <a
+          href={normalizeUrl(application.linkedin)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50 transition-colors"
+        >
+          <Linkedin className="w-5 h-5 text-blue-800" />
+          <div className="flex-1 min-w-0">
+            <p className="font-medium">LinkedIn</p>
+            <p className="text-xs text-gray-500 truncate">{application.linkedin}</p>
+          </div>
+          <ExternalLink className="w-4 h-4 text-gray-400 ml-auto" />
+        </a>
+      )}
+
+      {application.tiktok && (
+        <a
+          href={normalizeUrl(application.tiktok)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50 transition-colors"
+        >
+          <Music className="w-5 h-5 text-black" />
+          <div className="flex-1 min-w-0">
+            <p className="font-medium">TikTok</p>
+            <p className="text-xs text-gray-500 truncate">{application.tiktok}</p>
+          </div>
+          <ExternalLink className="w-4 h-4 text-gray-400 ml-auto" />
+        </a>
+      )}
+
+    </div>
+  </div>
+)}
 
               {/* Business Profile Details - Only show if any of these fields exist */}
               {(application.businessBio ||
@@ -1042,93 +1094,101 @@ export default function ApplicationDetailPage() {
                 </div>
               </div>
 
-                            {/* Documents Verification Section */}
+                            {/* Required Documents Verification Section */}
               <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-100 p-6">
                 <h2 className="text-lg font-semibold mb-6 pb-3 border-b flex items-center gap-2">
                   <FileCheck className="w-5 h-5" />
-                  Document Verification
+                  Required Verifications
                 </h2>
                 
                 <div className="space-y-6">
                   {/* Minority Documents */}
-                  {application.minorityProofDocuments && application.minorityProofDocuments.length > 0 && (
+                  {application.isMinorityOwned && (
                     <div>
                       <div className="flex items-center justify-between mb-3">
                         <h3 className="font-semibold text-gray-700 flex items-center gap-2">
                           <Shield className="w-4 h-4" />
-                          Minority Proof Documents ({application.minorityProofDocuments.length})
+                          Minority Proof Documents ({application.minorityProofDocuments?.length ?? 0})
                         </h3>
                         <span className={`px-2 py-1 rounded text-xs font-medium ${
-                          application.verificationChecklist.minorityDocs 
+                          getDocumentCategoryVerified("minorityDocs", application.minorityProofDocuments)
                             ? "bg-green-100 text-green-700" 
                             : "bg-yellow-100 text-yellow-700"
                         }`}>
-                          {application.verificationChecklist.minorityDocs ? "Verified" : "Pending"}
+                          {getDocumentCategoryVerified("minorityDocs", application.minorityProofDocuments) ? "Verified" : "Pending"}
                         </span>
                       </div>
-                      <div className="space-y-2">
-                        {application.minorityProofDocuments.map((doc, index) => (
-                          <div 
-                            key={doc._id} 
-                            className={`flex items-center justify-between p-3 rounded-lg border ${
-                              doc.verified 
-                                ? "border-green-200 bg-green-50" 
-                                : "border-gray-200 bg-gray-50"
-                            }`}
-                          >
-                            <div className="flex items-center gap-3 flex-1 min-w-0">
-                              <FileText className={`w-4 h-4 ${doc.verified ? "text-green-500" : "text-gray-500"}`} />
-                              <span className={`text-sm truncate ${doc.verified ? "text-green-800" : "text-gray-800"}`}>
-                                Minority Proof Document {index + 1}
-                              </span>
+                      {Boolean(application.minorityProofDocuments?.length) ? (
+                        <div className="space-y-2">
+                          {application.minorityProofDocuments.map((doc, index) => (
+                            <div 
+                              key={doc._id} 
+                              className={`flex items-center justify-between p-3 rounded-lg border ${
+                                doc.verified 
+                                  ? "border-green-200 bg-green-50" 
+                                  : "border-gray-200 bg-gray-50"
+                              }`}
+                            >
+                              <div className="flex items-center gap-3 flex-1 min-w-0">
+                                <FileText className={`w-4 h-4 ${doc.verified ? "text-green-500" : "text-gray-500"}`} />
+                                <span className={`text-sm truncate ${doc.verified ? "text-green-800" : "text-gray-800"}`}>
+                                  Minority Proof Document {index + 1}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={() => openDocument('minorityProofDocuments', doc, index)}
+                                  className="p-1.5 hover:bg-gray-200 rounded transition-colors"
+                                  title="View Document"
+                                >
+                                  <Eye className="w-4 h-4 text-blue-600" />
+                                </button>
+                                <button
+                                  onClick={() => handleVerifyDocument('minority-proof', index, true)}
+                                  disabled={verifying[`minority-proof_${index}`] || doc.verified}
+                                  className={`p-1.5 rounded transition-colors ${
+                                    doc.verified 
+                                      ? "bg-green-100 text-green-700" 
+                                      : "bg-green-500 text-white hover:bg-green-600"
+                                  } disabled:opacity-50`}
+                                  title="Verify Document"
+                                >
+                                  {verifying[`minority-proof_${index}`] ? (
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                  ) : (
+                                    <Check className="w-4 h-4" />
+                                  )}
+                                </button>
+                              </div>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <button
-                                onClick={() => openDocument('minorityProofDocuments', doc, index)}
-                                className="p-1.5 hover:bg-gray-200 rounded transition-colors"
-                                title="View Document"
-                              >
-                                <Eye className="w-4 h-4 text-blue-600" />
-                              </button>
-                              <button
-                                onClick={() => handleVerifyDocument('minority-proof', index, true)}
-                                disabled={verifying[`minority-proof_${index}`] || doc.verified}
-                                className={`p-1.5 rounded transition-colors ${
-                                  doc.verified 
-                                    ? "bg-green-100 text-green-700" 
-                                    : "bg-green-500 text-white hover:bg-green-600"
-                                } disabled:opacity-50`}
-                                title="Verify Document"
-                              >
-                                {verifying[`minority-proof_${index}`] ? (
-                                  <Loader2 className="w-4 h-4 animate-spin" />
-                                ) : (
-                                  <Check className="w-4 h-4" />
-                                )}
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-center py-4 text-gray-500 border rounded-lg bg-gray-50">
+                          <FileText className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                          <p className="text-sm">No minority proof documents uploaded</p>
+                        </div>
+                      )}
                     </div>
                   )}
 
                   {/* Tax Documents */}
-                  {application.taxDocuments && application.taxDocuments.length > 0 && (
-                    <div>
-                      <div className="flex items-center justify-between mb-3">
-                        <h3 className="font-semibold text-gray-700 flex items-center gap-2">
-                          <FileText className="w-4 h-4" />
-                          Tax Documents ({application.taxDocuments.length})
-                        </h3>
-                        <span className={`px-2 py-1 rounded text-xs font-medium ${
-                          application.verificationChecklist.taxDocs 
-                            ? "bg-green-100 text-green-700" 
-                            : "bg-yellow-100 text-yellow-700"
-                        }`}>
-                          {application.verificationChecklist.taxDocs ? "Verified" : "Pending"}
-                        </span>
-                      </div>
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="font-semibold text-gray-700 flex items-center gap-2">
+                        <FileText className="w-4 h-4" />
+                        Tax Documents ({application.taxDocuments?.length ?? 0})
+                      </h3>
+                      <span className={`px-2 py-1 rounded text-xs font-medium ${
+                        getDocumentCategoryVerified("taxDocs", application.taxDocuments) 
+                          ? "bg-green-100 text-green-700" 
+                          : "bg-yellow-100 text-yellow-700"
+                      }`}>
+                        {getDocumentCategoryVerified("taxDocs", application.taxDocuments) ? "Verified" : "Pending"}
+                      </span>
+                    </div>
+
+                    {Boolean(application.taxDocuments?.length) ? (
                       <div className="space-y-2">
                         {application.taxDocuments.map((doc, index) => (
                           <div 
@@ -1173,25 +1233,31 @@ export default function ApplicationDetailPage() {
                           </div>
                         ))}
                       </div>
-                    </div>
-                  )}
+                    ) : (
+                      <div className="text-center py-4 text-gray-500 border rounded-lg bg-gray-50">
+                        <FileText className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                        <p className="text-sm">No tax documents uploaded</p>
+                      </div>
+                    )}
+                  </div>
 
                   {/* Business License Documents */}
-                  {application.businessLicenseDocuments && application.businessLicenseDocuments.length > 0 && (
-                    <div>
-                      <div className="flex items-center justify-between mb-3">
-                        <h3 className="font-semibold text-gray-700 flex items-center gap-2">
-                          <Briefcase className="w-4 h-4" />
-                          Business License Documents ({application.businessLicenseDocuments.length})
-                        </h3>
-                        <span className={`px-2 py-1 rounded text-xs font-medium ${
-                          application.verificationChecklist.businessLicense 
-                            ? "bg-green-100 text-green-700" 
-                            : "bg-yellow-100 text-yellow-700"
-                        }`}>
-                          {application.verificationChecklist.businessLicense ? "Verified" : "Pending"}
-                        </span>
-                      </div>
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="font-semibold text-gray-700 flex items-center gap-2">
+                        <Briefcase className="w-4 h-4" />
+                        Business License Documents ({application.businessLicenseDocuments?.length ?? 0})
+                      </h3>
+                      <span className={`px-2 py-1 rounded text-xs font-medium ${
+                        getDocumentCategoryVerified("businessLicense", application.businessLicenseDocuments) 
+                          ? "bg-green-100 text-green-700" 
+                          : "bg-yellow-100 text-yellow-700"
+                      }`}>
+                        {getDocumentCategoryVerified("businessLicense", application.businessLicenseDocuments) ? "Verified" : "Pending"}
+                      </span>
+                    </div>
+
+                    {Boolean(application.businessLicenseDocuments?.length) ? (
                       <div className="space-y-2">
                         {application.businessLicenseDocuments.map((doc, index) => (
                           <div 
@@ -1236,25 +1302,21 @@ export default function ApplicationDetailPage() {
                           </div>
                         ))}
                       </div>
-                    </div>
-                  )}
-
-                  {(!application.minorityProofDocuments || application.minorityProofDocuments.length === 0) && 
-                   (!application.taxDocuments || application.taxDocuments.length === 0) && 
-                   (!application.businessLicenseDocuments || application.businessLicenseDocuments.length === 0) && (
-                    <div className="text-center py-4 text-gray-500">
-                      <FileText className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                      <p className="text-sm">No documents uploaded yet</p>
-                    </div>
-                  )}
+                    ) : (
+                      <div className="text-center py-4 text-gray-500 border rounded-lg bg-gray-50">
+                        <FileText className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                        <p className="text-sm">No business license documents uploaded</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
-              {/* Verification Checklist Card */}
+              {/* Optional Verifications Card */}
               <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-100 p-6">
                 <h2 className="text-lg font-semibold mb-6 pb-3 border-b flex items-center gap-2">
                   <CheckSquare className="w-5 h-5" />
-                  Verification Checklist
+                  Optional Verifications
                 </h2>
                 
                 <div className="space-y-4">

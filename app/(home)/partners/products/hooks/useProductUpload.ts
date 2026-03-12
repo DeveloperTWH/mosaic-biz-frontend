@@ -9,10 +9,10 @@ export const useProductUpload = () => {
   const handleFileUpload = async (
     type: 'cover' | 'gallery' | 'variant',
     file: File,
-    variantIndex?: number
+    variantKey?: string | number
   ): Promise<string> => {
     try {
-      const uploadKey = type === 'variant' ? `variant-${variantIndex}` : type;
+      const uploadKey = type === 'variant' ? `variant-${variantKey ?? 'unknown'}` : type;
       setUploading(prev => ({ ...prev, [uploadKey]: true }));
 
       const documentType = type === 'cover' ? 'product-cover' : 
@@ -46,7 +46,7 @@ export const useProductUpload = () => {
       toast.error(`Upload failed: ${error.message}`);
       throw error;
     } finally {
-      const uploadKey = type === 'variant' ? `variant-${variantIndex}` : type;
+      const uploadKey = type === 'variant' ? `variant-${variantKey ?? 'unknown'}` : type;
       setUploading(prev => ({ ...prev, [uploadKey]: false }));
     }
   };

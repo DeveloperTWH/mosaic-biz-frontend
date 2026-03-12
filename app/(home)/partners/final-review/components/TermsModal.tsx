@@ -109,11 +109,11 @@
 
           <div>
             <h3 className="font-semibold text-gray-900 mb-2">Contact Us</h3>
-            <p className="text-sm">
-              If you have questions or requests regarding this Privacy Policy, please contact:<br />
-              Mosaic Biz Hub Support<br />
-              Email: <span className="text-[#c9a227]">Info@mosaicbizhub.com</span>
-            </p>
+           <p className="text-sm">
+  If you have questions or requests regarding this Privacy Policy, please contact:<br />
+  Mosaic Biz Hub Support<br />
+  Email: <a href="mailto:Info@mosaicbizhub.com" className="text-[#c9a227]">Info@mosaicbizhub.com</a>
+</p>
             <p className="text-sm mt-2 italic">We value your trust and are committed to protecting your privacy.</p>
           </div>
         </div>

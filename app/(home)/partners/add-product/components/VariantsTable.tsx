@@ -24,6 +24,7 @@ export default function VariantsTable({
   onImageUpload,
 }: Props) {
   const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
+  
 
   if (variants.length === 0) return null;
 
@@ -72,9 +73,9 @@ export default function VariantsTable({
       <div className="flex items-center gap-2 mb-4">
         <Package className="w-5 h-5 text-[#c9a227]" />
         <h2 className="text-lg font-semibold text-gray-900">Variant Combinations</h2>
-        <span className="ml-2 px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
+        {/* <span className="ml-2 px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
           {variants.length} variants
-        </span>
+        </span> */}
       </div>
 
       {hasVariants && (
@@ -303,15 +304,17 @@ export default function VariantsTable({
                 )}
 
                 {/* Remove */}
-                <td className="py-2 px-2">
-                  <button
-                    type="button"
-                    onClick={() => onRemove(index)}
-                    className="p-1 hover:bg-red-100 rounded"
-                  >
-                    <X className="w-4 h-4 text-red-500" />
-                  </button>
-                </td>
+<td className="py-2 px-2">
+  {variants.length > 1 && (
+    <button
+      type="button"
+      onClick={() => onRemove(index)}
+      className="p-1 hover:bg-red-100 rounded"
+    >
+      <X className="w-4 h-4 text-red-500" />
+    </button>
+  )}
+</td>
               </tr>
             ))}
           </tbody>

@@ -1350,8 +1350,7 @@ const handlePayAndSubmit = async () => {
           className="text-[#1e3a5f] hover:underline font-medium"
         >
           Terms & Conditions
-        </button>{" "}
-        (Pop Up, Check-Off, Provide Initials)
+        </button>
       </span>
     </label>
 
@@ -1412,7 +1411,7 @@ const handlePayAndSubmit = async () => {
     </button>
 
     {/* New Submit Button */}
-    <button
+    {/* <button
       onClick={async () => {
         try {
           setLoading(true);
@@ -1430,7 +1429,7 @@ const handlePayAndSubmit = async () => {
       disabled={loading}
     >
       {loading ? 'Submitting...' : 'Submit'}
-    </button>
+    </button> */}
   </div>
 )}
       

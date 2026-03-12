@@ -31,6 +31,8 @@ const getAttributeGroups = (variants: Variant[]): Map<string, Set<string>> => {
   return attributeMap;
 };
 
+
+
 const getAvailableOptions = (
   variants: Variant[],
   attributeKey: string,
@@ -67,6 +69,7 @@ export default function ProductDetailPage() {
   const [businessType, setBusinessType] = useState("");
   const [location, setLocation] = useState("");
   const [minority, setMinority] = useState("");
+  const [selectedShipping, setSelectedShipping] = useState<'standard' | 'overnight' | 'local'>('standard');
 
   useEffect(() => {
     if (!id) return;
@@ -107,6 +110,11 @@ export default function ProductDetailPage() {
     };
     loadProduct();
   }, [id]);
+
+  const handleSelectShipping = (type: 'standard' | 'overnight' | 'local') => {
+  console.log('Selected shipping:', type);
+  // You can update state or call API here
+};
 
   useEffect(() => {
     if (Object.keys(selectedAttributes).length > 0 && product?.variants) {
@@ -438,28 +446,32 @@ setMainImage(firstImage);
             </div>
 
             {/* Price (hide when 0) */}
-            {price.current > 0 && (
-              <div className="flex items-baseline gap-3 pb-3 border-b border-gray-200">
-                <span
-                  className="text-3xl text-gray-900"
-                  style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600 }}
-                >
-                  ${price.current.toFixed(2)}
-                </span>
-                {price.onSale && (
-                  <>
-                    <span className="text-base text-gray-400 line-through">
-                      ${price.original.toFixed(2)}
-                    </span>
-                    {price.discount > 0 && (
-                      <span className="text-sm font-semibold text-green-600">
-                        {price.discount}% OFF
-                      </span>
-                    )}
-                  </>
-                )}
-              </div>
-            )}
+  {/* Price (hide when 0) */}
+{price.current > 0 && (
+  <div className="flex items-baseline gap-3 pb-3 border-b border-gray-200">
+    {/* Current price (sale price) */}
+    <span
+      className="text-3xl text-gray-900"
+      style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600 }}
+    >
+      ${price.current.toFixed(2)}
+    </span>
+
+    {/* Slashed/original price */}
+    {price.onSale && price.original > price.current && (
+      <>
+        <span className="text-base text-gray-400 line-through">
+          ${price.original.toFixed(2)}
+        </span>
+        {price.discount > 0 && (
+          <span className="text-sm font-semibold text-green-600">
+            {price.discount}% OFF
+          </span>
+        )}
+      </>
+    )}
+  </div>
+)}
 
             {/* Attributes */}
             {attributeGroups.size > 0 && (
@@ -523,24 +535,33 @@ setMainImage(firstImage);
             )}
 
             {/* Choose Your Shipping */}
-            <div className="pt-2">
-              <p className="text-sm font-semibold text-gray-800">Choose Your Shipping</p>
-              <p className="text-xs text-gray-500">Choose your shipping</p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-2">
-                <div className="bg-gray-50 p-3 rounded-md border border-gray-200">
-                  <p className="text-xs text-gray-500">Standard</p>
-                  <p className="text-sm font-semibold text-gray-900">${formatMoney(resolvedShipping.standard)}</p>
-                </div>
-                <div className="bg-gray-50 p-3 rounded-md border border-gray-200">
-                  <p className="text-xs text-gray-500">Overnight</p>
-                  <p className="text-sm font-semibold text-gray-900">${formatMoney(resolvedShipping.overnight)}</p>
-                </div>
-                <div className="bg-gray-50 p-3 rounded-md border border-gray-200">
-                  <p className="text-xs text-gray-500">Local</p>
-                  <p className="text-sm font-semibold text-gray-900">${formatMoney(resolvedShipping.local)}</p>
-                </div>
-              </div>
-            </div>
+<div className="pt-2">
+  <p className="text-sm font-semibold text-gray-800">Choose Your Shipping</p>
+  <p className="text-xs text-gray-500">Select one shipping option</p>
+
+  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-2">
+    {(['standard', 'overnight', 'local'] as const).map((type) => {
+      const isSelected = selectedShipping === type;
+      return (
+        <button
+          key={type}
+          onClick={() => setSelectedShipping(type)}
+          className={`
+            flex flex-col items-start p-4 rounded-md border transition-colors
+            ${isSelected ? 'bg-[#c9a227] border-[#c9a227] text-white' : 'bg-white border-gray-300 hover:bg-gray-50'}
+          `}
+        >
+          <p className={`text-xs ${isSelected ? 'text-white/80' : 'text-gray-500'} capitalize`}>
+            {type}
+          </p>
+          <p className={`text-sm font-semibold ${isSelected ? 'text-white' : 'text-gray-900'}`}>
+            ${formatMoney(resolvedShipping[type])}
+          </p>
+        </button>
+      );
+    })}
+  </div>
+</div>
 
             {/* Action Buttons */}
             <div className="flex gap-3 pt-2">

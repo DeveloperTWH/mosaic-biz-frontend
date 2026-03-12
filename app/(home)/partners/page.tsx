@@ -534,9 +534,9 @@ const Page: React.FC = () => {
       {!onboardingLoading && !hasApplication && (
         <div className="mb-8 p-8 text-center bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl shadow-lg">
           <div className="max-w-2xl mx-auto">
-            <div className="w-20 h-20 mx-auto mb-6 bg-blue-100 rounded-full flex items-center justify-center">
+            {/* <div className="w-20 h-20 mx-auto mb-6 bg-blue-100 rounded-full flex items-center justify-center">
               <Plus className="w-10 h-10 text-blue-600" />
-            </div>
+            </div> */}
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Start Your Vendor Journey</h2>
             <p className="text-gray-600 mb-6">
               List your business on our platform and start reaching new customers.

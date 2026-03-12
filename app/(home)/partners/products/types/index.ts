@@ -74,6 +74,9 @@ export interface Product {
   // Computed fields (from API)
   variantCount?: number;
   totalStock?: number;
+    price?: {
+    $numberDecimal: string;
+  };
   priceRange?: {
     min: number;
     max: number;
@@ -248,6 +251,7 @@ export interface ApiVariantAttribute {
 }
 
 export interface ApiVariant {
+  _id?: string;
   attributes: ApiVariantAttribute;
   price: number;
   salePrice?: number;

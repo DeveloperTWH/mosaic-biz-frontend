@@ -108,14 +108,19 @@ export default function VariationAttributes({
                   </div>
 
                   <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={newValue[attrIndex] || ''}
-                      onChange={(e) => setNewValue(prev => ({ ...prev, [attrIndex]: e.target.value }))}
-                      onKeyPress={(e) => e.key === 'Enter' && handleAddValue(attrIndex)}
-                      placeholder="Attribute Value"
-                      className="flex-1 px-3 py-1.5 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-[#c9a227] focus:border-[#c9a227]"
-                    />
+<input
+  type="text"
+  value={newValue[attrIndex] || ''}
+  onChange={(e) => setNewValue(prev => ({ ...prev, [attrIndex]: e.target.value }))}
+  onKeyDown={(e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault(); // <-- prevents form submit
+      handleAddValue(attrIndex); // <-- adds the attribute
+    }
+  }}
+  placeholder="Attribute Value"
+  className="flex-1 px-3 py-1.5 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-[#c9a227] focus:border-[#c9a227]"
+/>
                     <button
                       type="button"
                       onClick={() => handleAddValue(attrIndex)}

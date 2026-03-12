@@ -26,7 +26,7 @@ export default function MetaFields({
               type="text"
               value={field.metaFieldName}
               onChange={(e) => onUpdate(index, 'metaFieldName', e.target.value)}
-              placeholder="Max Field Name"
+              placeholder="Meta Field Name"
               className="w-full px-3 py-2 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-[#c9a227] focus:border-[#c9a227]"
             />
             <div className="flex gap-2">
@@ -34,7 +34,7 @@ export default function MetaFields({
                 type="text"
                 value={field.metaFieldValue}
                 onChange={(e) => onUpdate(index, 'metaFieldValue', e.target.value)}
-                placeholder="Max Field Value"
+                placeholder="Meta Field Value"
                 className="flex-1 px-3 py-2 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-[#c9a227] focus:border-[#c9a227]"
               />
               <button

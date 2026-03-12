@@ -417,7 +417,7 @@ function VendorBusinessPaymentContent() {
                 color: '#9a3412'
               }}>
                 After successful payment, your application will be submitted for admin review. 
-                You will receive an email confirmation within 2-3 business days.
+                You will receive an email confirmation within 24-48 hours.
               </p>
             </div>
           </div>

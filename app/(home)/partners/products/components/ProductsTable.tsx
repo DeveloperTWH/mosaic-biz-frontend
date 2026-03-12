@@ -34,9 +34,18 @@ export default function ProductsTable({
     return stock ?? 0;
   };
 
-  // Helper function to safely get price
-  const getSafePrice = (priceRange: { min: number; max: number } | undefined): number => {
-    return priceRange?.min ?? 0;
+  // Helper function to safely get price (Mongo Decimal128 + other shapes)
+  const getSafePrice = (price: unknown): number => {
+    if (typeof price === 'number') return Number.isFinite(price) ? price : 0;
+    if (typeof price === 'string') {
+      const parsed = parseFloat(price);
+      return Number.isFinite(parsed) ? parsed : 0;
+    }
+    if (price && typeof price === 'object' && '$numberDecimal' in (price as Record<string, unknown>)) {
+      const parsed = parseFloat(String((price as Record<string, unknown>).$numberDecimal));
+      return Number.isFinite(parsed) ? parsed : 0;
+    }
+    return 0;
   };
 
   return (
@@ -66,8 +75,7 @@ export default function ProductsTable({
               products.map((product, index) => {
                 const safeStock = getSafeStock(product.totalStock);
                 const stockStatus = getStockStatus(safeStock);
-                const displaySku = `SKU-${(index + 1).toString().padStart(2, '0')}`;
-                const safePrice = getSafePrice(product.priceRange);
+                const safePrice = getSafePrice(product.price);
                 
                 return (
                   <tr key={product._id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
