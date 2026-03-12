@@ -420,7 +420,15 @@
 
           <div>
             <h3 className="font-semibold text-gray-900 mb-2">CONTACT INFORMATION</h3>
-            <p className="text-sm">Questions about these Terms and Conditions of Service should be sent to the Company at <span className="text-[#c9a227]">info@mosaicbizhub.com</span></p>
+            <p className="text-sm">
+              Questions about these Terms and Conditions of Service should be sent to the Company at{" "}
+              <a
+                href="mailto:info@mosaicbizhub.com"
+                className="text-[#c9a227] hover:underline"
+              >
+                info@mosaicbizhub.com
+              </a>
+            </p>
           </div>
         </div>
       )
