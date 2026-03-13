@@ -903,11 +903,11 @@ const validateForm = (): boolean => {
               <div>
                 <label className="block text-xs font-medium text-gray-500 mb-1">Website</label>
                 <input
-                  type="url"
+                  type="text"
                   value={formData.website}
                   onChange={(e) => handleInputChange('website', e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#c9a227] focus:border-transparent text-sm"
-                  placeholder="https://www.yourbusiness.com"
+                  placeholder="www.yourbusiness.com"
                 />
               </div>
 
@@ -918,11 +918,11 @@ const validateForm = (): boolean => {
                     Facebook
                   </label>
                   <input
-                    type="url"
+                    type="text"
                     value={formData.facebook}
                     onChange={(e) => handleInputChange('facebook', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#c9a227] focus:border-transparent text-sm"
-                    placeholder="https://facebook.com/yourbusiness"
+                    placeholder="facebook.com/yourbusiness"
                   />
                 </div>
                 <div>
@@ -931,11 +931,11 @@ const validateForm = (): boolean => {
                     Instagram
                   </label>
                   <input
-                    type="url"
+                    type="text"
                     value={formData.instagram}
                     onChange={(e) => handleInputChange('instagram', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#c9a227] focus:border-transparent text-sm"
-                    placeholder="https://instagram.com/yourbusiness"
+                    placeholder="instagram.com/yourbusiness"
                   />
                 </div>
                 <div>
@@ -944,11 +944,11 @@ const validateForm = (): boolean => {
                     Twitter/X
                   </label>
                   <input
-                    type="url"
+                    type="text"
                     value={formData.twitter}
                     onChange={(e) => handleInputChange('twitter', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#c9a227] focus:border-transparent text-sm"
-                    placeholder="https://twitter.com/yourbusiness"
+                    placeholder="twitter.com/yourbusiness"
                   />
                 </div>
                 <div>
@@ -957,11 +957,11 @@ const validateForm = (): boolean => {
                     LinkedIn
                   </label>
                   <input
-                    type="url"
+                    type="text"
                     value={formData.linkedin}
                     onChange={(e) => handleInputChange('linkedin', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#c9a227] focus:border-transparent text-sm"
-                    placeholder="https://linkedin.com/company/yourbusiness"
+                    placeholder="linkedin.com/company/yourbusiness"
                   />
                 </div>
                 <div>
@@ -972,11 +972,11 @@ const validateForm = (): boolean => {
                     TikTok
                   </label>
                   <input
-                    type="url"
+                    type="text"
                     value={formData.tiktok}
                     onChange={(e) => handleInputChange('tiktok', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#c9a227] focus:border-transparent text-sm"
-                    placeholder="https://tiktok.com/@yourbusiness"
+                    placeholder="tiktok.com/@yourbusiness"
                   />
                 </div>
               </div>
@@ -985,7 +985,20 @@ const validateForm = (): boolean => {
 
           {/* Additional Information Section */}
           <div className="bg-white rounded-xl shadow-sm p-6">
-            <div className="flex items-center gap-2 mb-4">
+ <div className="text-amber-600 text-xl">
+      ⚠️
+    </div>
+
+    {/* Message */}
+    <div>
+      <p className="text-amber-700 text-sm leading-relaxed">
+        If you have not provided your own <span className="font-medium">Refund & Return Policy Document </span> 
+        and <span className="font-medium">Terms & Conditions</span>, you agree to accept and follow the 
+        <span className="font-medium">MosaicBizHub Refund & Return Policy</span> and 
+        <span className="font-medium">Terms & Conditions</span> by default.
+      </p>
+    </div>
+            <div className="flex items-center gap-2 mb-4 mt-4">
               <FileText className="w-5 h-5 text-[#c9a227]" />
               <h2 className="text-lg font-semibold text-gray-900">Additional Information</h2>
               <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">Optional</span>

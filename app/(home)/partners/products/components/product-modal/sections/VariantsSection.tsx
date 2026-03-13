@@ -98,7 +98,7 @@ export default function VariantsSection({
               )}
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Old Price</th>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">New Price</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Avalinility</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Availability</th>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Standard Ship</th>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Overnight Ship</th>
@@ -296,16 +296,23 @@ export default function VariantsSection({
 
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-1">
-                    {(variant.images || []).slice(0, 2).map((img, imgIdx) => (
-                      <img
-                        key={`img-${variant._id}-${imgIdx}`}
-                        src={img}
-                        alt=""
-                        className="w-6 h-6 object-cover rounded"
-                      />
-                    ))}
-                    {(variant.images || []).length > 2 && (
-                      <span className="text-xs text-gray-500">+{(variant.images || []).length - 2}</span>
+                    {Boolean((variant.images || []).length) && (
+                      <label
+                        htmlFor={`variant-upload-${variant._id}`}
+                        className="cursor-pointer relative"
+                        title="Replace image"
+                      >
+                        <img
+                          src={(variant.images || [])[0]}
+                          alt=""
+                          className="w-6 h-6 object-cover rounded"
+                        />
+                        {uploading[`variant-${variant._id}`] && (
+                          <span className="absolute inset-0 flex items-center justify-center bg-white/70 rounded">
+                            <Loader className="w-3 h-3 animate-spin text-gray-600" />
+                          </span>
+                        )}
+                      </label>
                     )}
 
                     <input
@@ -320,20 +327,23 @@ export default function VariantsSection({
                         // Clear immediately so selecting the same file again triggers onChange
                         inputEl.value = '';
                         const url = await onVariantImageUpload(file, variant._id);
-                        onUpdateVariant(variant._id, { images: [...(variant.images || []), url] });
+                        onUpdateVariant(variant._id, { images: [url] });
                       }}
                     />
-                    <label
-                      htmlFor={`variant-upload-${variant._id}`}
-                      className="p-1 bg-gray-100 rounded cursor-pointer hover:bg-gray-200"
-                      title="Upload image"
-                    >
-                      {uploading[`variant-${variant._id}`] ? (
-                        <Loader className="w-3 h-3 animate-spin text-gray-600" />
-                      ) : (
-                        <Upload className="w-3 h-3 text-gray-600" />
-                      )}
-                    </label>
+
+                    {!Boolean((variant.images || []).length) && (
+                      <label
+                        htmlFor={`variant-upload-${variant._id}`}
+                        className="p-1 bg-gray-100 rounded cursor-pointer hover:bg-gray-200"
+                        title="Upload image"
+                      >
+                        {uploading[`variant-${variant._id}`] ? (
+                          <Loader className="w-3 h-3 animate-spin text-gray-600" />
+                        ) : (
+                          <Upload className="w-3 h-3 text-gray-600" />
+                        )}
+                      </label>
+                    )}
                   </div>
                 </td>
 

@@ -72,13 +72,18 @@ export default function VariationAttributes({
             {attributes.map((attr, attrIndex) => (
               <div key={attrIndex} className="border border-gray-200 rounded p-3">
                 <div className="flex items-center gap-3 mb-3">
-                  <input
-                    type="text"
-                    value={attr.attributeName}
-                    onChange={(e) => onUpdate(attrIndex, 'attributeName', e.target.value)}
-                    placeholder="Attribute Name"
-                    className="flex-1 px-3 py-1.5 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-[#c9a227] focus:border-[#c9a227]"
-                  />
+<input
+  type="text"
+  value={attr.attributeName}
+  onChange={(e) => onUpdate(attrIndex, 'attributeName', e.target.value)}
+  onKeyDown={(e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault(); // prevents form submit
+    }
+  }}
+  placeholder="Attribute Name"
+  className="flex-1 px-3 py-1.5 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-[#c9a227] focus:border-[#c9a227]"
+/>
                   <button
                     type="button"
                     onClick={() => onRemove(attrIndex)}
@@ -95,7 +100,7 @@ export default function VariationAttributes({
                         key={valueIndex}
                         className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs"
                       >
-                        {value} {valueIndex + 1}
+                        {value}
                         <button
                           type="button"
                           onClick={() => onRemoveValue(attrIndex, valueIndex)}

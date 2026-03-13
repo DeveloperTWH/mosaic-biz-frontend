@@ -1,79 +1,90 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
 
-const PUBLIC_PATHS = ['/', '/login', '/signup'];
+const PUBLIC_PATHS = ['/', '/login', '/signup', '/signin'];
+const JWT_SECRET = new TextEncoder().encode('your_secret_key');
+
+function clearClientSessionCookies(res: NextResponse) {
+    res.cookies.set('user_gender', '', { maxAge: 0 });
+    res.cookies.set('user_session', '', { maxAge: 0 });
+    return res;
+}
+
+function redirectUnauthorized(req: NextRequest, path: string) {
+    const redirectPath = path.startsWith('/admin') ? '/signin' : '/';
+    return clearClientSessionCookies(
+        NextResponse.redirect(new URL(redirectPath, req.url))
+    );
+}
 
 export async function middleware(req: NextRequest) {
     const path = req.nextUrl.pathname;
 
-    // 🔐 Allow /verify-otp only if otpPending cookie exists
     if (path.startsWith('/verify-otp')) {
         const otpFlag = req.cookies.get('otpPending')?.value;
-        console.log(otpFlag);
 
         if (otpFlag !== 'true') {
-            console.log("here");
-
             return NextResponse.redirect(new URL('/', req.url));
         }
+
         return NextResponse.next();
     }
 
     const token = req.cookies.get('token')?.value;
 
-    // 🔐 Redirect authenticated users away from login/signup
-    if (token && (path === '/login' || path === '/signup')) {
+    if (token && (path === '/login' || path === '/signup' || path === '/signin')) {
         try {
-            const secret = new TextEncoder().encode("your_secret_key");
-            const { payload } = await jwtVerify(token, secret) as { payload: { role: string } };
+            const { payload } = (await jwtVerify(token, JWT_SECRET)) as {
+                payload: { role: string };
+            };
+
+            if (path === '/signin') {
+                if (payload.role === 'admin') {
+                    return NextResponse.redirect(new URL('/admin', req.url));
+                }
+
+                return NextResponse.next();
+            }
 
             return NextResponse.redirect(new URL(getRedirectPathByRole(payload.role), req.url));
         } catch {
-            return NextResponse.next(); // invalid token → allow to proceed
+            return NextResponse.next();
         }
     }
 
-    // ✅ Allow public pages if no token
     if (PUBLIC_PATHS.includes(path)) {
         return NextResponse.next();
     }
 
-    // 🔐 Block access if not logged in
     if (!token) {
-        const res = NextResponse.redirect(new URL('/', req.url));
-        res.cookies.set('user_gender', '', { maxAge: 0 });
-        res.cookies.set('user_session', '', { maxAge: 0 });
-        return res;
+        return redirectUnauthorized(req, path);
     }
 
-
     try {
-        const secret = new TextEncoder().encode("your_secret_key");
-        const { payload } = await jwtVerify(token, secret) as { payload: { role: string } };
+        const { payload } = (await jwtVerify(token, JWT_SECRET)) as {
+            payload: { role: string };
+        };
         const role = payload.role;
 
         if (path === '/dashboard') {
             return NextResponse.redirect(new URL(getRedirectPathByRole(role), req.url));
         }
 
-        // 🔐 Role-based route protection
         if (path.startsWith('/admin') && role !== 'admin') {
-            return NextResponse.redirect(new URL(getRedirectPathByRole(role), req.url));
+            return NextResponse.redirect(new URL('/signin', req.url));
         }
+
         if (path.startsWith('/partners') && role !== 'business_owner') {
             return NextResponse.redirect(new URL(getRedirectPathByRole(role), req.url));
         }
+
         if (path.startsWith('/customer') && role !== 'customer') {
             return NextResponse.redirect(new URL(getRedirectPathByRole(role), req.url));
         }
 
-        return NextResponse.next(); // ✅ Authorized
+        return NextResponse.next();
     } catch {
-        const res = NextResponse.redirect(new URL('/', req.url));
-        res.cookies.set('user_gender', '', { maxAge: 0 });
-        res.cookies.set('user_session', '', { maxAge: 0 });
-        return res;
-
+        return redirectUnauthorized(req, path);
     }
 }
 
@@ -97,6 +108,7 @@ export const config = {
         '/customer/:path*',
         '/login',
         '/signup',
+        '/signin',
         '/verify-otp',
         '/dashboard',
     ],

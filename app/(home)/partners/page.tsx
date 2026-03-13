@@ -3,7 +3,6 @@ import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import {
   Lock,
-  Plus,
   Clock,
   CheckCircle,
   AlertCircle,
@@ -461,9 +460,11 @@ const Page: React.FC = () => {
 
   return (
     <div className="container p-6 mx-auto max-w-6xl">
-      <h1 className="mb-8 text-2xl font-bold text-center text-gray-800 uppercase tracking-wide">
-        Business Profile Status
-      </h1>
+      {!onboardingLoading && hasApplication && onboardingStatus && (
+        <h1 className="mb-8 text-2xl font-bold text-center text-gray-800 uppercase tracking-wide">
+          Business Profile Status
+        </h1>
+      )}
 
       {!onboardingLoading && hasApplication && onboardingStatus && (
         <div className="mb-8">

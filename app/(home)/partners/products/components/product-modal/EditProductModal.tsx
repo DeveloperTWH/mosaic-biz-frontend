@@ -90,7 +90,7 @@ export default function EditProductModal({ product, onClose, onSave }: Props) {
           price: parseNumber(v.price),
           salePrice: v.salePrice !== undefined && v.salePrice !== null ? parseNumber(v.salePrice) : undefined,
           stock: v.stock || 0,
-          images: v.images || [],
+          images: (v.images || []).slice(0, 1),
           shipping: {
             standard: parseNumber(v.shipping?.standard ?? product.shipping?.standard),
             overnight: parseNumber(v.shipping?.overnight ?? product.shipping?.overnight),
@@ -113,7 +113,7 @@ export default function EditProductModal({ product, onClose, onSave }: Props) {
           ? parseNumber(variant?.salePrice)
           : undefined,
       stock: parseNumber(variant?.stock),
-      images: Array.isArray(variant?.images) ? variant.images : [],
+      images: Array.isArray(variant?.images) ? variant.images.slice(0, 1) : [],
       shipping: {
         standard: parseNumber(shipping?.standard),
         overnight: parseNumber(shipping?.overnight),
@@ -291,10 +291,10 @@ export default function EditProductModal({ product, onClose, onSave }: Props) {
             />
           )}
 
-          <DiscountSection
+          {/* <DiscountSection
             discount={productForm.discount}
             onChange={(discount) => setProductForm({ ...productForm, discount })}
-          />
+          /> */}
         </div>
 
         {/* Lightbox */}

@@ -140,10 +140,10 @@ export default function AddProductPage() {
             />
 
             {/* Discounts */}
-            <Discounts
+            {/* <Discounts
               discount={discount}
               onUpdate={updateDiscount}
-            />
+            /> */}
           </div>
 
           {/* Submit Buttons */}

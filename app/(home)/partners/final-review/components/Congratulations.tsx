@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { 
   ArrowUpRight, Megaphone, Rocket, Sparkles
 } from "lucide-react";
+import Link from "next/link";
 import confetti from "canvas-confetti";
 
 interface Business {
@@ -22,6 +23,9 @@ export default function Congratulations({ businessName, business }: Props) {
   
   const displayName = business?.businessName || businessName || "ABC Salon";
   const businessLogo = business?.logo || "/api/placeholder/120/120";
+  const storefrontHref = business?._id
+    ? `/vendor-profile/product-vendor/${business._id}`
+    : null;
 
   useEffect(() => {
     // Trigger confetti on mount
@@ -141,7 +145,12 @@ const steps = [
                 {/* <span className="text-gray-400">★</span> */}
                 <span className="text-white text-sm ml-1">NO reviews yet</span>
               </div>
-              <button className="bg-[#c9a227] hover:bg-[#b8921f] text-white px-6 py-2 rounded text-sm font-medium flex items-center gap-2 transition-colors">
+              <button
+                type="button"
+                onClick={() => storefrontHref && router.push(storefrontHref)}
+                disabled={!storefrontHref}
+                className="bg-[#c9a227] hover:bg-[#b8921f] disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-6 py-2 rounded text-sm font-medium flex items-center gap-2 transition-colors"
+              >
                 View Your Storefront
                 <ArrowUpRight className="w-4 h-4" />
               </button>
@@ -207,17 +216,12 @@ const steps = [
 
         {/* Action Buttons */}
         <div className="flex items-center justify-center gap-4">
-          <button
-            className="px-10 py-3 bg-[#1e3a5f] text-white rounded text-sm font-medium hover:bg-[#152a45] transition-colors"
-          >
-            Manage Your Store
-          </button>
           
-          <button
-            className="px-10 py-3 border border-gray-300 text-gray-700 rounded text-sm font-medium hover:bg-gray-50 transition-colors"
-          >
-            Go To Dashboard
-          </button>
+    <Link href="/partners">
+      <button className="px-10 py-3 border border-gray-300 text-gray-700 rounded text-sm font-medium hover:bg-gray-50 transition-colors">
+        Go To Dashboard
+      </button>
+    </Link>
         </div>
       </div>
     </div>

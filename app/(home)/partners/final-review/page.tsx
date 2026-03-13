@@ -905,7 +905,7 @@ export default function FinalReviewPage() {
           >
             Submit Response
           </button>
-          <button
+          {/* <button
             onClick={() => {
               setConfirmChecked(false);
               setAgreeChecked(false);
@@ -913,7 +913,7 @@ export default function FinalReviewPage() {
             className="px-8 py-2.5 rounded text-sm font-medium bg-gray-400 text-white hover:bg-gray-500 transition-colors"
           >
             Clear Response
-          </button>
+          </button> */}
         </div>
       </div>
 

@@ -500,6 +500,10 @@ export default function VendorOnboardingStage1Page() {
       errors.ssnLast9 = 'SSN must be 9 digits';
     }
 
+if (form.hasBusinessLicense && !form.licenseNumber.trim()) {
+  errors.licenseNumber = 'Business License Number is required';
+}
+
     // Business Details
     if (!form.businessOwnershipType) errors.businessOwnershipType = 'Ownership type is required';
     if (!form.yearsInBusiness) errors.yearsInBusiness = 'Years in business is required';
@@ -776,7 +780,7 @@ const handlePayAndSubmit = async () => {
 
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Upload Supporting Documents Proving Majority Stakes In The Name Of The Minority Founder (Optional)
+                    Upload Supporting Documents Proving Majority Stakes In The Name Of The Minority Founder
                   </label>
                   <div className="flex items-center gap-4">
                     <div className="flex-1 px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 text-sm">
@@ -871,7 +875,7 @@ const handlePayAndSubmit = async () => {
 
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Upload Supporting Documents (Optional)
+                    Upload Supporting Documents
                   </label>
                   <div className="flex items-center gap-4">
                     <div className="flex-1 px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 text-sm">
@@ -931,7 +935,7 @@ const handlePayAndSubmit = async () => {
 
 {/* Business License Section */}
 <div className="mb-4">
-  <div className="mb-3">
+  {/* <div className="mb-3">
     <label className="block text-sm font-medium text-gray-700 mb-3">
       Do You Have A Business License?
     </label>
@@ -961,25 +965,25 @@ const handlePayAndSubmit = async () => {
         <span className="ml-2 text-gray-700">No</span>
       </label>
     </div>
-  </div>
+  </div> */}
 
   {form.hasBusinessLicense && (
     <div className="space-y-4">
       {/* License Number Field */}
-      <InputField label="Business License Number" error={formErrors.licenseNumber}>
-        <input
-          type="text"
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-          value={form.licenseNumber || ''}
-          onChange={e => update('licenseNumber', e.target.value)}
-          placeholder="Enter your business license number"
-        />
-      </InputField>
+<InputField label="Business License Number" required error={formErrors.licenseNumber}>
+  <input
+    type="text"
+    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+    value={form.licenseNumber || ''}
+    onChange={e => update('licenseNumber', e.target.value)}
+    placeholder="Enter your business license number"
+  />
+</InputField>
 
       {/* Business License Documents Upload */}
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700 mb-3">
-          Upload Business License Document {!form.hasBusinessLicense && form.businessLicenseDocuments.length === 0 ? '(Required)' : '(Optional)'}
+          Upload Business License Document {!form.hasBusinessLicense && form.businessLicenseDocuments.length === 0 ? '(Required)' : ''}
         </label>
         <div className="flex items-center gap-4">
           <div className="flex-1 px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 text-sm">

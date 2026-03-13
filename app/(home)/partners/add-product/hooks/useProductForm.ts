@@ -204,7 +204,8 @@ const generateVariants = () => {
   if (!attr2) {
     for (const val1 of attr1.attributeValues) {
       newVariants.push({
-        sku: generateSKU(val1, '', variantIndex),
+        // sku: generateSKU(val1, '', variantIndex),
+         sku: '', // Let user input SKU for single attribute variants
         attribute1Name: attr1.attributeName,
         attribute1Value: val1,
         attribute2Name: '',
@@ -225,7 +226,8 @@ const generateVariants = () => {
     for (const val1 of attr1.attributeValues) {
       for (const val2 of attr2.attributeValues) {
         newVariants.push({
-          sku: generateSKU(val1, val2, variantIndex),
+          // sku: generateSKU(val1, val2, variantIndex),
+           sku: '', // Let user input SKU for variants
           attribute1Name: attr1.attributeName,
           attribute1Value: val1,
           attribute2Name: attr2.attributeName,
@@ -515,9 +517,6 @@ const toggleHasVariants = (value: boolean) => {
 
   // Transform to API payload
   const transformToApiPayload = (): ApiProductPayload => {
-    // Default placeholder image for variants if none provided
-    const defaultVariantImage = 'https://via.placeholder.com/300x300?text=Product+Image';
-    
     return {
       title: formData.productTitle,
       description: formData.productDescription,
@@ -562,7 +561,7 @@ const toggleHasVariants = (value: boolean) => {
               ? variant.salePrice
               : undefined,
           stock: variant.stock,
-          images: variant.images && variant.images.length > 0 ? variant.images : [defaultVariantImage],
+          images: variant.images && variant.images.length > 0 ? variant.images : [],
           sku: variant.sku,
           shipping: {
             standard: variant.standardShipping || 0,
