@@ -641,7 +641,7 @@ const normalizeUrl = (url?: string) => {
                 Refresh
               </button>
               
-              {canFinalize() && (
+              {/* {canFinalize() && (
                 <button
                   onClick={() => setShowFinalizeModal(true)}
                   className="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 flex items-center justify-center gap-2"
@@ -649,7 +649,7 @@ const normalizeUrl = (url?: string) => {
                   <CheckCheck className="w-4 h-4" />
                   Finalize Application
                 </button>
-              )}
+              )} */}
             </div>
           </div>
 
