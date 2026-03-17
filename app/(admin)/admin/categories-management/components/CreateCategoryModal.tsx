@@ -23,8 +23,20 @@ interface Props {
         img?: string;
         categoryId?: string;
     } | null;
+    initialValues?: {
+        name?: string;
+        description?: string;
+        categoryId?: string;
+        img?: string;
+    };
 }
 
+const buildSlug = (value: string) =>
+    value
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, '')
+        .replace(/\s+/g, '-');
 
 export default function CreateCategoryModal({
     isOpen,
@@ -36,6 +48,7 @@ export default function CreateCategoryModal({
     foodCategoryOptions = [],
     editMode = false,
     selectedCategory = null,
+    initialValues,
 }: Props) {
     const [name, setName] = useState('');
     const [slug, setSlug] = useState('');
@@ -52,8 +65,15 @@ export default function CreateCategoryModal({
             setDescription(selectedCategory.description || '');
             setParentCategoryId(selectedCategory.categoryId || '');
             setImagePreview(selectedCategory.img || '');
+        } else if (isOpen) {
+            const nextName = initialValues?.name || '';
+            setName(nextName);
+            setSlug(buildSlug(nextName));
+            setDescription(initialValues?.description || '');
+            setParentCategoryId(initialValues?.categoryId || '');
+            setImageFile(null);
+            setImagePreview(initialValues?.img || '');
         } else {
-            // Reset when modal opens in create mode
             setName('');
             setSlug('');
             setDescription('');
@@ -61,7 +81,7 @@ export default function CreateCategoryModal({
             setImageFile(null);
             setImagePreview('');
         }
-    }, [editMode, selectedCategory, isOpen]);
+    }, [editMode, initialValues, selectedCategory, isOpen]);
 
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -74,13 +94,7 @@ export default function CreateCategoryModal({
     const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newName = e.target.value;
         setName(newName);
-        setSlug(
-            newName
-                .toLowerCase()
-                .trim()
-                .replace(/[^\w\s-]/g, '')
-                .replace(/\s+/g, '-')
-        );
+        setSlug(buildSlug(newName));
     };
 
     const handleSubmit = async () => {

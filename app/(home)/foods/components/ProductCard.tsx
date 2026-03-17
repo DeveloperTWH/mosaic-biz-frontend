@@ -1,86 +1,124 @@
 import React from "react";
 
-type ProductCardProps = {
+type FoodCardProps = {
   image?: string;
-  title: string;
-  description?: string;
-  rating: number;
-  totalRatings: number;
-  reviews: number;
+  businessName: string; // updated
+  businessDescription?: string; // updated
   badge?: string;
-  price?: number;
+  logo?: string;
 };
 
 const HorizontalLine = () => {
-  return <p style={{ borderTop: '1px solid', color : "#D9D9D9",  margin: '10px 0' }}></p> ;
+  return (
+    <p
+      style={{
+        borderTop: "1px solid",
+        color: "#D9D9D9",
+        margin: "10px 0",
+      }}
+    ></p>
+  );
 };
 
-const ProductCard: React.FC<ProductCardProps> = ({
+
+const getBadgeUrl = (badge?: string) => {
+  if (!badge) return '';
+  return `/badge/${badge
+    .toLowerCase()
+    .replace(/\s+/g, '-') // replace spaces with dash
+    .replace(/[^a-z0-9-]/g, '') // remove any special characters
+  }.png`;
+};
+
+const FoodCard: React.FC<FoodCardProps> = ({
   image,
-  title,
-  description,
-  rating,
-  totalRatings,
-  reviews,
+  businessName,
+  businessDescription,
   badge,
-  price,
+  logo,
 }) => {
   return (
-    <div className="product-card h-[380px] flex flex-col overflow-hidden border-2 border-[#D9D9D9] shadow-lg">
-      {image ? (
-        <img src={image} alt={title} className="product-image h-[180px] w-full object-cover flex-shrink-0" />
-      ) : (
-        <div className="h-[180px] w-full bg-gray-100 flex-shrink-0 flex items-center justify-center text-xs font-semibold text-gray-500 tracking-wide">
-          NO IMAGE
-        </div>
-      )}
+    <div className="product-card h-[420px] flex flex-col overflow-hidden border-2 border-[#D9D9D9] shadow-lg">
+      
+      {/* Image with logo overlay */}
+      <div className="relative h-[180px] w-full flex-shrink-0">
+        {image ? (
+          <img
+            src={image}
+            alt={businessName}
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <div className="h-full w-full bg-gray-100 flex items-center justify-center text-xs font-semibold text-gray-500">
+            NO IMAGE
+          </div>
+        )}
 
-      <div className="product-content p-4 flex flex-col flex-1">
-        {/* Badge */}
-        <div className="mb-2 h-6">
-          {badge && (
-            <span className="px-2 py-1 text-xs font-semibold text-white bg-yellow-600 rounded uppercase">
-              {badge}
-            </span>
-          )}
-        </div>
+        {logo && (
+          <img
+            src={logo}
+            alt="Business Logo"
+            className="absolute bottom-2 right-2 h-12 w-12 object-contain bg-white rounded-full p-1 shadow-md"
+          />
+        )}
+      </div>
 
-        {/* Title */}
-        <h3 className="product-title text-base font-bold mb-2 line-clamp-1 h-6">{title}</h3>
+      <div className="p-4 flex flex-col flex-1">
+        
+        {/* Business Name */}
+        <h3 className="text-base font-bold mb-2 line-clamp-1">
+          {businessName}
+        </h3>
 
-        {/* Description */}
+        {/* Business Description */}
         <p
-          className="product-description text-sm text-[#5F5F5F] overflow-hidden font-montserrat mb-3"
+          className="text-sm text-[#5F5F5F] font-montserrat mb-3 overflow-hidden"
           style={{
             display: "-webkit-box",
             WebkitLineClamp: 2,
             WebkitBoxOrient: "vertical",
-            textOverflow: "ellipsis",
           }}
-          title={description}
+          title={businessDescription}
         >
-        {description || "\u00a0"}</p>
+          {businessDescription || "\u00a0"}
+        </p>
 
-        {/* Price */}
-        <div className="mb-3 h-7">
-          {price !== undefined && (
-            <span className="text-lg font-bold text-gray-900">
-              ${price.toFixed(2)}
-            </span>
-          )}
-        </div>
-
+        {/* Divider + View details */}
         <div className="flex justify-center mt-auto">
-            <div className="w-[65%] mr-5">
-            <HorizontalLine/>
-            </div>
-            <a href="#" className="view-details text-[#C7A040] text-xs text-montserrat">
+          <div className="w-[65%] mr-5">
+            <HorizontalLine />
+          </div>
+
+          <a
+            href="#"
+            className="text-[#C7A040] text-xs font-montserrat"
+          >
             View Details
-            </a>
+          </a>
         </div>
+
+        {/* Badge Section */}
+        <div className="mt-3 bg-gray-100 rounded px-4 py-2 flex justify-between items-center min-h-[64px]">
+          
+          <span className="text-gray-600 text-sm font-semibold">
+            Earned Badge:
+          </span>
+
+{badge ? (
+  <img
+    src={getBadgeUrl(badge)}
+    alt={`${badge} badge`}
+    className="h-16 object-contain"
+  />
+) : (
+  <div className="h-16 w-[96px]" />
+)}
+
+        </div>
+
       </div>
     </div>
   );
 };
 
-export default ProductCard;
+export default FoodCard;

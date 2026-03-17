@@ -1,7 +1,10 @@
+import { Business } from "./business";
+
 export interface Service {
   _id: string;
   title: string;
   slug: string;
+  businessId?: Business | null; // <-- add this
   description: string;
   price: number;
   duration: string;

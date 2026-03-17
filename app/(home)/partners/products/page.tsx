@@ -10,6 +10,8 @@ import ProductFilters from './components/ProductFilters';
 import ViewProductModal from './components/ViewProductModal';
 import EditProductModal from './components/product-modal/EditProductModal';
 import ConfirmDialog from './components/ConfirmDialog'; // You'll need to create this
+import AddDiscountModal from './components/AddDiscountModal';
+import ViewDiscountsModal from './components/ViewDiscountsModal';
 
 export default function ProductsPage() {
   const router = useRouter();
@@ -17,6 +19,8 @@ export default function ProductsPage() {
   const [loadingBusiness, setLoadingBusiness] = useState(true);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [productToDelete, setProductToDelete] = useState<string | null>(null);
+  const [showDiscountModal, setShowDiscountModal] = useState(false);
+  const [showDiscountListModal, setShowDiscountListModal] = useState(false);
   
   const {
     products,
@@ -168,6 +172,23 @@ export default function ProductsPage() {
             getStockStatus={getStockStatus}
           />
         </div>
+        <div className="mt-6 flex justify-end">
+<div className="flex items-center gap-2">
+  <button
+    onClick={() => setShowDiscountModal(true)}
+    className="flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white text-xs rounded-md hover:bg-green-700"
+  >
+    + Add discount
+  </button>
+
+  <button
+    onClick={() => setShowDiscountListModal(true)}
+    className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white text-xs rounded-md hover:bg-blue-700"
+  >
+    View
+  </button>
+</div>
+</div>
       </div>
 
       {/* View Modal */}
@@ -191,6 +212,21 @@ export default function ProductsPage() {
           onSave={handleProductSaved}
         />
       )}
+{/* add discount model */}
+      {showDiscountModal && (
+  <AddDiscountModal
+    businessId={businessId}
+    onClose={() => setShowDiscountModal(false)}
+  />
+)}
+
+{/* view discount model */}
+{showDiscountListModal && (
+  <ViewDiscountsModal
+    businessId={businessId}
+    onClose={() => setShowDiscountListModal(false)}
+  />
+)}
 
       {/* Confirm Delete Dialog */}
       <ConfirmDialog
@@ -202,6 +238,8 @@ export default function ProductsPage() {
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
       />
+
+      
     </div>
   );
 }

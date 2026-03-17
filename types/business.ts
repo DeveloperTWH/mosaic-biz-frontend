@@ -48,4 +48,5 @@ export interface Business {
   updatedAt: string;
   imageLimit: number;
   videoLimit: number;
+   badge?: string; // add this line
 }

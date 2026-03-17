@@ -36,6 +36,7 @@ const AdminSidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
     { label: "Businesses", icon: <Building2 className="w-5 h-5" /> },
     { label: "Products", icon: <Package className="w-5 h-5" /> },
     { label: "Vendor Applications", icon: <FileText className="w-5 h-5" /> },
+    { label: "Category Requests", icon: <ListTree className="w-5 h-5" /> },
     { label: "Orders", icon: <FileText className="w-5 h-5" /> },
     { label: "Users", icon: <Users className="w-5 h-5" /> },
     { label: "Subscription", icon: <CreditCard className="w-5 h-5" /> },

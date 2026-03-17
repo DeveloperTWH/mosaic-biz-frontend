@@ -24,6 +24,7 @@ export interface BusinessProfileData {
     primaryEmail: string;
     primaryPhone: string;
     language: string;
+    customLanguage:string;
   };
   
   businessInfo: {

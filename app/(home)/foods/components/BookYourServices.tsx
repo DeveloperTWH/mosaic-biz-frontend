@@ -103,17 +103,14 @@ const BookServices: React.FC<BookServicesProps> = ({
             <>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {services.map((service) => (
-                  <ProductCard
-                    key={service._id}
-                    image={service.coverImage}
-                    title={service.title}
-                    description={service.description}
-                    rating={service.averageRating ?? 0}
-                    totalRatings={service.totalReviews ?? 0}
-                    reviews={service.totalReviews ?? 0}
-                    badge={(service as any).badge}
-                    price={(service as any).price}
-                  />
+<ProductCard
+  key={service._id}
+  image={service.coverImage}
+  businessName={service.businessId?.businessName || service.title}
+  businessDescription={service.businessId?.description || service.description || "No description available"}
+  badge={service.businessId?.badge} // <- this will now work
+  logo={service.businessId?.logo} // optional if you have a logo field
+/>
                 ))}
               </div> 
 

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
+import TermsModal from "../final-review/components/TermsModal";
 import { 
   getOnboardingData, 
   updateBusinessProfile 
@@ -54,6 +55,7 @@ interface PrefilledData {
 interface FormData {
   // Personal Information
   language: string;
+  customLanguage?: string; // Added customLanguage to the interface
   
   // Business Information
   licenseNumber: string;
@@ -225,7 +227,8 @@ export default function BusinessProfilePage() {
   const [formData, setFormData] = useState<FormData>({
     // Personal Information
     language: '',
-    
+    customLanguage: '',
+
     // Business Information
     licenseNumber: '',
     businessBio: '',
@@ -253,6 +256,23 @@ export default function BusinessProfilePage() {
   
   const [errors, setErrors] = useState<FormErrors>({});
   const [characterCount, setCharacterCount] = useState(0);
+
+  //state for policy agreement
+
+const [hasOwnPolicy, setHasOwnPolicy] = useState(true); // default YES
+const [acceptMosaicPolicy, setAcceptMosaicPolicy] = useState(false);
+const [modalOpen, setModalOpen] = useState(false);
+const [modalType, setModalType] = useState<"terms" | "privacy" | null>(null);
+
+const openModal = (type: "terms" | "privacy") => {
+  setModalType(type);
+  setModalOpen(true);
+};
+
+const closeModal = () => {
+  setModalOpen(false);
+  setModalType(null);
+};
 
   // Fetch onboarding data on mount
   useEffect(() => {
@@ -297,6 +317,7 @@ export default function BusinessProfilePage() {
       setFormData({
         // Personal Information
         language: data.language || '',
+        customLanguage: data.customLanguage || '', // Initialize customLanguage from fetched data
         
         // Business Information
         licenseNumber: data.licenseNumber || '',
@@ -353,6 +374,11 @@ const validateForm = (): boolean => {
     newErrors.businessProfileImage = 'Business logo is required';
   }
 
+  // ✅ NEW: Policy checkbox validation
+  if (!hasOwnPolicy && !acceptMosaicPolicy) {
+    newErrors.acceptMosaicPolicy = 'You must accept Mosaic Terms & Policy';
+  }
+
   setErrors(newErrors);
   return Object.keys(newErrors).length === 0;
 };
@@ -369,7 +395,7 @@ const validateForm = (): boolean => {
       setSaving(true);
       
       await updateBusinessProfile({
-        language: formData.language,
+        language: formData.language === "Other" ? formData.customLanguage : formData.language, // Conditionally send customLanguage
         licenseNumber: formData.licenseNumber,
         businessBio: formData.businessBio,
         characterLimit: formData.characterLimit,
@@ -567,7 +593,39 @@ const validateForm = (): boolean => {
                   className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-700 text-sm cursor-not-allowed"
                 />
               </div>
-              <div>
+<div>
+  <label className="block text-xs font-medium text-gray-500 mb-1">
+    Language
+  </label>
+
+  <select
+    value={formData.language === "Other" ? "Other" : formData.language}
+    onChange={(e) => handleInputChange('language', e.target.value)}
+    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#c9a227] focus:border-transparent bg-white text-sm"
+  >
+    {/* <option value="">-- choose language --</option> */}
+    <option value="English">English</option>
+    <option value="Spanish">Spanish</option>
+    <option value="French">French</option>
+    <option value="Chinese">Chinese</option>
+    <option value="Other">Other</option>
+  </select>
+
+  {/* ✅ Show input when "Other" is selected */}
+  {formData.language === "Other" && (
+    <input
+      type="text"
+      placeholder="Enter language"
+      value={formData.customLanguage || ""}
+      onChange={(e) =>
+        handleInputChange('customLanguage', e.target.value)
+      }
+      className="mt-2 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#c9a227] focus:border-transparent text-sm"
+    />
+  )}
+</div>
+
+              {/* <div>
                 <label className="block text-xs font-medium text-gray-500 mb-1">Language</label>
                 <select
                   value={formData.language}
@@ -580,7 +638,7 @@ const validateForm = (): boolean => {
                   <option value="French">French</option>
                   <option value="Chinese">Chinese</option>
                 </select>
-              </div>
+              </div> */}
               <div>
                 <label className="block text-xs font-medium text-gray-500 mb-1">Minority Type</label>
                 <input
@@ -984,20 +1042,87 @@ const validateForm = (): boolean => {
           </div>
 
           {/* Additional Information Section */}
-          <div className="bg-white rounded-xl shadow-sm p-6">
- <div className="text-amber-600 text-xl">
-      ⚠️
-    </div>
+          <div className="bg-white ">
+   <div className="bg-white border  p-4 space-y-4">
 
-    {/* Message */}
+  {/* Icon + Question */}
+  <div className="flex items-start gap-3">
+    <div className="text-white-600 text-xl"></div>
+
     <div>
-      <p className="text-amber-700 text-sm leading-relaxed">
-        If you have not provided your own <span className="font-medium">Refund & Return Policy Document </span> 
-        and <span className="font-medium">Terms & Conditions</span>, you agree to accept and follow the 
-        <span className="font-medium">MosaicBizHub Refund & Return Policy</span> and 
-        <span className="font-medium">Terms & Conditions</span> by default.
+      <p className="text-amber-800 font-medium text-sm">
+        Do you have your own Refund Policy & Terms?
       </p>
+
+      {/* Yes / No */}
+      <div className="flex gap-4 mt-2">
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="radio"
+            checked={hasOwnPolicy === true}
+            onChange={() => setHasOwnPolicy(true)}
+          />
+          Yes
+        </label>
+
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="radio"
+            checked={hasOwnPolicy === false}
+            onChange={() => setHasOwnPolicy(false)}
+          />
+          No
+        </label>
+      </div>
     </div>
+  </div>
+
+  {/* If NO → show mosaic acceptance */}
+{!hasOwnPolicy && (
+  <div
+    className={`border rounded-lg p-3 space-y-3 ${
+      errors.acceptMosaicPolicy ? "border-red-500 bg-red-50" : "border-gray-300 bg-white"
+    }`}
+  >
+    <label className="flex items-start gap-2 text-sm">
+      <input
+        type="checkbox"
+        checked={acceptMosaicPolicy}
+        onChange={(e) => setAcceptMosaicPolicy(e.target.checked)}
+      />
+
+      <span className="text-gray-700">
+        I agree to follow{" "}
+        <button
+          type="button"
+          className="text-blue-600 underline"
+          onClick={() => openModal("terms")}
+        >
+          MosaicBizHub Terms & Conditions
+        </button>{" "}
+        and Refund Policy
+      </span>
+    </label>
+
+    {/* ✅ Error message like textarea */}
+    {errors.acceptMosaicPolicy ? (
+      <p className="text-xs text-red-600">
+        {errors.acceptMosaicPolicy}
+      </p>
+    ) : (
+      <p className="text-xs text-gray-500">
+        You must accept Mosaic policies if you don’t provide your own.
+      </p>
+    )}
+  </div>
+)}
+
+<TermsModal 
+  isOpen={modalOpen} 
+  onClose={closeModal} 
+  type={modalType || "terms"} // ✅ FIX
+/>
+</div>
             <div className="flex items-center gap-2 mb-4 mt-4">
               <FileText className="w-5 h-5 text-[#c9a227]" />
               <h2 className="text-lg font-semibold text-gray-900">Additional Information</h2>

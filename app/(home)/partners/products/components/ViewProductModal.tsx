@@ -272,7 +272,7 @@ export default function ViewProductModal({ product, onClose, onEdit, onDelete }:
           )}
 
           {/* Discount */}
-          {product.discount && (
+          {/* {product.discount && (
             <div>
               <h3 className="text-sm font-semibold text-gray-900 mb-2 border-l-4 border-[#c9a227] pl-3">Discount</h3>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -290,7 +290,7 @@ export default function ViewProductModal({ product, onClose, onEdit, onDelete }:
                 </div>
               </div>
             </div>
-          )}
+          )} */}
         </div>
 
         {/* Footer Actions */}

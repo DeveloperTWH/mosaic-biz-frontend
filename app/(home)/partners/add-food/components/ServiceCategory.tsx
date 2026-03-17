@@ -34,7 +34,7 @@ export default function ServiceCategory({
             onChange={(e) => onInputChange('businessId', e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:ring-1 focus:ring-[#c9a227] focus:border-[#c9a227]"
           >
-            <option value="">Select Business</option>
+            {/* <option value="">Select Business</option> */}
             {businesses.map((business) => (
               <option key={business._id} value={business._id}>
                 {business.businessName}

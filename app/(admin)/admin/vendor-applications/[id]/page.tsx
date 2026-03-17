@@ -192,9 +192,9 @@ const baseVerificationTypes = [
   {
     key: "business-profile-image",
     checklistKey: "businessProfileImage",
-    label: "Business Profile Image",
+    label: "Business Logo",
     icon: Building,
-    description: "Verify business profile image/logo",
+    description: "Verify business logo",
     points: 5,
     required: false,
     hasValue: (app: VendorApplication) => app.businessProfileImage?.url && app.businessProfileImage.url.trim() !== ""
@@ -480,13 +480,25 @@ const normalizeUrl = (url?: string) => {
   };
 
   const getDocumentCategoryVerified = (
-    checklistKey: keyof VerificationChecklist,
-    docs?: Document[] | null
-  ) => {
-    const checklistVerified = Boolean(application?.verificationChecklist?.[checklistKey]);
-    const allDocsVerified = Boolean(docs?.length) && docs!.every((doc) => Boolean(doc.verified));
-    return checklistVerified || allDocsVerified;
-  };
+  checklistKey: keyof VerificationChecklist,
+  docs?: Document[] | null,
+  hasNumber?: boolean // 👈 NEW
+) => {
+  const checklistVerified = Boolean(application?.verificationChecklist?.[checklistKey]);
+  const allDocsVerified = Boolean(docs?.length) && docs!.every((doc) => Boolean(doc.verified));
+
+  // ✅ NEW LOGIC
+  return checklistVerified || allDocsVerified || hasNumber;
+};
+
+  // const getDocumentCategoryVerified = (
+  //   checklistKey: keyof VerificationChecklist,
+  //   docs?: Document[] | null
+  // ) => {
+  //   const checklistVerified = Boolean(application?.verificationChecklist?.[checklistKey]);
+  //   const allDocsVerified = Boolean(docs?.length) && docs!.every((doc) => Boolean(doc.verified));
+  //   return checklistVerified || allDocsVerified;
+  // };
 
   const getVerificationProgress = () => {
     if (!application) {
@@ -507,12 +519,22 @@ const normalizeUrl = (url?: string) => {
       {
         key: "taxDocs" as const,
         applicable: true,
-        verified: getDocumentCategoryVerified("taxDocs", application.taxDocuments),
+        // verified: getDocumentCategoryVerified("taxDocs", application.taxDocuments),
+        verified: getDocumentCategoryVerified(
+  "taxDocs",
+  application.taxDocuments,
+  Boolean(application.einNumber || application.ssnLast9) // 👈 NEW
+),
       },
       {
         key: "businessLicense" as const,
         applicable: true,
-        verified: getDocumentCategoryVerified("businessLicense", application.businessLicenseDocuments),
+        // verified: getDocumentCategoryVerified("businessLicense", application.businessLicenseDocuments),
+        verified: getDocumentCategoryVerified(
+  "businessLicense",
+  application.businessLicenseDocuments,
+  Boolean(application.licenseNumber) // 👈 NEW
+),
       },
     ].filter((item) => item.applicable);
 
@@ -661,13 +683,13 @@ const normalizeUrl = (url?: string) => {
                   </div>
                   <div className="space-y-4">
                     <div>
-                      <p className="text-sm text-gray-500">Tax Identification</p>
+                      <p className="text-sm text-gray-500">EIN No</p>
                       <p className="font-medium mt-1">
                         {application.hasEIN ? `EIN: ${application.einNumber}` : application.ssnLast9 ? `SSN: ${application.ssnLast9}` : "Not provided"}
                       </p>
                     </div>
   <div>
-  <p className="text-sm text-gray-500">Business License</p>
+  <p className="text-sm text-gray-500">Business License No</p>
   <p className="font-medium mt-1">
     {application.licenseNumber ? application.licenseNumber : "Not provided"}
   </p>
@@ -898,7 +920,7 @@ const normalizeUrl = (url?: string) => {
                       {application.businessProfileImage?.url && (
                         <div className="border rounded-lg p-4 space-y-3">
                           <div className="flex items-center justify-between">
-                            <p className="font-medium">Business Profile Image</p>
+                            <p className="font-medium">Business Logo</p>
                             <span className={`px-2 py-1 rounded text-xs font-medium ${
                               application.businessProfileImage.verified
                                 ? "bg-green-100 text-green-700"
@@ -1177,7 +1199,7 @@ const normalizeUrl = (url?: string) => {
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="font-semibold text-gray-700 flex items-center gap-2">
                         <FileText className="w-4 h-4" />
-                        Tax Documents ({application.taxDocuments?.length ?? 0})
+                        EIN Document ({application.taxDocuments?.length ?? 0})
                       </h3>
                       <span className={`px-2 py-1 rounded text-xs font-medium ${
                         getDocumentCategoryVerified("taxDocs", application.taxDocuments) 
@@ -1188,7 +1210,90 @@ const normalizeUrl = (url?: string) => {
                       </span>
                     </div>
 
+
                     {Boolean(application.taxDocuments?.length) ? (
+  <div className="space-y-2">
+    {application.taxDocuments.map((doc, index) => (
+      <div 
+        key={doc._id} 
+        className={`flex items-center justify-between p-3 rounded-lg border ${
+          doc.verified 
+            ? "border-green-200 bg-green-50" 
+            : "border-gray-200 bg-gray-50"
+        }`}
+      >
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          <FileText className={`w-4 h-4 ${doc.verified ? "text-green-500" : "text-gray-500"}`} />
+          <span className={`text-sm truncate ${doc.verified ? "text-green-800" : "text-gray-800"}`}>
+            Tax Document {index + 1}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => openDocument('taxDocuments', doc, index)}
+            className="p-1.5 hover:bg-gray-200 rounded transition-colors"
+          >
+            <Eye className="w-4 h-4 text-blue-600" />
+          </button>
+
+          <button
+            onClick={() => handleVerifyDocument('tax-doc', index, true)}
+            disabled={verifying[`tax-doc_${index}`] || doc.verified}
+            className={`p-1.5 rounded ${
+              doc.verified 
+                ? "bg-green-100 text-green-700" 
+                : "bg-green-500 text-white hover:bg-green-600"
+            }`}
+          >
+            {verifying[`tax-doc_${index}`] ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Check className="w-4 h-4" />
+            )}
+          </button>
+        </div>
+      </div>
+    ))}
+  </div>
+
+) : application.einNumber || application.ssnLast9 ? (
+
+  // ✅ NEW: Show EIN/SSN verify option
+  <div className="flex items-center justify-between p-3 rounded-lg border bg-gray-50">
+    <div className="flex flex-col">
+      <span className="text-sm text-gray-800 font-medium">
+        {application.einNumber
+          ? `EIN: ${application.einNumber}`
+          : `SSN: ${application.ssnLast9}`}
+      </span>
+      <span className="text-xs text-gray-500">No document uploaded</span>
+    </div>
+
+    <button
+      onClick={() => handleVerifyCategory('tax-doc', true)}
+      disabled={verifying['tax-doc']}
+      className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50 flex items-center gap-1"
+    >
+      {verifying['tax-doc'] ? (
+        <Loader2 className="w-4 h-4 animate-spin" />
+      ) : (
+        <Check className="w-4 h-4" />
+      )}
+      Verify
+    </button>
+  </div>
+
+) : (
+
+  <div className="text-center py-4 text-gray-500 border rounded-lg bg-gray-50">
+    <FileText className="w-8 h-8 mx-auto mb-2 opacity-50" />
+    <p className="text-sm">No tax documents uploaded</p>
+  </div>
+
+)}
+
+                    {/* {Boolean(application.taxDocuments?.length) ? (
                       <div className="space-y-2">
                         {application.taxDocuments.map((doc, index) => (
                           <div 
@@ -1238,7 +1343,7 @@ const normalizeUrl = (url?: string) => {
                         <FileText className="w-8 h-8 mx-auto mb-2 opacity-50" />
                         <p className="text-sm">No tax documents uploaded</p>
                       </div>
-                    )}
+                    )} */}
                   </div>
 
                   {/* Business License Documents */}
@@ -1257,7 +1362,88 @@ const normalizeUrl = (url?: string) => {
                       </span>
                     </div>
 
+
                     {Boolean(application.businessLicenseDocuments?.length) ? (
+  <div className="space-y-2">
+    {application.businessLicenseDocuments.map((doc, index) => (
+      <div 
+        key={doc._id} 
+        className={`flex items-center justify-between p-3 rounded-lg border ${
+          doc.verified 
+            ? "border-green-200 bg-green-50" 
+            : "border-gray-200 bg-gray-50"
+        }`}
+      >
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          <FileText className={`w-4 h-4 ${doc.verified ? "text-green-500" : "text-gray-500"}`} />
+          <span className={`text-sm truncate ${doc.verified ? "text-green-800" : "text-gray-800"}`}>
+            Business License {index + 1}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => openDocument('businessLicenseDocuments', doc, index)}
+            className="p-1.5 hover:bg-gray-200 rounded transition-colors"
+          >
+            <Eye className="w-4 h-4 text-blue-600" />
+          </button>
+
+          <button
+            onClick={() => handleVerifyDocument('business-license', index, true)}
+            disabled={verifying[`business-license_${index}`] || doc.verified}
+            className={`p-1.5 rounded ${
+              doc.verified 
+                ? "bg-green-100 text-green-700" 
+                : "bg-green-500 text-white hover:bg-green-600"
+            }`}
+          >
+            {verifying[`business-license_${index}`] ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Check className="w-4 h-4" />
+            )}
+          </button>
+        </div>
+      </div>
+    ))}
+  </div>
+
+) : application.licenseNumber ? (
+
+  // ✅ NEW: Show license verify option
+  <div className="flex items-center justify-between p-3 rounded-lg border bg-gray-50">
+    <div className="flex flex-col">
+      <span className="text-sm text-gray-800 font-medium">
+        License: {application.licenseNumber}
+      </span>
+      <span className="text-xs text-gray-500">No document uploaded</span>
+    </div>
+
+    <button
+      onClick={() => handleVerifyCategory('business-license', true)}
+      disabled={verifying['business-license']}
+      className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50 flex items-center gap-1"
+    >
+      {verifying['business-license'] ? (
+        <Loader2 className="w-4 h-4 animate-spin" />
+      ) : (
+        <Check className="w-4 h-4" />
+      )}
+      Verify
+    </button>
+  </div>
+
+) : (
+
+  <div className="text-center py-4 text-gray-500 border rounded-lg bg-gray-50">
+    <FileText className="w-8 h-8 mx-auto mb-2 opacity-50" />
+    <p className="text-sm">No business license documents uploaded</p>
+  </div>
+
+)}
+
+                    {/* {Boolean(application.businessLicenseDocuments?.length) ? (
                       <div className="space-y-2">
                         {application.businessLicenseDocuments.map((doc, index) => (
                           <div 
@@ -1307,7 +1493,7 @@ const normalizeUrl = (url?: string) => {
                         <FileText className="w-8 h-8 mx-auto mb-2 opacity-50" />
                         <p className="text-sm">No business license documents uploaded</p>
                       </div>
-                    )}
+                    )} */}
                   </div>
                 </div>
               </div>

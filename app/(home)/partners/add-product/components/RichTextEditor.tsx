@@ -48,19 +48,36 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
 
   if (!editor) return null;
 
-  const ToolbarButton = ({ onClick, isActive, disabled, title, children }: any) => (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      className={`p-2 rounded transition-colors ${
-        isActive ? 'bg-[#c9a227] text-white' : 'hover:bg-gray-200'
-      } ${disabled ? 'opacity-30 cursor-not-allowed' : ''}`}
-      title={title}
-    >
-      {children}
-    </button>
-  );
+const ToolbarButton = ({ onClick, isActive, disabled, title, children }: any) => (
+  <button
+    type="button"
+    onMouseDown={(e) => {
+      e.preventDefault(); // ✅ prevents focus loss
+      onClick();
+    }}
+    disabled={disabled}
+    className={`p-2 rounded transition-colors ${
+      isActive ? 'bg-[#c9a227] text-white' : 'hover:bg-gray-200'
+    } ${disabled ? 'opacity-30 cursor-not-allowed' : ''}`}
+    title={title}
+  >
+    {children}
+  </button>
+);
+
+  // const ToolbarButton = ({ onClick, isActive, disabled, title, children }: any) => (
+  //   <button
+  //     type="button"
+  //     onClick={onClick}
+  //     disabled={disabled}
+  //     className={`p-2 rounded transition-colors ${
+  //       isActive ? 'bg-[#c9a227] text-white' : 'hover:bg-gray-200'
+  //     } ${disabled ? 'opacity-30 cursor-not-allowed' : ''}`}
+  //     title={title}
+  //   >
+  //     {children}
+  //   </button>
+  // );
 
   return (
     <div className="border border-gray-300 rounded-md focus-within:ring-1 focus-within:ring-[#c9a227] focus-within:border-[#c9a227]">
