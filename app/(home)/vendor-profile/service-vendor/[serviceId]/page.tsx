@@ -139,7 +139,7 @@ function formatDuration(min: number) {
 
 function getBadgeImage(badge?: string): string | null {
   if (!badge) return null;
-  const key = badge.trim().toLowerCase();
+  const key = badge.trim().toLowerCase().replace(/[\s_-]+/g, "");
   const badgeMap: Record<string, string> = {
     silver: "/badge/silver.png",
     gold: "/badge/gold.png",
