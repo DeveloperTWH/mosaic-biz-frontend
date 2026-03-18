@@ -140,6 +140,7 @@ export default function ProductVendorProfilePage() {
   const [minority, setMinority] = useState("");
   const [sort, setSort] = useState("price_asc");
   const [apiTotal, setApiTotal] = useState(0);
+  const [badgeSrc, setBadgeSrc] = useState<string | null>(null);
   const [revealedFields, setRevealedFields] = useState<
     Record<"call" | "email" | "address" | "website", boolean>
   >({
@@ -225,6 +226,10 @@ export default function ProductVendorProfilePage() {
   const businessAddress = formatAddress(vendorDetails ?? undefined);
   const websiteValue = (vendorDetails?.website || "").trim();
   const bannerImage = profile?.coverImage || profile?.logo || "";
+
+  useEffect(() => {
+    setBadgeSrc(badgeImage);
+  }, [badgeImage]);
 
   const toggleReveal = (field: "call" | "email" | "address" | "website") => {
     setRevealedFields((prev) => ({ ...prev, [field]: !prev[field] }));
@@ -329,7 +334,7 @@ export default function ProductVendorProfilePage() {
                   </div>
                 )}
               </div>
-              {badgeImage && (
+              {badgeSrc && (
                 <div className="absolute right-8 -bottom-10 z-20">
                   <div className="relative w-24 h-24 drop-shadow-[0_10px_12px_rgba(0,0,0,0.22)]">
                     <div
@@ -344,11 +349,24 @@ export default function ProductVendorProfilePage() {
                         clipPath: "polygon(25% 6%, 75% 6%, 98% 50%, 75% 94%, 25% 94%, 2% 50%)",
                       }}
                     />
-                    <div className="absolute inset-0 flex items-center justify-center p-3">
+                    <div
+                      className="absolute inset-[10px] overflow-hidden"
+                      style={{
+                        clipPath: "polygon(25% 6%, 75% 6%, 98% 50%, 75% 94%, 25% 94%, 2% 50%)",
+                      }}
+                    >
                       <img
-                        src={badgeImage}
+                        src={badgeSrc ?? undefined}
                         alt={`${profile?.badge || "Business"} badge`}
-                        className="w-full h-full object-contain scale-110"
+                        className="h-full w-full object-contain p-2"
+                        onError={(e) => {
+                          const img = e.currentTarget;
+                          if (img.src.endsWith("/badge.png")) {
+                            setBadgeSrc(null);
+                            return;
+                          }
+                          setBadgeSrc("/badge.png");
+                        }}
                       />
                     </div>
                   </div>

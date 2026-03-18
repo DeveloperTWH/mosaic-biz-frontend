@@ -440,11 +440,16 @@ export default function ServiceVendorProfilePage() {
                         clipPath: "polygon(25% 6%, 75% 6%, 98% 50%, 75% 94%, 25% 94%, 2% 50%)",
                       }}
                     />
-                    <div className="absolute inset-0 flex items-center justify-center p-3">
+                    <div
+                      className="absolute inset-[10px] overflow-hidden"
+                      style={{
+                        clipPath: "polygon(25% 6%, 75% 6%, 98% 50%, 75% 94%, 25% 94%, 2% 50%)",
+                      }}
+                    >
                       <img
                         src={badgeSrc ?? undefined}
                         alt={`${data?.businessBadge || "Business"} badge`}
-                        className="w-full h-full object-contain scale-110"
+                        className="h-full w-full object-contain p-2"
                         onError={(e) => {
                           const img = e.currentTarget;
                           if (img.src.endsWith("/badge.png")) {
