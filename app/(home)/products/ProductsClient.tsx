@@ -648,22 +648,32 @@ function ProductCard({ item }: { item: RankedItem }) {
                 </div>
 
                 {/* Price */}
-                <div className="flex-shrink-0 mt-auto">
-                    {onSale ? (
-                        <div className="flex items-center gap-3">
-                            <span className="text-base font-bold text-red-600">
-                                ${effective.toFixed(2)}
-                            </span>
-                            <span className="text-sm text-gray-500 line-through">
-                                ${price.toFixed(2)}
-                            </span>
-                        </div>
-                    ) : (
-                        <span className="text-base font-bold text-gray-900">
-                            ${price.toFixed(2)}
-                        </span>
-                    )}
-                </div>
+<div className="flex-shrink-0 mt-auto">
+  {onSale ? (
+    <div className="flex flex-col leading-tight">
+      <span className="text-xs text-gray-500">
+        Starting from
+      </span>
+      <div className="flex items-center gap-3">
+        <span className="text-base font-semibold text-[#B12704]">
+          ${effective.toFixed(2)}
+        </span>
+        <span className="text-sm text-gray-500 line-through">
+          ${price.toFixed(2)}
+        </span>
+      </div>
+    </div>
+  ) : (
+    <div className="flex flex-col leading-tight">
+      <span className="text-xs text-gray-500">
+        Starting from
+      </span>
+      <span className="text-base font-semibold text-gray-900">
+        ${price.toFixed(2)}
+      </span>
+    </div>
+  )}
+</div>
             </div>
         </div>
     );

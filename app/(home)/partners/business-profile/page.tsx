@@ -833,7 +833,7 @@ const validateForm = (): boolean => {
       
     )}
   </div>
-     <p className="mt-1 text-xs text-gray-500">Preffred size be 2200 x 1000 pixels</p>
+    <p className="mt-1 text-xs text-gray-500">Preferred size should be 2200 x 1000 pixels</p>
   {formData.featureBanner?.url && (
     <div className="mt-2 flex items-center gap-2">
       <a
@@ -1128,136 +1128,161 @@ const validateForm = (): boolean => {
               <h2 className="text-lg font-semibold text-gray-900">Additional Information</h2>
               <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">Optional</span>
             </div>
-
             <div className="space-y-4">
-              {/* Refund & Return Policy - Same as Stage 1 */}
-              <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Refund & Return Policy Document</label>
-                <div className="flex items-center gap-4">
-                  <div className="flex-1 px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 text-sm">
-                    {selectedFiles['refund'] ? selectedFiles['refund']?.name : 
-                     formData.refundPolicyDocument?.url ? 'Document uploaded' : 'No file chosen'}
-                  </div>
-                  <input
-                    type="file"
-                    id="refund-upload"
-                    className="hidden"
-                    accept=".pdf,.doc,.docx"
-                    onChange={(e) => handleFileSelect('refund', e)}
-                    disabled={uploading['refund']}
-                  />
-                  <label
-                    htmlFor="refund-upload"
-                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors cursor-pointer font-medium flex items-center gap-2 text-sm"
-                  >
-                    {uploading['refund'] ? (
-                      <Loader className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <Upload className="w-4 h-4" />
-                    )}
-                    {uploading['refund'] ? 'Uploading...' : 'Upload File'}
-                  </label>
-                  {formData.refundPolicyDocument?.url && (
-                    <button
-                      type="button"
-                      onClick={() => removeDocument('refund')}
-                      className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  )}
-                </div>
-                {formData.refundPolicyDocument?.url && (
-                  <div className="mt-2">
-                    <a
-                      href={formData.refundPolicyDocument.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs text-blue-600 hover:underline flex items-center gap-1"
-                    >
-                      <FileText className="w-3 h-3" />
-                      View uploaded document
-                    </a>
-                  </div>
-                )}
-              </div>
 
-              {/* Terms & Conditions - Same as Stage 1 */}
-              <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Terms & Conditions / Service Agreement Document</label>
-                <div className="flex items-center gap-4">
-                  <div className="flex-1 px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 text-sm">
-                    {selectedFiles['terms'] ? selectedFiles['terms']?.name : 
-                     formData.termsDocument?.url ? 'Document uploaded' : 'No file chosen'}
-                  </div>
-                  <input
-                    type="file"
-                    id="terms-upload"
-                    className="hidden"
-                    accept=".pdf,.doc,.docx"
-                    onChange={(e) => handleFileSelect('terms', e)}
-                    disabled={uploading['terms']}
-                  />
-                  <label
-                    htmlFor="terms-upload"
-                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors cursor-pointer font-medium flex items-center gap-2 text-sm"
-                  >
-                    {uploading['terms'] ? (
-                      <Loader className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <Upload className="w-4 h-4" />
-                    )}
-                    {uploading['terms'] ? 'Uploading...' : 'Upload File'}
-                  </label>
-                  {formData.termsDocument?.url && (
-                    <button
-                      type="button"
-                      onClick={() => removeDocument('terms')}
-                      className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  )}
-                </div>
-                {formData.termsDocument?.url && (
-                  <div className="mt-2">
-                    <a
-                      href={formData.termsDocument.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs text-blue-600 hover:underline flex items-center gap-1"
-                    >
-                      <FileText className="w-3 h-3" />
-                      View uploaded document
-                    </a>
-                  </div>
-                )}
-              </div>
+  {/* ✅ SHOW ONLY IF USER HAS OWN POLICY */}
+  {hasOwnPolicy && (
+    <>
+      {/* Refund & Return Policy */}
+      <div>
+        <label className="block text-xs font-medium text-gray-500 mb-1">
+          Refund & Return Policy Document
+        </label>
 
-              {/* Google Review Link */}
-              <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Google Review Link</label>
-                <input
-                  type="url"
-                  value={formData.googleReviewLink}
-                  onChange={(e) => handleInputChange('googleReviewLink', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#c9a227] focus:border-transparent text-sm"
-                  placeholder="https://g.page/r/your-business-review"
-                />
-              </div>
+        <div className="flex items-center gap-4">
+          <div className="flex-1 px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 text-sm">
+            {selectedFiles['refund']
+              ? selectedFiles['refund']?.name
+              : formData.refundPolicyDocument?.url
+              ? 'Document uploaded'
+              : 'No file chosen'}
+          </div>
 
-              {/* Community Service Link */}
-              <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Link To A Community Service/Drive</label>
-                <input
-                  type="url"
-                  value={formData.communityServiceLink}
-                  onChange={(e) => handleInputChange('communityServiceLink', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#c9a227] focus:border-transparent text-sm"
-                  placeholder="https://example.com/community-service"
-                />
-              </div>
-            </div>
+          <input
+            type="file"
+            id="refund-upload"
+            className="hidden"
+            accept=".pdf,.doc,.docx"
+            onChange={(e) => handleFileSelect('refund', e)}
+            disabled={uploading['refund']}
+          />
+
+          <label
+            htmlFor="refund-upload"
+            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 cursor-pointer flex items-center gap-2 text-sm"
+          >
+            {uploading['refund'] ? (
+              <Loader className="w-4 h-4 animate-spin" />
+            ) : (
+              <Upload className="w-4 h-4" />
+            )}
+            {uploading['refund'] ? 'Uploading...' : 'Upload File'}
+          </label>
+
+          {formData.refundPolicyDocument?.url && (
+            <button
+              type="button"
+              onClick={() => removeDocument('refund')}
+              className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+
+        {formData.refundPolicyDocument?.url && (
+          <a
+            href={formData.refundPolicyDocument.url}
+            target="_blank"
+            className="text-xs text-blue-600 mt-2 inline-flex items-center gap-1"
+          >
+            <FileText className="w-3 h-3" />
+            View uploaded document
+          </a>
+        )}
+      </div>
+
+      {/* Terms */}
+      <div>
+        <label className="block text-xs font-medium text-gray-500 mb-1">
+          Terms & Conditions / Service Agreement Document
+        </label>
+
+        <div className="flex items-center gap-4">
+          <div className="flex-1 px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 text-sm">
+            {selectedFiles['terms']
+              ? selectedFiles['terms']?.name
+              : formData.termsDocument?.url
+              ? 'Document uploaded'
+              : 'No file chosen'}
+          </div>
+
+          <input
+            type="file"
+            id="terms-upload"
+            className="hidden"
+            accept=".pdf,.doc,.docx"
+            onChange={(e) => handleFileSelect('terms', e)}
+            disabled={uploading['terms']}
+          />
+
+          <label
+            htmlFor="terms-upload"
+            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 cursor-pointer flex items-center gap-2 text-sm"
+          >
+            {uploading['terms'] ? (
+              <Loader className="w-4 h-4 animate-spin" />
+            ) : (
+              <Upload className="w-4 h-4" />
+            )}
+            {uploading['terms'] ? 'Uploading...' : 'Upload File'}
+          </label>
+
+          {formData.termsDocument?.url && (
+            <button
+              onClick={() => removeDocument('terms')}
+              className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+
+        {formData.termsDocument?.url && (
+          <a
+            href={formData.termsDocument.url}
+            target="_blank"
+            className="text-xs text-blue-600 mt-2 inline-flex items-center gap-1"
+          >
+            <FileText className="w-3 h-3" />
+            View uploaded document
+          </a>
+        )}
+      </div>
+    </>
+  )}
+
+  {/* ✅ ALWAYS SHOW */}
+  {/* Google Review */}
+  <div>
+    <label className="block text-xs font-medium text-gray-500 mb-1">
+      Google Review Link
+    </label>
+    <input
+      type="url"
+      value={formData.googleReviewLink}
+      onChange={(e) => handleInputChange('googleReviewLink', e.target.value)}
+      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+      placeholder="https://g.page/r/your-business-review"
+    />
+  </div>
+
+  {/* Community */}
+  <div>
+    <label className="block text-xs font-medium text-gray-500 mb-1">
+      Link To A Community Service/Drive
+    </label>
+    <input
+      type="url"
+      value={formData.communityServiceLink}
+      onChange={(e) => handleInputChange('communityServiceLink', e.target.value)}
+      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+      placeholder="https://example.com/community-service"
+    />
+  </div>
+
+</div>
+
           </div>
 
           {/* Form Actions */}

@@ -327,22 +327,26 @@ export default function SimilarProduct({ productId }: { productId?: string }) {
                         )}
                       </div>
 
-                      <div className="flex items-baseline gap-2 mt-auto">
-                        {onSale ? (
-                          <>
-                            <span className="text-sm font-semibold text-red-600 sm:text-base">
-                              ${effective.toFixed(2)}
-                            </span>
-                            <span className="text-xs text-gray-500 line-through">
-                              ${price.toFixed(2)}
-                            </span>
-                          </>
-                        ) : (
-                          <span className="text-sm font-semibold text-gray-900 sm:text-base">
-                            ${price.toFixed(2)}
-                          </span>
-                        )}
-                      </div>
+<div className="flex flex-col mt-auto leading-tight">
+  <span className="text-xs text-gray-500">
+    Starting from
+  </span>
+
+  {onSale ? (
+    <div className="flex items-baseline gap-2">
+      <span className="text-sm font-semibold text-[#B12704] sm:text-base">
+        ${effective.toFixed(2)}
+      </span>
+      <span className="text-xs text-gray-500 line-through">
+        ${price.toFixed(2)}
+      </span>
+    </div>
+  ) : (
+    <span className="text-sm font-semibold text-gray-900 sm:text-base">
+      ${price.toFixed(2)}
+    </span>
+  )}
+</div>
                     </Link>
                   </SwiperSlide>
                 );

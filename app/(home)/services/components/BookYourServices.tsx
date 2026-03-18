@@ -105,6 +105,7 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
                 {services.map((service) => (
                   <ProductCard 
                   key={service._id}
+                  serviceId={service._id}
                   title={(service as any).businessDetails?.businessName || service.title}
                   image={service.coverImage}
                   description={(service as any).businessDetails?.description || service.description}

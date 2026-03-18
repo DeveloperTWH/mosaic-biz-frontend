@@ -1,6 +1,8 @@
 import React from "react";
+import Link from "next/link";
 
 type ProductCardProps = {
+  serviceId?: string;
   image: string;
   title: string;
   description: string;
@@ -17,6 +19,7 @@ const HorizontalLine = () => {
 };
 
 const ProductCard: React.FC<ProductCardProps> = ({
+  serviceId,
   image,
   title,
   description,
@@ -27,7 +30,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   price,
   logo,
 }) => {
-  return (
+  const cardContent = (
     <div className="product-card h-[420px] flex flex-col overflow-hidden border-2 border-[#D9D9D9] shadow-lg">
       <div className="relative h-[180px] w-full flex-shrink-0">
         {image ? (
@@ -64,9 +67,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
           <div className="w-[65%] mr-5">
             <HorizontalLine />
           </div>
-          <a href="#" className="view-details text-[#C7A040] text-xs text-montserrat">
+          <span className="view-details text-[#C7A040] text-xs text-montserrat">
             View Details
-          </a>
+          </span>
         </div>
 
         {/* Grey background full width, fixed height to keep space even if no badge */}
@@ -89,6 +92,19 @@ const ProductCard: React.FC<ProductCardProps> = ({
       </div>
     </div>
   );
+
+  if (serviceId) {
+    return (
+      <Link
+        href={`/vendor-profile/service-vendor/${serviceId}`}
+        className="block cursor-pointer transition-transform hover:-translate-y-0.5"
+      >
+        {cardContent}
+      </Link>
+    );
+  }
+
+  return cardContent;
 };
 
 export default ProductCard;

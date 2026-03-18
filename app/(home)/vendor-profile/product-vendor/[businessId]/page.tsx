@@ -552,22 +552,26 @@ export default function ProductVendorProfilePage() {
                         {item.reviewCount} Ratings & Reviews
                       </p>
 
-                      <div className="mt-auto">
-                        {item.salePrice != null && item.salePrice < item.price ? (
-                          <div className="flex items-center gap-2">
-                            <span className="text-base font-bold text-red-600">
-                              ${effectivePrice.toFixed(2)}
-                            </span>
-                            <span className="text-xs text-gray-500 line-through">
-                              ${item.price.toFixed(2)}
-                            </span>
-                          </div>
-                        ) : (
-                          <span className="text-base font-bold text-gray-900">
-                            ${effectivePrice.toFixed(2)}
-                          </span>
-                        )}
-                      </div>
+<div className="mt-auto flex flex-col leading-tight">
+  <span className="text-xs text-gray-500">
+    Starting from
+  </span>
+
+  {item.salePrice != null && item.salePrice < item.price ? (
+    <div className="flex items-center gap-2">
+      <span className="text-base font-semibold text-[#B12704]">
+        ${effectivePrice.toFixed(2)}
+      </span>
+      <span className="text-xs text-gray-500 line-through">
+        ${item.price.toFixed(2)}
+      </span>
+    </div>
+  ) : (
+    <span className="text-base font-semibold text-gray-900">
+      ${effectivePrice.toFixed(2)}
+    </span>
+  )}
+</div>
                     </div>
                   </Link>
                 );
