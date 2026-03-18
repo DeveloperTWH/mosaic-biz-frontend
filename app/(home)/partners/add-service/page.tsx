@@ -107,6 +107,8 @@ export default function AddServicePage() {
               <ServiceImages
                 coverImage={formData.coverImage}
                 galleryImages={formData.images}
+                coverError={errors.coverImage}
+                error={errors.images}
                 onCoverUpload={(file) => handleFileUpload('cover', file)}
                 onGalleryUpload={async (files) => {
                   for (const file of files) {

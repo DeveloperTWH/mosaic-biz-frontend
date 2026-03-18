@@ -1,6 +1,8 @@
 import React from "react";
+import Link from "next/link";
 
 type FoodCardProps = {
+  foodId?: string;
   image?: string;
   businessName: string; // updated
   businessDescription?: string; // updated
@@ -22,22 +24,26 @@ const HorizontalLine = () => {
 
 
 const getBadgeUrl = (badge?: string) => {
-  if (!badge) return '';
-  return `/badge/${badge
-    .toLowerCase()
-    .replace(/\s+/g, '-') // replace spaces with dash
-    .replace(/[^a-z0-9-]/g, '') // remove any special characters
-  }.png`;
+  if (!badge) return "";
+  const normalized = badge.toLowerCase().replace(/[\s_-]+/g, "");
+  const badgeMap: Record<string, string> = {
+    silver: "/badge/silver.png",
+    gold: "/badge/gold.png",
+    platinum: "/badge/platinum.png",
+    diamond: "/badge/diamond.png",
+  };
+  return badgeMap[normalized] || "/badge.png";
 };
 
 const FoodCard: React.FC<FoodCardProps> = ({
+  foodId,
   image,
   businessName,
   businessDescription,
   badge,
   logo,
 }) => {
-  return (
+  const cardContent = (
     <div className="product-card h-[420px] flex flex-col overflow-hidden border-2 border-[#D9D9D9] shadow-lg">
       
       {/* Image with logo overlay */}
@@ -89,12 +95,9 @@ const FoodCard: React.FC<FoodCardProps> = ({
             <HorizontalLine />
           </div>
 
-          <a
-            href="#"
-            className="text-[#C7A040] text-xs font-montserrat"
-          >
+          <span className="text-[#C7A040] text-xs font-montserrat">
             View Details
-          </a>
+          </span>
         </div>
 
         {/* Badge Section */}
@@ -109,6 +112,14 @@ const FoodCard: React.FC<FoodCardProps> = ({
     src={getBadgeUrl(badge)}
     alt={`${badge} badge`}
     className="h-16 object-contain"
+    onError={(e) => {
+      const img = e.currentTarget;
+      if (img.src.endsWith("/badge.png")) {
+        img.style.display = "none";
+        return;
+      }
+      img.src = "/badge.png";
+    }}
   />
 ) : (
   <div className="h-16 w-[96px]" />
@@ -119,6 +130,19 @@ const FoodCard: React.FC<FoodCardProps> = ({
       </div>
     </div>
   );
+
+  if (foodId) {
+    return (
+      <Link
+        href={`/vendor-profile/food-vendor/${foodId}`}
+        className="block cursor-pointer transition-transform hover:-translate-y-0.5"
+      >
+        {cardContent}
+      </Link>
+    );
+  }
+
+  return cardContent;
 };
 
 export default FoodCard;

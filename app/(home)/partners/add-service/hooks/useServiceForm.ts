@@ -365,6 +365,13 @@ export const useServiceForm = () => {
           ...prev,
           images: [...prev.images, fileUrl]
         }));
+        if (errors.images) {
+          setErrors(prev => {
+            const newErrors = { ...prev };
+            delete newErrors.images;
+            return newErrors;
+          });
+        }
       }
 
       toast.success('File uploaded successfully!');
@@ -393,6 +400,8 @@ export const useServiceForm = () => {
     const newErrors: FormErrors = {};
     if (!formData.categoryId) newErrors.categoryId = 'Category is required';
     if (!formData.subcategoryId) newErrors.subcategoryId = 'Subcategory is required';
+    if (!formData.coverImage) newErrors.coverImage = 'Please upload a banner image';
+    if (formData.images.length === 0) newErrors.images = 'Please upload at least one gallery image';
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;

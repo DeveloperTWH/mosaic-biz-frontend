@@ -162,6 +162,7 @@ export default function FoodVendorProfilePage() {
   const [locationFilter, setLocationFilter] = useState("");
   const [minority, setMinority] = useState("");
   const [revealed, setRevealed] = useState<Record<string, boolean>>({});
+  const [badgeSrc, setBadgeSrc] = useState<string | null>(null);
   const [bookForm, setBookForm] = useState({
     name: "",
     email: "",
@@ -201,6 +202,12 @@ export default function FoodVendorProfilePage() {
     })();
   }, [foodId]);
 
+  const badgeImage = getBadgeImage(data?.businessBadge);
+
+  useEffect(() => {
+    setBadgeSrc(badgeImage);
+  }, [badgeImage]);
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -223,12 +230,12 @@ export default function FoodVendorProfilePage() {
   if (!data) return null;
 
   const reveal = (key: string) => setRevealed((prev) => ({ ...prev, [key]: true }));
-  const badgeImage = getBadgeImage(data.businessBadge);
   const heroTitle = data.businessName || data.title || "Food Vendor";
   const heroSection = data.category || "Food And Grocery";
   const galleryItems = data.galleryImages.slice(0, 6);
   const estYear = data.createdAt ? new Date(data.createdAt).getFullYear() : null;
   const mapUrl = getMapEmbedUrl(data.locationAddress, data.coordinates);
+  const hasDirectBookingLink = /^https?:\/\//i.test(data.bookingToolLink);
 
   return (
     <div className="min-h-screen bg-white font-sans">
@@ -318,7 +325,7 @@ export default function FoodVendorProfilePage() {
                   {heroTitle.charAt(0) || "F"}
                 </div>
               )}
-              {badgeImage && (
+              {badgeSrc && (
                 <div className="absolute right-8 -bottom-10 z-20">
                   <div className="relative h-24 w-24 drop-shadow-[0_10px_12px_rgba(0,0,0,0.22)]">
                     <div
@@ -335,9 +342,17 @@ export default function FoodVendorProfilePage() {
                     />
                     <div className="absolute inset-0 flex items-center justify-center p-3">
                       <img
-                        src={badgeImage ?? undefined}
+                        src={badgeSrc ?? undefined}
                         alt={`${data.businessBadge || "Business"} badge`}
                         className="h-full w-full object-contain scale-110"
+                        onError={(e) => {
+                          const img = e.currentTarget;
+                          if (img.src.endsWith("/badge.png")) {
+                            setBadgeSrc(null);
+                            return;
+                          }
+                          setBadgeSrc("/badge.png");
+                        }}
                       />
                     </div>
                   </div>
@@ -378,25 +393,22 @@ export default function FoodVendorProfilePage() {
               </button>
             </div>
 
+            {galleryItems.length > 0 && (
             <div className="mt-6">
               <h3 className="mb-3 text-sm font-semibold text-[#c79b44]">Photo Gallery</h3>
               <div className="grid grid-cols-3 gap-1.5 sm:grid-cols-6">
-                {Array.from({ length: Math.max(galleryItems.length, 6) }).map((_, i) => {
-                  const image = galleryItems[i];
-                  return (
-                    <div key={i} className="h-[78px] overflow-hidden bg-[#dfdfdf]">
-                      {image ? (
-                        <img
-                          src={image}
-                          alt={`Gallery ${i + 1}`}
-                          className="h-full w-full object-cover transition-transform duration-300 hover:scale-110"
-                        />
-                      ) : null}
-                    </div>
-                  );
-                })}
+                {galleryItems.map((image, i) => (
+                  <div key={`${image}-${i}`} className="h-[78px] overflow-hidden bg-[#dfdfdf]">
+                    <img
+                      src={image}
+                      alt={`Gallery ${i + 1}`}
+                      className="h-full w-full object-cover transition-transform duration-300 hover:scale-110"
+                    />
+                  </div>
+                ))}
               </div>
             </div>
+            )}
 
             <div className="mt-8">
               <h3 className="mb-4 text-sm font-semibold text-[#c79b44]">Testimonials</h3>
@@ -426,8 +438,8 @@ export default function FoodVendorProfilePage() {
                 {[
                   { label: "Brand Name", value: data.businessName, key: null },
                   { label: "Category", value: data.category || "N/A", key: null },
-                  { label: "Food Type", value: data.foodType || "N/A", key: null },
-                  { label: "Brand", value: data.brand || "N/A", key: null },
+                  // { label: "Food Type", value: data.foodType || "N/A", key: null },
+                  // { label: "Brand", value: data.brand || "N/A", key: null },
                   { label: "Established In", value: estYear?.toString() || "N/A", key: null },
                   { label: "Call Us", value: data.businessPhone, key: "call" },
                   { label: "Email Us", value: data.businessEmail, key: "email" },
@@ -470,10 +482,22 @@ export default function FoodVendorProfilePage() {
             <div className="overflow-hidden border border-[#e2c46a] bg-[#fff8e8]">
               <div className="border-b border-[#e6d3a3] px-5 py-4">
                 <h3 className="text-[14px] font-bold uppercase tracking-wide text-[#1A1F71]">
-                  Book A Table
+                  {hasDirectBookingLink ? "Book Now" : "Book A Table"}
                 </h3>
               </div>
 
+              {hasDirectBookingLink ? (
+                <div className="p-5">
+                  <button
+                    className="h-10 w-full bg-[#C7A040] text-[11px] font-semibold uppercase tracking-wide text-white transition-colors hover:bg-[#a88432]"
+                    onClick={() => {
+                      window.open(data.bookingToolLink, "_blank", "noopener,noreferrer");
+                    }}
+                  >
+                    Book Now
+                  </button>
+                </div>
+              ) : (
               <div className="space-y-3 p-5">
                 <div className="space-y-1">
                   <label className="block text-[10px] font-medium uppercase tracking-wide text-[#6f6f6f]">
@@ -585,6 +609,7 @@ export default function FoodVendorProfilePage() {
                   Book Table
                 </button>
               </div>
+              )}
             </div>
 
             <div className="overflow-hidden bg-white">

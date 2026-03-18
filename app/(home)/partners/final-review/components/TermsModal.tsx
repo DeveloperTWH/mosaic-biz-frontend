@@ -5,7 +5,7 @@
   interface TermsModalProps {
     isOpen: boolean;
     onClose: () => void;
-    type: "terms" | "privacy" | "directory";
+    type: "terms" | "privacy" | "directory" | "refund";
   }
 
   export default function TermsModal({ isOpen, onClose, type }: TermsModalProps) {
@@ -14,7 +14,8 @@
     const titles = {
       terms: "Terms and Conditions of Service",
       privacy: "Privacy Policy",
-      directory: "Mosaic Biz Hub Directory Policy"
+      directory: "Mosaic Biz Hub Directory Policy",
+      refund: "Refund Policy"
     };
 
     const content = {
@@ -262,6 +263,54 @@
               <li>PayPal</li>
             </ul>
             <p className="text-sm mt-4 italic">Thank you for partnering with Mosaic Biz Hub. Together, we empower entrepreneurs to thrive—Empowering Entrepreneurs, Building Community.</p>
+          </div>
+        </div>
+      ),
+
+      refund: (
+        <div className="space-y-6 text-gray-700">
+          <div className="bg-gray-50 p-3 rounded-md mb-2">
+            <p className="text-sm">
+              <span className="font-semibold">Mosaic Biz Hub, LLC</span> - Temporary Refund Policy Draft
+            </p>
+          </div>
+
+          <div>
+            <h3 className="font-semibold text-gray-900 mb-2">OVERVIEW</h3>
+            <p className="text-sm">This is a temporary refund policy placeholder for the business profile flow. It can be replaced with the final approved policy content later.</p>
+          </div>
+
+          <div>
+            <h3 className="font-semibold text-gray-900 mb-2">ELIGIBILITY</h3>
+            <p className="text-sm">Refund requests may be reviewed for orders that arrive damaged, defective, incomplete, or materially different from the item or service description.</p>
+          </div>
+
+          <div>
+            <h3 className="font-semibold text-gray-900 mb-2">REQUEST WINDOW</h3>
+            <p className="text-sm">Customers should submit refund or return requests within 48 hours of delivery or service completion unless a different window is stated on the vendor profile.</p>
+          </div>
+
+          <div>
+            <h3 className="font-semibold text-gray-900 mb-2">REVIEW PROCESS</h3>
+            <p className="text-sm">Vendors should acknowledge refund requests within 48 hours and provide a resolution, update, or next step within 7 business days.</p>
+          </div>
+
+          <div>
+            <h3 className="font-semibold text-gray-900 mb-2">NON-REFUNDABLE ITEMS</h3>
+            <p className="text-sm">Unless otherwise required by law, custom orders, completed services, gift cards, sale items, and personal care items may be excluded from refunds.</p>
+          </div>
+
+          <div>
+            <h3 className="font-semibold text-gray-900 mb-2">CONTACT</h3>
+            <p className="text-sm">
+              Questions about this refund policy can be sent to{" "}
+              <a
+                href="mailto:info@mosaicbizhub.com"
+                className="text-[#c9a227] hover:underline"
+              >
+                info@mosaicbizhub.com
+              </a>
+            </p>
           </div>
         </div>
       ),

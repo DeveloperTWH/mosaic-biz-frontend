@@ -105,10 +105,11 @@ const BookServices: React.FC<BookServicesProps> = ({
                 {services.map((service) => (
 <ProductCard
   key={service._id}
+  foodId={service._id}
   image={service.coverImage}
   businessName={service.businessId?.businessName || service.title}
   businessDescription={service.businessId?.description || service.description || "No description available"}
-  badge={service.businessId?.badge} // <- this will now work
+  badge={service.businessId?.badge || (service as any).badge}
   logo={service.businessId?.logo} // optional if you have a logo field
 />
                 ))}

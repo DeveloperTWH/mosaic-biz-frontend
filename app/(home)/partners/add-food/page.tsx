@@ -94,6 +94,8 @@ export default function AddFoodPage() {
                 coverImage={formData.coverImage}
                 galleryImages={formData.images}
                 menuImage={formData.menuImage}
+                coverError={errors.coverImage}
+                galleryError={errors.images}
                 onCoverUpload={(file) => handleFileUpload('cover', file)}
                 onGalleryUpload={async (files) => {
                   for (const file of files) {

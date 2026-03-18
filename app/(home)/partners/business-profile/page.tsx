@@ -262,9 +262,9 @@ export default function BusinessProfilePage() {
 const [hasOwnPolicy, setHasOwnPolicy] = useState(true); // default YES
 const [acceptMosaicPolicy, setAcceptMosaicPolicy] = useState(false);
 const [modalOpen, setModalOpen] = useState(false);
-const [modalType, setModalType] = useState<"terms" | "privacy" | null>(null);
+const [modalType, setModalType] = useState<"terms" | "privacy" | "refund" | null>(null);
 
-const openModal = (type: "terms" | "privacy") => {
+const openModal = (type: "terms" | "privacy" | "refund") => {
   setModalType(type);
   setModalOpen(true);
 };
@@ -1100,7 +1100,14 @@ const validateForm = (): boolean => {
         >
           MosaicBizHub Terms & Conditions
         </button>{" "}
-        and Refund Policy
+        and{" "}
+        <button
+          type="button"
+          className="text-blue-600 underline"
+          onClick={() => openModal("refund")}
+        >
+          Refund Policy
+        </button>
       </span>
     </label>
 

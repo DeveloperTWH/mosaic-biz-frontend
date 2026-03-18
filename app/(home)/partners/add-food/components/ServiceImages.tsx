@@ -5,6 +5,8 @@ interface Props {
   coverImage: string;
   galleryImages: string[];
   menuImage: string;
+  coverError?: string;
+  galleryError?: string;
   onCoverUpload: (file: File) => Promise<void>;
   onGalleryUpload: (files: File[]) => Promise<void>;
   onMenuUpload: (file: File) => Promise<void>;
@@ -21,6 +23,8 @@ export default function ServiceImages({
   coverImage,
   galleryImages,
   menuImage,
+  coverError,
+  galleryError,
   onCoverUpload,
   onGalleryUpload,
   onMenuUpload,
@@ -38,6 +42,7 @@ export default function ServiceImages({
         <h2 className="text-base font-semibold text-gray-900 mb-4 border-l-4 border-[#c9a227] pl-3">
           Feature Banner Image
         </h2>
+        {coverError ? <p className="mb-3 text-xs text-red-600">{coverError}</p> : null}
         {coverImage ? (
           <div className="relative w-full h-48 bg-gray-200 rounded-lg overflow-hidden">
             <img src={coverImage} alt="Cover" className="w-full h-full object-cover" />
@@ -84,6 +89,7 @@ export default function ServiceImages({
           Food Gallery
         </h3>
         <p className="text-xs text-gray-500 mb-3 pl-4">Max 5 images allowed based on your subscription plan.</p>
+        {galleryError ? <p className="mb-3 pl-4 text-xs text-red-600">{galleryError}</p> : null}
         <div className="mb-3">
           <input
             type="file"

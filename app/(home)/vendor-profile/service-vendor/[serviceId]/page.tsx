@@ -107,6 +107,7 @@ function normalizeData(payload: ApiResponse) {
     coverImage: service?.coverImage || business?.coverImage || "",
     galleryImages: service?.images || [],
     businessHours: service?.businessHours || [],
+    bookingToolLink: service?.bookingToolLink || "",
     averageRating: service?.averageRating || 0,
     totalReviews: service?.totalReviews || 0,
     slug: service?.slug || "",
@@ -149,6 +150,49 @@ function getBadgeImage(badge?: string): string | null {
   return badgeMap[key] ?? null;
 }
 
+function getMapUrls(location?: string, address?: string) {
+  const rawLocation = (location || "").trim();
+  const rawAddress = (address || "").trim();
+  const hasHttpLocation = /^https?:\/\//i.test(rawLocation);
+  const isEmbeddableMap =
+    /\/maps\/embed/i.test(rawLocation) || /[?&]output=embed/i.test(rawLocation);
+
+  if (isEmbeddableMap) {
+    return {
+      embedUrl: rawLocation,
+      externalUrl: rawLocation,
+    };
+  }
+
+  if (rawAddress) {
+    return {
+      embedUrl: `https://maps.google.com/maps?q=${encodeURIComponent(rawAddress)}&output=embed`,
+      externalUrl: hasHttpLocation
+        ? rawLocation
+        : `https://maps.google.com/maps?q=${encodeURIComponent(rawAddress)}`,
+    };
+  }
+
+  if (hasHttpLocation) {
+    return {
+      embedUrl: undefined,
+      externalUrl: rawLocation,
+    };
+  }
+
+  if (rawLocation) {
+    return {
+      embedUrl: `https://maps.google.com/maps?q=${encodeURIComponent(rawLocation)}&output=embed`,
+      externalUrl: `https://maps.google.com/maps?q=${encodeURIComponent(rawLocation)}`,
+    };
+  }
+
+  return {
+    embedUrl: undefined,
+    externalUrl: undefined,
+  };
+}
+
 function StarRating({ rating }: { rating: number }) {
   return (
     <span className="inline-flex gap-0.5">
@@ -175,6 +219,7 @@ export default function ServiceVendorProfilePage() {
   const [locationFilter, setLocationFilter] = useState("");
   const [duration, setDuration] = useState("");
   const [sort, setSort] = useState("price_asc");
+  const [badgeSrc, setBadgeSrc] = useState<string | null>(null);
   
 
   /* reveal contact */
@@ -200,6 +245,12 @@ export default function ServiceVendorProfilePage() {
       finally { setLoading(false); }
     })();
   }, [serviceId]);
+
+  const badgeImage = getBadgeImage(data?.businessBadge);
+
+  useEffect(() => {
+    setBadgeSrc(badgeImage);
+  }, [badgeImage]);
 
   const sortedServices = useMemo(() => {
     if (!data) return [];
@@ -244,11 +295,15 @@ export default function ServiceVendorProfilePage() {
 
   const todayName = new Date().toLocaleDateString("en-US", { weekday: "long" });
   const todayHours = businessHours.find(h => h.day === todayName);
-
-  const badgeImage = getBadgeImage(data?.businessBadge);
   const heroTitle = businessName || title || "Vendor Profile";
   const heroSection = subcategory || category || "Services";
   const galleryItems = galleryImages.slice(0, 6);
+  const bookingToolLink = data.bookingToolLink || "";
+  const hasDirectBookingLink = /^https?:\/\//i.test(bookingToolLink);
+  const { embedUrl: mapEmbedUrl, externalUrl: mapExternalUrl } = getMapUrls(
+    mapUrl,
+    contact.address
+  );
 
 
 
@@ -370,7 +425,7 @@ export default function ServiceVendorProfilePage() {
                 ? <img src={coverImage} alt={title} className="w-full h-full object-cover" />
                 : <div className="w-full h-full flex items-center justify-center text-5xl font-bold text-gray-300">S</div>
               }
-              {badgeImage && (
+              {badgeSrc && (
                 <div className="absolute right-8 -bottom-10 z-20">
                   <div className="relative w-24 h-24 drop-shadow-[0_10px_12px_rgba(0,0,0,0.22)]">
                     <div
@@ -387,9 +442,17 @@ export default function ServiceVendorProfilePage() {
                     />
                     <div className="absolute inset-0 flex items-center justify-center p-3">
                       <img
-                        src={badgeImage ?? undefined}
+                        src={badgeSrc ?? undefined}
                         alt={`${data?.businessBadge || "Business"} badge`}
                         className="w-full h-full object-contain scale-110"
+                        onError={(e) => {
+                          const img = e.currentTarget;
+                          if (img.src.endsWith("/badge.png")) {
+                            setBadgeSrc(null);
+                            return;
+                          }
+                          setBadgeSrc("/badge.png");
+                        }}
                       />
                     </div>
                   </div>
@@ -462,31 +525,28 @@ export default function ServiceVendorProfilePage() {
 
             {/* Photo Gallery */}
 {/* Photo Gallery */}
+  {galleryItems.length > 0 && (
   <div className="mt-6">
     <h3 className="mb-3 text-sm font-semibold text-[#c79b44]">
       Photo Gallery
     </h3>
 
     <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
-      {Array.from({ length: Math.max(galleryItems.length, 6) }).map((_, i) => {
-        const img = galleryItems[i];
-        return (
-          <div
-            key={i}
-            className="h-[78px] overflow-hidden bg-[#dfdfdf]"
-          >
-            {img ? (
-              <img
-                src={img}
-                alt={`Gallery ${i + 1}`}
-                className="h-full w-full object-cover hover:scale-110 transition-transform duration-300"
-              />
-            ) : null}
-          </div>
-        );
-      })}
+      {galleryItems.map((img, i) => (
+        <div
+          key={`${img}-${i}`}
+          className="h-[78px] overflow-hidden bg-[#dfdfdf]"
+        >
+          <img
+            src={img}
+            alt={`Gallery ${i + 1}`}
+            className="h-full w-full object-cover hover:scale-110 transition-transform duration-300"
+          />
+        </div>
+      ))}
     </div>
   </div>
+  )}
 
             {/* Testimonials */}
             <div className="mt-8">
@@ -526,7 +586,7 @@ export default function ServiceVendorProfilePage() {
                     ) : row.value ? (
                       revealed[row.key] ? (
                         row.key === "address" ? (
-                          <a href={row.value.startsWith("http") ? row.value : `https://${row.value}`}
+                          <a href={mapExternalUrl || row.value}
                             target="_blank" rel="noreferrer" className="font-montserrat font-medium text-gray-700 underline break-all">
                             View on Maps
                           </a>
@@ -558,10 +618,22 @@ export default function ServiceVendorProfilePage() {
   {/* Header */}
   <div className="border-b border-[#e6d3a3] px-5 py-4">
     <h3 className="text-[14px] font-bold tracking-wide text-[#1A1F71] uppercase">
-      Book Service
+      {hasDirectBookingLink ? "Book Now" : "Book Service"}
     </h3>
   </div>
 
+  {hasDirectBookingLink ? (
+    <div className="p-5">
+      <button
+        className="h-10 w-full bg-[#C7A040] text-[11px] font-semibold uppercase tracking-wide text-white transition-colors hover:bg-[#a88432]"
+        onClick={() => {
+          window.open(bookingToolLink, "_blank", "noopener,noreferrer");
+        }}
+      >
+        Book Now
+      </button>
+    </div>
+  ) : (
   <div className="space-y-3 p-5">
 
     <div className="space-y-1">
@@ -652,6 +724,7 @@ export default function ServiceVendorProfilePage() {
       Request An Appointment
     </button>
   </div>
+  )}
 </div>
 
             {/* Locations & Hours */}
@@ -661,22 +734,28 @@ export default function ServiceVendorProfilePage() {
               </div>
 
               <div className="h-40 w-full overflow-hidden border border-[#ece6d8] bg-gray-200">
-                {mapUrl ? (
+                {mapEmbedUrl ? (
                   <iframe
-                  src={
-  mapUrl
-    ? mapUrl.includes("maps.google.com") && !mapUrl.includes("/maps/embed")
-      ? `https://maps.google.com/maps?q=${encodeURIComponent("Default Location")}&output=embed`
-      : mapUrl
-    : undefined
-}
+                  src={mapEmbedUrl}
                   className="h-full w-full border-0"
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-sm text-gray-400">
-                    Map unavailable
+                  <div className="flex h-full w-full flex-col items-center justify-center gap-2 px-4 text-center">
+                    <span className="text-sm text-gray-500">Map preview unavailable</span>
+                    {mapExternalUrl ? (
+                      <a
+                        href={mapExternalUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-xs font-semibold uppercase tracking-wide text-[#1A1F71] underline"
+                      >
+                        Open in Google Maps
+                      </a>
+                    ) : (
+                      <span className="text-sm text-gray-400">Map unavailable</span>
+                    )}
                   </div>
                 )}
               </div>

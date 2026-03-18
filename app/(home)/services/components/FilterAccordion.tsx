@@ -19,6 +19,8 @@ type Section = {
   type?: "price";
 };
 
+const SCROLLABLE_SECTION_MAX_HEIGHT = 320;
+
 function valuetext(value: number) {
   return `${value}°C`;
 }
@@ -136,8 +138,9 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({ onFilterChange, selec
                 maxHeight: isOpen
                   ? section.type === "price"
                     ? "170px"
-                    : `${section.items?.length! * 44}px`
+                    : `${SCROLLABLE_SECTION_MAX_HEIGHT}px`
                   : "0px",
+                overflowY: isOpen && section.type !== "price" ? "auto" : "hidden",
               }}
             >
               {section.type === "price" ? (

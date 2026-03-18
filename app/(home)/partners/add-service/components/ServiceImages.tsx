@@ -4,6 +4,8 @@ import { Upload, X, Image as ImageIcon } from 'lucide-react';
 interface Props {
   coverImage: string;
   galleryImages: string[];
+  coverError?: string;
+  error?: string;
   onCoverUpload: (file: File) => Promise<void>;
   onGalleryUpload: (files: File[]) => Promise<void>;
   onRemoveCover: () => void;
@@ -15,6 +17,8 @@ interface Props {
 export default function ServiceImages({
   coverImage,
   galleryImages,
+  coverError,
+  error,
   onCoverUpload,
   onGalleryUpload,
   onRemoveCover,
@@ -28,6 +32,9 @@ export default function ServiceImages({
 
       {/* Feature Image */}
       <div className="mb-6">
+        {coverError ? (
+          <p className="mb-3 text-xs text-red-600">{coverError}</p>
+        ) : null}
         {coverImage ? (
           <div className="relative w-full h-48 bg-gray-200 rounded-lg overflow-hidden">
             <img
@@ -65,6 +72,9 @@ export default function ServiceImages({
       <div>
         <h3 className="text-sm font-semibold text-gray-900 mb-1 border-l-4 border-[#c9a227] pl-3">Service Gallery</h3>
         <p className="text-xs text-gray-500 mb-3 pl-4">Max 5 images allowed based on your subscription plan.</p>
+        {error ? (
+          <p className="mb-3 pl-4 text-xs text-red-600">{error}</p>
+        ) : null}
         
         {/* Add Photo Button */}
         <div className="mb-3">
