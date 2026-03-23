@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Star } from "lucide-react";
@@ -355,7 +355,7 @@ function BusinessResultCard({
   );
 }
 
-export default function SearchPage() {
+function SearchPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -584,5 +584,28 @@ export default function SearchPage() {
         )}
       </section>
     </div>
+  );
+}
+
+function SearchPageFallback() {
+  return (
+    <div className="min-h-screen bg-white">
+      <section className="mx-auto max-w-[1400px] px-4 py-10 sm:px-6 lg:px-12">
+        <div className="flex min-h-[240px] items-center justify-center">
+          <div className="flex flex-col items-center gap-4">
+            <div className="h-12 w-12 animate-spin rounded-full border-4 border-[#c79b44] border-t-transparent" />
+            <p className="text-sm font-medium text-gray-500">Loading search...</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<SearchPageFallback />}>
+      <SearchPageContent />
+    </Suspense>
   );
 }
