@@ -18,6 +18,8 @@ type CartItem = {
     salePrice?: number | null;            // sale price (may be null)
     discountEndDate?: string | null;      // ISO string or null
     selectedSizePrice?: number;  // salePrice or price (already decided by backend)
+    shippingType?: "standard" | "overnight" | "local";
+    shippingCost?: number;
     stock?: number;
     allowBackorder?: boolean;
     title?: string;
@@ -62,6 +64,12 @@ export default function CartPage() {
         addresses.find(a => a.isDefault)?.id
     );
     const [userNote, setUserNote] = useState<string>("");
+
+    const isSaleActive = (salePrice?: number | null, discountEndDate?: string | null) => {
+        if (salePrice == null) return false;
+        if (!discountEndDate) return true;
+        return new Date(discountEndDate).getTime() > Date.now();
+    };
 
     const loadCart = useCallback(async () => {
         setLoading(true);
@@ -150,14 +158,17 @@ export default function CartPage() {
         (sum, it) => sum + (Number(it.selectedSizePrice) || 0) * (it.quantity || 0),
         0
     );
+    const shippingTotalProduct = itemsProduct.reduce(
+        (sum, it) => sum + (Number(it.shippingCost) || 0) * (it.quantity || 0),
+        0
+    );
+    const grandTotalProduct = subtotalProduct + shippingTotalProduct;
     const totalQtyProduct = itemsProduct.reduce((sum, it) => sum + (it.quantity || 0), 0);
 
     const totalSavingsProduct = useMemo(() => {
         return itemsProduct.reduce((sum, it: any) => {
             const base = Number(it.price ?? it.selectedSizePrice ?? 0);
-            const end = it.discountEndDate ? new Date(it.discountEndDate) : null;
-            const saleActive =
-                it.salePrice != null && end != null && end.getTime() > Date.now();
+            const saleActive = isSaleActive(it.salePrice, it.discountEndDate);
 
             const effective = saleActive
                 ? Number(it.salePrice)
@@ -195,13 +206,13 @@ export default function CartPage() {
                         >
                             Mosaic biz hub ({itemsProduct.length})
                         </button>
-                        <button
+                        {/* <button
                             className={`sm:p-5 p-2 pt-3 sm:text-lg text-sm font-semibold ${selectedTab === "food" ? "border-b-4 border-blue-500" : "text-gray-800"
                                 }`}
                             onClick={() => setSelectedTab("food")}
                         >
                             Grocery ({itemsFood.length})
-                        </button>
+                        </button> */}
                     </div>
 
                     {/* Delivery Address */}
@@ -240,17 +251,16 @@ export default function CartPage() {
                                                     {item.label ? `${item.label}: ` : ""}
                                                     {item.size}
                                                     {item.color ? ` · ${item.color}` : ""}
-                                                    {item.sku ? ` · SKU: ${item.sku}` : ""}
+                                                    {/* {item.sku ? ` · SKU: ${item.sku}` : ""} */}
                                                 </div>
 
                                                 <div className="flex items-center gap-2 mt-5">
                                                     {(() => {
                                                         const base = Number(item.price ?? item.selectedSizePrice ?? 0);
                                                         const sale = item.salePrice != null ? Number(item.salePrice) : null;
-                                                        const end = item.discountEndDate ? new Date(item.discountEndDate) : null;
                                                         const saleActive =
                                                             (item as any).isSaleActive ??
-                                                            (sale != null && end != null && end.getTime() > Date.now());
+                                                            isSaleActive(sale, item.discountEndDate);
 
                                                         if (saleActive && sale != null && sale < base) {
                                                             const pct = base > 0 ? Math.round(((base - sale) / base) * 100) : 0;
@@ -261,9 +271,11 @@ export default function CartPage() {
                                                                         <span className="text-sm text-gray-400 line-through">${base.toFixed(2)}</span>
                                                                         {pct > 0 && <span className="text-sm text-green-600">{pct}% OFF</span>}
                                                                     </div>
-                                                                    <div className="text-xs text-gray-500">
-                                                                        Offer valid till {end!.toLocaleDateString()}
-                                                                    </div>
+                                                                    {item.discountEndDate && (
+                                                                        <div className="text-xs text-gray-500">
+                                                                            Offer valid till {new Date(item.discountEndDate).toLocaleDateString()}
+                                                                        </div>
+                                                                    )}
                                                                 </div>
                                                             );
                                                         }
@@ -272,6 +284,11 @@ export default function CartPage() {
                                                         return <span className="text-base text-gray-800">${effective.toFixed(2)}</span>;
                                                     })()}
                                                 </div>
+                                                {item.shippingType && (
+                                                    <div className="mt-2 text-xs text-gray-500">
+                                                        Shipping: {(item.shippingType || "standard").replace(/^./, (c) => c.toUpperCase())} ${Number(item.shippingCost).toFixed(2)}
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
 
@@ -373,9 +390,19 @@ export default function CartPage() {
                                     <div>{totalQtyProduct}</div>
                                 </div>
 
+                                <div className="flex justify-between mt-3 text-sm text-gray-600">
+                                    <div>Shipping</div>
+                                    <div>${shippingTotalProduct.toFixed(2)}</div>
+                                </div>
+
                                 <div className="flex justify-between pt-2 pb-2 mt-4 text-lg text-gray-800 border-t-2 border-b-2 border-gray-200">
                                     <div>Subtotal</div>
                                     <div>${subtotalProduct.toFixed(2)}</div>
+                                </div>
+
+                                <div className="flex justify-between mt-4 text-lg font-semibold text-gray-900">
+                                    <div>Total</div>
+                                    <div>${grandTotalProduct.toFixed(2)}</div>
                                 </div>
 
                                 {totalSavingsProduct > 0 && (
@@ -387,7 +414,7 @@ export default function CartPage() {
 
                                 <div className="flex items-center justify-end mt-5 space-x-2">
                                     <button
-                                        className="px-4 py-2 text-white bg-blue-500"
+                                        className="px-4 py-2 text-white bg-blue-900"
                                         onClick={() => {
                                             if (!selectedAddress) {
                                                 alert("Please add address");

@@ -45,6 +45,17 @@ type Business = {
   slug: string;
   coverImage: string;
   badge: string; // ✅ ADD THIS
+  website?: string;
+  socialLinks?: {
+    website?: string;
+  };
+  address?: {
+    street?: string;
+    city?: string;
+    state?: string;
+    country?: string;
+    zipCode?: string;
+  };
 };
 
 type ServiceData = {
@@ -86,10 +97,27 @@ type ApiResponse = {
 };
 
 /* ─────────────── Helpers ─────────────── */
+function formatBusinessAddress(address?: Business["address"]) {
+  if (!address) return "";
+
+  return [
+    address.street,
+    address.city,
+    address.state,
+    address.country,
+    address.zipCode,
+  ]
+    .map((part) => (typeof part === "string" ? part.trim() : ""))
+    .filter(Boolean)
+    .join(", ");
+}
+
 function normalizeData(payload: ApiResponse) {
   const service = payload?.data?.service;
   const business = payload?.data?.business;
-  
+  const businessAddress = formatBusinessAddress(business?.address);
+  const businessWebsite = business?.website || business?.socialLinks?.website || "";
+
   return {
     // Service info
     title: service?.title || service?.slug || "Service Provider",
@@ -103,7 +131,12 @@ function normalizeData(payload: ApiResponse) {
       durationMinutes: s.durationMinutes || 0,
       price: Number(s.price) || 0,
     })),
-    contact: service?.contact || { phone: "", email: "", address: "", website: "" },
+    contact: {
+      phone: service?.contact?.phone || business?.phone || "",
+      email: service?.contact?.email || business?.email || "",
+      address: service?.contact?.address || businessAddress,
+      website: service?.contact?.website || businessWebsite,
+    },
     coverImage: service?.coverImage || business?.coverImage || "",
     galleryImages: service?.images || [],
     businessHours: service?.businessHours || [],
@@ -124,6 +157,8 @@ function normalizeData(payload: ApiResponse) {
     businessPhone: business?.phone || "",
     businessSlug: business?.slug || "",
     businessBadge: business?.badge || "", // ✅ ADD THIS
+    businessAddress,
+    businessWebsite,
     
     // Categories
     category: service?.categoryId?.name || "",
@@ -256,7 +291,7 @@ export default function ServiceVendorProfilePage() {
     if (!data) return [];
     let list = data.services.filter(s => {
       const mtName = !serviceType || s.name.toLowerCase().includes(serviceType.toLowerCase());
-      const mtLoc = !locationFilter || (data.contact.address || "").toLowerCase().includes(locationFilter.toLowerCase());
+      const mtLoc = !locationFilter || (data.businessAddress || data.contact.address || "").toLowerCase().includes(locationFilter.toLowerCase());
       const mtDur = !duration || s.durationMinutes.toString().includes(duration);
       return mtName && mtLoc && mtDur;
     });
@@ -290,7 +325,7 @@ export default function ServiceVendorProfilePage() {
   const { 
     title, description, contact, coverImage, galleryImages, businessHours,
     averageRating, totalReviews, slug, location: mapUrl, amenities, features,
-    businessName, businessLogo, businessDescription, category, subcategory
+    businessName, businessLogo, businessDescription, businessAddress, businessWebsite, category, subcategory
   } = data;
 
   const todayName = new Date().toLocaleDateString("en-US", { weekday: "long" });
@@ -302,7 +337,7 @@ export default function ServiceVendorProfilePage() {
   const hasDirectBookingLink = /^https?:\/\//i.test(bookingToolLink);
   const { embedUrl: mapEmbedUrl, externalUrl: mapExternalUrl } = getMapUrls(
     mapUrl,
-    contact.address
+    businessAddress || contact.address
   );
 
 
@@ -322,9 +357,9 @@ export default function ServiceVendorProfilePage() {
 
   {/* Center Content */}
   <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/30 text-center px-4">
-    <h1 className="text-3xl md:text-4xl font-bold tracking-wide text-white uppercase">
-      {heroTitle}
-    </h1>
+<h1 className="text-3xl md:text-4xl font-poppins font-semibold tracking-wide text-white uppercase">
+  {heroTitle}
+</h1>
 
     <nav className="mt-2 text-sm text-gray-300">
       <Link href="/" className="hover:text-white">Home</Link>
@@ -468,7 +503,9 @@ export default function ServiceVendorProfilePage() {
             {/* Business Name & Info */}
             <div className="mt-7 border-b border-[#ece6d9] pb-5">
               <div className="flex items-center gap-2.5 flex-wrap">
-                <h2 className="text-[32px] font-semibold leading-none text-[#1b1b1b]">{heroTitle}</h2>
+               <h2 className="text-[32px] font-poppins font-semibold leading-none text-[#1b1b1b]">
+  {heroTitle}
+</h2>
                 {amenities?.slice(0, 2).map(a => (
                   <span key={a} className="border border-[#d7cfbb] bg-[#f7f3e7] px-2 py-0.5 text-[10px] uppercase tracking-[0.14em] text-[#8a7b52]">{a}</span>
                 ))}
@@ -480,7 +517,9 @@ export default function ServiceVendorProfilePage() {
                 )}
               </div>
               {(businessDescription || description) && (
-                <p className="mt-3 max-w-[760px] text-[11px] leading-5 text-[#7b7b7b]">{businessDescription || description}</p>
+               <p className="mt-3 max-w-[760px] text-[11px] font-montserrat font-medium leading-5 text-[#7b7b7b]">
+  {businessDescription || description}
+</p>
               )}
               <button className="mt-4 flex h-8 items-center gap-2 border border-[#c79b44] px-3 text-[11px] font-semibold uppercase tracking-wide text-[#c79b44] hover:bg-[#c79b44] hover:text-white transition-colors">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -492,9 +531,9 @@ export default function ServiceVendorProfilePage() {
 
             {/* Offered Services */}
 <div className="mt-6">
-  <h3 className="mb-3 text-sm font-semibold text-[#c79b44]">
-    Offered Services
-  </h3>
+<h3 className="mb-3 text-sm font-montserrat font-semibold text-[#c79b44]">
+  Offered Services
+</h3>
 
   {sortedServices.length === 0 ? (
     <p className="text-sm text-gray-500">No services found.</p>
@@ -503,7 +542,7 @@ export default function ServiceVendorProfilePage() {
       {sortedServices.map(svc => (
         <div
           key={svc._id}
-          className="group flex gap-3 border border-[#ece6d8] bg-[#f8f8f8] p-2.5 transition-shadow hover:shadow-sm"
+          className="group flex gap-3 border border-[#ece6d8] bg-[#F5F5F5] p-2.5 transition-shadow hover:shadow-sm"
         >
           <div className="h-16 w-16 shrink-0 overflow-hidden bg-gray-100">
             <img
@@ -513,14 +552,16 @@ export default function ServiceVendorProfilePage() {
             />
           </div>
           <div className="flex-1 min-w-0">
-            <h4 className="text-[13px] font-semibold text-[#1d1d1d]">{svc.name}</h4>
-            <p className="mt-1 line-clamp-2 text-[10px] leading-4 text-[#7f7f7f]">
-              {svc.description || "Professional service offered by our experts."}
-            </p>
-            <div className="mt-1.5 flex items-center gap-4 text-[10px] text-[#7f7f7f]">
+            <h4 className="text-[15px] font-poppins font-bold text-[#1d1d1d]">
+  {svc.name}
+</h4>
+<p className="mt-1 line-clamp-2 text-[12px] font-montserrat font-medium leading-4 text-[#7f7f7f]">
+  {svc.description || "Professional service offered by our experts."}
+</p>
+            {/* <div className="mt-1.5 flex items-center gap-4 text-[10px] text-[#7f7f7f]">
               <span>Duration: {formatDuration(svc.durationMinutes)}</span>
               <span className="text-[11px] font-semibold text-[#1d1d1d]">${svc.price.toFixed(2)}</span>
-            </div>
+            </div> */}
           </div>
         </div>
       ))}
@@ -574,15 +615,15 @@ export default function ServiceVendorProfilePage() {
                 </div>
               </div>
 
-              <div className="mt-3 space-y-1.5 text-[12px]">
+             <div className="mt-3 space-y-1.5 text-[12px] font-montserrat font-medium">
                 {[
                   { label: "Business Name", value: data.businessName, key: null },
                   { label: "Category", value: category, key: null },
                   { label: "Established In", value: estYear?.toString() || "N/A", key: null },
-                  { label: "Call Us", value: contact.phone || data.businessPhone, key: "call" },
-                  { label: "Email Us", value: contact.email || data.businessEmail, key: "email" },
-                  { label: "Address", value: contact.address, key: "address" },
-                  { label: "Website", value: contact.website, key: "website" },
+                  { label: "Call Us", value: data.businessPhone || contact.phone, key: "call" },
+                  { label: "Email Us", value: data.businessEmail || contact.email, key: "email" },
+                  { label: "Address", value: businessAddress || contact.address, key: "address" },
+                  { label: "Website", value: businessWebsite || contact.website, key: "website" },
                 ].map(row => (
                   <div key={row.label} className="grid grid-cols-[96px_1fr] gap-2 items-start">
                     <span className="font-montserrat font-bold text-gray-900">{row.label}</span>
@@ -622,9 +663,9 @@ export default function ServiceVendorProfilePage() {
   
   {/* Header */}
   <div className="border-b border-[#e6d3a3] px-5 py-4">
-    <h3 className="text-[14px] font-bold tracking-wide text-[#1A1F71] uppercase">
-      {hasDirectBookingLink ? "Book Now" : "Book Service"}
-    </h3>
+<h3 className="text-[14px] font-poppins font-bold tracking-wide text-[#1A1F71] uppercase">
+  {hasDirectBookingLink ? "Book Now" : "Book Service"}
+</h3>
   </div>
 
   {hasDirectBookingLink ? (
@@ -765,16 +806,23 @@ export default function ServiceVendorProfilePage() {
                 )}
               </div>
 
-              <div className="space-y-1.5 px-1 py-4">
-                {businessHours.map(h => (
-                  <div key={h._id} className={`grid grid-cols-[90px_1fr] text-[10px] ${h.day === todayName ? "font-bold text-[#1d1d1d]" : "text-[#6d6d6d]"}`}>
-                    <span className="uppercase tracking-[0.14em]">{h.day}</span>
-                    <span className={h.closed ? "text-red-500" : ""}>
-                      {h.closed ? "Closed" : h.hours.toUpperCase()}
-                    </span>
-                  </div>
-                ))}
-              </div>
+<div className="space-y-1.5 px-5 py-5">
+  {businessHours.map(h => (
+    <div
+      key={h._id}
+      className={`grid grid-cols-[120px_1fr] gap-x-2 items-center text-[12px] ${
+        h.day === todayName ? "text-[#1d1d1d]" : "text-[#6d6d6d]"
+      }`}
+    >
+      <span className="uppercase tracking-[0.14em] font-montserrat font-semibold">
+        {h.day}
+      </span>
+      <span className={`${h.closed ? "text-red-500" : ""} font-montserrat font-semibold`}>
+        {h.closed ? "Closed" : h.hours.toUpperCase()}
+      </span>
+    </div>
+  ))}
+</div>
             </div>
 
           </div>

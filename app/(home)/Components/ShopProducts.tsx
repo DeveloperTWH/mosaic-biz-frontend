@@ -3,6 +3,7 @@
 import React from "react";
 import { Star, StarHalf, RotateCcw, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Keyboard, A11y, Autoplay } from "swiper/modules";
 import "swiper/css";
@@ -258,17 +259,29 @@ function FilterSection({ onSearch }: { onSearch: (filters: { businessType: strin
 
 /* ---------- main component ---------- */
 export default function ShopProducts() {
-  const [searchFilters, setSearchFilters] = React.useState({ businessType: "", location: "", minority: "" });
-  const { items, error, loading, reload } = useFeaturedProducts(searchFilters);
+  const router = useRouter();
+  const { items, error, loading, reload } = useFeaturedProducts();
   const [swiperRef, setSwiperRef] = React.useState<any>(null);
 
   const prevButton = React.useRef(null);
   const nextButton = React.useRef(null);
 
   const handleSearch = (filters: { businessType: string; location: string; minority: string }) => {
-    console.log('Received search filters:', filters);
-    setSearchFilters(filters);
-    // Force reload will happen automatically due to useEffect dependency
+    const params = new URLSearchParams();
+
+    if (filters.businessType.trim()) {
+      params.set("keyword", filters.businessType.trim());
+    }
+
+    if (filters.location.trim()) {
+      params.set("location", filters.location.trim());
+    }
+
+    if (filters.minority.trim()) {
+      params.set("minorityType", filters.minority.trim());
+    }
+
+    router.push(`/search${params.toString() ? `?${params.toString()}` : ""}`);
   };
 
   return (

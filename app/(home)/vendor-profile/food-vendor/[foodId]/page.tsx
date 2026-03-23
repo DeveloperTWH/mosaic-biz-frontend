@@ -58,7 +58,17 @@ type Business = {
   coverImage?: string;
   email?: string;
   phone?: string;
-  address?: string;
+  address?: {
+    street?: string;
+    city?: string;
+    state?: string;
+    country?: string;
+    zipCode?: string;
+  };
+  website?: string;
+  socialLinks?: {
+    website?: string;
+  };
   badge?: string;
 };
 
@@ -99,9 +109,26 @@ function getMapEmbedUrl(address?: string, coordinates?: [number, number]): strin
   return undefined;
 }
 
+function formatBusinessAddress(address?: Business["address"]): string {
+  if (!address) return "";
+
+  return [
+    address.street,
+    address.city,
+    address.state,
+    address.country,
+    address.zipCode,
+  ]
+    .map((part) => (typeof part === "string" ? part.trim() : ""))
+    .filter(Boolean)
+    .join(", ");
+}
+
 function normalizeData(payload: FoodProfileResponse) {
   const food = payload?.data?.food;
   const business = payload?.data?.business;
+  const businessAddress = formatBusinessAddress(business?.address);
+  const businessWebsite = business?.website || business?.socialLinks?.website || "";
 
   const galleryItems = [food?.coverImage, ...(food?.images ?? []), food?.menuImage]
     .filter((item): item is string => Boolean(item))
@@ -122,14 +149,15 @@ function normalizeData(payload: FoodProfileResponse) {
     averageRating: Number(food?.averageRating) || 0,
     totalReviews: Number(food?.totalReviews) || 0,
     createdAt: food?.createdAt || "",
-    locationAddress: food?.location?.address || business?.address || "",
+    locationAddress: food?.location?.address || businessAddress || "",
     coordinates: food?.location?.coordinates,
     businessName: business?.businessName || food?.businessName || "",
     businessDescription: cleanText(business?.description),
     businessLogo: business?.logo || "",
     businessEmail: business?.email || "",
     businessPhone: business?.phone || "",
-    businessAddress: business?.address || food?.location?.address || "",
+    businessAddress: businessAddress || food?.location?.address || "",
+    businessWebsite,
     businessBadge: business?.badge || food?.badge || "",
   };
 }
@@ -246,7 +274,7 @@ export default function FoodVendorProfilePage() {
           className="absolute inset-0 h-full w-full object-cover opacity-40"
         />
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/30 px-4 text-center">
-          <h1 className="text-3xl font-bold uppercase tracking-wide text-white md:text-4xl">
+          <h1 className="text-3xl font-poppins font-semibold uppercase tracking-wide text-white md:text-4xl">
             {heroTitle}
           </h1>
           <nav className="mt-2 text-sm text-gray-300">
@@ -275,7 +303,7 @@ export default function FoodVendorProfilePage() {
                 value={businessType}
                 onChange={(e) => setBusinessType(e.target.value)}
                 placeholder="Type Here"
-                className="h-10 w-full bg-white px-4 text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-custom-orange"
+                className="h-10 w-full bg-white px-4 text-xs font-montserrat font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-custom-orange"
               />
             </div>
 
@@ -288,7 +316,7 @@ export default function FoodVendorProfilePage() {
                 value={locationFilter}
                 onChange={(e) => setLocationFilter(e.target.value)}
                 placeholder="Choose Location"
-                className="h-10 w-full bg-white px-4 text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-custom-orange"
+                className="h-10 w-full bg-white px-4 text-xs font-montserrat font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-custom-orange"
               />
             </div>
 
@@ -301,12 +329,12 @@ export default function FoodVendorProfilePage() {
                 value={minority}
                 onChange={(e) => setMinority(e.target.value)}
                 placeholder="Choose Minority"
-                className="h-10 w-full bg-white px-4 text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-custom-orange"
+                className="h-10 w-full bg-white px-4 text-xs font-montserrat font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-custom-orange"
               />
             </div>
 
             <div className="min-w-0 flex-1">
-              <button className="flex h-10 w-full items-center justify-center bg-[#C7A040] text-sm font-semibold text-white transition-colors hover:bg-[#a88432]">
+              <button className="flex h-10 w-full items-center justify-center bg-[#C7A040] text-sm font-poppins font-semibold text-white transition-colors hover:bg-[#a88432]">
                 Search Here
               </button>
             </div>
@@ -367,11 +395,11 @@ export default function FoodVendorProfilePage() {
 
             <div className="mt-7 border-b border-[#ece6d9] pb-5">
               <div className="flex flex-wrap items-center gap-2.5">
-                <h2 className="text-[32px] font-semibold leading-none text-[#1b1b1b]">{heroTitle}</h2>
+                <h2 className="text-[32px] font-poppins font-semibold leading-none text-[#1b1b1b]">{heroTitle}</h2>
                 {[data.category, data.foodType].filter(Boolean).slice(0, 2).map((item) => (
                   <span
                     key={item}
-                    className="border border-[#d7cfbb] bg-[#f7f3e7] px-2 py-0.5 text-[10px] uppercase tracking-[0.14em] text-[#8a7b52]"
+                    className="border border-[#d7cfbb] bg-[#f7f3e7] px-2 py-0.5 text-[10px] font-montserrat uppercase tracking-[0.14em] text-[#8a7b52]"
                   >
                     {item}
                   </span>
@@ -380,17 +408,17 @@ export default function FoodVendorProfilePage() {
               <div className="mt-2 flex items-center gap-2">
                 <StarRating rating={data.averageRating} />
                 {data.totalReviews > 0 && (
-                  <span className="text-[11px] text-[#8c8c8c]">
-                    {data.averageRating.toFixed(1)} Ratings And {data.totalReviews} Reviews
-                  </span>
-                )}
+                    <span className="text-[11px] font-montserrat font-medium text-[#8c8c8c]">
+                      {data.averageRating.toFixed(1)} Ratings And {data.totalReviews} Reviews
+                    </span>
+                  )}
               </div>
               {data.businessDescription && (
-                <p className="mt-3 max-w-[760px] text-[11px] leading-5 text-[#7b7b7b]">
+                <p className="mt-3 max-w-[760px] text-[11px] font-montserrat font-medium leading-5 text-[#7b7b7b]">
                   {data.businessDescription}
                 </p>
               )}
-              <button className="mt-4 flex h-8 items-center gap-2 border border-[#c79b44] px-3 text-[11px] font-semibold uppercase tracking-wide text-[#c79b44] transition-colors hover:bg-[#c79b44] hover:text-white">
+              <button className="mt-4 flex h-8 items-center gap-2 border border-[#c79b44] px-3 text-[11px] font-poppins font-semibold uppercase tracking-wide text-[#c79b44] transition-colors hover:bg-[#c79b44] hover:text-white">
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
@@ -400,7 +428,7 @@ export default function FoodVendorProfilePage() {
 
             {galleryItems.length > 0 && (
             <div className="mt-6">
-              <h3 className="mb-3 text-sm font-semibold text-[#c79b44]">Photo Gallery</h3>
+              <h3 className="mb-3 text-sm font-montserrat font-semibold text-[#c79b44]">Photo Gallery</h3>
               <div className="grid grid-cols-3 gap-1.5 sm:grid-cols-6">
                 {galleryItems.map((image, i) => (
                   <div key={`${image}-${i}`} className="h-[78px] overflow-hidden bg-[#dfdfdf]">
@@ -416,7 +444,7 @@ export default function FoodVendorProfilePage() {
             )}
 
             <div className="mt-8">
-              <h3 className="mb-4 text-sm font-semibold text-[#c79b44]">Testimonials</h3>
+              <h3 className="mb-4 text-sm font-montserrat font-semibold text-[#c79b44]">Testimonials</h3>
               <ClientTestimonials />
             </div>
           </div>
@@ -449,6 +477,7 @@ export default function FoodVendorProfilePage() {
                   { label: "Call Us", value: data.businessPhone, key: "call" },
                   { label: "Email Us", value: data.businessEmail, key: "email" },
                   { label: "Address", value: data.businessAddress || data.locationAddress, key: "address" },
+                  { label: "Website", value: data.businessWebsite, key: "website" },
                 ].map((row) => (
                   <div key={row.label} className="grid grid-cols-[96px_1fr] gap-2 items-start">
                     <span className="font-montserrat font-bold text-gray-900">{row.label}</span>
@@ -464,6 +493,15 @@ export default function FoodVendorProfilePage() {
                             className="font-montserrat font-medium text-gray-700 underline break-all"
                           >
                             View on Maps
+                          </a>
+                        ) : row.key === "website" ? (
+                          <a
+                            href={row.value.startsWith("http") ? row.value : `https://${row.value}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="font-montserrat font-medium text-gray-700 underline break-all"
+                          >
+                            {row.value.replace(/^https?:\/\//, "")}
                           </a>
                         ) : (
                           <span className="font-montserrat font-medium text-gray-700 break-all">{row.value}</span>
@@ -484,9 +522,9 @@ export default function FoodVendorProfilePage() {
               </div>
             </div>
 
-            <div className="overflow-hidden border border-[#e2c46a] bg-[#fff8e8]">
+            <div className="overflow-hidden border border-[#e2c46a] bg-[#fff8e8] mt-6">
               <div className="border-b border-[#e6d3a3] px-5 py-4">
-                <h3 className="text-[14px] font-bold uppercase tracking-wide text-[#1A1F71]">
+                <h3 className="text-[14px] font-poppins font-bold uppercase tracking-wide text-[#1A1F71]">
                   {hasDirectBookingLink ? "Book Now" : "Book A Table"}
                 </h3>
               </div>
@@ -494,7 +532,7 @@ export default function FoodVendorProfilePage() {
               {hasDirectBookingLink ? (
                 <div className="p-5">
                   <button
-                    className="h-10 w-full bg-[#C7A040] text-[11px] font-semibold uppercase tracking-wide text-white transition-colors hover:bg-[#a88432]"
+                    className="h-10 w-full bg-[#C7A040] text-[11px] font-poppins font-semibold uppercase tracking-wide text-white transition-colors hover:bg-[#a88432]"
                     onClick={() => {
                       window.open(data.bookingToolLink, "_blank", "noopener,noreferrer");
                     }}
@@ -505,62 +543,62 @@ export default function FoodVendorProfilePage() {
               ) : (
               <div className="space-y-3 p-5">
                 <div className="space-y-1">
-                  <label className="block text-[10px] font-medium uppercase tracking-wide text-[#6f6f6f]">
+                  <label className="block text-[10px] font-montserrat font-medium uppercase tracking-wide text-[#6f6f6f]">
                     Name
                   </label>
                   <input
                     value={bookForm.name}
                     onChange={(e) => setBookForm((prev) => ({ ...prev, name: e.target.value }))}
                     placeholder="Enter Name"
-                    className="h-8 w-full border border-[#d8d0ba] bg-[#fff8e8] px-2.5 text-[11px] text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#C7A040]"
+                    className="h-8 w-full border border-[#d8d0ba] bg-[#fff8e8] px-2.5 text-[11px] font-montserrat font-medium text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#C7A040]"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="block text-[10px] font-medium uppercase tracking-wide text-[#6f6f6f]">
+                  <label className="block text-[10px] font-montserrat font-medium uppercase tracking-wide text-[#6f6f6f]">
                     Email
                   </label>
                   <input
                     value={bookForm.email}
                     onChange={(e) => setBookForm((prev) => ({ ...prev, email: e.target.value }))}
                     placeholder="Enter Email"
-                    className="h-8 w-full border border-[#d8d0ba] bg-[#fff8e8] px-2.5 text-[11px] text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#C7A040]"
+                    className="h-8 w-full border border-[#d8d0ba] bg-[#fff8e8] px-2.5 text-[11px] font-montserrat font-medium text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#C7A040]"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="block text-[10px] font-medium uppercase tracking-wide text-[#6f6f6f]">
+                  <label className="block text-[10px] font-montserrat font-medium uppercase tracking-wide text-[#6f6f6f]">
                     Phone Number
                   </label>
                   <input
                     value={bookForm.phone}
                     onChange={(e) => setBookForm((prev) => ({ ...prev, phone: e.target.value }))}
                     placeholder="Enter Phone Number"
-                    className="h-8 w-full border border-[#d8d0ba] bg-[#fff8e8] px-2.5 text-[11px] text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#C7A040]"
+                    className="h-8 w-full border border-[#d8d0ba] bg-[#fff8e8] px-2.5 text-[11px] font-montserrat font-medium text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#C7A040]"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-1">
-                    <label className="block text-[10px] font-medium uppercase tracking-wide text-[#6f6f6f]">
+                    <label className="block text-[10px] font-montserrat font-medium uppercase tracking-wide text-[#6f6f6f]">
                       Reservation Date
                     </label>
                     <input
                       value={bookForm.date}
                       onChange={(e) => setBookForm((prev) => ({ ...prev, date: e.target.value }))}
                       placeholder="MM/DD/YYYY"
-                      className="h-8 w-full border border-[#d8d0ba] bg-[#fff8e8] px-2.5 text-[11px] text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#C7A040]"
+                      className="h-8 w-full border border-[#d8d0ba] bg-[#fff8e8] px-2.5 text-[11px] font-montserrat font-medium text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#C7A040]"
                     />
                   </div>
 
                   <div className="space-y-1">
-                    <label className="block text-[10px] font-medium uppercase tracking-wide text-[#6f6f6f]">
+                    <label className="block text-[10px] font-montserrat font-medium uppercase tracking-wide text-[#6f6f6f]">
                       Select Time
                     </label>
                     <select
                       value={bookForm.timeSlot}
                       onChange={(e) => setBookForm((prev) => ({ ...prev, timeSlot: e.target.value }))}
-                      className="h-8 w-full border border-[#d8d0ba] bg-[#fff8e8] px-2.5 text-[11px] text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#C7A040]"
+                      className="h-8 w-full border border-[#d8d0ba] bg-[#fff8e8] px-2.5 text-[11px] font-montserrat font-medium text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#C7A040]"
                     >
                       <option value="">09 - 6AM</option>
                       {data.bookingTimeSlots.map((slot) => (
@@ -573,13 +611,13 @@ export default function FoodVendorProfilePage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="block text-[10px] font-medium uppercase tracking-wide text-[#6f6f6f]">
+                  <label className="block text-[10px] font-montserrat font-medium uppercase tracking-wide text-[#6f6f6f]">
                     Number Of People
                   </label>
                   <select
                     value={bookForm.tableType}
                     onChange={(e) => setBookForm((prev) => ({ ...prev, tableType: e.target.value }))}
-                    className="h-8 w-full border border-[#d8d0ba] bg-[#fff8e8] px-2.5 text-[11px] text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#C7A040]"
+                    className="h-8 w-full border border-[#d8d0ba] bg-[#fff8e8] px-2.5 text-[11px] font-montserrat font-medium text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#C7A040]"
                   >
                     <option value="">Select Seat Count</option>
                     {data.tableTypes.map((table) => (
@@ -591,7 +629,7 @@ export default function FoodVendorProfilePage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="block text-[10px] font-medium uppercase tracking-wide text-[#6f6f6f]">
+                  <label className="block text-[10px] font-montserrat font-medium uppercase tracking-wide text-[#6f6f6f]">
                     Message
                   </label>
                   <textarea
@@ -599,12 +637,12 @@ export default function FoodVendorProfilePage() {
                     onChange={(e) => setBookForm((prev) => ({ ...prev, message: e.target.value }))}
                     placeholder="Add Message"
                     rows={3}
-                    className="w-full resize-none border border-[#d8d0ba] bg-[#fff8e8] px-2.5 py-2 text-[11px] text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#C7A040]"
+                    className="w-full resize-none border border-[#d8d0ba] bg-[#fff8e8] px-2.5 py-2 text-[11px] font-montserrat font-medium text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#C7A040]"
                   />
                 </div>
 
                 <button
-                  className="h-9 w-full bg-[#C7A040] text-[11px] font-semibold uppercase tracking-wide text-white transition-colors hover:bg-[#a88432]"
+                  className="h-9 w-full bg-[#C7A040] text-[11px] font-poppins font-semibold uppercase tracking-wide text-white transition-colors hover:bg-[#a88432]"
                   onClick={() => {
                     if (data.bookingToolLink) {
                       window.open(data.bookingToolLink, "_blank", "noopener,noreferrer");
@@ -618,7 +656,7 @@ export default function FoodVendorProfilePage() {
             </div>
 
             <div className="overflow-hidden bg-white">
-              <h3 className="mb-2 text-sm font-semibold text-[#c79b44]">Location And Hours</h3>
+              <h3 className="mb-2 text-sm font-montserrat font-semibold text-[#c79b44]">Location And Hours</h3>
 
               <div className="h-40 w-full overflow-hidden border border-[#ece6d8] bg-gray-200">
                 {mapUrl ? (
@@ -645,8 +683,8 @@ export default function FoodVendorProfilePage() {
                         : "text-[#6d6d6d]"
                     }`}
                   >
-                    <span className="uppercase tracking-[0.14em]">{hour.day}</span>
-                    <span className={hour.closed ? "text-red-500" : ""}>
+                      <span className="font-montserrat font-semibold uppercase tracking-[0.14em]">{hour.day}</span>
+                    <span className={`${hour.closed ? "text-red-500" : ""} font-montserrat font-semibold`}>
                       {hour.closed ? "Closed" : (hour.hours || "").toUpperCase()}
                     </span>
                   </div>

@@ -168,7 +168,9 @@ setMainImage(firstImage);
     if (!selectedVariant) return { current: 0, original: 0, discount: 0, onSale: false };
     const base = Number(selectedVariant.price) || 0;
     const sale = selectedVariant.salePrice != null ? Number(selectedVariant.salePrice) : null;
-    const onSale = sale != null;
+    const onSale =
+      sale != null &&
+      (!selectedVariant.discountEndDate || new Date(selectedVariant.discountEndDate).getTime() > Date.now());
     return {
       current: onSale ? (sale as number) : base,
       original: base,
@@ -611,7 +613,34 @@ setMainImage(firstImage);
                     setIsBlocking(true);
                     try {
                       const sizeValue = selectedVariant.attributes?.size || selectedVariant.attributes?.Size || 'default';
-                      const res = await addToCart(product._id, selectedVariant.variantId, sizeValue, 1, getBusinessId());
+                      const basePrice = toNumber(selectedVariant.price);
+                      const variantSalePrice =
+                        selectedVariant.salePrice == null ? null : toNumber(selectedVariant.salePrice);
+                      const discountEndDate = selectedVariant.discountEndDate ?? null;
+                      const saleActive =
+                        variantSalePrice != null &&
+                        (!discountEndDate || new Date(discountEndDate).getTime() > Date.now());
+                      const res = await addToCart(
+                        product._id,
+                        selectedVariant.variantId,
+                        sizeValue,
+                        1,
+                        getBusinessId(),
+                        {
+                          price: basePrice,
+                          salePrice: variantSalePrice,
+                          discountEndDate,
+                          selectedSizePrice: saleActive ? variantSalePrice ?? basePrice : basePrice,
+                          shippingType: selectedShipping,
+                          shippingCost: toNumber(resolvedShipping[selectedShipping]),
+                          imageUrl: selectedVariant.images?.[0] || product.coverImage,
+                          color: selectedVariant.attributes?.Color || selectedVariant.attributes?.color,
+                          stock: selectedVariant.stock,
+                          allowBackorder: selectedVariant.allowBackorder ?? false,
+                          title: product.title,
+                          sku: selectedVariant.sku,
+                        }
+                      );
                       if (res?.reset) toast.info('Your cart was switched to this store.');
                       setCartQty(1);
                     } catch (err: any) {

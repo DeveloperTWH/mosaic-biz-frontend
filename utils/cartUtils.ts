@@ -6,6 +6,19 @@ interface CartItem {
   size: string;
   quantity: number;
   cartItemId?: string;
+  price?: number;
+  salePrice?: number | null;
+  discountEndDate?: string | null;
+  selectedSizePrice?: number;
+  shippingType?: 'standard' | 'overnight' | 'local';
+  shippingCost?: number;
+  imageUrl?: string;
+  color?: string;
+  label?: string;
+  stock?: number;
+  allowBackorder?: boolean;
+  title?: string;
+  sku?: string;
 }
 
 export interface CartItemDetailed extends CartItem {
@@ -28,6 +41,24 @@ export interface CartItemDetailed extends CartItem {
   isSaleActive?: boolean;               // convenience flag
 }
 
+type ShippingType = 'standard' | 'overnight' | 'local';
+
+type GuestCartItemMeta = {
+  price?: number;
+  salePrice?: number | null;
+  discountEndDate?: string | null;
+  selectedSizePrice?: number;
+  shippingType?: ShippingType;
+  shippingCost?: number;
+  imageUrl?: string;
+  color?: string;
+  label?: string;
+  stock?: number;
+  allowBackorder?: boolean;
+  title?: string;
+  sku?: string;
+};
+
 
 export type AddToCartResult = {
   success: boolean;
@@ -41,7 +72,8 @@ export const addToCart = async (
   variantId: string,
   size: string,
   quantity: number = 1,
-  businessId?: string
+  businessId?: string,
+  meta?: GuestCartItemMeta
 ): Promise<AddToCartResult> => {
   const loggedIn = await isUserLoggedIn();
 
@@ -125,11 +157,12 @@ export const addToCart = async (
 
   if (existing) {
     existing.quantity += quantity;
+    if (meta) Object.assign(existing, meta);
   } else {
     console.log(`Adding new item to guest cart: ${productId}, ${variantId}, ${size}`, businessId);
 
     if (!businessId) throw new Error('Guest cart requires businessId');
-    store.items.push({ productId, variantId, size, quantity });
+    store.items.push({ productId, variantId, size, quantity, ...meta });
   }
 
   localStorage.setItem('guest_cart', JSON.stringify(store));
@@ -428,6 +461,12 @@ const toNumber = (v: any): number =>
 
 const toId = (v: any) => (typeof v === "string" ? v : v?._id);
 
+const isSalePriceActive = (salePrice: number | null | undefined, discountEndDate?: string | null) => {
+  if (salePrice == null) return false;
+  if (!discountEndDate) return true;
+  return new Date(discountEndDate).getTime() > Date.now();
+};
+
 
 
 
@@ -485,6 +524,11 @@ type VariantMini = {
   allowBackorder?: boolean;
   images?: string[];                  // <-- exists on response
   sizes?: SizeMini[];                 // <-- exists on response (filtered to the requested size)
+  shipping?: {
+    standard?: number;
+    overnight?: number;
+    local?: number;
+  } | null;
 };
 
 // --- API fetchers (batch) ---
@@ -539,12 +583,19 @@ async function buildGuestCartDetailed(): Promise<CartItemDetailed[]> {
     const sizeKey = it.size ? String(it.size).toUpperCase() : undefined;
     const sizeObj = v?.sizes?.find((s) => s.size === sizeKey); // <- no fallback
 
-    const price = toNum(sizeObj?.price) ?? 0;
-    const salePrice = toNum(sizeObj?.salePrice) ?? null;
-    const discountEndISO = sizeObj?.discountEndDate ?? null;
+    const price = toNum(sizeObj?.price) ?? toNum(it.price) ?? 0;
+    const salePrice = toNum(sizeObj?.salePrice) ?? toNum(it.salePrice) ?? null;
+    const discountEndISO = sizeObj?.discountEndDate ?? it.discountEndDate ?? null;
+    const shippingType: ShippingType =
+      it.shippingType === 'overnight' || it.shippingType === 'local' ? it.shippingType : 'standard';
+    const variantShippingCost = v?.shipping?.[shippingType];
+    const shippingCost = toNum(variantShippingCost) ?? toNum(it.shippingCost) ?? 0;
 
-    const isSaleActive =
-      salePrice != null && discountEndISO != null && new Date(discountEndISO).getTime() > now;
+    const isSaleActive = isSalePriceActive(salePrice, discountEndISO);
+
+    const selectedSizePrice =
+      toNum(it.selectedSizePrice) ??
+      (isSaleActive ? salePrice ?? price : price);
 
     return {
       productId: it.productId,
@@ -553,18 +604,20 @@ async function buildGuestCartDetailed(): Promise<CartItemDetailed[]> {
       quantity: it.quantity ?? 1,
 
       businessId: stored?.businessId,
-      title: p?.title ?? "Untitled",
-      imageUrl: (v?.images?.[0] as string) || p?.coverImage || PLACEHOLDER_IMG,
-      label: v?.label ?? undefined,
-      color: v?.color ?? undefined,
-      sku: sizeObj?.sku ?? undefined,
+      title: p?.title ?? it.title ?? "Untitled",
+      imageUrl: (v?.images?.[0] as string) || it.imageUrl || p?.coverImage || PLACEHOLDER_IMG,
+      label: v?.label ?? it.label ?? undefined,
+      color: v?.color ?? it.color ?? undefined,
+      sku: sizeObj?.sku ?? it.sku ?? undefined,
       stock: toNum(sizeObj?.stock),
-      allowBackorder: v?.allowBackorder ?? false,
+      allowBackorder: v?.allowBackorder ?? it.allowBackorder ?? false,
 
       price,
       salePrice,
       discountEndDate: discountEndISO,
-      selectedSizePrice: price,
+      selectedSizePrice,
+      shippingType,
+      shippingCost,
 
       isSaleActive,
     };
@@ -597,10 +650,7 @@ export const getCartDetailed = async (): Promise<CartItemDetailed[]> => {
       const discountEndISO =
         it.discountEndDate ? new Date(it.discountEndDate).toISOString() : null;
 
-      const isSaleActive =
-        salePrice != null &&
-        discountEndISO != null &&
-        new Date(discountEndISO).getTime() > Date.now();
+      const isSaleActive = isSalePriceActive(salePrice, discountEndISO);
 
       return {
         productId: toId(it.productId),
@@ -668,10 +718,7 @@ function toLineItem(it: CartItemDetailed) {
   // choose effective price for the size/line
   const base = Number(it.price ?? it.selectedSizePrice ?? 0);
   const sale = it.salePrice != null ? Number(it.salePrice) : null;
-  const onSale =
-    sale != null &&
-    it.discountEndDate != null &&
-    new Date(it.discountEndDate).getTime() > Date.now();
+  const onSale = isSalePriceActive(sale, it.discountEndDate);
 
   return {
     productId: String(it.productId),
