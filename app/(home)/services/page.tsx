@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { Suspense, useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
 import CategoryGrid from "./components/CategoryGrid";
@@ -25,7 +25,7 @@ type ServicesListResponse = {
   limit?: number;
 };
 
-const ServicePage = () => {
+const ServicePageContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [searchText, setSearchText] = useState("");
@@ -232,6 +232,20 @@ const ServicePage = () => {
   );
 };
 
+function ServicePageFallback() {
+  return (
+    <main className="bg-white text-black">
+      <HeroSection heading="Services" imageUrl="/bgdetailpage.png" />
+      <section className="flex min-h-[320px] items-center justify-center px-4 py-10">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-[#C7A040] border-t-transparent" />
+          <p className="text-sm font-medium text-gray-600">Loading services...</p>
+        </div>
+      </section>
+    </main>
+  );
+}
+
 function FilterSection({ filters, onFiltersChange, onSearch, selectedCategory, onCategorySelect }: { 
   filters: PublicSearchFilters;
   onFiltersChange: (filters: PublicSearchFilters) => void;
@@ -252,4 +266,10 @@ function FilterSection({ filters, onFiltersChange, onSearch, selectedCategory, o
   );
 }
 
-export default ServicePage;
+export default function ServicePage() {
+  return (
+    <Suspense fallback={<ServicePageFallback />}>
+      <ServicePageContent />
+    </Suspense>
+  );
+}
