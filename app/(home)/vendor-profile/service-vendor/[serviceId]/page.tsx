@@ -2,8 +2,10 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import ClientTestimonials from "../../../Components/ClientTestimonials";
+import PublicSearchFilterBar from "../../../Components/PublicSearchFilterBar";
+import { buildSearchPageUrl, PublicSearchFilters } from "../../../Components/publicSearch";
 
 /* ─────────────── Types based on actual API response ─────────────── */
 type ServiceContact = {
@@ -243,6 +245,7 @@ function StarRating({ rating }: { rating: number }) {
 /* ─────────────── Main Page ─────────────── */
 export default function ServiceVendorProfilePage() {
   const params = useParams();
+  const router = useRouter();
   const serviceId = typeof params.serviceId === "string" ? params.serviceId : params.serviceId?.[0];
 
   const [data, setData] = useState<ReturnType<typeof normalizeData> | null>(null);
@@ -250,8 +253,11 @@ export default function ServiceVendorProfilePage() {
   const [error, setError] = useState<string | null>(null);
 
   /* filter / sort */
-  const [serviceType, setServiceType] = useState("");
-  const [locationFilter, setLocationFilter] = useState("");
+  const [filters, setFilters] = useState<PublicSearchFilters>({
+    keyword: "",
+    location: "",
+    minorityType: "",
+  });
   const [duration, setDuration] = useState("");
   const [sort, setSort] = useState("price_asc");
   const [badgeSrc, setBadgeSrc] = useState<string | null>(null);
@@ -290,8 +296,8 @@ export default function ServiceVendorProfilePage() {
   const sortedServices = useMemo(() => {
     if (!data) return [];
     let list = data.services.filter(s => {
-      const mtName = !serviceType || s.name.toLowerCase().includes(serviceType.toLowerCase());
-      const mtLoc = !locationFilter || (data.businessAddress || data.contact.address || "").toLowerCase().includes(locationFilter.toLowerCase());
+      const mtName = !filters.keyword || s.name.toLowerCase().includes(filters.keyword.toLowerCase());
+      const mtLoc = !filters.location || (data.businessAddress || data.contact.address || "").toLowerCase().includes(filters.location.toLowerCase());
       const mtDur = !duration || s.durationMinutes.toString().includes(duration);
       return mtName && mtLoc && mtDur;
     });
@@ -300,7 +306,7 @@ export default function ServiceVendorProfilePage() {
     else if (sort === "duration_asc") list.sort((a, b) => a.durationMinutes - b.durationMinutes);
     else if (sort === "duration_desc") list.sort((a, b) => b.durationMinutes - a.durationMinutes);
     return list;
-  }, [data, serviceType, locationFilter, duration, sort]);
+  }, [data, filters, duration, sort]);
 
   const estYear = data?.createdAt ? new Date(data.createdAt).getFullYear() : null;
 
@@ -412,41 +418,11 @@ export default function ServiceVendorProfilePage() {
 </div>
 
       {/* ── Filter Bar ── */}
-      <div className="w-full bg-[#1A1F71] py-5">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12">
-          <div className="flex flex-col md:flex-row gap-3 md:items-end">
-            <div className="flex-1">
-              <label className="block text-[12px] font-semibold text-white mb-1 font-poppins">Filter By Service Type</label>
-              <input value={serviceType} onChange={e => setServiceType(e.target.value)}
-                placeholder="Type Here" className="w-full h-9 px-3 text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-[#c79b44]" />
-            </div>
-            <div className="flex-1">
-              <label className="block text-[12px] font-semibold text-white mb-1 font-poppins">Filter By Location</label>
-              <select value={locationFilter} onChange={e => setLocationFilter(e.target.value)}
-                className="w-full h-9 px-3 text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-[#c79b44]">
-                <option value="">Choose Location</option>
-                <option value="new york">New York</option>
-                <option value="los angeles">Los Angeles</option>
-                <option value="chicago">Chicago</option>
-              </select>
-            </div>
-            <div className="flex-1">
-              <label className="block text-[12px] font-semibold text-white mb-1 font-poppins">Filter By Duration</label>
-              <select value={duration} onChange={e => setDuration(e.target.value)}
-                className="w-full h-9 px-3 text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-[#c79b44]">
-                <option value="">Select Duration</option>
-                <option value="30">30 Min</option>
-                <option value="60">60 Min</option>
-                <option value="90">90 Min</option>
-                <option value="120">2 Hours</option>
-              </select>
-            </div>
-            <button className="h-9 px-8 bg-[#c79b44] text-white text-sm font-semibold hover:bg-[#a87c30] transition-colors whitespace-nowrap">
-              Search Now
-            </button>
-          </div>
-        </div>
-      </div>
+      <PublicSearchFilterBar
+        filters={filters}
+        onChange={setFilters}
+        onSubmit={() => router.push(buildSearchPageUrl(filters))}
+      />
 
       {/* ── Main Content ── */}
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12 py-8">

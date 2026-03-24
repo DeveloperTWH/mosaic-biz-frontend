@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useEffect, useState } from 'react'
+import { useRouter } from "next/navigation";
 import HeroSection from './components/HeroSection';
 import FilterBar from '../services/components/FilterBar';
 import TabsHeadingSection from './components/TabsHeadingSection';
@@ -13,12 +14,27 @@ import axios from "axios";
 import Image from 'next/image';
 import JoinVendorBanner from './components/JoinVendorBanner';
 import BrowseFoods from '../Components/BrowseFoods';
+import PublicSearchFilterBar from '../Components/PublicSearchFilterBar';
+import { buildSearchPageUrl, DEFAULT_PUBLIC_SEARCH_FILTERS, PublicSearchFilters } from '../Components/publicSearch';
+
+type FoodsListResponse = {
+  success?: boolean;
+  data?: Service[];
+  total?: number;
+  page?: number;
+  totalPages?: number;
+  limit?: number;
+};
 
 const FoodSection = () => {
+  const router = useRouter();
   const [searchText, setSearchText] = useState("");
   const [minorityType, setMinorityType] = useState("");
   const [searchLocation, setSearchLocation] = useState("");
   const [services, setServices] = useState<Service[]>([]);
+  const [totalServices, setTotalServices] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [loading, setLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [subcategories, setSubcategories] = useState<SubCategory[]>([]);
@@ -28,12 +44,12 @@ const FoodSection = () => {
   const [priceMax, setPriceMax] = useState<number | undefined>();
 
   const handleSearch = () => {
-    console.log({
-      searchText,
+    router.push(buildSearchPageUrl({
+      keyword: searchText,
+      location: searchLocation,
       minorityType,
-      searchLocation,
-    });
-  }
+    }));
+  };
 
   const fetchFoods = async (categoryId?: string, subcategoryId?: string, badge?: string, priceMin?: number, priceMax?: number) => {
     setLoading(true);
@@ -53,10 +69,13 @@ const FoodSection = () => {
         params.price = `${priceMin}-${priceMax}`;
       }
 
-      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/food/list`, {
+      const res = await axios.get<FoodsListResponse>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/food/list`, {
         params,
       });
-      setServices(res.data.data);
+      setServices(Array.isArray(res.data.data) ? res.data.data : []);
+      setTotalServices(typeof res.data.total === "number" ? res.data.total : 0);
+      setCurrentPage(typeof res.data.page === "number" ? res.data.page : 1);
+      setItemsPerPage(typeof res.data.limit === "number" ? res.data.limit : Number(params.limit) || 10);
     } catch (err) {
       console.error(err);
     } finally {
@@ -90,15 +109,14 @@ const FoodSection = () => {
       <HeroSection heading={"Foods"} imageUrl="/bgdetailpage.png"  />
 
       <FilterSection onSearch={(filters) => {
-        console.log('Filter search triggered:', filters);
-        fetchFoods(selectedCategory?._id, selectedSubcategory || undefined);
+        router.push(buildSearchPageUrl(filters));
       }} selectedCategory={selectedCategory} onCategorySelect={(category) => {
         setSelectedCategory(category);
         setSelectedSubcategory("");
         fetchFoods(category._id, undefined);
       }} />
 
-      <BookServices services={services} selectedCategory={selectedCategory} loading={loading} onCategorySelect={(categoryId) => {
+      <BookServices services={services} totalProducts={totalServices} currentPage={currentPage} itemsPerPage={itemsPerPage} selectedCategory={selectedCategory} loading={loading} onCategorySelect={(categoryId) => {
         const categories = services.map(s => ({ _id: categoryId, name: '' } as Category));
         const category = categories.find(c => c._id === categoryId) || { _id: categoryId, name: '', description: '', createdAt: '', updatedAt: '', slug: '', __v: 0 } as Category;
         setSelectedCategory(category);
@@ -122,94 +140,15 @@ const FoodSection = () => {
 }
 
 function FilterSection({ onSearch, selectedCategory, onCategorySelect }: { 
-  onSearch?: (filters: { businessType: string; location: string; minority: string }) => void;
+  onSearch?: (filters: PublicSearchFilters) => void;
   selectedCategory?: Category | null;
   onCategorySelect?: (category: Category) => void;
 }) {
-  const [businessType, setBusinessType] = useState("");
-  const [location, setLocation] = useState("");
-  const [minority, setMinority] = useState("");
-
-  const handleSearch = () => {
-    console.log('Foods page search clicked with filters:', { businessType, location, minority, category: selectedCategory?.name });
-    onSearch?.({ businessType, location, minority });
-  };
+  const [filters, setFilters] = useState(DEFAULT_PUBLIC_SEARCH_FILTERS);
 
   return (
     <>
-      <div className="w-full bg-[#1A1F71] py-6 text-center text-white pb-10">
-        <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-12">
-          <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-6">
-            <div className="flex-[3] min-w-0">
-              <label className="block text-left text-[14px] font-medium text-white font-poppins">
-                Filter By Business Type
-              </label>
-              <input
-                type="text"
-                placeholder="Type Here"
-                value={businessType}
-                onChange={(e) => setBusinessType(e.target.value)}
-                className="w-full h-10 px-4 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-custom-orange text-xs font-poppins"
-              />
-            </div>
-
-            <div className="flex-[1] min-w-0">
-              <label className="block text-left text-[14px] font-medium text-white font-poppins">
-                Filter By Location
-              </label>
-              <div className="relative">
-                <select 
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  className="w-full h-10 px-4 text-gray-700 bg-white text-xs appearance-none focus:outline-none focus:ring-2 focus:ring-custom-orange text-[#5F5F5F] font-poppins">
-                  <option value="">Choose Location</option>
-                  <option value="ny">New York City</option>
-                  <option value="gc">Grand Canyon</option>
-                  <option value="sf"> San Francisco</option>
-                  <option value="ch">Chicago</option>
-                </select>
-                <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
-                  <svg className="w-full h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex-1 min-w-0">
-              <label className="block text-left text-[14px] font-medium text-white font-poppins">
-                Filter By Minority
-              </label>
-              <div className="relative">
-                <select 
-                  value={minority}
-                  onChange={(e) => setMinority(e.target.value)}
-                  className="w-full h-10 px-4 text-gray-700 bg-white text-xs appearance-none focus:outline-none focus:ring-2 focus:ring-custom-orange text-[#5F5F5F] font-poppins">
-                  <option value="">Choose Minority</option>
-                  <option value="african-american">African-American</option>
-                  <option value="asian">Asian</option>
-                  <option value="latinx">LatinX</option>
-                  <option value="woman">Woman</option>
-                  <option value="disabled-veteran">Disabled Veteran</option>
-                </select>
-                <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
-                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex-1 min-w-0">
-              <button 
-                onClick={handleSearch}
-                className="w-full h-10 text-sm text-white font-xs text-gray-800 bg-[#C7A040] hover:bg-yellow-500 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-600 flex items-center justify-center gap-2 font-montserrat">
-                Search Here
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <PublicSearchFilterBar filters={filters} onChange={setFilters} onSubmit={() => onSearch?.(filters)} />
 
       <BrowseFoods onCategorySelect={onCategorySelect} />
     </>

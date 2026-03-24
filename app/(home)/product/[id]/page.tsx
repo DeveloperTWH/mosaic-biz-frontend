@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import axios from "axios";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Heart, ChevronDown } from "lucide-react";
 import SimilarProduct from "./Component/SimilarProduct";
@@ -11,10 +11,13 @@ import { toast } from 'react-toastify';
 import {
   addToCart,
   getCart,
+  getCartDetailed,
   updateCartQuantity,
   removeFromCart,
 } from '@/utils/cartUtils';
 import { toggleWishlist, isProductWishlisted } from '@/utils/wishlistUtils';
+import PublicSearchFilterBar from "../../Components/PublicSearchFilterBar";
+import { buildSearchPageUrl, PublicSearchFilters } from "../../Components/publicSearch";
 
 const getAttributeGroups = (variants: Variant[]): Map<string, Set<string>> => {
   const attributeMap = new Map<string, Set<string>>();
@@ -56,6 +59,7 @@ const getAvailableOptions = (
 
 export default function ProductDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const id = typeof params.id === 'string' ? params.id : params.id?.[0];
   const [product, setProduct] = useState<ProductDetailItem | null>(null);
   const [liked, setLiked] = useState(false);
@@ -66,10 +70,13 @@ export default function ProductDetailPage() {
   const [loadingQty, setLoadingQty] = useState<boolean>(false);
   const [isBlocking, setIsBlocking] = useState(false);
   const [attributeGroups, setAttributeGroups] = useState<Map<string, Set<string>>>(new Map());
-  const [businessType, setBusinessType] = useState("");
-  const [location, setLocation] = useState("");
-  const [minority, setMinority] = useState("");
+  const [filters, setFilters] = useState<PublicSearchFilters>({
+    keyword: "",
+    location: "",
+    minorityType: "",
+  });
   const [selectedShipping, setSelectedShipping] = useState<'standard' | 'overnight' | 'local'>('standard');
+  const [showVendorSwitchDialog, setShowVendorSwitchDialog] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -153,17 +160,6 @@ setMainImage(firstImage);
     }
   }, [product?._id, selectedVariant?.variantId]);
 
-  if (!product) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="flex flex-col items-center gap-4 text-center">
-          <div className="w-12 h-12 border-4 border-[#c79b44] rounded-full border-t-transparent animate-spin" />
-          <p className="text-sm font-medium text-gray-600">Loading product details...</p>
-        </div>
-      </div>
-    );
-  }
-
   const calculatePrice = () => {
     if (!selectedVariant) return { current: 0, original: 0, discount: 0, onSale: false };
     const base = Number(selectedVariant.price) || 0;
@@ -184,6 +180,7 @@ setMainImage(firstImage);
   const price = calculatePrice();
 
   const getSellerName = (): string => {
+    if (!product) return "Unknown Seller";
     if (product.businessId && typeof product.businessId === 'object' && 'businessName' in product.businessId)
       return (product.businessId as BusinessInfo).businessName;
     if (product.business && typeof product.business === 'object' && 'businessName' in product.business)
@@ -192,6 +189,7 @@ setMainImage(firstImage);
   };
 
   const getBusinessId = (): string => {
+    if (!product) return '';
     if (product.businessId && typeof product.businessId === 'object' && '_id' in product.businessId)
       return (product.businessId as BusinessInfo)._id;
     if (typeof product.businessId === 'string') return product.businessId;
@@ -214,7 +212,7 @@ setMainImage(firstImage);
   const sellerBusinessId = getBusinessId();
 
   const handleSearch = () => {
-    console.log('Filter search triggered:', { businessType, location, minority });
+    router.push(buildSearchPageUrl(filters));
   };
 
   const productImages = [
@@ -244,6 +242,85 @@ setMainImage(firstImage);
     local: selectedVariant?.shipping?.local ?? product?.shipping?.local ?? 0
   };
 
+  const performAddToCart = useCallback(async () => {
+    if (!product || isBlocking || !selectedVariant?.variantId) {
+      toast.error('Variant information is missing');
+      return;
+    }
+
+    setIsBlocking(true);
+    try {
+      const sizeValue = selectedVariant.attributes?.size || selectedVariant.attributes?.Size || 'default';
+      const basePrice = toNumber(selectedVariant.price);
+      const variantSalePrice =
+        selectedVariant.salePrice == null ? null : toNumber(selectedVariant.salePrice);
+      const discountEndDate = selectedVariant.discountEndDate ?? null;
+      const saleActive =
+        variantSalePrice != null &&
+        (!discountEndDate || new Date(discountEndDate).getTime() > Date.now());
+      const res = await addToCart(
+        product._id,
+        selectedVariant.variantId,
+        sizeValue,
+        1,
+        getBusinessId(),
+        {
+          price: basePrice,
+          salePrice: variantSalePrice,
+          discountEndDate,
+          selectedSizePrice: saleActive ? variantSalePrice ?? basePrice : basePrice,
+          shippingType: selectedShipping,
+          shippingCost: toNumber(resolvedShipping[selectedShipping]),
+          imageUrl: selectedVariant.images?.[0] || product.coverImage,
+          color: selectedVariant.attributes?.Color || selectedVariant.attributes?.color,
+          stock: selectedVariant.stock,
+          allowBackorder: selectedVariant.allowBackorder ?? false,
+          title: product.title,
+          sku: selectedVariant.sku,
+        }
+      );
+      if (res?.reset) toast.info('Your cart was switched to this store.');
+      setCartQty(1);
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to add to cart.');
+    } finally {
+      setIsBlocking(false);
+    }
+  }, [isBlocking, product, resolvedShipping, selectedShipping, selectedVariant]);
+
+  const handleAddToCartClick = useCallback(async () => {
+    if (isBlocking || !selectedVariant?.variantId) {
+      toast.error('Variant information is missing');
+      return;
+    }
+
+    try {
+      const cartItems = await getCartDetailed();
+      const currentBusinessId = getBusinessId();
+      const existingBusinessId = cartItems.find((item) => item.businessId)?.businessId;
+
+      if (cartItems.length > 0 && existingBusinessId && existingBusinessId !== currentBusinessId) {
+        setShowVendorSwitchDialog(true);
+        return;
+      }
+
+      await performAddToCart();
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to check cart.');
+    }
+  }, [isBlocking, performAddToCart, selectedVariant]);
+
+  if (!product) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <div className="w-12 h-12 border-4 border-[#c79b44] rounded-full border-t-transparent animate-spin" />
+          <p className="text-sm font-medium text-gray-600">Loading product details...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
@@ -263,76 +340,7 @@ setMainImage(firstImage);
       </div>
 
       {/* Filter Section */}
-      <div className="w-full bg-[#1A1F71] py-6 text-center text-white pb-10">
-        <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-12">
-          <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-6">
-            <div className="flex-[3] min-w-0">
-              <label className="block text-left text-[14px] font-medium text-white font-poppins">
-                Filter By Business Type
-              </label>
-              <input
-                type="text"
-                placeholder="Type Here"
-                value={businessType}
-                onChange={(e) => setBusinessType(e.target.value)}
-                className="w-full h-10 px-4 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-custom-orange text-xs font-poppins"
-              />
-            </div>
-
-            <div className="flex-[1] min-w-0">
-              <label className="block text-left text-[14px] font-medium text-white font-poppins">
-                Filter By Location
-              </label>
-              <div className="relative">
-                <select 
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  className="w-full h-10 px-4 text-gray-700 bg-white text-xs appearance-none focus:outline-none focus:ring-2 focus:ring-custom-orange text-[#5F5F5F] font-poppins">
-                  <option value="">Choose Location</option>
-                  <option value="ny">New York City</option>
-                </select>
-                <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
-                  <svg className="w-full h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex-1 min-w-0">
-              <label className="block text-left text-[14px] font-medium text-white font-poppins">
-                Filter By Minority
-              </label>
-              <div className="relative">
-                <select 
-                  value={minority}
-                  onChange={(e) => setMinority(e.target.value)}
-                  className="w-full h-10 px-4 text-gray-700 bg-white text-xs appearance-none focus:outline-none focus:ring-2 focus:ring-custom-orange text-[#5F5F5F] font-poppins">
-                  <option value="">Choose Minority</option>
-                  <option value="african-american">African-American</option>
-                  <option value="asian">Asian</option>
-                  <option value="latinx">LatinX</option>
-                  <option value="woman">Woman</option>
-                  <option value="disabled-veteran">Disabled Veteran</option>
-                </select>
-                <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
-                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex-1 min-w-0">
-              <button 
-                onClick={handleSearch}
-                className="w-full h-10 text-sm text-white font-xs text-gray-800 bg-[#C7A040] hover:bg-yellow-500 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-600 flex items-center justify-center gap-2 font-montserrat">
-                Search Here
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <PublicSearchFilterBar filters={filters} onChange={setFilters} onSubmit={handleSearch} />
 
       {/* Blocking overlay */}
       {(isBlocking || loadingQty) && (
@@ -340,6 +348,37 @@ setMainImage(firstImage);
           <div className="flex items-center gap-3 px-4 py-3 bg-white rounded-lg shadow">
             <span className="w-5 h-5 border-2 border-[#c79b44] rounded-full border-t-transparent animate-spin" />
             <span className="text-sm font-medium text-gray-700">Loading…</span>
+          </div>
+        </div>
+      )}
+
+      {showVendorSwitchDialog && (
+        <div className="fixed inset-0 z-[1100] flex items-center justify-center bg-black/45 px-4">
+          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
+            <h2 className="text-xl font-semibold text-gray-900">You&apos;re adding a product from a different vendor.</h2>
+            <p className="mt-4 text-sm leading-6 text-gray-600">
+              Your current cart contains items from another vendor and will be cleared if you continue.
+            </p>
+            <p className="mt-2 text-sm font-medium text-gray-800">Do you want to proceed?</p>
+            <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-center">
+              <button
+                type="button"
+                onClick={() => setShowVendorSwitchDialog(false)}
+                className="min-w-[140px] rounded-md border border-gray-300 px-6 py-3 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  setShowVendorSwitchDialog(false);
+                  await performAddToCart();
+                }}
+                className="min-w-[140px] rounded-md bg-[#1e3a5f] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#152a45]"
+              >
+                I Agree
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -608,45 +647,7 @@ setMainImage(firstImage);
                 <button
                   className="flex-1 py-2.5 font-semibold text-white bg-[#1e3a5f] rounded hover:bg-[#152a45] disabled:opacity-60 disabled:cursor-not-allowed transition-colors text-sm uppercase tracking-wide"
                   disabled={isBlocking || loadingQty || !isVariantSelected() || Boolean(selectedVariant && selectedVariant.stock <= 0)}
-                  onClick={async () => {
-                    if (isBlocking || !selectedVariant?.variantId) { toast.error('Variant information is missing'); return; }
-                    setIsBlocking(true);
-                    try {
-                      const sizeValue = selectedVariant.attributes?.size || selectedVariant.attributes?.Size || 'default';
-                      const basePrice = toNumber(selectedVariant.price);
-                      const variantSalePrice =
-                        selectedVariant.salePrice == null ? null : toNumber(selectedVariant.salePrice);
-                      const discountEndDate = selectedVariant.discountEndDate ?? null;
-                      const saleActive =
-                        variantSalePrice != null &&
-                        (!discountEndDate || new Date(discountEndDate).getTime() > Date.now());
-                      const res = await addToCart(
-                        product._id,
-                        selectedVariant.variantId,
-                        sizeValue,
-                        1,
-                        getBusinessId(),
-                        {
-                          price: basePrice,
-                          salePrice: variantSalePrice,
-                          discountEndDate,
-                          selectedSizePrice: saleActive ? variantSalePrice ?? basePrice : basePrice,
-                          shippingType: selectedShipping,
-                          shippingCost: toNumber(resolvedShipping[selectedShipping]),
-                          imageUrl: selectedVariant.images?.[0] || product.coverImage,
-                          color: selectedVariant.attributes?.Color || selectedVariant.attributes?.color,
-                          stock: selectedVariant.stock,
-                          allowBackorder: selectedVariant.allowBackorder ?? false,
-                          title: product.title,
-                          sku: selectedVariant.sku,
-                        }
-                      );
-                      if (res?.reset) toast.info('Your cart was switched to this store.');
-                      setCartQty(1);
-                    } catch (err: any) {
-                      toast.error(err?.message || 'Failed to add to cart.');
-                    } finally { setIsBlocking(false); }
-                  }}
+                  onClick={handleAddToCartClick}
                 >
                   {!isVariantSelected() ? 'Select Options' : selectedVariant && selectedVariant.stock <= 0 ? 'Out of Stock' : 'Add To Cart'}
                 </button>

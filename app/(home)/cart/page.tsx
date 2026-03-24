@@ -24,6 +24,7 @@ type CartItem = {
     allowBackorder?: boolean;
     title?: string;
     sku?: string;
+    isSaleActive?: boolean;
 
 };
 
@@ -204,7 +205,7 @@ export default function CartPage() {
                                 }`}
                             onClick={() => setSelectedTab("product")}
                         >
-                            Mosaic biz hub ({itemsProduct.length})
+                            Items  ({itemsProduct.length})
                         </button>
                         {/* <button
                             className={`sm:p-5 p-2 pt-3 sm:text-lg text-sm font-semibold ${selectedTab === "food" ? "border-b-4 border-blue-500" : "text-gray-800"
@@ -227,153 +228,145 @@ export default function CartPage() {
                     />
 
                     {/* Cart Items */}
-                    {selectedTab === "product" ? (
-                        <div className="mt-6 space-y-6 bg-white">
-                            {itemsProduct.length === 0 ? (
-                                <div className="p-8 text-center text-gray-600">Your cart is empty.</div>
-                            ) : (
-                                itemsProduct.map((item) => (
-                                    <div
-                                        key={`${item.productId}-${item.variantId}-${item.size}`}
-                                        className="p-4 rounded-md"
-                                    >
-                                        <div className="flex items-center gap-4">
-                                            <img
-                                                className="object-contain w-20 h-20 rounded bg-gray-50"
-                                                src={item.imageUrl || "/placeholder.png"}
-                                                alt={item.title || "Product"}
-                                            />
-                                            <div className="flex flex-col justify-between">
-                                                <div className="font-semibold text-gray-800">
-                                                    {item.title || "Product"}
-                                                </div>
-                                                <div className="text-xs text-gray-500">
-                                                    {item.label ? `${item.label}: ` : ""}
-                                                    {item.size}
-                                                    {item.color ? ` · ${item.color}` : ""}
-                                                    {/* {item.sku ? ` · SKU: ${item.sku}` : ""} */}
-                                                </div>
+{selectedTab === "product" ? (
+  <div className="mt-6 space-y-6 bg-white">
+    {itemsProduct.length === 0 ? (
+      <div className="p-8 text-center text-gray-600">
+        Your cart is empty.
+      </div>
+    ) : (
+      itemsProduct.map((item) => (
+        <div
+          key={`${item.productId}-${item.variantId}-${item.size}`}
+          className="p-4 border border-gray-200 rounded-md"
+        >
+          {/* TOP ROW */}
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex gap-4 min-w-0">
+              {/* IMAGE */}
+              <img
+                className="object-contain w-20 h-20 rounded bg-gray-50 flex-shrink-0"
+                src={item.imageUrl || "/placeholder.png"}
+                alt={item.title || "Product"}
+              />
 
-                                                <div className="flex items-center gap-2 mt-5">
-                                                    {(() => {
-                                                        const base = Number(item.price ?? item.selectedSizePrice ?? 0);
-                                                        const sale = item.salePrice != null ? Number(item.salePrice) : null;
-                                                        const saleActive =
-                                                            (item as any).isSaleActive ??
-                                                            isSaleActive(sale, item.discountEndDate);
+              {/* INFO */}
+              <div className="min-w-0">
+                <div className="font-semibold text-gray-800 truncate">
+                  {item.title || "Product"}
+                </div>
 
-                                                        if (saleActive && sale != null && sale < base) {
-                                                            const pct = base > 0 ? Math.round(((base - sale) / base) * 100) : 0;
-                                                            return (
-                                                                <div className="flex flex-col">
-                                                                    <div className="flex items-center gap-2">
-                                                                        <span className="text-base text-gray-800">${sale.toFixed(2)}</span>
-                                                                        <span className="text-sm text-gray-400 line-through">${base.toFixed(2)}</span>
-                                                                        {pct > 0 && <span className="text-sm text-green-600">{pct}% OFF</span>}
-                                                                    </div>
-                                                                    {item.discountEndDate && (
-                                                                        <div className="text-xs text-gray-500">
-                                                                            Offer valid till {new Date(item.discountEndDate).toLocaleDateString()}
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-                                                            );
-                                                        }
+                <div className="text-xs text-gray-500">
+                  {item.label ? `${item.label}: ` : ""}
+                  {item.size}
+                  {item.color ? ` · ${item.color}` : ""}
+                </div>
 
-                                                        const effective = Number(item.selectedSizePrice ?? base);
-                                                        return <span className="text-base text-gray-800">${effective.toFixed(2)}</span>;
-                                                    })()}
-                                                </div>
-                                                {item.shippingType && (
-                                                    <div className="mt-2 text-xs text-gray-500">
-                                                        Shipping: {(item.shippingType || "standard").replace(/^./, (c) => c.toUpperCase())} ${Number(item.shippingCost).toFixed(2)}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
+                {/* PRICE */}
+                <div className="mt-2">
+                  {(() => {
+                    const base = Number(item.price ?? item.selectedSizePrice ?? 0);
+                    const sale = item.salePrice != null ? Number(item.salePrice) : null;
+                    const saleActive =
+                      item.isSaleActive ??
+                      isSaleActive(sale, item.discountEndDate);
 
-                                        <div className="flex items-center justify-between mt-5">
-                                            <div className="flex items-center space-x-2">
-                                                <button
-                                                    onClick={() => dec(item)}
-                                                    className="px-3 py-1 text-lg bg-gray-200 rounded-md"
-                                                >
-                                                    -
-                                                </button>
-                                                <div className="text-sm">{item.quantity}</div>
-                                                <button
-                                                    onClick={() => inc(item)}
-                                                    className="px-3 py-1 text-lg bg-gray-200 rounded-md"
-                                                >
-                                                    +
-                                                </button>
-                                            </div>
+                    if (saleActive && sale != null && sale < base) {
+                      const pct =
+                        base > 0
+                          ? Math.round(((base - sale) / base) * 100)
+                          : 0;
 
-                                            <div className="text-sm font-semibold text-gray-800">
-                                                ${((Number(item.selectedSizePrice) || 0) * (item.quantity || 0)).toFixed(2)}
-                                            </div>
-
-                                            <button
-                                                onClick={() => removeLine(item)}
-                                                className="px-3 py-1 text-sm text-red-600 border border-red-200 rounded hover:bg-red-50"
-                                            >
-                                                Remove
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))
-                            )}
+                      return (
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-base text-gray-800">
+                            ${sale.toFixed(2)}
+                          </span>
+                          <span className="text-sm text-gray-400 line-through">
+                            ${base.toFixed(2)}
+                          </span>
+                          {pct > 0 && (
+                            <span className="text-sm text-green-600">
+                              {pct}% OFF
+                            </span>
+                          )}
                         </div>
-                    ) : (
-                        <div className="mt-6 space-y-6 bg-white">
-                            {itemsFood.length === 0 ? (
-                                <div className="p-8 text-center text-gray-600">
-                                    Grocery cart is empty.
-                                </div>
-                            ) : (
-                                itemsFood.map((item) => (
-                                    <div
-                                        key={item.sku || `${item.productId}-${item.variantId}-${item.size}`}
-                                        className="flex items-center justify-between p-4 border border-gray-200 rounded-md"
-                                    >
-                                        <div className="flex items-center">
-                                            <img
-                                                className="object-cover w-16 h-16"
-                                                src={item.imageUrl || "/placeholder.png"}
-                                                alt={item.title || "Item"}
-                                            />
-                                            <div className="ml-4">
-                                                <div className="font-medium text-gray-800">
-                                                    {item.title || "Item"}
-                                                </div>
-                                                <div className="text-xs text-gray-500">
-                                                    {item.size}{item.color ? ` · ${item.color}` : ""}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="text-sm text-gray-800">
-                                            ${Number(item.selectedSizePrice || 0).toFixed(2)}
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                            <button
-                                                onClick={() => dec(item)}
-                                                className="px-2 py-1 bg-gray-200 rounded-full"
-                                            >
-                                                -
-                                            </button>
-                                            <div className="text-sm">{item.quantity}</div>
-                                            <button
-                                                onClick={() => inc(item)}
-                                                className="px-2 py-1 bg-gray-200 rounded-full"
-                                            >
-                                                +
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))
-                            )}
-                        </div>
-                    )}
+                      );
+                    }
+
+                    return (
+                      <span className="text-base text-gray-800">
+                        ${base.toFixed(2)}
+                      </span>
+                    );
+                  })()}
+                </div>
+              </div>
+            </div>
+
+            {/* REMOVE BUTTON */}
+            <button
+              onClick={() => removeLine(item)}
+              className="text-xs text-red-600 whitespace-nowrap"
+            >
+              Remove
+            </button>
+          </div>
+
+          {/* BOTTOM ROW */}
+          <div className="flex items-center justify-between mt-4">
+            {/* SHIPPING */}
+            <div className="text-xs text-gray-500">
+              {item.shippingType && (
+                <>
+                  Shipping:{" "}
+                  {(item.shippingType || "standard").replace(/^./, (c) =>
+                    c.toUpperCase()
+                  )}{" "}
+                  ${Number(item.shippingCost).toFixed(2)}
+                </>
+              )}
+            </div>
+
+            {/* RIGHT SIDE */}
+            <div className="flex items-center gap-6">
+              {/* QUANTITY */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => dec(item)}
+                  className="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-full"
+                  disabled={item.quantity <= 1}
+                >
+                  -
+                </button>
+
+                <div className="text-sm w-6 text-center">
+                  {item.quantity}
+                </div>
+
+                <button
+                  onClick={() => inc(item)}
+                  className="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-full"
+                >
+                  +
+                </button>
+              </div>
+
+              {/* TOTAL */}
+              {/* <div className="text-sm font-semibold text-gray-800 min-w-[70px] text-right">
+                $
+                {(
+                  (Number(item.selectedSizePrice) || 0) *
+                  (item.quantity || 0)
+                ).toFixed(2)}
+              </div> */}
+            </div>
+          </div>
+        </div>
+      ))
+    )}
+  </div>
+) : null}
                 </div>
 
                 {/* Price Details */}
@@ -395,10 +388,10 @@ export default function CartPage() {
                                     <div>${shippingTotalProduct.toFixed(2)}</div>
                                 </div>
 
-                                <div className="flex justify-between pt-2 pb-2 mt-4 text-lg text-gray-800 border-t-2 border-b-2 border-gray-200">
+                                {/* <div className="flex justify-between pt-2 pb-2 mt-4 text-lg text-gray-800 border-t-2 border-b-2 border-gray-200">
                                     <div>Subtotal</div>
                                     <div>${subtotalProduct.toFixed(2)}</div>
-                                </div>
+                                </div> */}
 
                                 <div className="flex justify-between mt-4 text-lg font-semibold text-gray-900">
                                     <div>Total</div>

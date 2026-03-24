@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import { Service } from "@/types/service";
 import { Category } from "@/types/Category";
-import Image from "next/image";
-import Link from "next/link";
 import FilterAccordion from "./FilterAccordion";
 import ProductCard from "./ProductCard";
 
@@ -19,46 +17,45 @@ interface BookServicesProps {
   onPriceChange?: (min: number, max: number) => void;
 }
 
-const BookServices: React.FC<BookServicesProps> = ({ 
-  services, 
-  totalProducts = 72,
+const BookServices: React.FC<BookServicesProps> = ({
+  services,
+  totalProducts = 0,
   currentPage = 1,
-  itemsPerPage = 40,
+  itemsPerPage = 10,
   selectedCategory,
   loading = false,
   onCategorySelect,
   onSubcategorySelect,
   onBadgeSelect,
-  onPriceChange
+  onPriceChange,
 }) => {
   const [selectedFilters, setSelectedFilters] = useState({
     category: "",
     subCategory: "",
-    badge: ""
+    badge: "",
   });
 
-  const startItem = (currentPage - 1) * itemsPerPage + 1;
-  const endItem = Math.min(currentPage * itemsPerPage, totalProducts);
+  const startItem = totalProducts > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0;
+  const endItem = totalProducts > 0 ? Math.min(startItem + services.length - 1, totalProducts) : 0;
 
   const handleFilterChange = (filterType: keyof typeof selectedFilters, value: string) => {
-    setSelectedFilters(prev => ({
+    setSelectedFilters((prev) => ({
       ...prev,
-      [filterType]: prev[filterType] === value ? "" : value
+      [filterType]: prev[filterType] === value ? "" : value,
     }));
   };
 
   return (
     <section className="px-4 py-8 mx-auto max-w-7xl sm:px-6">
-       
       <div className="flex flex-col lg:flex-row gap-6">
-
-        {/* Left Sidebar - Filters */}
         <div className="lg:w-1/4">
           <div className="space-y-6">
-            <FilterAccordion 
+            <FilterAccordion
               selectedCategory={selectedCategory}
               onFilterChange={(category, subCategory) => {
-                console.log('Food filter clicked:', category, subCategory);
+                console.log("Food filter clicked:", category, subCategory);
+                handleFilterChange("category", category);
+                handleFilterChange("subCategory", subCategory);
               }}
               onCategorySelect={onCategorySelect}
               onSubcategorySelect={onSubcategorySelect}
@@ -68,17 +65,12 @@ const BookServices: React.FC<BookServicesProps> = ({
           </div>
         </div>
 
-        {/* Right Content - Services Grid */}
         <div className="lg:w-3/4">
-    
-          {/* Products Count - Compact */}
           <div className="flex mb-4 flex-row justify-between">
-   
             <p className="text-sm text-gray-600">
-              (Showing {startItem} – {endItem} Products Of {totalProducts} Products)
+              (Showing {startItem} - {endItem} foods Of {totalProducts} foods)
             </p>
 
-            {/* Sort By Section - Compact */}
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-700">Sort By:</span>
               <select className="px-3 py-1 text-sm border rounded cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
@@ -89,10 +81,8 @@ const BookServices: React.FC<BookServicesProps> = ({
                 <option>Newest</option>
               </select>
             </div>
-              
           </div>
 
-          {/* Services Grid - Compact Cards */}
           {loading ? (
             <div className="flex justify-center items-center h-64">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1A1F71]"></div>
@@ -100,22 +90,19 @@ const BookServices: React.FC<BookServicesProps> = ({
           ) : services.length === 0 ? (
             <p className="text-center text-gray-600">No services found.</p>
           ) : (
-            <>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {services.map((service) => (
-<ProductCard
-  key={service._id}
-  foodId={service._id}
-  image={service.coverImage}
-  businessName={service.businessId?.businessName || service.title}
-  businessDescription={service.businessId?.description || service.description || "No description available"}
-  badge={service.businessId?.badge || (service as any).badge}
-  logo={service.businessId?.logo} // optional if you have a logo field
-/>
-                ))}
-              </div> 
-
-            </>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {services.map((service) => (
+                <ProductCard
+                  key={service._id}
+                  foodId={service._id}
+                  image={service.coverImage}
+                  businessName={service.businessId?.businessName || service.title}
+                  businessDescription={service.businessId?.description || service.description || "No description available"}
+                  badge={service.businessId?.badge || (service as any).badge}
+                  logo={service.businessId?.logo}
+                />
+              ))}
+            </div>
           )}
         </div>
       </div>

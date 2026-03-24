@@ -1,8 +1,7 @@
 "use client"
 import React, { useState, useEffect } from 'react'
 import axios from "axios"
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import FilterBar from "./components/FilterBar";
+import { useRouter } from "next/navigation";
 import HeroSection from "./components/HeroSection";
 import CategoryGrid from './components/CategoryGrid';
 import FeaturedProducts from './components/FeaturedProducts';
@@ -16,6 +15,8 @@ import BrowseCategories from './components/BrowsCategories';
 import FilterAccordion from './components/FilterAccordion';
 import { Category, SubCategory, SubCategoryResponse, CategoryResponse } from '@/types/Category';
 import Link from 'next/link';
+import PublicSearchFilterBar from "../Components/PublicSearchFilterBar";
+import { buildSearchPageUrl, PublicSearchFilters } from "../Components/publicSearch";
 
 type MinorityType = { _id: string; name: string };
 
@@ -61,8 +62,6 @@ const HorizontalLine = () => {
 
 const Page = () => {
     const router = useRouter();
-    const searchParams = useSearchParams();
-    const pathname = usePathname();
 
     const [searchText, setSearchText] = useState("");
     const [minorityType, setMinorityType] = useState("");
@@ -153,17 +152,12 @@ const Page = () => {
     };
 
     const handleSearch = () => {
-        const params = new URLSearchParams();
-        if (searchText) params.set("q", searchText);
-        if (searchLocation) params.set("city", searchLocation);
-
-        if (minorityType) {
-            const mt = minorityTypes.find((t: MinorityType) => String(t._id) === String(minorityType));
-            const nameOrId = mt?.name || minorityType;
-            params.set("minorityType", nameOrId);
-        }
-
-        router.push(`${pathname}?${params.toString()}`);
+        const mt = minorityTypes.find((t: MinorityType) => String(t._id) === String(minorityType));
+        router.push(buildSearchPageUrl({
+            keyword: searchText,
+            location: searchLocation,
+            minorityType: mt?.name || minorityType,
+        }));
     };
 
     const [services, setServices] = useState<Service[]>([]);
@@ -186,35 +180,29 @@ const Page = () => {
     };
 
     useEffect(() => {
-        const q = searchParams.get("q") || "";
-        const mRaw = searchParams.get("minorityType") || "";
-        const c = searchParams.get("city") || "";
-
-        const isHex24 = /^[a-f\d]{24}$/i.test(mRaw);
-        let mResolved = mRaw;
-        if (mRaw && !isHex24) {
-            const match = minorityTypes.find((t: MinorityType) => String(t.name).toLowerCase() === String(mRaw).toLowerCase());
-            mResolved = match?._id ? String(match._id) : "";
-        }
-
-        if (q !== searchText) setSearchText(q);
-        if (mResolved !== minorityType) setMinorityType(mResolved);
-        if (c !== searchLocation) setSearchLocation(c);
-
-        fetchProducts(q, mResolved, c);
-        fetchServices()
-    }, [searchParams, minorityTypes]);
+        fetchProducts();
+        fetchServices();
+    }, []);
 
     return (
         <div>
             <HeroSection heading="Services" imageUrl="/bgdetailpage.png" />
             
             <FilterSection 
-                onSearch={(filters) => {
-                    console.log('Filter search triggered:', filters);
+                filters={{
+                    keyword: searchText,
+                    location: searchLocation,
+                    minorityType,
+                }}
+                onFiltersChange={(filters) => {
+                    setSearchText(filters.keyword);
+                    setSearchLocation(filters.location);
+                    setMinorityType(filters.minorityType);
+                }}
+                onSearch={() => {
                     setLoading(true);
-                    fetchProducts(filters.businessType, filters.minority, filters.location);
-                }} 
+                    handleSearch();
+                }}
                 selectedCategory={selectedCategory} 
                 onCategorySelect={(category) => {
                     setSelectedCategory(category);
@@ -332,105 +320,16 @@ const Page = () => {
     )
 }
 
-function FilterSection({ onSearch, selectedCategory, onCategorySelect }: { 
-    onSearch?: (filters: { businessType: string; location: string; minority: string }) => void;
+function FilterSection({ filters, onFiltersChange, onSearch, selectedCategory, onCategorySelect }: { 
+    filters: PublicSearchFilters;
+    onFiltersChange: (filters: PublicSearchFilters) => void;
+    onSearch?: () => void;
     selectedCategory?: Category | null;
     onCategorySelect?: (category: Category) => void;
 }) {
-    const [businessType, setBusinessType] = useState("");
-    const [location, setLocation] = useState("");
-    const [minority, setMinority] = useState("");
-
-    const fetchSubcategories = async (categoryId: string) => {
-        try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/products/subcategories/${categoryId}`);
-            const data: SubCategoryResponse = await response.json();
-        } catch (err) {
-            console.error('Error fetching subcategories:', err);
-        }
-    };
-
-    const handleCategorySelect = (category: Category) => {
-        fetchSubcategories(category._id);
-    };
-
-    const handleSearch = () => {
-        console.log('Products page search clicked with filters:', { businessType, location, minority, category: selectedCategory?.name });
-        onSearch?.({ businessType, location, minority });
-    };
-
     return (
         <>
-            <div className="w-full bg-[#1A1F71] py-6 text-center text-white pb-10">
-                <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-12">
-                    <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-6">
-                        <div className="flex-[3] min-w-0">
-                            <label className="block text-left text-[14px] font-medium text-white font-poppins">
-                                Filter By Business Type
-                            </label>
-                            <input
-                                type="text"
-                                placeholder="Type Here"
-                                value={businessType}
-                                onChange={(e) => setBusinessType(e.target.value)}
-                                className="w-full h-10 px-4 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-custom-orange text-xs font-poppins"
-                            />
-                        </div>
-
-                        <div className="flex-[1] min-w-0">
-                            <label className="block text-left text-[14px] font-medium text-white font-poppins">
-                                Filter By Location
-                            </label>
-                            <div className="relative">
-                                <select 
-                                    value={location}
-                                    onChange={(e) => setLocation(e.target.value)}
-                                    className="w-full h-10 px-4 text-gray-700 bg-white text-xs appearance-none focus:outline-none focus:ring-2 focus:ring-custom-orange text-[#5F5F5F] font-poppins">
-                                    <option value="">Choose Location</option>
-                                    <option value="ny">New York City</option>
-                                </select>
-                                <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
-                                    <svg className="w-full h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="flex-1 min-w-0">
-                            <label className="block text-left text-[14px] font-medium text-white font-poppins">
-                                Filter By Minority
-                            </label>
-                            <div className="relative">
-                                <select 
-                                    value={minority}
-                                    onChange={(e) => setMinority(e.target.value)}
-                                    className="w-full h-10 px-4 text-gray-700 bg-white text-xs appearance-none focus:outline-none focus:ring-2 focus:ring-custom-orange text-[#5F5F5F] font-poppins">
-                                    <option value="">Choose Minority</option>
-                                    <option value="african-american">African-American</option>
-                                    <option value="asian">Asian</option>
-                                    <option value="latinx">LatinX</option>
-                                    <option value="woman">Woman</option>
-                                    <option value="disabled-veteran">Disabled Veteran</option>
-                                </select>
-                                <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
-                                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="flex-1 min-w-0">
-                            <button 
-                                onClick={handleSearch}
-                                className="w-full h-10 text-sm text-white font-xs text-gray-800 bg-[#C7A040] hover:bg-yellow-500 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-600 flex items-center justify-center gap-2 font-montserrat">
-                                Search Here
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <PublicSearchFilterBar filters={filters} onChange={onFiltersChange} onSubmit={() => onSearch?.()} />
 
             <BrowseCategories onCategorySelect={onCategorySelect} />
         </>

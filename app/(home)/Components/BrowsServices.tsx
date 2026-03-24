@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
@@ -13,15 +14,21 @@ import "swiper/css/navigation";
 interface BrowseServicesProps {
   showAllService: boolean;
   onCategorySelect?: (category: Category) => void;
+  selectedCategoryId?: string | null;
 }
 
-export default function BrowseServices({ showAllService, onCategorySelect }: BrowseServicesProps) {
+export default function BrowseServices({
+  showAllService,
+  onCategorySelect,
+  selectedCategoryId,
+}: BrowseServicesProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const prevButtonRef = React.useRef<HTMLButtonElement>(null);
   const nextButtonRef = React.useRef<HTMLButtonElement>(null);
   const [swiperInstance, setSwiperInstance] = useState<any>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -38,6 +45,20 @@ export default function BrowseServices({ showAllService, onCategorySelect }: Bro
 
     fetchCategories();
   }, []);
+
+  const handleCategoryClick = (category: Category) => {
+    if (onCategorySelect) {
+      onCategorySelect(category);
+      return;
+    }
+
+    const params = new URLSearchParams({
+      categoryId: category._id,
+      categorySlug: category.slug,
+    });
+
+    router.push(`/services?${params.toString()}`);
+  };
 
   if (loading) {
     return (
@@ -106,15 +127,20 @@ breakpoints={{
             >
               {categories.map((category, index) => (
                 <SwiperSlide key={category._id}>
+                  {(() => {
+                    const isSelected = selectedCategoryId === category._id;
+                    const isActive = hoveredIndex === index || isSelected;
+
+                    return (
                   <div 
                     className="text-center cursor-pointer"
                     onMouseEnter={() => setHoveredIndex(index)}
                     onMouseLeave={() => setHoveredIndex(null)}
-                    onClick={() => onCategorySelect?.(category)}
+                    onClick={() => handleCategoryClick(category)}
                   >
                     <div className="relative w-44 h-44 mx-auto rounded-full overflow-hidden border-8 border-white shadow-xl transition-all duration-300">
                       <div className={`relative w-full h-full ${
-                        hoveredIndex === index 
+                        isActive
                           ? "ring-4 ring-[#d1aa45] border-[#d1aa45]" 
                           : ""
                       }`}>
@@ -126,12 +152,12 @@ breakpoints={{
                         />
                         
                         <div className={`absolute inset-0 flex items-center justify-center transition-all duration-300 ${
-                          hoveredIndex === index 
+                          isActive
                             ? "bg-[#d1aa45]/90" 
                             : "bg-[#d1aa45]/0"
                         }`}>
                           <span className={`text-white font-bold text-lg px-4 text-center transition-opacity duration-300 font-poppins ${
-                            hoveredIndex === index ? "opacity-100" : "opacity-0"
+                            isActive ? "opacity-100" : "opacity-0"
                           }`}>
                             {category.name}
                           </span>
@@ -140,13 +166,15 @@ breakpoints={{
                     </div>
 
                     <p className={`mt-6 text-sm font-medium transition-all duration-300 font-poppins ${
-                      hoveredIndex === index 
+                      isActive
                         ? "text-[#d1aa45] font-semibold" 
                         : "text-gray-800"
                     }`}>
                       {category.name}
                     </p>
                   </div>
+                    );
+                  })()}
                 </SwiperSlide>
               ))}
             </Swiper>

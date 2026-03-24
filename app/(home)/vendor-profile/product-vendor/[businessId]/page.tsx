@@ -2,8 +2,10 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import ClientTestimonials from "../../../Components/ClientTestimonials";
+import PublicSearchFilterBar from "../../../Components/PublicSearchFilterBar";
+import { buildSearchPageUrl, PublicSearchFilters } from "../../../Components/publicSearch";
 
 type VendorBusiness = {
   _id: string;
@@ -127,6 +129,7 @@ function getBadgeImage(badge?: string): string | null {
 
 export default function ProductVendorProfilePage() {
   const params = useParams();
+  const router = useRouter();
   const businessId =
     typeof params.businessId === "string" ? params.businessId : params.businessId?.[0];
 
@@ -135,9 +138,11 @@ export default function ProductVendorProfilePage() {
   const [products, setProducts] = useState<VendorProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [businessType, setBusinessType] = useState("");
-  const [location, setLocation] = useState("");
-  const [minority, setMinority] = useState("");
+  const [filters, setFilters] = useState<PublicSearchFilters>({
+    keyword: "",
+    location: "",
+    minorityType: "",
+  });
   const [sort, setSort] = useState("price_asc");
   const [apiTotal, setApiTotal] = useState(0);
   const [badgeSrc, setBadgeSrc] = useState<string | null>(null);
@@ -207,16 +212,16 @@ export default function ProductVendorProfilePage() {
 
   const filteredProducts = useMemo(() => {
     return products.filter((item) => {
-      const matchBusinessType = !businessType || (profile?.listingType ?? "").toLowerCase().includes(businessType.toLowerCase());
-      const matchLocation = !location || formatAddress(vendorDetails ?? undefined).toLowerCase().includes(location.toLowerCase());
+      const matchBusinessType = !filters.keyword || (profile?.listingType ?? "").toLowerCase().includes(filters.keyword.toLowerCase());
+      const matchLocation = !filters.location || formatAddress(vendorDetails ?? undefined).toLowerCase().includes(filters.location.toLowerCase());
       const matchMinority =
-        !minority ||
+        !filters.minorityType ||
         (vendorDetails?.minorityCategories ?? []).some((cat) =>
-          cat.toLowerCase().includes(minority.toLowerCase())
+          cat.toLowerCase().includes(filters.minorityType.toLowerCase())
         );
       return matchBusinessType && matchLocation && matchMinority;
     });
-  }, [products, businessType, location, minority, profile?.listingType, vendorDetails]);
+  }, [products, filters, profile?.listingType, vendorDetails]);
 
   const totalProducts = filteredProducts.length;
   const safeTotalProducts = apiTotal > 0 ? apiTotal : totalProducts;
@@ -261,50 +266,11 @@ export default function ProductVendorProfilePage() {
         </div>
       </div>
 
-      <div className="w-full bg-[#1A1F71] py-6 text-center text-white pb-10">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12">
-          <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-6">
-            <div className="flex-[3] min-w-0">
-              <label className="block text-left text-[14px] font-medium text-white font-poppins">
-                Filter By Business Type
-              </label>
-              <input
-                type="text"
-                placeholder="Type Here"
-                value={businessType}
-                onChange={(e) => setBusinessType(e.target.value)}
-                className="w-full h-10 px-4 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-custom-orange text-xs font-poppins"
-              />
-            </div>
-
-            <div className="flex-[2] min-w-0">
-              <label className="block text-left text-[14px] font-medium text-white font-poppins">
-                Filter By Location
-              </label>
-              <input
-                type="text"
-                placeholder="Choose Location"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                className="w-full h-10 px-4 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-custom-orange text-xs font-poppins"
-              />
-            </div>
-
-            <div className="flex-[2] min-w-0">
-              <label className="block text-left text-[14px] font-medium text-white font-poppins">
-                Filter By Minority
-              </label>
-              <input
-                type="text"
-                placeholder="Choose Minority"
-                value={minority}
-                onChange={(e) => setMinority(e.target.value)}
-                className="w-full h-10 px-4 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-custom-orange text-xs font-poppins"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
+      <PublicSearchFilterBar
+        filters={filters}
+        onChange={setFilters}
+        onSubmit={() => router.push(buildSearchPageUrl(filters))}
+      />
 
       {loading ? (
         <div className="flex items-center justify-center min-h-[40vh]">

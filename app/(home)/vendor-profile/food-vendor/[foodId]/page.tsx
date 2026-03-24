@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import ClientTestimonials from "../../../Components/ClientTestimonials";
+import PublicSearchFilterBar from "../../../Components/PublicSearchFilterBar";
+import { buildSearchPageUrl, PublicSearchFilters } from "../../../Components/publicSearch";
 
 type CategoryRef = {
   _id?: string;
@@ -181,14 +183,17 @@ function StarRating({ rating }: { rating: number }) {
 
 export default function FoodVendorProfilePage() {
   const params = useParams();
+  const router = useRouter();
   const foodId = typeof params.foodId === "string" ? params.foodId : params.foodId?.[0];
 
   const [data, setData] = useState<ReturnType<typeof normalizeData> | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [businessType, setBusinessType] = useState("");
-  const [locationFilter, setLocationFilter] = useState("");
-  const [minority, setMinority] = useState("");
+  const [filters, setFilters] = useState<PublicSearchFilters>({
+    keyword: "",
+    location: "",
+    minorityType: "",
+  });
   const [revealed, setRevealed] = useState<Record<string, boolean>>({});
   const [badgeSrc, setBadgeSrc] = useState<string | null>(null);
   const [bookForm, setBookForm] = useState({
@@ -291,56 +296,11 @@ export default function FoodVendorProfilePage() {
         </div>
       </div>
 
-      <div className="w-full bg-[#1A1F71] py-6 pb-10 text-white">
-        <div className="mx-auto max-w-[1500px] px-4 sm:px-6 lg:px-12">
-          <div className="flex flex-col gap-4 md:flex-row md:items-end md:gap-6">
-            <div className="min-w-0 flex-[3]">
-              <label className="block text-left text-[14px] font-medium text-white font-poppins">
-                Filter By Business Type
-              </label>
-              <input
-                type="text"
-                value={businessType}
-                onChange={(e) => setBusinessType(e.target.value)}
-                placeholder="Type Here"
-                className="h-10 w-full bg-white px-4 text-xs font-montserrat font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-custom-orange"
-              />
-            </div>
-
-            <div className="min-w-0 flex-1">
-              <label className="block text-left text-[14px] font-medium text-white font-poppins">
-                Filter By Location
-              </label>
-              <input
-                type="text"
-                value={locationFilter}
-                onChange={(e) => setLocationFilter(e.target.value)}
-                placeholder="Choose Location"
-                className="h-10 w-full bg-white px-4 text-xs font-montserrat font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-custom-orange"
-              />
-            </div>
-
-            <div className="min-w-0 flex-1">
-              <label className="block text-left text-[14px] font-medium text-white font-poppins">
-                Filter By Minority
-              </label>
-              <input
-                type="text"
-                value={minority}
-                onChange={(e) => setMinority(e.target.value)}
-                placeholder="Choose Minority"
-                className="h-10 w-full bg-white px-4 text-xs font-montserrat font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-custom-orange"
-              />
-            </div>
-
-            <div className="min-w-0 flex-1">
-              <button className="flex h-10 w-full items-center justify-center bg-[#C7A040] text-sm font-poppins font-semibold text-white transition-colors hover:bg-[#a88432]">
-                Search Here
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <PublicSearchFilterBar
+        filters={filters}
+        onChange={setFilters}
+        onSubmit={() => router.push(buildSearchPageUrl(filters))}
+      />
 
       <div className="mx-auto max-w-[1400px] px-4 py-8 sm:px-6 lg:px-12">
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[2fr_1fr]">

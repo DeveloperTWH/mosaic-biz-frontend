@@ -2,6 +2,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import {
+  X,
   Lock,
   Clock,
   CheckCircle,
@@ -14,6 +15,7 @@ import {
   Globe,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface Business {
   _id: string;
@@ -72,6 +74,7 @@ const onboardingSteps = [
 ];
 
 const Page: React.FC = () => {
+  const router = useRouter();
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [loading, setLoading] = useState(true);
   const [onboardingStatus, setOnboardingStatus] = useState<OnboardingStatus | null>(null);
@@ -79,6 +82,7 @@ const Page: React.FC = () => {
   const [hasApplication, setHasApplication] = useState<boolean>(false);
   const [onboardingLoading, setOnboardingLoading] = useState(true);
   const [selectedStage, setSelectedStage] = useState<number>(1);
+  const [showRegistrationModal, setShowRegistrationModal] = useState(false);
 
   useEffect(() => {
     axios
@@ -460,6 +464,73 @@ const Page: React.FC = () => {
 
   return (
     <div className="container p-6 mx-auto max-w-6xl">
+      {showRegistrationModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+          <div className="relative w-full max-w-2xl overflow-hidden rounded-3xl bg-white shadow-2xl">
+            <button
+              type="button"
+              aria-label="Close registration popup"
+              onClick={() => setShowRegistrationModal(false)}
+              className="absolute right-4 top-4 rounded-full p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+            >
+              <X className="h-5 w-5" />
+            </button>
+
+            <div className="bg-gradient-to-r from-[#0f172a] to-[#1e3a8a] px-8 py-6 text-white">
+
+              <h2 className="mt-2 text-3xl font-bold">Before You Get Started</h2>
+            </div>
+
+            <div className="space-y-6 px-8 py-8">
+              <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
+                <p className="text-sm font-semibold text-amber-900">
+                  To join MosaicBizHub, a few details are mandatory for approval:
+                </p>
+                <ul className="mt-4 space-y-3 text-sm text-amber-950">
+                  <li className="flex items-start gap-3">
+                    <span className="mt-1 h-2 w-2 rounded-full bg-amber-600" />
+                    <span>Minority-Owned Business status</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="mt-1 h-2 w-2 rounded-full bg-amber-600" />
+                    <span>EIN / SSN</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="mt-1 h-2 w-2 rounded-full bg-amber-600" />
+                    <span>Business License Number &amp; Supporting Document Upload</span>
+                  </li>
+                </ul>
+                <p className="mt-4 text-sm font-medium text-amber-900">
+                  These are required for verification. Applications without them will not be approved.
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                <h3 className="text-lg font-semibold text-slate-900">Build Your Trust Score</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-600">
+                  Additional details you provide will earn trust points, helping you unlock higher trust badges.
+                  This improves your visibility and allows customers to filter your business based on credibility
+                  and transparency.
+                </p>
+              </div>
+
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowRegistrationModal(false);
+                    router.push("/partners/business/new");
+                  }}
+                  className="rounded-xl bg-[#c9a44a] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#b59138]"
+                >
+                  I Understand
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {!onboardingLoading && hasApplication && onboardingStatus && (
         <h1 className="mb-8 text-2xl font-bold text-center text-gray-800 uppercase tracking-wide">
           Business Profile Status
@@ -543,11 +614,13 @@ const Page: React.FC = () => {
               List your business on our platform and start reaching new customers.
               Complete our simple 6-step verification process to get started.
             </p>
-            <Link href="/partners/business/new" passHref>
-              <button className="px-8 py-3 text-lg font-bold text-white bg-yellow-600 rounded-lg hover:bg-yellow-700 transition-colors duration-300 shadow-lg hover:shadow-xl">
-                Start Vendor Onboarding
-              </button>
-            </Link>
+            <button
+              type="button"
+              onClick={() => setShowRegistrationModal(true)}
+              className="px-8 py-3 text-lg font-bold text-white bg-yellow-600 rounded-lg hover:bg-yellow-700 transition-colors duration-300 shadow-lg hover:shadow-xl"
+            >
+              Start Vendor Onboarding
+            </button>
             <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="p-4 bg-white rounded-lg shadow">
                 <div className="w-12 h-12 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">

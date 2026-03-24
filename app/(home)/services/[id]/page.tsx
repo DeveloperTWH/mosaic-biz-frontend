@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, use, useRef } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import FilterBar from "../components/FilterBar";
 import FAQSection from "../../Components/FaQ";
 import ClientTestimonials from "../../Components/ClientTestimonials";
@@ -12,6 +13,7 @@ import { Service } from '@/types/service';
 import AllServicesMap from "./components/AllServicesMap";
 import AffixSidebar from "./components/AffixSidebar"; // adjust path as needed
 import HeroSection from "../components/HeroSection";
+import { buildSearchPageUrl } from "../../Components/publicSearch";
 
 
 
@@ -19,10 +21,12 @@ interface PageProps {
     params: Promise<{ id: string }>;
 }
 
+type MinorityType = { _id: string; name: string };
 
 export default function ServiceCategoryPage({ params }: PageProps) {
     const unwrappedParams = use(params);
     const { id } = unwrappedParams;
+    const router = useRouter();
 
     const [activeService, setActiveService] = useState<String | null>(null);
     const [isMobile, setIsMobile] = useState<boolean>(false);
@@ -31,6 +35,7 @@ export default function ServiceCategoryPage({ params }: PageProps) {
     const [searchLocation, setSearchLocation] = useState("");
     const [services, setServices] = useState<Service[]>([]);
     const [loading, setLoading] = useState(true);
+    const [minorityTypes, setMinorityTypes] = useState<MinorityType[]>([]);
 
     const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
     const listColRef = useRef<HTMLDivElement | null>(null);
@@ -55,15 +60,11 @@ export default function ServiceCategoryPage({ params }: PageProps) {
         };
     }, [services.length]); // re-evaluate when list size changes
 
-
-
-    const fetchServices = async () => {
+    const fetchServices = async (q?: string, m?: string, c?: string) => {
         try {
-            console.log(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/services/list?categorySlug=${id}&search=${searchText}&minorityType=${minorityType}&city=${searchLocation}`);
-
             setLoading(true);
             const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/services/list?categorySlug=${id}&search=${searchText}&minorityType=${minorityType}&city=${searchLocation}`
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/services/list?categorySlug=${id}&search=${q ?? searchText}&minorityType=${m ?? minorityType}&city=${c ?? searchLocation}`
             );
             const data = await res.json();
             if (data.success) {
@@ -77,18 +78,31 @@ export default function ServiceCategoryPage({ params }: PageProps) {
     };
 
     useEffect(() => {
-        fetchServices();
-    }, [id, minorityType]);
+        const fetchMinorityTypes = async () => {
+            try {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/minority-types`);
+                const data = await res.json();
+                setMinorityTypes(Array.isArray(data) ? data : []);
+            } catch (err) {
+                console.error("Failed to load minority types", err);
+            }
+        };
 
+        fetchMinorityTypes();
+    }, []);
+
+    useEffect(() => {
+        fetchServices();
+    }, [id]);
 
     const handleSearch = () => {
-        console.log({
-            searchText,
-            minorityType,
-            searchLocation,
-        });
-        fetchServices();
-    }
+        const match = minorityTypes.find((type) => String(type._id) === String(minorityType));
+        router.push(buildSearchPageUrl({
+            keyword: searchText,
+            location: searchLocation,
+            minorityType: match?.name || minorityType,
+        }));
+    };
 
     useEffect(() => {
         const checkMobile = () => {

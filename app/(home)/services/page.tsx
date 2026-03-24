@@ -1,8 +1,8 @@
 "use client"
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
-import FilterBar from "./components/FilterBar";
+import { useRouter, useSearchParams } from "next/navigation";
 import CategoryGrid from "./components/CategoryGrid";
 import HeroSection from "./components/HeroSection";
 import BookServices from "./components/BookYourServices";
@@ -12,14 +12,29 @@ import FilterAccordion from "./components/FilterAccordion";
 import JoinVendorBanner from "./components/JoinVendorBanner";
 import BrowseServices from "../Components/BrowsServices";
 import { Category, SubCategory, SubCategoryResponse, ServiceCategoryResponse } from "@/types/Category";
+import PublicSearchFilterBar from "../Components/PublicSearchFilterBar";
+import { buildSearchPageUrl, PublicSearchFilters } from "../Components/publicSearch";
 
 type MinorityType = { _id: string; name: string };
+type ServicesListResponse = {
+  success?: boolean;
+  data?: Service[];
+  total?: number;
+  page?: number;
+  totalPages?: number;
+  limit?: number;
+};
 
 const ServicePage = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [searchText, setSearchText] = useState("");
   const [minorityType, setMinorityType] = useState("");
   const [searchLocation, setSearchLocation] = useState("");
   const [services, setServices] = useState<Service[]>([]);
+  const [totalServices, setTotalServices] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
@@ -28,14 +43,27 @@ const ServicePage = () => {
   const [selectedBadge, setSelectedBadge] = useState("");
   const [priceMin, setPriceMin] = useState<number | undefined>();
   const [priceMax, setPriceMax] = useState<number | undefined>();
+  const [minorityTypes, setMinorityTypes] = useState<MinorityType[]>([]);
+  const latestRequestIdRef = useRef(0);
+  const searchParamsKey = searchParams.toString();
 
-  const fetchServices = async (categoryId?: string, subcategoryId?: string, badge?: string, priceMin?: number, priceMax?: number) => {
+  const fetchServices = async (
+    categoryId?: string,
+    subcategoryId?: string,
+    badge?: string,
+    priceMin?: number,
+    priceMax?: number,
+    q?: string,
+    m?: string,
+    c?: string,
+  ) => {
+    const requestId = ++latestRequestIdRef.current;
     setLoading(true);
     try {
       const params: any = {
-        search: searchText,
-        city: searchLocation,
-        minorityType,
+        search: q ?? searchText,
+        city: c ?? searchLocation,
+        minorityType: m ?? minorityType,
         page: 1,
         limit: 10,
       };
@@ -47,14 +75,24 @@ const ServicePage = () => {
         params.price = `${priceMin}-${priceMax}`;
       }
 
-      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/services/list`, {
+      const res = await axios.get<ServicesListResponse>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/services/list`, {
         params,
       });
-      setServices(res.data.data);
+
+      if (requestId !== latestRequestIdRef.current) {
+        return;
+      }
+
+      setServices(Array.isArray(res.data.data) ? res.data.data : []);
+      setTotalServices(typeof res.data.total === "number" ? res.data.total : 0);
+      setCurrentPage(typeof res.data.page === "number" ? res.data.page : 1);
+      setItemsPerPage(typeof res.data.limit === "number" ? res.data.limit : Number(params.limit) || 10);
     } catch (err) {
       console.error(err);
     } finally {
-      setLoading(false);
+      if (requestId === latestRequestIdRef.current) {
+        setLoading(false);
+      }
     }
   };
 
@@ -69,22 +107,31 @@ const ServicePage = () => {
     }
   };
 
+  const syncCategoryInUrl = (category: Category) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("categoryId", category._id);
+    params.set("categorySlug", category.slug);
+    router.replace(`/services?${params.toString()}`);
+  };
+
   const handleCategorySelect = (category: Category) => {
     setSelectedCategory(category);
     setSelectedSubcategory("");
+    syncCategoryInUrl(category);
     fetchServices(category._id, undefined);
   };
 
-  const handleSearch = () => {
-    console.log({
-      searchText,
-      minorityType,
-      searchLocation,
-    });
-    fetchServices(selectedCategory?._id, selectedSubcategory || undefined);
-  };
-
   useEffect(() => {
+    const fetchMinorityTypes = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/minority-types`);
+        const data = await res.json();
+        setMinorityTypes(Array.isArray(data) ? (data as MinorityType[]) : []);
+      } catch (err) {
+        console.error('Failed to load minority types', err);
+      }
+    };
+
     const fetchCategories = async () => {
       try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/categories/services`);
@@ -94,28 +141,79 @@ const ServicePage = () => {
         console.error('Failed to load service categories', err);
       }
     };
+    fetchMinorityTypes();
     fetchCategories();
-    fetchServices(undefined, undefined);
-  }, [minorityType]);
+  }, []);
+
+  useEffect(() => {
+    const hasCategoryFilter = Boolean(searchParams.get("categoryId") || searchParams.get("categorySlug"));
+
+    if (hasCategoryFilter) {
+      return;
+    }
+
+    fetchServices();
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (categories.length === 0) {
+      return;
+    }
+
+    const categoryId = searchParams.get("categoryId");
+    const categorySlug = searchParams.get("categorySlug");
+
+    if (!categoryId && !categorySlug) {
+      return;
+    }
+
+    const matchedCategory =
+      categories.find((category) => category._id === categoryId) ??
+      categories.find((category) => category.slug === categorySlug);
+
+    if (!matchedCategory || selectedCategory?._id === matchedCategory._id) {
+      return;
+    }
+
+    setSelectedCategory(matchedCategory);
+    setSelectedSubcategory("");
+    fetchServices(matchedCategory._id, undefined, selectedBadge, priceMin, priceMax);
+  }, [categories, searchParamsKey, selectedCategory?._id, selectedBadge, priceMin, priceMax]);
+
+  const handleSearch = () => {
+    const match = minorityTypes.find((type) => String(type._id) === String(minorityType));
+    router.push(buildSearchPageUrl({
+      keyword: searchText,
+      location: searchLocation,
+      minorityType: match?.name || minorityType,
+    }));
+  };
 
   return (
     <main className="text-black bg-white">
       <HeroSection heading="Services" imageUrl="/bgdetailpage.png"  />
 
-      <FilterSection onSearch={(filters) => {
-        console.log('Filter search triggered:', filters);
-        fetchServices(selectedCategory?._id, selectedSubcategory || undefined);
-      }} selectedCategory={selectedCategory} onCategorySelect={(category) => {
-        setSelectedCategory(category);
-        setSelectedSubcategory("");
-        fetchServices(category._id, undefined);
-      }} />
+      <FilterSection
+        filters={{
+          keyword: searchText,
+          location: searchLocation,
+          minorityType,
+        }}
+        onFiltersChange={(filters) => {
+          setSearchText(filters.keyword);
+          setSearchLocation(filters.location);
+          setMinorityType(filters.minorityType);
+        }}
+        onSearch={handleSearch}
+        selectedCategory={selectedCategory}
+        onCategorySelect={handleCategorySelect}
+      />
 
-      <BookServices services={services} selectedCategory={selectedCategory} loading={loading} onCategorySelect={(categoryId) => {
+      <BookServices services={services} totalProducts={totalServices} currentPage={currentPage} itemsPerPage={itemsPerPage} selectedCategory={selectedCategory} loading={loading} onCategorySelect={(categoryId) => {
         const category = categories.find(cat => cat._id === categoryId);
         if (category) {
-          setSelectedCategory(category);
-          setSelectedSubcategory("");
+          handleCategorySelect(category);
+          return;
         }
         fetchServices(categoryId, undefined, selectedBadge, priceMin, priceMax);
       }} onSubcategorySelect={(subcategoryId) => {
@@ -134,94 +232,22 @@ const ServicePage = () => {
   );
 };
 
-function FilterSection({ onSearch, selectedCategory, onCategorySelect }: { 
-  onSearch?: (filters: { businessType: string; location: string; minority: string }) => void;
+function FilterSection({ filters, onFiltersChange, onSearch, selectedCategory, onCategorySelect }: { 
+  filters: PublicSearchFilters;
+  onFiltersChange: (filters: PublicSearchFilters) => void;
+  onSearch?: () => void;
   selectedCategory?: Category | null;
   onCategorySelect?: (category: Category) => void;
 }) {
-  const [businessType, setBusinessType] = useState("");
-  const [location, setLocation] = useState("");
-  const [minority, setMinority] = useState("");
-
-  const handleSearch = () => {
-    console.log('Services page search clicked with filters:', { businessType, location, minority, category: selectedCategory?.name });
-    onSearch?.({ businessType, location, minority });
-  };
-
   return (
     <>
-      <div className="w-full bg-[#1A1F71] py-6 text-center text-white pb-10">
-        <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-12">
-          <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-6">
-            <div className="flex-[3] min-w-0">
-              <label className="block text-left text-[14px] font-medium text-white font-poppins">
-                Filter By Business Type
-              </label>
-              <input
-                type="text"
-                placeholder="Type Here"
-                value={businessType}
-                onChange={(e) => setBusinessType(e.target.value)}
-                className="w-full h-10 px-4 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-custom-orange text-xs font-poppins"
-              />
-            </div>
+      <PublicSearchFilterBar filters={filters} onChange={onFiltersChange} onSubmit={() => onSearch?.()} />
 
-            <div className="flex-[1] min-w-0">
-              <label className="block text-left text-[14px] font-medium text-white font-poppins">
-                Filter By Location
-              </label>
-              <div className="relative">
-                <select 
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  className="w-full h-10 px-4 text-gray-700 bg-white text-xs appearance-none focus:outline-none focus:ring-2 focus:ring-custom-orange text-[#5F5F5F] font-poppins">
-                  <option value="">Choose Location</option>
-                  <option value="ny">New York City</option>
-                </select>
-                <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
-                  <svg className="w-full h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex-1 min-w-0">
-              <label className="block text-left text-[14px] font-medium text-white font-poppins">
-                Filter By Minority
-              </label>
-              <div className="relative">
-                <select 
-                  value={minority}
-                  onChange={(e) => setMinority(e.target.value)}
-                  className="w-full h-10 px-4 text-gray-700 bg-white text-xs appearance-none focus:outline-none focus:ring-2 focus:ring-custom-orange text-[#5F5F5F] font-poppins">
-                  <option value="">Choose Minority</option>
-                  <option value="african-american">African-American</option>
-                  <option value="asian">Asian</option>
-                  <option value="latinx">LatinX</option>
-                  <option value="woman">Woman</option>
-                  <option value="disabled-veteran">Disabled Veteran</option>
-                </select>
-                <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
-                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex-1 min-w-0">
-              <button 
-                onClick={handleSearch}
-                className="w-full h-10 text-sm text-white font-xs text-gray-800 bg-[#C7A040] hover:bg-yellow-500 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-600 flex items-center justify-center gap-2 font-montserrat">
-                Search Here
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <BrowseServices showAllService={false} onCategorySelect={onCategorySelect} />
+      <BrowseServices
+        showAllService={false}
+        onCategorySelect={onCategorySelect}
+        selectedCategoryId={selectedCategory?._id ?? null}
+      />
     </>
   );
 }

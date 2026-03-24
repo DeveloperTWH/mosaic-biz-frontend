@@ -10,6 +10,8 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { getFeaturedProducts, FeaturedProduct } from "@/lib/api/featured-products";
+import PublicSearchFilterBar from "./PublicSearchFilterBar";
+import { buildSearchPageUrl, DEFAULT_PUBLIC_SEARCH_FILTERS, PublicSearchFilters } from "./publicSearch";
 
 /* ---------- types ---------- */
 type RankedItem = {
@@ -164,94 +166,11 @@ function useFeaturedProducts(searchFilters?: { businessType: string; location: s
 
 /* ---------- Filter Component ---------- */
 
-function FilterSection({ onSearch }: { onSearch: (filters: { businessType: string; location: string; minority: string }) => void }) {
-  const [businessType, setBusinessType] = React.useState("");
-  const [location, setLocation] = React.useState("");
-  const [minority, setMinority] = React.useState("");
-
-  const handleSearch = () => {
-    console.log('Search clicked with filters:', { businessType, location, minority });
-    onSearch({ businessType, location, minority });
-  };
+function FilterSection({ onSearch }: { onSearch: (filters: PublicSearchFilters) => void }) {
+  const [filters, setFilters] = React.useState(DEFAULT_PUBLIC_SEARCH_FILTERS);
 
   return (
-    <div className="w-full bg-[#1A1F71] py-6 text-center text-white pb-10">
-      <div className="max-w-[1500px]  mx-auto px-4 sm:px-6 lg:px-12">
-        <div className="flex flex-col  md:flex-row md:items-end gap-4 md:gap-6">
-        <div className="flex-[3] min-w-0 ">
-            <label className="block text-[14px] text-left  font-medium text-white font-poppins">
-              Filter By Business Type
-            </label>
-            <input
-              type="text"
-              placeholder="Type Here"
-              value={businessType}
-              onChange={(e) => setBusinessType(e.target.value)}
-              className="w-full h-10 px-4 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-custom-orange text-xs font-poppins"
-            />
-          </div>
-
-          <div className="flex-[1] min-w-0">
-            <label className="block   text-left  text-[14px] font-medium text-white font-poppins">
-              Filter By Location
-            </label>
-            <div className="relative">
-              <select 
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                className="w-full h-10 px-4 text-gray-700 bg-white text-xs appearance-none focus:outline-none focus:ring-2 focus:ring-custom-orange text-[#5F5F5F] font-poppins">
-                <option value="">Choose Location</option>
-                <option value="ny">New York City</option>
-                {/* <option value="gc">Grand Canyon</option>
-                <option value="sf"> San Francisco</option>
-                <option value="ch">Chicago</option> */}
-              </select>
-              <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
-                <svg className="w-full h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex-1 min-w-0">
-            <label className="block text-left   text-[14px] font-medium text-white font-poppins">
-              Filter By Minority
-            </label>
-            <div className="relative">
-              <select 
-                value={minority}
-                onChange={(e) => setMinority(e.target.value)}
-                className="w-full h-10 px-4 text-gray-700 bg-white  text-xs appearance-none focus:outline-none focus:ring-2 focus:ring-custom-orange text-[#5F5F5F] font-poppins">
-                <option value="">Choose Minority</option>
-                <option value="african-american">African-American</option>
-                <option value="asian">Asian</option>
-                <option value="latinx">LatinX</option>
-                <option value="woman">Woman</option>
-                 <option value="disabled-veteran">Disabled Veteran</option>
-              </select>
-              <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
-                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          {/* Yellow Search Button */}
-          <div className="flex-1 min-w-0">
-            <label className="block mb-2 text-sm font-medium text-white">
-              {/* Search Here */}
-            </label>
-            <button 
-              onClick={handleSearch}
-              className="w-full h-10 text-sm text-white font-xs text-gray-800 bg-[#C7A040] hover:bg-yellow-500 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-600 flex items-center justify-center gap-2 font-montserrat">
-              Search Here
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <PublicSearchFilterBar filters={filters} onChange={setFilters} onSubmit={() => onSearch(filters)} />
   );
 }
 
@@ -266,22 +185,8 @@ export default function ShopProducts() {
   const prevButton = React.useRef(null);
   const nextButton = React.useRef(null);
 
-  const handleSearch = (filters: { businessType: string; location: string; minority: string }) => {
-    const params = new URLSearchParams();
-
-    if (filters.businessType.trim()) {
-      params.set("keyword", filters.businessType.trim());
-    }
-
-    if (filters.location.trim()) {
-      params.set("location", filters.location.trim());
-    }
-
-    if (filters.minority.trim()) {
-      params.set("minorityType", filters.minority.trim());
-    }
-
-    router.push(`/search${params.toString() ? `?${params.toString()}` : ""}`);
+  const handleSearch = (filters: PublicSearchFilters) => {
+    router.push(buildSearchPageUrl(filters));
   };
 
   return (
@@ -414,63 +319,68 @@ function FeaturedProductCard({ item }: { item: FeaturedProduct }) {
     description.length > 100 ? `${description.slice(0, 100).trimEnd()}...` : description;
 
   return (
-    <div className="bg-green p-2 border-2 border-[#D9D9D9] w-full max-w-[300px] h-[460px] shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col">
-      {/* Product Image - Square (1:1 like 1080x1080) */}
-      <div className="relative w-full aspect-square overflow-hidden bg-gray-100 flex-shrink-0">
-        <img
-          src={item.coverImage}
-          alt={item.title}
-          loading="lazy"
-          className="w-full h-full object-contain transition-transform duration-500 hover:scale-105"
-        />
-        
-        {/* <div className="absolute top-3 left-3">
-          <span className="px-3 py-1 text-xs font-bold text-white bg-yellow-600 rounded-full">
-            FEATURED
-          </span>
-        </div> */}
-      </div>
+    <Link
+      href={`/product/${item._id}`}
+      className="block bg-green p-2 border-2 border-[#D9D9D9] w-full max-w-[300px] h-[460px] shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden"
+    >
+      <div className="flex h-full flex-col">
+        {/* Product Image - Square (1:1 like 1080x1080) */}
+        <div className="relative w-full aspect-square overflow-hidden bg-gray-100 flex-shrink-0">
+          <img
+            src={item.coverImage}
+            alt={item.title}
+            loading="lazy"
+            className="w-full h-full object-contain transition-transform duration-500 hover:scale-105"
+          />
+          
+          {/* <div className="absolute top-3 left-3">
+            <span className="px-3 py-1 text-xs font-bold text-white bg-yellow-600 rounded-full">
+              FEATURED
+            </span>
+          </div> */}
+        </div>
 
-      {/* Product Info - Flex grow to fill space */}
-      <div className="p-3 flex flex-col flex-1">
-        {/* Title */}
-        <h3 className="text-base font-bold text-gray-900 uppercase tracking-tight leading-snug font-poppins line-clamp-2 h-[42px]">
-          {item.title}
-        </h3>
+        {/* Product Info - Flex grow to fill space */}
+        <div className="p-3 flex flex-col flex-1">
+          {/* Title */}
+          <h3 className="text-base font-bold text-gray-900 uppercase tracking-tight leading-snug font-poppins line-clamp-2 h-[42px]">
+            {item.title}
+          </h3>
 
-        {/* Description */}
-        <p className="mb-2 text-xs text-gray-600 leading-5 font-montserrat h-[40px] overflow-hidden">
-          {trimmedDescription || "\u00a0"}
-        </p>
+          {/* Description */}
+          <p className="mb-2 text-xs text-gray-600 leading-5 font-montserrat h-[40px] overflow-hidden">
+            {trimmedDescription || "\u00a0"}
+          </p>
 
-        {/* Rating */}
-        <div className="flex-shrink-0 min-h-[20px]">
-          <div className="flex items-center mb-1">
-            <div className="flex">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  size={14}
-                  fill="#FBBF24"
-                  stroke="#FBBF24"
-                  className="text-yellow-400"
-                />
-              ))}
+          {/* Rating */}
+          <div className="flex-shrink-0 min-h-[20px]">
+            <div className="flex items-center mb-1">
+              <div className="flex">
+                {[...Array(5)].map((_, i) => (
+                  <Star
+                    key={i}
+                    size={14}
+                    fill="#FBBF24"
+                    stroke="#FBBF24"
+                    className="text-yellow-400"
+                  />
+                ))}
+              </div>
+              <p className="text-[10px] ml-2 text-gray-500 font-poppins leading-tight">
+                Featured Product
+              </p>
             </div>
-            <p className="text-[10px] ml-2 text-gray-500 font-poppins leading-tight">
-              Featured Product
-            </p>
+          </div>
+
+          {/* Price */}
+          <div className="flex-shrink-0 mt-auto">
+            <span className="text-base font-bold text-gray-900">
+              ${item.price.toFixed(2)}
+            </span>
           </div>
         </div>
-
-        {/* Price */}
-        <div className="flex-shrink-0 mt-auto">
-          <span className="text-base font-bold text-gray-900">
-            ${item.price.toFixed(2)}
-          </span>
-        </div>
       </div>
-    </div>
+    </Link>
   );
 }
 

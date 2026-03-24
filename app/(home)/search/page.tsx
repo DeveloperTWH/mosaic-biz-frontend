@@ -1,15 +1,11 @@
 "use client";
 
-import { FormEvent, Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Star } from "lucide-react";
-
-type SearchFilters = {
-  keyword: string;
-  location: string;
-  minorityType: string;
-};
+import PublicSearchFilterBar from "../Components/PublicSearchFilterBar";
+import { PublicSearchFilters } from "../Components/publicSearch";
 
 type ApiBusiness = {
   _id?: string;
@@ -63,7 +59,7 @@ type ApiFood = {
 
 type SearchApiResponse = {
   success: boolean;
-  filters?: Partial<SearchFilters>;
+  filters?: Partial<PublicSearchFilters>;
   totals?: {
     all?: number;
     products?: number;
@@ -79,15 +75,6 @@ type SearchApiResponse = {
 };
 
 type SearchTab = "products" | "services" | "foods";
-
-const minorityOptions = [
-  { value: "", label: "Choose Minority" },
-  { value: "African-American", label: "African-American" },
-  { value: "Asian", label: "Asian" },
-  { value: "LatinX", label: "LatinX" },
-  { value: "Woman", label: "Woman" },
-  { value: "Disabled Veteran", label: "Disabled Veteran" },
-];
 
 function stripHtml(value?: string): string {
   return typeof value === "string" ? value.replace(/<[^>]*>/g, "").trim() : "";
@@ -118,7 +105,7 @@ function getBadgeImage(badge?: string): string | null {
   return badgeMap[key] ?? null;
 }
 
-function buildSearchApiUrl(filters: SearchFilters): string {
+function buildSearchApiUrl(filters: PublicSearchFilters): string {
   const base = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") ?? "";
   const params = new URLSearchParams();
 
@@ -127,89 +114,6 @@ function buildSearchApiUrl(filters: SearchFilters): string {
   if (filters.minorityType.trim()) params.set("minorityType", filters.minorityType.trim());
 
   return `${base}/api/public/search?${params.toString()}`;
-}
-
-function SearchFilterBar({
-  filters,
-  onChange,
-  onSubmit,
-}: {
-  filters: SearchFilters;
-  onChange: (next: SearchFilters) => void;
-  onSubmit: () => void;
-}) {
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    onSubmit();
-  };
-
-  return (
-    <div className="w-full bg-[#1A1F71] py-6 pb-10 text-white">
-      <form
-        onSubmit={handleSubmit}
-        className="mx-auto flex max-w-[1500px] flex-col gap-4 px-4 sm:px-6 md:flex-row md:items-end md:gap-6 lg:px-12"
-      >
-        <div className="min-w-0 flex-[3]">
-          <label className="block text-left text-[14px] font-medium text-white font-poppins">
-            Filter By Business Type
-          </label>
-          <input
-            type="text"
-            placeholder="Type Here"
-            value={filters.keyword}
-            onChange={(e) => onChange({ ...filters, keyword: e.target.value })}
-            className="h-10 w-full bg-white px-4 text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-custom-orange"
-          />
-        </div>
-
-        <div className="min-w-0 flex-1">
-          <label className="block text-left text-[14px] font-medium text-white font-poppins">
-            Filter By Location
-          </label>
-          <input
-            type="text"
-            placeholder="Choose Location"
-            value={filters.location}
-            onChange={(e) => onChange({ ...filters, location: e.target.value })}
-            className="h-10 w-full bg-white px-4 text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-custom-orange"
-          />
-        </div>
-
-        <div className="min-w-0 flex-1">
-          <label className="block text-left text-[14px] font-medium text-white font-poppins">
-            Filter By Minority
-          </label>
-          <div className="relative">
-            <select
-              value={filters.minorityType}
-              onChange={(e) => onChange({ ...filters, minorityType: e.target.value })}
-              className="h-10 w-full appearance-none bg-white px-4 text-xs text-[#5F5F5F] focus:outline-none focus:ring-2 focus:ring-custom-orange"
-            >
-              {minorityOptions.map((option) => (
-                <option key={option.value || "empty"} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3">
-              <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        <div className="min-w-0 flex-1">
-          <button
-            type="submit"
-            className="flex h-10 w-full items-center justify-center bg-[#C7A040] text-sm font-semibold text-white transition-colors hover:bg-[#a88432]"
-          >
-            Search Here
-          </button>
-        </div>
-      </form>
-    </div>
-  );
 }
 
 function ProductCard({ item }: { item: ApiProduct }) {
@@ -359,7 +263,7 @@ function SearchPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [filters, setFilters] = useState<SearchFilters>({
+  const [filters, setFilters] = useState<PublicSearchFilters>({
     keyword: "",
     location: "",
     minorityType: "",
@@ -475,17 +379,31 @@ function SearchPageContent() {
   const products = response?.data?.products ?? [];
   const services = response?.data?.services ?? [];
   const foods = response?.data?.foods ?? [];
-  const totalResults = response?.totals?.all ?? 0;
+  // const totalResults = response?.totals?.all ?? 0;
+  const totalResults =
+  (response?.data?.products?.length ?? 0) +
+  (response?.data?.services?.length ?? 0) +
+  (response?.data?.foods?.length ?? 0);
 
-  const tabItems: Array<{ key: SearchTab; label: string; count: number }> = [
-    { key: "products", label: "Search For Products", count: response?.totals?.products ?? 0 },
-    { key: "services", label: "Search For Services", count: response?.totals?.services ?? 0 },
-    { key: "foods", label: "Search For Food Item", count: response?.totals?.foods ?? 0 },
-  ];
+  // const tabItems: Array<{ key: SearchTab; label: string; count: number }> = [
+  //   { key: "products", label: "Search For Products", count: response?.totals?.products ?? 0 },
+  //   { key: "services", label: "Search For Services", count: response?.totals?.services ?? 0 },
+  //   { key: "foods", label: "Search For Food Item", count: response?.totals?.foods ?? 0 },
+  // ];
+
+const tabItems = [
+  { key: "products", label: "Search For Products", count: response?.totals?.products ?? 0 },
+  { key: "services", label: "Search For Services", count: response?.totals?.services ?? 0 },
+  { key: "foods", label: "Search For Food Item", count: response?.totals?.foods ?? 0 },
+].filter((tab) => tab.count > 0) as Array<{
+  key: SearchTab;
+  label: string;
+  count: number;
+}>;
 
   return (
     <div className="min-h-screen bg-[#FAF8F2]">
-      <SearchFilterBar filters={filters} onChange={setFilters} onSubmit={handleSearch} />
+      <PublicSearchFilterBar filters={filters} onChange={setFilters} onSubmit={handleSearch} />
 
       <section className="mx-auto max-w-[1400px] px-4 py-10 sm:px-6 lg:px-12">
         <div className="mb-8 flex flex-col items-center justify-center gap-3 md:flex-row">
@@ -532,10 +450,10 @@ function SearchPageContent() {
           <div className="rounded border border-red-200 bg-red-50 p-4 text-red-700">{error}</div>
         ) : totalResults === 0 ? (
           <div className="rounded border border-[#E5DEC9] bg-white p-10 text-center">
-            <h2 className="text-xl font-semibold text-gray-900">No results found</h2>
+            {/* <h2 className="text-xl font-semibold text-gray-900">No results found</h2>
             <p className="mt-2 text-sm text-gray-600">
               Try another business keyword, location, or minority type.
-            </p>
+            </p> */}
           </div>
         ) : (
           <>
