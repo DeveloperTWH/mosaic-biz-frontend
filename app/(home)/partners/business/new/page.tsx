@@ -523,8 +523,8 @@ if (form.hasBusinessLicense && !form.licenseNumber.trim()) {
     if (!form.address.zipCode.trim()) errors.address_zipCode = 'ZIP code is required';
 
     // Documents
-    if (!form.hasBusinessLicense && form.businessLicenseDocuments.length === 0) {
-      errors.businessLicenseDocuments = 'Business license is required';
+    if (form.hasBusinessLicense && form.businessLicenseDocuments.length === 0) {
+      errors.businessLicenseDocuments = 'Business license document is required';
     }
 
     // Terms
@@ -983,7 +983,7 @@ const handlePayAndSubmit = async () => {
       {/* Business License Documents Upload */}
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700 mb-3">
-          Upload Business License Document {!form.hasBusinessLicense && form.businessLicenseDocuments.length === 0 ? '(Required)' : ''}
+          Upload Business License Document (Required)
         </label>
         <div className="flex items-center gap-4">
           <div className="flex-1 px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 text-sm">

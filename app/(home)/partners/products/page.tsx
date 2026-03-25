@@ -148,7 +148,7 @@ export default function ProductsPage() {
       onClick={() => router.push('/partners/final-review')}
       className="px-4 py-1 bg-blue-900 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
     >
-      Go Live
+      publish
     </button>
   </div>
 </div>

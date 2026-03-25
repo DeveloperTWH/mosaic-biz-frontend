@@ -175,6 +175,116 @@ function formatDuration(min: number) {
   return m ? `${h}h ${m}m` : `${h} Hour${h > 1 ? "s" : ""}`;
 }
 
+const DAY_NAMES = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+] as const;
+
+function startOfDay(date: Date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function addDays(date: Date, amount: number) {
+  const next = new Date(date);
+  next.setDate(next.getDate() + amount);
+  return next;
+}
+
+function formatDateKey(date: Date) {
+  const year = date.getFullYear();
+  const month = `${date.getMonth() + 1}`.padStart(2, "0");
+  const day = `${date.getDate()}`.padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function formatCalendarDate(date: Date) {
+  return date.toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  });
+}
+
+function formatMonthLabel(date: Date) {
+  return date.toLocaleDateString("en-US", {
+    month: "long",
+    year: "numeric",
+  });
+}
+
+function parseTimeToMinutes(raw: string) {
+  const value = raw.trim().toUpperCase();
+  const match = value.match(/^(\d{1,2})(?::(\d{2}))?\s*(AM|PM)?$/);
+  if (!match) return null;
+
+  let hours = Number(match[1]);
+  const minutes = Number(match[2] || "0");
+  const meridiem = match[3];
+
+  if (!Number.isFinite(hours) || !Number.isFinite(minutes) || minutes > 59) {
+    return null;
+  }
+
+  if (meridiem) {
+    if (hours < 1 || hours > 12) return null;
+    if (hours === 12) hours = 0;
+    if (meridiem === "PM") hours += 12;
+  } else if (hours > 23) {
+    return null;
+  }
+
+  return hours * 60 + minutes;
+}
+
+function parseBusinessHourRange(hours: string) {
+  const [openRaw = "", closeRaw = ""] = hours.split("-").map(part => part.trim());
+  const openMinutes = parseTimeToMinutes(openRaw);
+  const closeMinutes = parseTimeToMinutes(closeRaw);
+
+  if (openMinutes === null || closeMinutes === null || closeMinutes <= openMinutes) {
+    return null;
+  }
+
+  return { openMinutes, closeMinutes };
+}
+
+function formatTimeLabel(totalMinutes: number) {
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  const suffix = hours >= 12 ? "PM" : "AM";
+  const normalizedHours = hours % 12 || 12;
+  return `${normalizedHours}:${`${minutes}`.padStart(2, "0")} ${suffix}`;
+}
+
+function generateTimeSlots(hours: string, appointmentMinutes: number, stepMinutes = 30) {
+  const parsed = parseBusinessHourRange(hours);
+  if (!parsed) return [];
+
+  const { openMinutes, closeMinutes } = parsed;
+  const duration = Math.max(appointmentMinutes, stepMinutes);
+  const latestStart = closeMinutes - duration;
+  const slots: string[] = [];
+
+  for (let current = openMinutes; current <= latestStart; current += stepMinutes) {
+    slots.push(formatTimeLabel(current));
+  }
+
+  return slots;
+}
+
+function buildCalendarDays(month: Date) {
+  const firstDayOfMonth = new Date(month.getFullYear(), month.getMonth(), 1);
+  const startOffset = firstDayOfMonth.getDay();
+  const gridStart = addDays(firstDayOfMonth, -startOffset);
+
+  return Array.from({ length: 42 }, (_, index) => addDays(gridStart, index));
+}
+
 function getBadgeImage(badge?: string): string | null {
   if (!badge) return null;
   const key = badge.trim().toLowerCase().replace(/[\s_-]+/g, "");
@@ -268,7 +378,19 @@ export default function ServiceVendorProfilePage() {
   const reveal = (k: string) => setRevealed(p => ({ ...p, [k]: true }));
 
   /* book-service form */
-  const [bookForm, setBookForm] = useState({ name: "", email: "", phone: "", date: "", note: "", serviceType: "" });
+  const [bookForm, setBookForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    date: "",
+    note: "",
+    serviceTypes: [] as string[],
+    timeSlot: "",
+  });
+  const [calendarMonth, setCalendarMonth] = useState(() => {
+    const today = new Date();
+    return new Date(today.getFullYear(), today.getMonth(), 1);
+  });
 
   useEffect(() => {
     if (!serviceId) { setError("Invalid service id."); setLoading(false); return; }
@@ -308,6 +430,62 @@ export default function ServiceVendorProfilePage() {
     return list;
   }, [data, filters, duration, sort]);
 
+  const normalizedBusinessHours = useMemo(
+    () => (data?.businessHours || []).map(hour => ({
+      ...hour,
+      closed: Boolean(hour.closed),
+      day: DAY_NAMES.includes(hour.day as (typeof DAY_NAMES)[number]) ? hour.day : hour.day,
+    })),
+    [data?.businessHours]
+  );
+
+  const workingDays = useMemo(
+    () => new Set(normalizedBusinessHours.filter(hour => !hour.closed).map(hour => hour.day)),
+    [normalizedBusinessHours]
+  );
+
+  const selectedServices = useMemo(
+    () => (data?.services || []).filter(service => bookForm.serviceTypes.includes(service._id)),
+    [data?.services, bookForm.serviceTypes]
+  );
+
+  const totalDurationMinutes = useMemo(
+    () => selectedServices.reduce((sum, service) => sum + (service.durationMinutes || 0), 0),
+    [selectedServices]
+  );
+
+  const totalPrice = useMemo(
+    () => selectedServices.reduce((sum, service) => sum + (service.price || 0), 0),
+    [selectedServices]
+  );
+
+  const selectedDateObject = useMemo(() => {
+    if (!bookForm.date) return null;
+    const [year, month, day] = bookForm.date.split("-").map(Number);
+    if (!year || !month || !day) return null;
+    return new Date(year, month - 1, day);
+  }, [bookForm.date]);
+
+  const selectedBusinessHour = useMemo(() => {
+    if (!selectedDateObject) return null;
+    const dayName = DAY_NAMES[selectedDateObject.getDay()];
+    return normalizedBusinessHours.find(hour => hour.day === dayName && !hour.closed) || null;
+  }, [normalizedBusinessHours, selectedDateObject]);
+
+  const availableTimeSlots = useMemo(() => {
+    if (!selectedBusinessHour?.hours) return [];
+    return generateTimeSlots(selectedBusinessHour.hours, totalDurationMinutes || 30);
+  }, [selectedBusinessHour, totalDurationMinutes]);
+
+  const calendarDays = useMemo(() => buildCalendarDays(calendarMonth), [calendarMonth]);
+
+  useEffect(() => {
+    if (!bookForm.timeSlot) return;
+    if (!availableTimeSlots.includes(bookForm.timeSlot)) {
+      setBookForm(prev => ({ ...prev, timeSlot: "" }));
+    }
+  }, [availableTimeSlots, bookForm.timeSlot]);
+
   const estYear = data?.createdAt ? new Date(data.createdAt).getFullYear() : null;
 
   /* ─── Loading / Error states ─── */
@@ -333,6 +511,33 @@ export default function ServiceVendorProfilePage() {
     averageRating, totalReviews, slug, location: mapUrl, amenities, features,
     businessName, businessLogo, businessDescription, businessAddress, businessWebsite, category, subcategory
   } = data;
+
+  const toggleServiceSelection = (serviceIdToToggle: string) => {
+    setBookForm(prev => {
+      const exists = prev.serviceTypes.includes(serviceIdToToggle);
+      return {
+        ...prev,
+        serviceTypes: exists
+          ? prev.serviceTypes.filter(id => id !== serviceIdToToggle)
+          : [...prev.serviceTypes, serviceIdToToggle],
+      };
+    });
+  };
+
+  const today = startOfDay(new Date());
+  const isDateAvailable = (date: Date) => {
+    const normalizedDate = startOfDay(date);
+    if (normalizedDate < today) return false;
+    return workingDays.has(DAY_NAMES[normalizedDate.getDay()]);
+  };
+
+  const bookingReady =
+    Boolean(bookForm.name.trim()) &&
+    Boolean(bookForm.email.trim()) &&
+    Boolean(bookForm.phone.trim()) &&
+    Boolean(bookForm.date) &&
+    Boolean(bookForm.timeSlot) &&
+    bookForm.serviceTypes.length > 0;
 
   const todayName = new Date().toLocaleDateString("en-US", { weekday: "long" });
   const todayHours = businessHours.find(h => h.day === todayName);
@@ -534,10 +739,17 @@ export default function ServiceVendorProfilePage() {
 <p className="mt-1 line-clamp-2 text-[12px] font-montserrat font-medium leading-4 text-[#7f7f7f]">
   {svc.description || "Professional service offered by our experts."}
 </p>
-            {/* <div className="mt-1.5 flex items-center gap-4 text-[10px] text-[#7f7f7f]">
-              <span>Duration: {formatDuration(svc.durationMinutes)}</span>
-              <span className="text-[11px] font-semibold text-[#1d1d1d]">${svc.price.toFixed(2)}</span>
-            </div> */}
+<div className="mt-1.5 flex items-center gap-4 text-[10px] text-[#7f7f7f]">
+  {/* Duration */}
+  <span>
+    Duration: <span className="font-medium text-[#1d1d1d]">{formatDuration(svc.durationMinutes)}</span>
+  </span>
+
+  {/* Price */}
+  <span className="text-[11px] font-semibold text-[#1d1d1d]">
+    ${svc.price.toFixed(2)}
+  </span>
+</div>
           </div>
         </div>
       ))}
@@ -654,18 +866,37 @@ export default function ServiceVendorProfilePage() {
       >
         Book Now
       </button>
+
+<p className="border border-dashed border-[#d8d0ba] bg-[#fffdf4] px-3 py-2 text-[11px] text-gray-500 leading-relaxed mt-3">
+  On submission of this form, your booking request will be shared with the business. 
+  They will <span className="font-medium text-[#1d1d1d]">confirm or decline</span> it based on availability. 
+  We’ll keep you updated.
+</p>
     </div>
   ) : (
-  <div className="space-y-3 p-5">
+  <div className="space-y-4 p-5">
 
-    <div className="space-y-1">
-      <label className="block text-[10px] font-medium uppercase tracking-wide text-[#6f6f6f]">Name</label>
-      <input
-        value={bookForm.name}
-        onChange={e => setBookForm(p => ({ ...p, name: e.target.value }))}
-        placeholder="Enter Name"
-        className="h-8 w-full border border-[#d8d0ba] bg-[#fff8e8] px-2.5 text-[11px] text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#C7A040] placeholder:text-gray-400"
-      />
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <div className="space-y-1">
+        <label className="block text-[10px] font-medium uppercase tracking-wide text-[#6f6f6f]">Name</label>
+        <input
+          value={bookForm.name}
+          onChange={e => setBookForm(p => ({ ...p, name: e.target.value }))}
+          placeholder="Enter Name"
+          className="h-9 w-full border border-[#d8d0ba] bg-[#fff8e8] px-3 text-[11px] text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#C7A040] placeholder:text-gray-400"
+        />
+      </div>
+
+      <div className="space-y-1">
+        <label className="block text-[10px] font-medium uppercase tracking-wide text-[#6f6f6f]">Phone Number</label>
+        <input
+          value={bookForm.phone}
+          onChange={e => setBookForm(p => ({ ...p, phone: e.target.value }))}
+          placeholder="Enter Phone Number"
+          type="tel"
+          className="h-9 w-full border border-[#d8d0ba] bg-[#fff8e8] px-3 text-[11px] text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#C7A040] placeholder:text-gray-400"
+        />
+      </div>
     </div>
 
     <div className="space-y-1">
@@ -675,76 +906,203 @@ export default function ServiceVendorProfilePage() {
         onChange={e => setBookForm(p => ({ ...p, email: e.target.value }))}
         placeholder="Enter Email"
         type="email"
-        className="h-8 w-full border border-[#d8d0ba] bg-[#fff8e8] px-2.5 text-[11px] text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#C7A040] placeholder:text-gray-400"
+        className="h-9 w-full border border-[#d8d0ba] bg-[#fff8e8] px-3 text-[11px] text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#C7A040] placeholder:text-gray-400"
       />
     </div>
 
-    <div className="space-y-1">
-      <label className="block text-[10px] font-medium uppercase tracking-wide text-[#6f6f6f]">Phone Number</label>
-      <input
-        value={bookForm.phone}
-        onChange={e => setBookForm(p => ({ ...p, phone: e.target.value }))}
-        placeholder="Enter Phone Number"
-        type="tel"
-        className="h-8 w-full border border-[#d8d0ba] bg-[#fff8e8] px-2.5 text-[11px] text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#C7A040] placeholder:text-gray-400"
-      />
+    <div className="space-y-2">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-[10px] font-semibold uppercase tracking-wide text-[#6f6f6f]">
+          Select Services
+        </p>
+        {selectedServices.length > 0 && (
+          <span className="text-[10px] font-semibold uppercase tracking-wide text-[#1A1F71]">
+            {selectedServices.length} Selected
+          </span>
+        )}
+      </div>
+
+      <div className="space-y-2">
+        {data.services.map((svc) => {
+          const active = bookForm.serviceTypes.includes(svc._id);
+          return (
+            <label
+              key={svc._id}
+              className={`flex cursor-pointer items-start gap-3 border px-3 py-3 transition-colors ${
+                active
+                  ? "border-[#C7A040] bg-[#fff2cc]"
+                  : "border-[#eadcb7] bg-[#fff8e8] hover:border-[#d6b35f]"
+              }`}
+            >
+              <input
+                type="checkbox"
+                checked={active}
+                onChange={() => toggleServiceSelection(svc._id)}
+                className="mt-0.5 h-4 w-4 accent-[#C7A040]"
+              />
+              <div className="min-w-0 flex-1">
+                <div className="flex items-start justify-between gap-3">
+                  <span className="text-[11px] font-semibold uppercase tracking-wide text-[#1A1F71]">
+                    {svc.name}
+                  </span>
+                  <span className="text-[11px] font-semibold text-[#7b5e19]">
+                    ${svc.price.toFixed(2)}
+                  </span>
+                </div>
+                <p className="mt-1 text-[10px] font-medium uppercase tracking-wide text-[#8a7b52]">
+                  {formatDuration(svc.durationMinutes)}
+                </p>
+              </div>
+            </label>
+          );
+        })}
+      </div>
     </div>
 
-    <div className="space-y-1">
-      <label className="block text-[10px] font-medium uppercase tracking-wide text-[#6f6f6f]">Date</label>
-      <input
-        value={bookForm.date}
-        onChange={e => setBookForm(p => ({ ...p, date: e.target.value }))}
-        placeholder="MM/DD/YYYY"
-        type="text"
-        className="h-8 w-full border border-[#d8d0ba] bg-[#fff8e8] px-2.5 text-[11px] text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#C7A040] placeholder:text-gray-400"
-      />
-    </div>
+    <div className="space-y-2">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-[10px] font-semibold uppercase tracking-wide text-[#6f6f6f]">
+          Pick A Date
+        </p>
+      </div>
 
-    <p className="text-[10px] font-semibold uppercase tracking-wide text-[#6f6f6f]">
-      Which Type Of Service Do You Need?
-    </p>
+      <div className="border border-[#eadcb7] bg-[#fffdf4] p-3">
+        <div className="mb-3 flex items-center justify-between">
+          <button
+            type="button"
+            onClick={() => setCalendarMonth(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1))}
+            className="h-8 w-8 border border-[#d7c796] text-[#7b5e19] transition-colors hover:bg-[#f8edd0]"
+          >
+            ‹
+          </button>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#1A1F71]">
+            {formatMonthLabel(calendarMonth)}
+          </p>
+          <button
+            type="button"
+            onClick={() => setCalendarMonth(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1))}
+            className="h-8 w-8 border border-[#d7c796] text-[#7b5e19] transition-colors hover:bg-[#f8edd0]"
+          >
+            ›
+          </button>
+        </div>
 
-    <div className="overflow-hidden border border-[#eadcb7] bg-[#fff8e8]">
-      <table className="w-full text-[11px]">
-        <thead className="bg-[#f8f1dd]">
-          <tr>
-            <th className="px-2 py-1.5 text-left font-semibold text-gray-600">Service Name</th>
-            <th className="px-2 py-1.5 text-left font-semibold text-gray-600">Duration</th>
-            <th className="px-2 py-1.5 text-left font-semibold text-gray-600">Price</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.services.slice(0, 4).map((svc, i) => (
-            <tr key={svc._id} className={i % 2 === 0 ? "bg-[#fff8e8]" : "bg-[#fcf4df]"}>
-              <td className="px-2 py-1.5">
-                <label className="flex items-center gap-1.5 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="bookSvc"
-                    value={svc._id}
-                    checked={bookForm.serviceType === svc._id}
-                    onChange={() => setBookForm(p => ({ ...p, serviceType: svc._id }))}
-                    className="accent-[#C7A040]"
-                  />
-                  <span className="capitalize text-[10px]">{svc.name}</span>
-                </label>
-              </td>
-              <td className="px-2 py-1.5 text-[10px] text-gray-500">
-                {formatDuration(svc.durationMinutes)}
-              </td>
-              <td className="px-2 py-1.5 text-[10px] font-medium text-gray-700">
-                ${svc.price.toFixed(2)}
-              </td>
-            </tr>
+        <div className="grid grid-cols-7 gap-1 text-center">
+          {DAY_NAMES.map(day => (
+            <span key={day} className="pb-1 text-[10px] font-semibold uppercase tracking-wide text-[#8a7b52]">
+              {day.slice(0, 3)}
+            </span>
           ))}
-        </tbody>
-      </table>
+          {calendarDays.map(day => {
+            const isCurrentMonth = day.getMonth() === calendarMonth.getMonth();
+            const dateKey = formatDateKey(day);
+            const isSelected = bookForm.date === dateKey;
+            const available = isDateAvailable(day);
+
+            return (
+              <button
+                key={dateKey}
+                type="button"
+                disabled={!available}
+                onClick={() => setBookForm(prev => ({ ...prev, date: dateKey }))}
+                className={`h-10 border text-[11px] transition-colors ${
+                  isSelected
+                    ? "border-[#C7A040] bg-[#C7A040] font-semibold text-white"
+                    : available
+                      ? "border-[#eadcb7] bg-white text-[#1d1d1d] hover:border-[#C7A040] hover:bg-[#fff2cc]"
+                      : "border-[#f0e6c8] bg-[#fbf6e8] text-gray-300"
+                } ${!isCurrentMonth ? "opacity-50" : ""}`}
+              >
+                {day.getDate()}
+              </button>
+            );
+          })}
+        </div>
+      </div>
     </div>
 
-    <button className="h-9 w-full bg-[#C7A040] text-[11px] font-semibold uppercase tracking-wide text-white transition-colors hover:bg-[#a88432]">
+    <div className="space-y-2">
+      <p className="text-[10px] font-semibold uppercase tracking-wide text-[#6f6f6f]">
+        Available Time Slots
+      </p>
+      {bookForm.date ? (
+        availableTimeSlots.length > 0 ? (
+          <div className="grid grid-cols-2 gap-2">
+            {availableTimeSlots.map(slot => (
+              <button
+                key={slot}
+                type="button"
+                onClick={() => setBookForm(prev => ({ ...prev, timeSlot: slot }))}
+                className={`h-9 border px-2 text-[11px] font-medium transition-colors ${
+                  bookForm.timeSlot === slot
+                    ? "border-[#C7A040] bg-[#C7A040] text-white"
+                    : "border-[#d8d0ba] bg-white text-[#1d1d1d] hover:border-[#C7A040] hover:bg-[#fff2cc]"
+                }`}
+              >
+                {slot}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <p className="border border-dashed border-[#d8d0ba] bg-[#fffdf4] px-3 py-3 text-[11px] text-gray-500">
+            {selectedServices.length === 0
+              ? "Select one or more services to calculate valid appointment slots."
+              : "No slots fit inside the vendor's working hours for the selected services."}
+          </p>
+        )
+      ) : (
+        <p className="border border-dashed border-[#d8d0ba] bg-[#fffdf4] px-3 py-3 text-[11px] text-gray-500">
+          Choose a working day to see time slots.
+        </p>
+      )}
+    </div>
+
+    {/* <div className="space-y-1">
+      <label className="block text-[10px] font-medium uppercase tracking-wide text-[#6f6f6f]">Special Notes</label>
+      <textarea
+        value={bookForm.note}
+        onChange={e => setBookForm(p => ({ ...p, note: e.target.value }))}
+        placeholder="Tell the vendor anything important before the appointment"
+        rows={3}
+        className="w-full resize-none border border-[#d8d0ba] bg-[#fff8e8] px-3 py-2 text-[11px] text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#C7A040] placeholder:text-gray-400"
+      />
+    </div> */}
+
+    {/* <div className="border border-[#eadcb7] bg-[#fff3d3] p-3">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-[10px] font-semibold uppercase tracking-wide text-[#6f6f6f]">
+          Booking Summary
+        </p>
+        <span className="text-[12px] font-bold text-[#1A1F71]">
+          ${totalPrice.toFixed(2)}
+        </span>
+      </div>
+      <p className="mt-2 text-[11px] text-gray-700">
+        {selectedServices.length > 0
+          ? selectedServices.map(service => service.name).join(", ")
+          : "No services selected yet."}
+      </p>
+      <div className="mt-2 flex flex-wrap gap-2 text-[10px] uppercase tracking-wide text-[#8a7b52]">
+        <span>Total Duration: {formatDuration(totalDurationMinutes)}</span>
+        <span>{bookForm.date ? formatCalendarDate(selectedDateObject || new Date()) : "Date not selected"}</span>
+        <span>{bookForm.timeSlot || "Time not selected"}</span>
+      </div>
+    </div> */}
+
+    <button
+      type="button"
+      disabled={!bookingReady}
+      className={`h-10 w-full text-[11px] font-semibold uppercase tracking-wide text-white transition-colors ${
+        bookingReady ? "bg-[#C7A040] hover:bg-[#a88432]" : "bg-[#d7c796] cursor-not-allowed"
+      }`}
+    >
       Request An Appointment
     </button>
+<p className="border border-dashed border-[#d8d0ba] bg-[#fffdf4] px-3 py-2 text-[11px] text-gray-500 leading-relaxed mt-3">
+  On submission of this form, your booking request will be shared with the business. 
+  They will <span className="font-medium text-[#1d1d1d]">confirm or decline</span> it based on availability. 
+  We’ll keep you updated.
+</p>
   </div>
   )}
 </div>

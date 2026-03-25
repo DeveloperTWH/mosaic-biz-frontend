@@ -18,6 +18,10 @@ interface Business {
   _id: string;
   businessName: string;
   logo?: string;
+  listingType?: "product" | "service" | "food";
+  products?: Array<string | { _id?: string }>;
+  services?: Array<string | { _id?: string }>;
+  foods?: Array<string | { _id?: string }>;
 }
 
 interface OnboardingData {

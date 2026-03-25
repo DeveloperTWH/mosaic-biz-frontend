@@ -71,7 +71,7 @@ export default function ViewDiscountsModal({ businessId, onClose }: any) {
                   <p className="text-sm text-gray-600">
                     {d.type === 'percentage'
                       ? `${d.value}% OFF`
-                      : `₹${d.value} OFF`}
+                      : `${d.value} OFF`}
                   </p>
                 </div>
 

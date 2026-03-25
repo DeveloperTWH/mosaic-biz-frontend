@@ -9,6 +9,7 @@ import { getCartDetailed, updateCartQuantity, removeFromCart, handlePlaceOrderFl
 type CartItem = {
     productId: string;
     variantId: string;
+    businessId?: string;
     size: string;
     quantity: number;
     imageUrl?: string;
@@ -26,6 +27,13 @@ type CartItem = {
     sku?: string;
     isSaleActive?: boolean;
 
+};
+
+type AppliedDiscount = {
+    originalAmount: number;
+    discountAmount: number;
+    finalAmount: number;
+    couponCode: string;
 };
 
 export type ShippingAddress = {
@@ -55,7 +63,7 @@ export type Address = {
 export default function CartPage() {
     const [selectedTab, setSelectedTab] = useState<"product" | "food">("product");
     const [itemsProduct, setItemsProduct] = useState<CartItem[]>([]);
-    const [itemsFood, setItemsFood] = useState<CartItem[]>([]); // keep for future Grocery integration
+    const [itemsFood] = useState<CartItem[]>([]); // keep for future Grocery integration
     const [loading, setLoading] = useState<boolean>(true);
     const [addresses, setAddresses] = useState<Address[]>([
         
@@ -65,6 +73,9 @@ export default function CartPage() {
         addresses.find(a => a.isDefault)?.id
     );
     const [userNote, setUserNote] = useState<string>("");
+    const [couponCode, setCouponCode] = useState<string>("");
+    const [applyingCoupon, setApplyingCoupon] = useState<boolean>(false);
+    const [appliedDiscount, setAppliedDiscount] = useState<AppliedDiscount | null>(null);
 
     const isSaleActive = (salePrice?: number | null, discountEndDate?: string | null) => {
         if (salePrice == null) return false;
@@ -163,8 +174,8 @@ export default function CartPage() {
         (sum, it) => sum + (Number(it.shippingCost) || 0) * (it.quantity || 0),
         0
     );
-    const grandTotalProduct = subtotalProduct + shippingTotalProduct;
     const totalQtyProduct = itemsProduct.reduce((sum, it) => sum + (it.quantity || 0), 0);
+    const businessId = itemsProduct[0]?.businessId;
 
     const totalSavingsProduct = useMemo(() => {
         return itemsProduct.reduce((sum, it: any) => {
@@ -180,7 +191,72 @@ export default function CartPage() {
         }, 0);
     }, [itemsProduct]);
 
+    useEffect(() => {
+        setAppliedDiscount(null);
+    }, [subtotalProduct, shippingTotalProduct, businessId]);
+
+    const discountAmountProduct = appliedDiscount?.discountAmount ?? 0;
+    const discountedSubtotalProduct = appliedDiscount?.finalAmount ?? subtotalProduct;
+    const payableTotalProduct = Math.max(0, discountedSubtotalProduct + shippingTotalProduct);
+
     const selectedAddress = addresses.find(a => a.id === selectedAddressId);
+
+    const applyCoupon = async () => {
+        const trimmedCoupon = couponCode.trim();
+
+        if (!trimmedCoupon) {
+            toast.error("Please enter a coupon code");
+            return;
+        }
+
+        if (!businessId) {
+            toast.error("Business information is missing for this cart");
+            return;
+        }
+
+        if (subtotalProduct <= 0) {
+            toast.error("Your cart is empty");
+            return;
+        }
+
+        setApplyingCoupon(true);
+        try {
+            const base = (process.env.NEXT_PUBLIC_API_BASE_URL || "").replace(/\/$/, "");
+            const res = await fetch(`${base}/api/discounts/apply`, {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    couponCode: trimmedCoupon,
+                    businessId,
+                    amount: subtotalProduct,
+                }),
+            });
+
+            const data = await res.json().catch(() => ({}));
+
+            if (!res.ok || !data?.success || !data?.data) {
+                toast.error(data?.message || "Failed to apply coupon");
+                return;
+            }
+
+            setAppliedDiscount(data.data as AppliedDiscount);
+            setCouponCode((data.data as AppliedDiscount).couponCode || trimmedCoupon);
+            toast.success("Coupon applied successfully");
+        } catch (error) {
+            console.error("Failed to apply coupon", error);
+            toast.error("Failed to apply coupon");
+        } finally {
+            setApplyingCoupon(false);
+        }
+    };
+
+    const removeCoupon = () => {
+        setAppliedDiscount(null);
+        setCouponCode("");
+    };
 
 
     if (loading) {
@@ -198,7 +274,7 @@ export default function CartPage() {
         <div className="bg-[#ebecef]">
             <div className="flex flex-wrap gap-5 px-4 py-6 mx-auto max-w-7xl">
                 {/* Tab Navigation */}
-                <div className="w-full lg:w-2/3">
+                <div className="w-full lg:w-[68%]">
                     <div className="flex gap-5 px-5 mb-8 bg-white">
                         <button
                             className={`sm:p-5 p-2 pt-3 sm:text-lg text-sm font-semibold ${selectedTab === "product" ? "border-b-4 border-blue-500" : "text-gray-800"
@@ -265,25 +341,28 @@ export default function CartPage() {
                 {/* PRICE */}
                 <div className="mt-2">
                   {(() => {
-                    const base = Number(item.price ?? item.selectedSizePrice ?? 0);
+                    const effectivePrice = Number(
+                      item.selectedSizePrice ?? item.salePrice ?? item.price ?? 0
+                    );
+                    const originalPrice = Number(item.price ?? effectivePrice);
                     const sale = item.salePrice != null ? Number(item.salePrice) : null;
                     const saleActive =
                       item.isSaleActive ??
                       isSaleActive(sale, item.discountEndDate);
 
-                    if (saleActive && sale != null && sale < base) {
+                    if (saleActive && sale != null && originalPrice > effectivePrice) {
                       const pct =
-                        base > 0
-                          ? Math.round(((base - sale) / base) * 100)
+                        originalPrice > 0
+                          ? Math.round(((originalPrice - effectivePrice) / originalPrice) * 100)
                           : 0;
 
                       return (
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="text-base text-gray-800">
-                            ${sale.toFixed(2)}
+                            ${effectivePrice.toFixed(2)}
                           </span>
                           <span className="text-sm text-gray-400 line-through">
-                            ${base.toFixed(2)}
+                            ${originalPrice.toFixed(2)}
                           </span>
                           {pct > 0 && (
                             <span className="text-sm text-green-600">
@@ -296,7 +375,7 @@ export default function CartPage() {
 
                     return (
                       <span className="text-base text-gray-800">
-                        ${base.toFixed(2)}
+                        ${effectivePrice.toFixed(2)}
                       </span>
                     );
                   })()}
@@ -370,7 +449,7 @@ export default function CartPage() {
                 </div>
 
                 {/* Price Details */}
-                <div className="w-full lg:w-1/4 lg:mt-0">
+                <div className="w-full lg:w-[30%] lg:mt-0">
                     <div className="w-full bg-white border border-gray-200">
                         <div className="p-5 mb-2 text-lg text-gray-800 border-b-2 border-gray-200">
                             <h3 className="pt-2 text-lg text-gray-800">Price Details</h3>
@@ -378,9 +457,14 @@ export default function CartPage() {
 
                         {selectedTab === "product" ? (
                             <div className="p-5">
-                                <div className="flex justify-between text-sm text-gray-600">
+                                {/* <div className="flex justify-between text-sm text-gray-600">
                                     <div>Items</div>
                                     <div>{totalQtyProduct}</div>
+                                </div> */}
+
+                                <div className="flex justify-between mt-3 text-sm text-gray-600">
+                                    <div>Product Price</div>
+                                    <div>${subtotalProduct.toFixed(2)}</div>
                                 </div>
 
                                 <div className="flex justify-between mt-3 text-sm text-gray-600">
@@ -388,14 +472,54 @@ export default function CartPage() {
                                     <div>${shippingTotalProduct.toFixed(2)}</div>
                                 </div>
 
-                                {/* <div className="flex justify-between pt-2 pb-2 mt-4 text-lg text-gray-800 border-t-2 border-b-2 border-gray-200">
-                                    <div>Subtotal</div>
-                                    <div>${subtotalProduct.toFixed(2)}</div>
-                                </div> */}
+                                <div className="mt-5">
+                                    <label className="block mb-2 text-sm font-medium text-gray-700">
+                                        Discount Coupon
+                                    </label>
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            value={couponCode}
+                                            onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                                            placeholder="Enter coupon code"
+                                            className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded outline-none focus:border-blue-500"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={applyCoupon}
+                                            disabled={applyingCoupon || itemsProduct.length === 0}
+                                            className="px-4 py-2 text-sm font-medium text-white bg-blue-900 rounded disabled:cursor-not-allowed disabled:opacity-60"
+                                        >
+                                            {applyingCoupon ? "Applying..." : "Apply"}
+                                        </button>
+                                    </div>
+
+                                    {appliedDiscount && (
+                                        <div className="flex items-center justify-between mt-2 text-sm">
+                                            <span className="text-green-600">
+                                                Applied: {appliedDiscount.couponCode}
+                                            </span>
+                                            <button
+                                                type="button"
+                                                onClick={removeCoupon}
+                                                className="text-red-600"
+                                            >
+                                                Remove
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="flex justify-between mt-4 text-sm text-gray-600">
+                                    <div>Discount</div>
+                                    <div className={discountAmountProduct > 0 ? "text-green-600" : ""}>
+                                        ${discountAmountProduct.toFixed(2)}
+                                    </div>
+                                </div>
 
                                 <div className="flex justify-between mt-4 text-lg font-semibold text-gray-900">
                                     <div>Total</div>
-                                    <div>${grandTotalProduct.toFixed(2)}</div>
+                                    <div>${payableTotalProduct.toFixed(2)}</div>
                                 </div>
 
                                 {totalSavingsProduct > 0 && (

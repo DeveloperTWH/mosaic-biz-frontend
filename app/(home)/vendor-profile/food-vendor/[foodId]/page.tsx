@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import ClientTestimonials from "../../../Components/ClientTestimonials";
@@ -86,6 +86,121 @@ function cleanText(value?: string): string {
   return typeof value === "string" ? value.replace(/<[^>]*>/g, "").trim() : "";
 }
 
+const DAY_NAMES = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+] as const;
+
+const SEAT_OPTIONS = [
+  "No of Seats - Up to 2",
+  "No of Seats - Up to 4",
+  "No of Seats - Up to 8",
+  "Large Group (More than 10)",
+] as const;
+
+function startOfDay(date: Date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function addDays(date: Date, amount: number) {
+  const next = new Date(date);
+  next.setDate(next.getDate() + amount);
+  return next;
+}
+
+function formatDateKey(date: Date) {
+  const year = date.getFullYear();
+  const month = `${date.getMonth() + 1}`.padStart(2, "0");
+  const day = `${date.getDate()}`.padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function formatMonthLabel(date: Date) {
+  return date.toLocaleDateString("en-US", {
+    month: "long",
+    year: "numeric",
+  });
+}
+
+function formatCalendarDate(date: Date) {
+  return date.toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  });
+}
+
+function parseTimeToMinutes(raw: string) {
+  const value = raw.trim().toUpperCase();
+  const match = value.match(/^(\d{1,2})(?::(\d{2}))?\s*(AM|PM)?$/);
+  if (!match) return null;
+
+  let hours = Number(match[1]);
+  const minutes = Number(match[2] || "0");
+  const meridiem = match[3];
+
+  if (!Number.isFinite(hours) || !Number.isFinite(minutes) || minutes > 59) {
+    return null;
+  }
+
+  if (meridiem) {
+    if (hours < 1 || hours > 12) return null;
+    if (hours === 12) hours = 0;
+    if (meridiem === "PM") hours += 12;
+  } else if (hours > 23) {
+    return null;
+  }
+
+  return hours * 60 + minutes;
+}
+
+function parseBusinessHourRange(hours: string) {
+  const [openRaw = "", closeRaw = ""] = hours.split("-").map(part => part.trim());
+  const openMinutes = parseTimeToMinutes(openRaw);
+  const closeMinutes = parseTimeToMinutes(closeRaw);
+
+  if (openMinutes === null || closeMinutes === null || closeMinutes <= openMinutes) {
+    return null;
+  }
+
+  return { openMinutes, closeMinutes };
+}
+
+function formatTimeLabel(totalMinutes: number) {
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  const suffix = hours >= 12 ? "PM" : "AM";
+  const normalizedHours = hours % 12 || 12;
+  return `${normalizedHours}:${`${minutes}`.padStart(2, "0")} ${suffix}`;
+}
+
+function generateHourlyTimeSlots(hours: string) {
+  const parsed = parseBusinessHourRange(hours);
+  if (!parsed) return [];
+
+  const { openMinutes, closeMinutes } = parsed;
+  const slots: string[] = [];
+
+  for (let current = openMinutes; current + 60 <= closeMinutes; current += 60) {
+    slots.push(formatTimeLabel(current));
+  }
+
+  return slots;
+}
+
+function buildCalendarDays(month: Date) {
+  const firstDayOfMonth = new Date(month.getFullYear(), month.getMonth(), 1);
+  const startOffset = firstDayOfMonth.getDay();
+  const gridStart = addDays(firstDayOfMonth, -startOffset);
+
+  return Array.from({ length: 42 }, (_, index) => addDays(gridStart, index));
+}
+
 function getBadgeImage(badge?: string): string | null {
   if (!badge) return null;
   const key = badge.trim().toLowerCase().replace(/[\s_-]+/g, "");
@@ -132,7 +247,7 @@ function normalizeData(payload: FoodProfileResponse) {
   const businessAddress = formatBusinessAddress(business?.address);
   const businessWebsite = business?.website || business?.socialLinks?.website || "";
 
-  const galleryItems = [food?.coverImage, ...(food?.images ?? []), food?.menuImage]
+  const galleryItems = [food?.coverImage, ...(food?.images ?? [])]
     .filter((item): item is string => Boolean(item))
     .filter((item, index, list) => list.indexOf(item) === index);
 
@@ -143,6 +258,7 @@ function normalizeData(payload: FoodProfileResponse) {
     foodType: food?.foodType || "",
     brand: food?.brand || "",
     coverImage: food?.coverImage || business?.coverImage || "",
+    menuImage: food?.menuImage || "",
     galleryImages: galleryItems,
     businessHours: food?.businessHours || [],
     bookingToolLink: food?.bookingToolLink || "",
@@ -205,6 +321,10 @@ export default function FoodVendorProfilePage() {
     timeSlot: "",
     message: "",
   });
+  const [calendarMonth, setCalendarMonth] = useState(() => {
+    const today = new Date();
+    return new Date(today.getFullYear(), today.getMonth(), 1);
+  });
 
   useEffect(() => {
     if (!foodId) {
@@ -241,6 +361,49 @@ export default function FoodVendorProfilePage() {
     setBadgeSrc(badgeImage);
   }, [badgeImage]);
 
+  const normalizedBusinessHours = useMemo(
+    () => (data?.businessHours || []).map(hour => ({
+      ...hour,
+      closed: Boolean(hour.closed),
+    })),
+    [data?.businessHours]
+  );
+
+  const workingDays = useMemo(
+    () => new Set(normalizedBusinessHours.filter(hour => !hour.closed).map(hour => hour.day || "")),
+    [normalizedBusinessHours]
+  );
+
+  const selectedDateObject = useMemo(() => {
+    if (!bookForm.date) return null;
+    const [year, month, day] = bookForm.date.split("-").map(Number);
+    if (!year || !month || !day) return null;
+    return new Date(year, month - 1, day);
+  }, [bookForm.date]);
+
+  const selectedBusinessHour = useMemo(() => {
+    if (!selectedDateObject) return null;
+    const dayName = DAY_NAMES[selectedDateObject.getDay()];
+    return normalizedBusinessHours.find(hour => hour.day === dayName && !hour.closed) || null;
+  }, [normalizedBusinessHours, selectedDateObject]);
+
+  const availableTimeSlots = useMemo(() => {
+    if (!selectedBusinessHour?.hours) {
+      return data?.bookingTimeSlots || [];
+    }
+    const slots = generateHourlyTimeSlots(selectedBusinessHour.hours);
+    return slots.length > 0 ? slots : data?.bookingTimeSlots || [];
+  }, [data?.bookingTimeSlots, selectedBusinessHour]);
+
+  const calendarDays = useMemo(() => buildCalendarDays(calendarMonth), [calendarMonth]);
+
+  useEffect(() => {
+    if (!bookForm.timeSlot) return;
+    if (!availableTimeSlots.includes(bookForm.timeSlot)) {
+      setBookForm(prev => ({ ...prev, timeSlot: "" }));
+    }
+  }, [availableTimeSlots, bookForm.timeSlot]);
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -266,9 +429,23 @@ export default function FoodVendorProfilePage() {
   const heroTitle = data.businessName || data.title || "Food Vendor";
   const heroSection = data.category || "Food And Grocery";
   const galleryItems = data.galleryImages.slice(0, 6);
+  const hasMenuImage = Boolean(data.menuImage);
   const estYear = data.createdAt ? new Date(data.createdAt).getFullYear() : null;
   const mapUrl = getMapEmbedUrl(data.locationAddress, data.coordinates);
   const hasDirectBookingLink = /^https?:\/\//i.test(data.bookingToolLink);
+  const today = startOfDay(new Date());
+  const isDateAvailable = (date: Date) => {
+    const normalizedDate = startOfDay(date);
+    if (normalizedDate < today) return false;
+    return workingDays.has(DAY_NAMES[normalizedDate.getDay()]);
+  };
+  const bookingReady =
+    Boolean(bookForm.name.trim()) &&
+    Boolean(bookForm.email.trim()) &&
+    Boolean(bookForm.phone.trim()) &&
+    Boolean(bookForm.date) &&
+    Boolean(bookForm.timeSlot) &&
+    Boolean(bookForm.tableType);
 
   return (
     <div className="min-h-screen bg-white font-sans">
@@ -403,6 +580,29 @@ export default function FoodVendorProfilePage() {
             </div>
             )}
 
+            {hasMenuImage && (
+              <div className="mt-6">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <h3 className="text-sm font-montserrat font-semibold text-[#c79b44]">Menu</h3>
+                  <a
+                    href={data.menuImage}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-[10px] font-montserrat font-semibold uppercase tracking-[0.14em] text-[#1A1F71] underline"
+                  >
+                    View Full Menu
+                  </a>
+                </div>
+                <div className="mx-auto max-w-[720px] overflow-hidden border border-[#ece6d9] bg-[#fffdf7]">
+                  <img
+                    src={data.menuImage}
+                    alt={`${heroTitle} menu`}
+                    className="max-h-[420px] w-full object-contain bg-white"
+                  />
+                </div>
+              </div>
+            )}
+
             <div className="mt-8">
               <h3 className="mb-4 text-sm font-montserrat font-semibold text-[#c79b44]">Testimonials</h3>
               <ClientTestimonials />
@@ -499,19 +699,38 @@ export default function FoodVendorProfilePage() {
                   >
                     Book Now
                   </button>
+                  <p className="border border-dashed border-[#d8d0ba] bg-[#fffdf4] px-3 py-2 text-[11px] text-gray-500 leading-relaxed mt-3">
+  On submission of this form, your booking request will be shared with the business. 
+  They will <span className="font-medium text-[#1d1d1d]">confirm or decline</span> it based on availability. 
+  We’ll keep you updated.
+</p>
                 </div>
               ) : (
-              <div className="space-y-3 p-5">
-                <div className="space-y-1">
-                  <label className="block text-[10px] font-montserrat font-medium uppercase tracking-wide text-[#6f6f6f]">
-                    Name
-                  </label>
-                  <input
-                    value={bookForm.name}
-                    onChange={(e) => setBookForm((prev) => ({ ...prev, name: e.target.value }))}
-                    placeholder="Enter Name"
-                    className="h-8 w-full border border-[#d8d0ba] bg-[#fff8e8] px-2.5 text-[11px] font-montserrat font-medium text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#C7A040]"
-                  />
+              <div className="space-y-4 p-5">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div className="space-y-1">
+                    <label className="block text-[10px] font-montserrat font-medium uppercase tracking-wide text-[#6f6f6f]">
+                      Name
+                    </label>
+                    <input
+                      value={bookForm.name}
+                      onChange={(e) => setBookForm((prev) => ({ ...prev, name: e.target.value }))}
+                      placeholder="Enter Name"
+                      className="h-9 w-full border border-[#d8d0ba] bg-[#fff8e8] px-3 text-[11px] font-montserrat font-medium text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#C7A040]"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="block text-[10px] font-montserrat font-medium uppercase tracking-wide text-[#6f6f6f]">
+                      Phone Number
+                    </label>
+                    <input
+                      value={bookForm.phone}
+                      onChange={(e) => setBookForm((prev) => ({ ...prev, phone: e.target.value }))}
+                      placeholder="Enter Phone Number"
+                      className="h-9 w-full border border-[#d8d0ba] bg-[#fff8e8] px-3 text-[11px] font-montserrat font-medium text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#C7A040]"
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-1">
@@ -522,73 +741,128 @@ export default function FoodVendorProfilePage() {
                     value={bookForm.email}
                     onChange={(e) => setBookForm((prev) => ({ ...prev, email: e.target.value }))}
                     placeholder="Enter Email"
-                    className="h-8 w-full border border-[#d8d0ba] bg-[#fff8e8] px-2.5 text-[11px] font-montserrat font-medium text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#C7A040]"
+                    className="h-9 w-full border border-[#d8d0ba] bg-[#fff8e8] px-3 text-[11px] font-montserrat font-medium text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#C7A040]"
                   />
                 </div>
 
-                <div className="space-y-1">
-                  <label className="block text-[10px] font-montserrat font-medium uppercase tracking-wide text-[#6f6f6f]">
-                    Phone Number
-                  </label>
-                  <input
-                    value={bookForm.phone}
-                    onChange={(e) => setBookForm((prev) => ({ ...prev, phone: e.target.value }))}
-                    placeholder="Enter Phone Number"
-                    className="h-8 w-full border border-[#d8d0ba] bg-[#fff8e8] px-2.5 text-[11px] font-montserrat font-medium text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#C7A040]"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="space-y-1">
-                    <label className="block text-[10px] font-montserrat font-medium uppercase tracking-wide text-[#6f6f6f]">
-                      Reservation Date
-                    </label>
-                    <input
-                      value={bookForm.date}
-                      onChange={(e) => setBookForm((prev) => ({ ...prev, date: e.target.value }))}
-                      placeholder="MM/DD/YYYY"
-                      className="h-8 w-full border border-[#d8d0ba] bg-[#fff8e8] px-2.5 text-[11px] font-montserrat font-medium text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#C7A040]"
-                    />
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-[10px] font-semibold uppercase tracking-wide text-[#6f6f6f]">
+                      Pick A Reservation Date
+                    </p>
+                    <span className="text-[10px] font-medium text-[#8a7b52]">
+                      Closed days are blocked
+                    </span>
                   </div>
 
-                  <div className="space-y-1">
-                    <label className="block text-[10px] font-montserrat font-medium uppercase tracking-wide text-[#6f6f6f]">
-                      Select Time
-                    </label>
-                    <select
-                      value={bookForm.timeSlot}
-                      onChange={(e) => setBookForm((prev) => ({ ...prev, timeSlot: e.target.value }))}
-                      className="h-8 w-full border border-[#d8d0ba] bg-[#fff8e8] px-2.5 text-[11px] font-montserrat font-medium text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#C7A040]"
-                    >
-                      <option value="">09 - 6AM</option>
-                      {data.bookingTimeSlots.map((slot) => (
-                        <option key={slot} value={slot}>
-                          {slot}
-                        </option>
+                  <div className="border border-[#eadcb7] bg-[#fffdf4] p-3">
+                    <div className="mb-3 flex items-center justify-between">
+                      <button
+                        type="button"
+                        onClick={() => setCalendarMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1))}
+                        className="h-8 w-8 border border-[#d7c796] text-[#7b5e19] transition-colors hover:bg-[#f8edd0]"
+                      >
+                        ‹
+                      </button>
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#1A1F71]">
+                        {formatMonthLabel(calendarMonth)}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setCalendarMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1))}
+                        className="h-8 w-8 border border-[#d7c796] text-[#7b5e19] transition-colors hover:bg-[#f8edd0]"
+                      >
+                        ›
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-7 gap-1 text-center">
+                      {DAY_NAMES.map((day) => (
+                        <span key={day} className="pb-1 text-[10px] font-semibold uppercase tracking-wide text-[#8a7b52]">
+                          {day.slice(0, 3)}
+                        </span>
                       ))}
-                    </select>
+                      {calendarDays.map((day) => {
+                        const isCurrentMonth = day.getMonth() === calendarMonth.getMonth();
+                        const dateKey = formatDateKey(day);
+                        const isSelected = bookForm.date === dateKey;
+                        const available = isDateAvailable(day);
+
+                        return (
+                          <button
+                            key={dateKey}
+                            type="button"
+                            disabled={!available}
+                            onClick={() => setBookForm((prev) => ({ ...prev, date: dateKey }))}
+                            className={`h-10 border text-[11px] transition-colors ${
+                              isSelected
+                                ? "border-[#C7A040] bg-[#C7A040] font-semibold text-white"
+                                : available
+                                  ? "border-[#eadcb7] bg-white text-[#1d1d1d] hover:border-[#C7A040] hover:bg-[#fff2cc]"
+                                  : "border-[#f0e6c8] bg-[#fbf6e8] text-gray-300"
+                            } ${!isCurrentMonth ? "opacity-50" : ""}`}
+                          >
+                            {day.getDate()}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
+                </div>
+
+                <div className="space-y-2">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-[#6f6f6f]">
+                    Available Time Slots
+                  </p>
+                  {bookForm.date ? (
+                    availableTimeSlots.length > 0 ? (
+                      <div className="grid grid-cols-2 gap-2">
+                        {availableTimeSlots.map((slot) => (
+                          <button
+                            key={slot}
+                            type="button"
+                            onClick={() => setBookForm((prev) => ({ ...prev, timeSlot: slot }))}
+                            className={`h-9 border px-2 text-[11px] font-medium transition-colors ${
+                              bookForm.timeSlot === slot
+                                ? "border-[#C7A040] bg-[#C7A040] text-white"
+                                : "border-[#d8d0ba] bg-white text-[#1d1d1d] hover:border-[#C7A040] hover:bg-[#fff2cc]"
+                            }`}
+                          >
+                            {slot}
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="border border-dashed border-[#d8d0ba] bg-[#fffdf4] px-3 py-3 text-[11px] text-gray-500">
+                        No valid one-hour reservation slots are available for the selected day.
+                      </p>
+                    )
+                  ) : (
+                    <p className="border border-dashed border-[#d8d0ba] bg-[#fffdf4] px-3 py-3 text-[11px] text-gray-500">
+                      Choose a working day to unlock time slots.
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-1">
                   <label className="block text-[10px] font-montserrat font-medium uppercase tracking-wide text-[#6f6f6f]">
-                    Number Of People
+                    Select Seat
                   </label>
                   <select
                     value={bookForm.tableType}
                     onChange={(e) => setBookForm((prev) => ({ ...prev, tableType: e.target.value }))}
-                    className="h-8 w-full border border-[#d8d0ba] bg-[#fff8e8] px-2.5 text-[11px] font-montserrat font-medium text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#C7A040]"
+                    className="h-9 w-full border border-[#d8d0ba] bg-[#fff8e8] px-3 text-[11px] font-montserrat font-medium text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#C7A040]"
                   >
                     <option value="">Select Seat Count</option>
-                    {data.tableTypes.map((table) => (
-                      <option key={`${table.type}-${table.count}`} value={table.type || ""}>
-                        {table.type} ({table.count ?? 0} Available)
+                    {SEAT_OPTIONS.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
                       </option>
                     ))}
                   </select>
                 </div>
 
-                <div className="space-y-1">
+                {/* <div className="space-y-1">
                   <label className="block text-[10px] font-montserrat font-medium uppercase tracking-wide text-[#6f6f6f]">
                     Message
                   </label>
@@ -597,20 +871,35 @@ export default function FoodVendorProfilePage() {
                     onChange={(e) => setBookForm((prev) => ({ ...prev, message: e.target.value }))}
                     placeholder="Add Message"
                     rows={3}
-                    className="w-full resize-none border border-[#d8d0ba] bg-[#fff8e8] px-2.5 py-2 text-[11px] font-montserrat font-medium text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#C7A040]"
+                    className="w-full resize-none border border-[#d8d0ba] bg-[#fff8e8] px-3 py-2 text-[11px] font-montserrat font-medium text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#C7A040]"
                   />
+                </div> */}
+
+                <div className="border border-[#eadcb7] bg-[#fff3d3] p-3">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-[#6f6f6f]">
+                    Reservation Summary
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-2 text-[10px] uppercase tracking-wide text-[#8a7b52]">
+                    <span>{bookForm.date && selectedDateObject ? formatCalendarDate(selectedDateObject) : "Date not selected"}</span>
+                    <span>{bookForm.timeSlot || "Time not selected"}</span>
+                    <span>{bookForm.tableType || "Seat size not selected"}</span>
+                  </div>
                 </div>
 
                 <button
-                  className="h-9 w-full bg-[#C7A040] text-[11px] font-poppins font-semibold uppercase tracking-wide text-white transition-colors hover:bg-[#a88432]"
-                  onClick={() => {
-                    if (data.bookingToolLink) {
-                      window.open(data.bookingToolLink, "_blank", "noopener,noreferrer");
-                    }
-                  }}
+                  type="button"
+                  disabled={!bookingReady}
+                  className={`h-10 w-full text-[11px] font-poppins font-semibold uppercase tracking-wide text-white transition-colors ${
+                    bookingReady ? "bg-[#C7A040] hover:bg-[#a88432]" : "cursor-not-allowed bg-[#d7c796]"
+                  }`}
                 >
                   Book Table
                 </button>
+                <p className="border border-dashed border-[#d8d0ba] bg-[#fffdf4] px-3 py-2 text-[11px] text-gray-500 leading-relaxed mt-3">
+  On submission of this form, your booking request will be shared with the business. 
+  They will <span className="font-medium text-[#1d1d1d]">confirm or decline</span> it based on availability. 
+  We’ll keep you updated.
+</p>
               </div>
               )}
             </div>

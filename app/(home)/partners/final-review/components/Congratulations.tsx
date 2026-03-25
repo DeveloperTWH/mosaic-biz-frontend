@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { 
   ArrowUpRight, Megaphone, Rocket, Sparkles
@@ -11,6 +11,10 @@ interface Business {
   _id: string;
   businessName: string;
   logo?: string;
+  listingType?: "product" | "service" | "food";
+  products?: Array<string | { _id?: string }>;
+  services?: Array<string | { _id?: string }>;
+  foods?: Array<string | { _id?: string }>;
 }
 
 interface Props {
@@ -20,12 +24,113 @@ interface Props {
 
 export default function Congratulations({ businessName, business }: Props) {
   const router = useRouter();
+  const [resolvedStorefrontHref, setResolvedStorefrontHref] = useState<string | null>(null);
   
   const displayName = business?.businessName || businessName || "ABC Salon";
   const businessLogo = business?.logo || "/api/placeholder/120/120";
-  const storefrontHref = business?._id
-    ? `/vendor-profile/product-vendor/${business._id}`
-    : null;
+  const getListingId = (items?: Array<string | { _id?: string }>) => {
+    const firstItem = items?.[0];
+
+    if (!firstItem) {
+      return null;
+    }
+
+    return typeof firstItem === "string" ? firstItem : firstItem._id || null;
+  };
+
+  const storefrontHref = (() => {
+    if (!business?._id) {
+      return null;
+    }
+
+    if (business.listingType === "service") {
+      const serviceId = getListingId(business.services);
+      return serviceId ? `/vendor-profile/service-vendor/${serviceId}` : null;
+    }
+
+    if (business.listingType === "food") {
+      const foodId = getListingId(business.foods);
+      return foodId ? `/vendor-profile/food-vendor/${foodId}` : null;
+    }
+
+    return `/vendor-profile/product-vendor/${business._id}`;
+  })();
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const resolveStorefrontHref = async () => {
+      if (!business?._id) {
+        if (isMounted) {
+          setResolvedStorefrontHref(null);
+        }
+        return;
+      }
+
+      if (storefrontHref) {
+        if (isMounted) {
+          setResolvedStorefrontHref(storefrontHref);
+        }
+        return;
+      }
+
+      try {
+        const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") ?? "";
+
+        if (business.listingType === "service") {
+          const response = await fetch(`${apiBase}/api/service/my-services`, {
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+          });
+          const data = await response.json();
+          const firstService =
+            Array.isArray(data?.services) && data.services.length > 0
+              ? data.services[0]
+              : null;
+          const serviceId = firstService?._id || null;
+
+          if (isMounted) {
+            setResolvedStorefrontHref(
+              serviceId ? `/vendor-profile/service-vendor/${serviceId}` : null
+            );
+          }
+          return;
+        }
+
+        if (business.listingType === "food") {
+          const response = await fetch(`${apiBase}/api/food/my-foods`, {
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+          });
+          const data = await response.json();
+          const firstFood =
+            Array.isArray(data?.foods) && data.foods.length > 0 ? data.foods[0] : null;
+          const foodId = firstFood?._id || null;
+
+          if (isMounted) {
+            setResolvedStorefrontHref(
+              foodId ? `/vendor-profile/food-vendor/${foodId}` : null
+            );
+          }
+          return;
+        }
+
+        if (isMounted) {
+          setResolvedStorefrontHref(`/vendor-profile/product-vendor/${business._id}`);
+        }
+      } catch (error) {
+        if (isMounted) {
+          setResolvedStorefrontHref(null);
+        }
+      }
+    };
+
+    resolveStorefrontHref();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [business?._id, business?.listingType, storefrontHref]);
 
   useEffect(() => {
     // Trigger confetti on mount
@@ -147,8 +252,8 @@ const steps = [
               </div>
               <button
                 type="button"
-                onClick={() => storefrontHref && router.push(storefrontHref)}
-                disabled={!storefrontHref}
+                onClick={() => resolvedStorefrontHref && router.push(resolvedStorefrontHref)}
+                disabled={!resolvedStorefrontHref}
                 className="bg-[#c9a227] hover:bg-[#b8921f] disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-6 py-2 rounded text-sm font-medium flex items-center gap-2 transition-colors"
               >
                 View Your Storefront

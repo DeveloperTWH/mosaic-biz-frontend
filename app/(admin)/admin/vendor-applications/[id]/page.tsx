@@ -480,10 +480,18 @@ const normalizeUrl = (url?: string) => {
     }
   };
 
-  const getDocumentCategoryVerified = (
+const getDocumentCategoryVerified = (
   checklistKey: keyof VerificationChecklist,
   docs?: Document[] | null
 ): boolean => {
+  if (
+    checklistKey === "minorityDocs" &&
+    application?.isMinorityOwned &&
+    !docs?.length
+  ) {
+    return true;
+  }
+
   const checklistVerified = Boolean(application?.verificationChecklist?.[checklistKey]);
 
   const allDocsVerified =
@@ -502,7 +510,7 @@ const normalizeUrl = (url?: string) => {
 //     Boolean(docs?.length) && docs.every((doc) => Boolean(doc.verified));
 
 //   return checklistVerified || allDocsVerified;
-// };
+// }; 
 
 
 
@@ -1137,7 +1145,7 @@ verified: getDocumentCategoryVerified(
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-semibold text-gray-700 flex items-center gap-2">
             <Shield className="w-4 h-4" />
-            Minority Proof Documents ({application.minorityProofDocuments?.length ?? 0})
+            Minority Proof Document ({application.minorityProofDocuments?.length ?? 0})
           </h3>
           <span className={`px-2 py-1 rounded text-xs font-medium ${
             getDocumentCategoryVerified("minorityDocs", application.minorityProofDocuments)
@@ -1215,7 +1223,7 @@ verified: getDocumentCategoryVerified(
             <div key={doc._id} className="p-3 border rounded-lg space-y-3 mb-2">
               
               <div className="flex justify-between items-center">
-                <span className="text-sm">Tax Document {index + 1}</span>
+                <span className="text-sm">EIN Document {index + 1}</span>
                 <button
                   onClick={() => openDocument('taxDocuments', doc, index)}
                   className="text-blue-600 text-sm"
@@ -1607,7 +1615,7 @@ verified: getDocumentCategoryVerified(
                   Ready to Finalize
                 </h4>
                 <p className="text-gray-600 text-center text-sm mb-6">
-                  All required verifications are completed. This action will mark the application as approved and notify the vendor.
+                  All required verifications are completed. This action will mark the application as approved or rejected baced on points and  notify the vendor.
                 </p>
                 
                 <div className="bg-gray-50 rounded-lg p-4 mb-6">
@@ -1667,12 +1675,6 @@ verified: getDocumentCategoryVerified(
               </div>
               
               <div className="mt-4 p-3 bg-yellow-50 rounded-lg">
-                <div className="flex items-start gap-2">
-                  <AlertTriangle className="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" />
-                  <p className="text-xs text-yellow-700">
-                    This action cannot be undone. The vendor will be notified and the application status will be updated to "approved".
-                  </p>
-                </div>
               </div>
             </div>
           </div>

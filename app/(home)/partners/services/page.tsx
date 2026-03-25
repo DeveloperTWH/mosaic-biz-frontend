@@ -109,7 +109,7 @@ export default function ServicesPage() {
       onClick={() => router.push('/partners/final-review')}
       className="px-2 py-1 bg-blue-700 text-white rounded-md hover:bg-blue-700 transition-colors"
     >
-      Go Live
+      publish
     </button>
   </div>
 </div>
