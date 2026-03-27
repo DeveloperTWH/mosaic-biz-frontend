@@ -35,6 +35,7 @@ export default function EditServiceModal({ service, onClose, onSave }: Props) {
       []
   );
   const [bookingToolLink, setBookingToolLink] = useState(service.bookingToolLink || '');
+  const [location, setLocation] = useState(service.location || '');
   const [isPublished, setIsPublished] = useState(service.isPublished);
   
   // Child services
@@ -49,7 +50,7 @@ export default function EditServiceModal({ service, onClose, onSave }: Props) {
   const addChildService = () => {
     setChildServices([
       ...childServices,
-      { name: '', description: '', durationMinutes: 60, price: 0 }
+      { name: '', description: '', durationMinutes: 60, price: 0, location: '' }
     ]);
   };
 
@@ -104,6 +105,7 @@ export default function EditServiceModal({ service, onClose, onSave }: Props) {
         coverImage,
         images: galleryImages,
         bookingToolLink,
+        location,
         services: normalizedServices,
         businessHours,
         isPublished
@@ -246,6 +248,17 @@ export default function EditServiceModal({ service, onClose, onSave }: Props) {
           </div>
 
           <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Map Location</label>
+            <input
+              type="url"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-[#c9a227] focus:border-[#c9a227]"
+              placeholder="https://www.google.com/maps"
+            />
+          </div>
+
+          <div className="mb-6">
             <label className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -299,6 +312,16 @@ export default function EditServiceModal({ service, onClose, onSave }: Props) {
                     value={service.description}
                     onChange={(e) => updateChildService(index, 'description', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                  />
+                </div>
+                <div className="mb-3">
+                  <label className="block text-xs text-gray-500 mb-1">Map URL</label>
+                  <input
+                    type="url"
+                    value={service.location || ''}
+                    onChange={(e) => updateChildService(index, 'location', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                    placeholder="https://www.google.com/maps"
                   />
                 </div>
                 <div className="mb-3">

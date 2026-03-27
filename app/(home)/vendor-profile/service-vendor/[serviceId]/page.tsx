@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
+import { Eye } from "lucide-react";
 import ClientTestimonials from "../../../Components/ClientTestimonials";
 import PublicSearchFilterBar from "../../../Components/PublicSearchFilterBar";
 import { buildSearchPageUrl, PublicSearchFilters } from "../../../Components/publicSearch";
@@ -50,6 +51,16 @@ type Business = {
   website?: string;
   socialLinks?: {
     website?: string;
+  };
+  googleReviewLink?: string | null;
+  communityServiceLink?: string | null;
+  refundPolicyDocument?: {
+    url?: string;
+    verified?: boolean;
+  };
+  termsDocument?: {
+    url?: string;
+    verified?: boolean;
   };
   address?: {
     street?: string;
@@ -161,6 +172,10 @@ function normalizeData(payload: ApiResponse) {
     businessBadge: business?.badge || "", // ✅ ADD THIS
     businessAddress,
     businessWebsite,
+    googleReviewLink: business?.googleReviewLink || "",
+    communityServiceLink: business?.communityServiceLink || "",
+    refundPolicyDocumentUrl: business?.refundPolicyDocument?.url || "",
+    termsDocumentUrl: business?.termsDocument?.url || "",
     
     // Categories
     category: service?.categoryId?.name || "",
@@ -297,6 +312,11 @@ function getBadgeImage(badge?: string): string | null {
   return badgeMap[key] ?? null;
 }
 
+function getSafeExternalUrl(url?: string) {
+  if (!url) return "";
+  return /^https?:\/\//i.test(url) ? url : `https://${url}`;
+}
+
 function getMapUrls(location?: string, address?: string) {
   const rawLocation = (location || "").trim();
   const rawAddress = (address || "").trim();
@@ -311,16 +331,33 @@ function getMapUrls(location?: string, address?: string) {
     };
   }
 
-  if (rawAddress) {
-    return {
-      embedUrl: `https://maps.google.com/maps?q=${encodeURIComponent(rawAddress)}&output=embed`,
-      externalUrl: hasHttpLocation
-        ? rawLocation
-        : `https://maps.google.com/maps?q=${encodeURIComponent(rawAddress)}`,
-    };
-  }
-
   if (hasHttpLocation) {
+    try {
+      const parsedUrl = new URL(rawLocation);
+      const atMatch = parsedUrl.pathname.match(/@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?),(\d+(?:\.\d+)?)z/i);
+
+      if (atMatch) {
+        const [, lat, lng, zoom] = atMatch;
+        return {
+          embedUrl: `https://maps.google.com/maps?q=${lat},${lng}&z=${zoom}&output=embed`,
+          externalUrl: rawLocation,
+        };
+      }
+
+      const query = parsedUrl.searchParams.get("q") || parsedUrl.searchParams.get("query");
+      if (query) {
+        return {
+          embedUrl: `https://maps.google.com/maps?q=${encodeURIComponent(query)}&output=embed`,
+          externalUrl: rawLocation,
+        };
+      }
+    } catch {
+      return {
+        embedUrl: undefined,
+        externalUrl: rawLocation,
+      };
+    }
+
     return {
       embedUrl: undefined,
       externalUrl: rawLocation,
@@ -334,10 +371,28 @@ function getMapUrls(location?: string, address?: string) {
     };
   }
 
+  if (rawAddress) {
+    return {
+      embedUrl: `https://maps.google.com/maps?q=${encodeURIComponent(rawAddress)}&output=embed`,
+      externalUrl: `https://maps.google.com/maps?q=${encodeURIComponent(rawAddress)}`,
+    };
+  }
+
   return {
     embedUrl: undefined,
     externalUrl: undefined,
   };
+}
+
+function isShortGoogleMapsUrl(location?: string) {
+  if (!location) return false;
+
+  try {
+    const parsed = new URL(location);
+    return parsed.hostname.toLowerCase() === "maps.app.goo.gl";
+  } catch {
+    return false;
+  }
 }
 
 function StarRating({ rating }: { rating: number }) {
@@ -509,7 +564,9 @@ export default function ServiceVendorProfilePage() {
   const { 
     title, description, contact, coverImage, galleryImages, businessHours,
     averageRating, totalReviews, slug, location: mapUrl, amenities, features,
-    businessName, businessLogo, businessDescription, businessAddress, businessWebsite, category, subcategory
+    businessName, businessLogo, businessDescription, businessAddress, businessWebsite,
+    googleReviewLink, communityServiceLink, refundPolicyDocumentUrl, termsDocumentUrl,
+    category, subcategory
   } = data;
 
   const toggleServiceSelection = (serviceIdToToggle: string) => {
@@ -550,6 +607,7 @@ export default function ServiceVendorProfilePage() {
     mapUrl,
     businessAddress || contact.address
   );
+  const usesShortGoogleMapsLink = isShortGoogleMapsUrl(mapUrl);
 
 
 
@@ -825,7 +883,7 @@ export default function ServiceVendorProfilePage() {
                             View on Maps
                           </a>
                         ) : row.key === "website" ? (
-                          <a href={row.value.startsWith("http") ? row.value : `https://${row.value}`}
+                          <a href={getSafeExternalUrl(row.value)}
                             target="_blank" rel="noreferrer" className="font-montserrat font-medium text-gray-700 underline break-all">
                             {row.value.replace(/^https?:\/\//, '')}
                           </a>
@@ -843,6 +901,62 @@ export default function ServiceVendorProfilePage() {
                     )}
                   </div>
                 ))}
+                {googleReviewLink ? (
+                  <div className="grid grid-cols-[96px_1fr] gap-2 items-start">
+                    <span className="font-montserrat font-bold text-gray-900">Reviews</span>
+                    <a
+                      href={getSafeExternalUrl(googleReviewLink)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-montserrat font-medium text-[#1A1F71] underline break-all"
+                    >
+                      Google Review
+                    </a>
+                  </div>
+                ) : null}
+                {communityServiceLink ? (
+                  <div className="grid grid-cols-[96px_1fr] gap-2 items-start">
+                    <span className="font-montserrat font-bold text-gray-900">Community</span>
+                    <a
+                      href={getSafeExternalUrl(communityServiceLink)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-montserrat font-medium text-[#1A1F71] underline break-all"
+                    >
+                      Community Service
+                    </a>
+                  </div>
+                ) : null}
+                {refundPolicyDocumentUrl ? (
+                  <div className="grid grid-cols-[96px_1fr] gap-2 items-center">
+                    <span className="font-montserrat font-bold text-gray-900">Refund policy</span>
+                    <a
+                      href={refundPolicyDocumentUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex w-fit items-center gap-2 rounded border border-gray-200 px-2.5 py-1.5 text-[#1A1F71] hover:bg-gray-50"
+                      aria-label="View refund policy document"
+                      title="View refund policy document"
+                    >
+                      <Eye size={16} />
+                    </a>
+                  </div>
+                ) : null}
+                {termsDocumentUrl ? (
+                  <div className="grid grid-cols-[96px_1fr] gap-2 items-center">
+                    <span className="font-montserrat font-bold text-gray-900">Terms doc</span>
+                    <a
+                      href={termsDocumentUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex w-fit items-center gap-2 rounded border border-gray-200 px-2.5 py-1.5 text-[#1A1F71] hover:bg-gray-50"
+                      aria-label="View terms document"
+                      title="View terms document"
+                    >
+                      <Eye size={16} />
+                    </a>
+                  </div>
+                ) : null}
               </div>
             </div>
 
@@ -1123,7 +1237,11 @@ export default function ServiceVendorProfilePage() {
                   />
                 ) : (
                   <div className="flex h-full w-full flex-col items-center justify-center gap-2 px-4 text-center">
-                    <span className="text-sm text-gray-500">Map preview unavailable</span>
+                    <span className="text-sm text-gray-500">
+                      {usesShortGoogleMapsLink
+                        ? "Preview is not available for Google short links."
+                        : "Map preview unavailable"}
+                    </span>
                     {mapExternalUrl ? (
                       <a
                         href={mapExternalUrl}
@@ -1131,7 +1249,7 @@ export default function ServiceVendorProfilePage() {
                         rel="noreferrer"
                         className="text-xs font-semibold uppercase tracking-wide text-[#1A1F71] underline"
                       >
-                        Open in Google Maps
+                        {usesShortGoogleMapsLink ? "Open Shared Map" : "Open in Google Maps"}
                       </a>
                     ) : (
                       <span className="text-sm text-gray-400">Map unavailable</span>

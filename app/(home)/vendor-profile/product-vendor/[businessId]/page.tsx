@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
+import { Eye } from "lucide-react";
 import ClientTestimonials from "../../../Components/ClientTestimonials";
 import PublicSearchFilterBar from "../../../Components/PublicSearchFilterBar";
 import { buildSearchPageUrl, PublicSearchFilters } from "../../../Components/publicSearch";
@@ -38,6 +39,16 @@ type VendorDetails = {
   yearsInBusiness?: string;
   website?: string;
   businessBio?: string;
+  googleReviewLink?: string;
+  communityServiceLink?: string;
+  refundPolicyDocument?: {
+    url?: string;
+    verified?: boolean;
+  };
+  termsDocument?: {
+    url?: string;
+    verified?: boolean;
+  };
 };
 
 type VendorProfileResponse = {
@@ -125,6 +136,11 @@ function getBadgeImage(badge?: string): string | null {
     diamond: "/badge/diamond.png",
   };
   return badgeMap[key] ?? null;
+}
+
+function getSafeExternalUrl(url?: string): string {
+  if (!url) return "";
+  return url.startsWith("http://") || url.startsWith("https://") ? url : `https://${url}`;
 }
 
 export default function ProductVendorProfilePage() {
@@ -230,6 +246,10 @@ export default function ProductVendorProfilePage() {
   const badgeImage = getBadgeImage(profile?.badge);
   const businessAddress = formatAddress(vendorDetails ?? undefined);
   const websiteValue = (vendorDetails?.website || "").trim();
+  const googleReviewLink = (vendorDetails?.googleReviewLink || "").trim();
+  const communityServiceLink = (vendorDetails?.communityServiceLink || "").trim();
+  const refundPolicyDocumentUrl = (vendorDetails?.refundPolicyDocument?.url || "").trim();
+  const termsDocumentUrl = (vendorDetails?.termsDocument?.url || "").trim();
   const bannerImage = profile?.coverImage || profile?.logo || "";
 
   useEffect(() => {
@@ -446,7 +466,7 @@ export default function ProductVendorProfilePage() {
                   {websiteValue ? (
                     revealedFields.website ? (
                       <a
-                        href={websiteValue.startsWith("http") ? websiteValue : `https://${websiteValue}`}
+                        href={getSafeExternalUrl(websiteValue)}
                         target="_blank"
                         rel="noreferrer"
                         className="font-montserrat font-medium text-gray-700"
@@ -466,6 +486,62 @@ export default function ProductVendorProfilePage() {
                     <span className="text-gray-500">N/A</span>
                   )}
                 </div>
+                {googleReviewLink ? (
+                  <div className="grid grid-cols-[96px_1fr] gap-2">
+                    <span className="font-montserrat font-bold text-gray-900">Reviews</span>
+                    <a
+                      href={getSafeExternalUrl(googleReviewLink)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-montserrat font-medium text-[#1A1F71] underline break-all"
+                    >
+                      Google Review
+                    </a>
+                  </div>
+                ) : null}
+                {communityServiceLink ? (
+                  <div className="grid grid-cols-[96px_1fr] gap-2">
+                    <span className="font-montserrat font-bold text-gray-900">Community</span>
+                    <a
+                      href={getSafeExternalUrl(communityServiceLink)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-montserrat font-medium text-[#1A1F71] underline break-all"
+                    >
+                      Community Service
+                    </a>
+                  </div>
+                ) : null}
+                {refundPolicyDocumentUrl ? (
+                  <div className="grid grid-cols-[96px_1fr] gap-2 items-center">
+                    <span className="font-montserrat font-bold text-gray-900"> refund policy</span>
+                    <a
+                      href={refundPolicyDocumentUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex w-fit items-center gap-2 rounded border border-gray-200 px-2.5 py-1.5 text-[#1A1F71] hover:bg-gray-50"
+                      aria-label="refund policy"
+                      title="refund policy"
+                    >
+                      <Eye size={16} />
+                    </a>
+                  </div>
+                ) : null}
+                {termsDocumentUrl ? (
+                  <div className="grid grid-cols-[96px_1fr] gap-2 items-center">
+                    <span className="font-montserrat font-bold text-gray-900">Terms doc</span>
+                    <a
+                      href={termsDocumentUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex w-fit items-center gap-2 rounded border border-gray-200 px-2.5 py-1.5 text-[#1A1F71] hover:bg-gray-50"
+                      aria-label="View terms document"
+                      title="View terms document"
+                    >
+                      <Eye size={16} />
+                    </a>
+                  </div>
+                ) : null}
               </div>
             </div>
           </div>

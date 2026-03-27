@@ -11,7 +11,14 @@ interface CartItem {
   discountEndDate?: string | null;
   selectedSizePrice?: number;
   shippingType?: 'standard' | 'overnight' | 'local';
+  shippingMethod?: 'standard' | 'overnight' | 'local';
   shippingCost?: number;
+  shippingCharge?: number;
+  shipping?: {
+    standard?: number;
+    overnight?: number;
+    local?: number;
+  } | null;
   imageUrl?: string;
   color?: string;
   label?: string;
@@ -49,7 +56,14 @@ type GuestCartItemMeta = {
   discountEndDate?: string | null;
   selectedSizePrice?: number;
   shippingType?: ShippingType;
+  shippingMethod?: ShippingType;
   shippingCost?: number;
+  shippingCharge?: number;
+  shipping?: {
+    standard?: number;
+    overnight?: number;
+    local?: number;
+  } | null;
   imageUrl?: string;
   color?: string;
   label?: string;
@@ -86,6 +100,7 @@ export const addToCart = async (
         productId,
         variantId,
         quantity,
+        shippingMethod: meta?.shippingMethod ?? meta?.shippingType,
         variant: { size }, // <-- IMPORTANT: backend expects { variant: { size } }
       }),
     });
@@ -618,6 +633,8 @@ async function buildGuestCartDetailed(): Promise<CartItemDetailed[]> {
       selectedSizePrice,
       shippingType,
       shippingCost,
+      shippingCharge: shippingCost,
+      shipping: v?.shipping ?? it.shipping ?? null,
 
       isSaleActive,
     };
@@ -649,6 +666,15 @@ export const getCartDetailed = async (): Promise<CartItemDetailed[]> => {
       const salePrice = it.salePrice == null ? null : toNumber(it.salePrice);
       const discountEndISO =
         it.discountEndDate ? new Date(it.discountEndDate).toISOString() : null;
+      const shipping = it.shipping
+        ? {
+            standard: toNumber(it.shipping.standard),
+            overnight: toNumber(it.shipping.overnight),
+            local: toNumber(it.shipping.local),
+          }
+        : null;
+      const shippingCharge = toNumber(it.shippingCharge ?? it.shippingCost);
+      const shippingMethod = it.shippingMethod ?? it.shippingType;
 
       const isSaleActive = isSalePriceActive(salePrice, discountEndISO);
 
@@ -673,6 +699,11 @@ export const getCartDetailed = async (): Promise<CartItemDetailed[]> => {
         salePrice,
         discountEndDate: discountEndISO,
         selectedSizePrice: toNumber(it.selectedSizePrice),
+        shippingType: shippingMethod,
+        shippingMethod,
+        shippingCost: shippingCharge,
+        shippingCharge,
+        shipping,
 
         // derived
         isSaleActive,

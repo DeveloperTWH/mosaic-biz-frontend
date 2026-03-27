@@ -6,6 +6,7 @@ export interface ChildService {
   durationMinutes?: number;
   price: number;
   image?: string;
+  location?: string;
 }
 
 export interface BusinessHour {

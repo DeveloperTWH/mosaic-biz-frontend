@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
+import { Eye } from "lucide-react";
 import ClientTestimonials from "../../../Components/ClientTestimonials";
 import PublicSearchFilterBar from "../../../Components/PublicSearchFilterBar";
 import { buildSearchPageUrl, PublicSearchFilters } from "../../../Components/publicSearch";
@@ -70,6 +71,16 @@ type Business = {
   website?: string;
   socialLinks?: {
     website?: string;
+  };
+  googleReviewLink?: string | null;
+  communityServiceLink?: string | null;
+  refundPolicyDocument?: {
+    url?: string;
+    verified?: boolean;
+  };
+  termsDocument?: {
+    url?: string;
+    verified?: boolean;
   };
   badge?: string;
 };
@@ -213,6 +224,11 @@ function getBadgeImage(badge?: string): string | null {
   return badgeMap[key] ?? null;
 }
 
+function getSafeExternalUrl(url?: string): string {
+  if (!url) return "";
+  return /^https?:\/\//i.test(url) ? url : `https://${url}`;
+}
+
 function getMapEmbedUrl(address?: string, coordinates?: [number, number]): string | undefined {
   if (Array.isArray(coordinates) && coordinates.length === 2) {
     const [lng, lat] = coordinates;
@@ -276,6 +292,10 @@ function normalizeData(payload: FoodProfileResponse) {
     businessPhone: business?.phone || "",
     businessAddress: businessAddress || food?.location?.address || "",
     businessWebsite,
+    googleReviewLink: business?.googleReviewLink || "",
+    communityServiceLink: business?.communityServiceLink || "",
+    refundPolicyDocumentUrl: business?.refundPolicyDocument?.url || "",
+    termsDocumentUrl: business?.termsDocument?.url || "",
     businessBadge: business?.badge || food?.badge || "",
   };
 }
@@ -656,7 +676,7 @@ export default function FoodVendorProfilePage() {
                           </a>
                         ) : row.key === "website" ? (
                           <a
-                            href={row.value.startsWith("http") ? row.value : `https://${row.value}`}
+                            href={getSafeExternalUrl(row.value)}
                             target="_blank"
                             rel="noreferrer"
                             className="font-montserrat font-medium text-gray-700 underline break-all"
@@ -679,6 +699,64 @@ export default function FoodVendorProfilePage() {
                     )}
                   </div>
                 ))}
+                {data.googleReviewLink ? (
+                  <div className="grid grid-cols-[96px_1fr] gap-2 items-start">
+                    <span className="font-montserrat font-bold text-gray-900">Reviews</span>
+                    <a
+                      href={getSafeExternalUrl(data.googleReviewLink)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-montserrat font-medium text-[#1A1F71] underline break-all"
+                    >
+                      Google Review
+                    </a>
+                  </div>
+                ) : null}
+                {data.communityServiceLink ? (
+                  <div className="grid grid-cols-[96px_1fr] gap-2 items-start">
+                    <span className="font-montserrat font-bold text-gray-900">Community</span>
+                    <a
+                      href={getSafeExternalUrl(data.communityServiceLink)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-montserrat font-medium text-[#1A1F71] underline break-all"
+                    >
+                      Community Service
+                    </a>
+                  </div>
+                ) : null}
+                {data.refundPolicyDocumentUrl ? (
+                  <div className="grid grid-cols-[96px_1fr] gap-2 items-center">
+                    <span className="font-montserrat font-bold text-gray-900">Refund</span>
+                    <a
+                      href={data.refundPolicyDocumentUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex w-fit items-center gap-2 rounded border border-gray-200 px-2.5 py-1.5 text-[#1A1F71] hover:bg-gray-50"
+                      aria-label="View refund policy document"
+                      title="View refund policy document"
+                    >
+                      <Eye size={16} />
+                      <span className="font-montserrat font-medium">Policy Doc</span>
+                    </a>
+                  </div>
+                ) : null}
+                {data.termsDocumentUrl ? (
+                  <div className="grid grid-cols-[96px_1fr] gap-2 items-center">
+                    <span className="font-montserrat font-bold text-gray-900">Terms</span>
+                    <a
+                      href={data.termsDocumentUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex w-fit items-center gap-2 rounded border border-gray-200 px-2.5 py-1.5 text-[#1A1F71] hover:bg-gray-50"
+                      aria-label="View terms document"
+                      title="View terms document"
+                    >
+                      <Eye size={16} />
+                      <span className="font-montserrat font-medium">Terms Doc</span>
+                    </a>
+                  </div>
+                ) : null}
               </div>
             </div>
 

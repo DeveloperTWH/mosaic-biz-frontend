@@ -246,7 +246,7 @@ const Navbar = () => {
                       </Link>
                     ) : (
                       <Link
-                        href="/dashboard"
+                        href="/partners/dashboard"
                         className="block px-4 py-3 text-sm text-gray-700 rounded-t-lg hover:bg-gray-100 font-medium"
                         onClick={() => setShowDropdown(false)}
                       >
@@ -419,7 +419,7 @@ const Navbar = () => {
                   </Link>
                 ) : (
                   <Link
-                    href="/dashboard"
+                    href="/partners/dashboard"
                     onClick={() => setIsOpen(false)}
                     className="block px-4 py-3 text-gray-800 hover:bg-gray-100 rounded font-medium"
                   >

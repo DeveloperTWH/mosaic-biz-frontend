@@ -542,9 +542,9 @@ const validateForm = (): boolean => {
           </button>
           
           <h1 className="text-2xl font-bold text-gray-900">Set Up Your Business Profile</h1>
-          <p className="text-sm text-gray-600 mt-1">
+          {/* <p className="text-sm text-gray-600 mt-1">
             Create a public profile to showcase your business, products, and services
-          </p>
+          </p> */}
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -684,6 +684,7 @@ const validateForm = (): boolean => {
                   <input
                     type="text"
                     value={formData.licenseNumber}
+                    disabled
                     onChange={(e) => handleInputChange('licenseNumber', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#c9a227] focus:border-transparent text-sm"
                     placeholder=""

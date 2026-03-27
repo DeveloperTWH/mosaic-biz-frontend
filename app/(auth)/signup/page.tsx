@@ -127,11 +127,13 @@ function SignupContent() {
 
     const firstName = (formData.get("firstName") as string)?.trim() || "";
     const lastName = (formData.get("lastName") as string)?.trim() || "";
+    const name = (formData.get("name") as string)?.trim() || "";
+    const mobile = (formData.get("mobile") as string)?.trim() || "";
     const email = (formData.get("email") as string)?.trim() || "";
     const password = (formData.get("password") as string) || "";
     const confirmPassword = (formData.get("confirmPassword") as string) || "";
     
-    if (type === "vendor" && password !== confirmPassword) {
+    if (password !== confirmPassword) {
       setError("Passwords do not match");
       setLoading(false);
       return;
@@ -148,11 +150,11 @@ function SignupContent() {
     }
 
     const payload = {
-      name: type === "vendor" ? `${firstName} ${lastName}`.trim() : undefined,
+      name: type === "vendor" ? `${firstName} ${lastName}`.trim() : name,
       email,
       password,
       role: type === "vendor" ? "business_owner" : "customer",
-      mobile: formData.get("mobile"),
+      mobile,
       gender: formData.get("gender"),
       minorityType: formData.get("minorityType"),
     };
@@ -457,7 +459,7 @@ function SignupContent() {
           </div>
 
           <div className="flex items-center justify-center bg-white px-6">
-            <div className="w-full max-w-md">
+            <div className="w-full max-w-xl">
               <span className="inline-block mb-2 rounded-full bg-[#FFF6E0] px-2 text-[10px] font-thin font-montserrat text-[#C7A040]">
                 Customer
               </span>
@@ -471,36 +473,87 @@ function SignupContent() {
               </div>
 
               <form className="space-y-4" onSubmit={handleSubmit}>
-                <div>
-                  <label className="block text-sm font-medium font-poppins text-[#9E9E9E] mb-1">
-                    Email
-                  </label>
-                  <input
-                    name="email"
-                    type="email"
-                    required
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-900"
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-base font-medium font-poppins text-gray-700 mb-2">
+                      Name <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      name="name"
+                      type="text"
+                      required
+                      className="w-full rounded-md border border-gray-300 px-6 py-2 focus:ring-2 focus:ring-blue-900 focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-base font-medium font-poppins text-gray-700 mb-2">
+                      Mobile Number <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      name="mobile"
+                      type="tel"
+                      required
+                      className="w-full rounded-md border border-gray-300 px-6 py-2 focus:ring-2 focus:ring-blue-900 focus:outline-none"
+                    />
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium font-poppins text-[#9E9E9E] mb-1">
-                    Password
-                  </label>
-                  <div className="relative">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-base font-medium font-poppins text-gray-700 mb-2">
+                      Email Address <span className="text-red-500">*</span>
+                    </label>
                     <input
-                      name="password"
-                      type={showPassword ? "text" : "password"}
+                      name="email"
+                      type="email"
                       required
-                      className="w-full rounded-md border border-gray-300 px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-900"
+                      className="w-full rounded-md border border-gray-300 px-6 py-2 focus:ring-2 focus:ring-blue-900 focus:outline-none"
                     />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
-                    >
-                      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                    </button>
+                  </div>
+
+                  <div>
+                    <label className="block text-base font-medium font-poppins text-gray-700 mb-2">
+                      Password <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        name="password"
+                        type={showPassword ? "text" : "password"}
+                        required
+                        className="w-full rounded-md border border-gray-300 px-6 py-2 pr-10 focus:ring-2 focus:ring-blue-900 focus:outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
+                      >
+                        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-base font-medium font-poppins text-gray-700 mb-2">
+                      Confirm Password <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        name="confirmPassword"
+                        type={showConfirmPassword ? "text" : "password"}
+                        required
+                        className="w-full rounded-md border border-gray-300 px-6 py-2 pr-10 focus:ring-2 focus:ring-blue-900 focus:outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
+                      >
+                        {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      </button>
+                    </div>
                   </div>
                 </div>
 

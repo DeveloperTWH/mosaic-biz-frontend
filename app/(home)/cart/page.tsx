@@ -20,7 +20,14 @@ type CartItem = {
     discountEndDate?: string | null;      // ISO string or null
     selectedSizePrice?: number;  // salePrice or price (already decided by backend)
     shippingType?: "standard" | "overnight" | "local";
+    shippingMethod?: "standard" | "overnight" | "local";
     shippingCost?: number;
+    shippingCharge?: number;
+    shipping?: {
+        standard?: number;
+        overnight?: number;
+        local?: number;
+    } | null;
     stock?: number;
     allowBackorder?: boolean;
     title?: string;
@@ -81,6 +88,28 @@ export default function CartPage() {
         if (salePrice == null) return false;
         if (!discountEndDate) return true;
         return new Date(discountEndDate).getTime() > Date.now();
+    };
+
+    const getEffectiveShippingCost = (item: CartItem) =>
+        Number(item.shippingCost ?? item.shippingCharge ?? 0);
+
+    const getEffectiveShippingMethod = (item: CartItem) =>
+        item.shippingMethod ?? item.shippingType;
+
+    const getShippingLabel = (type?: CartItem["shippingType"] | CartItem["shippingMethod"]) => {
+        if (!type) return "";
+        return type.replace(/^./, (char) => char.toUpperCase());
+    };
+
+    const getShippingOptions = (item: CartItem) => {
+        if (!item.shipping) return [];
+
+        return (["standard", "overnight", "local"] as const)
+            .map((type) => ({
+                type,
+                cost: Number(item.shipping?.[type] ?? 0),
+            }))
+            .filter((option) => option.cost > 0);
     };
 
     const loadCart = useCallback(async () => {
@@ -171,7 +200,7 @@ export default function CartPage() {
         0
     );
     const shippingTotalProduct = itemsProduct.reduce(
-        (sum, it) => sum + (Number(it.shippingCost) || 0) * (it.quantity || 0),
+        (sum, it) => sum + getEffectiveShippingCost(it) * (it.quantity || 0),
         0
     );
     const totalQtyProduct = itemsProduct.reduce((sum, it) => sum + (it.quantity || 0), 0);
@@ -396,15 +425,40 @@ export default function CartPage() {
           <div className="flex items-center justify-between mt-4">
             {/* SHIPPING */}
             <div className="text-xs text-gray-500">
-              {item.shippingType && (
-                <>
-                  Shipping:{" "}
-                  {(item.shippingType || "standard").replace(/^./, (c) =>
-                    c.toUpperCase()
-                  )}{" "}
-                  ${Number(item.shippingCost).toFixed(2)}
-                </>
-              )}
+              {(() => {
+                const shippingOptions = getShippingOptions(item);
+                const effectiveShippingCost = getEffectiveShippingCost(item);
+                const effectiveShippingMethod = getEffectiveShippingMethod(item);
+
+                if (effectiveShippingMethod) {
+                  return (
+                    <>
+                      Shipping: {getShippingLabel(effectiveShippingMethod)} $
+                      {effectiveShippingCost.toFixed(2)}
+                    </>
+                  );
+                }
+
+                if (shippingOptions.length > 0) {
+                  return (
+                    <>
+                      Shipping:{" "}
+                      {shippingOptions
+                        .map((option) => `${getShippingLabel(option.type)} $${option.cost.toFixed(2)}`)
+                        .join(" | ")}
+                      {effectiveShippingCost > 0 && (
+                        <>{" "} | Applied: ${effectiveShippingCost.toFixed(2)}</>
+                      )}
+                    </>
+                  );
+                }
+
+                if (effectiveShippingCost > 0) {
+                  return <>Shipping: ${effectiveShippingCost.toFixed(2)}</>;
+                }
+
+                return null;
+              })()}
             </div>
 
             {/* RIGHT SIDE */}
