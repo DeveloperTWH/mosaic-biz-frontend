@@ -14,6 +14,11 @@ function VerifyOtpPage() {
     const router = useRouter();
     const email = searchParams.get('email');
     const type = searchParams.get('type'); // 'vendor' or 'customer'
+    const redirect = searchParams.get('redirect');
+    const safeRedirect =
+        redirect && redirect.startsWith('/') && !redirect.startsWith('//')
+            ? redirect
+            : null;
 
     const [otp, setOtp] = useState<string[]>(Array(6).fill(''));
     const [error, setError] = useState('');
@@ -76,7 +81,8 @@ function VerifyOtpPage() {
             if (data.success) {
                 localStorage.setItem('user_session', 'true');
                 localStorage.setItem('user_gender', data.user.gender || '');
-                router.push(data.user.role === 'business_owner' ? '/partners' : '/');
+                window.dispatchEvent(new Event('auth:login'));
+                router.push(data.user.role === 'business_owner' ? '/partners' : (safeRedirect || '/'));
             } else {
                 setError(data.message || 'Invalid OTP');
             }

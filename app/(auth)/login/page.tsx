@@ -19,6 +19,7 @@ function LoginContent() {
   const pathname = usePathname()
 
   const type = searchParams.get('type')
+  const redirect = searchParams.get('redirect')
   const isValidType = type === 'vendor' || type === 'customer'
 
   const role = type === 'vendor' ? 'business_owner' : 'customer';
@@ -45,6 +46,10 @@ function LoginContent() {
 
   const title = type === 'vendor' ? 'Vendor Login' : 'Customer Login'
   const router = useRouter();
+  const safeRedirect =
+    redirect && redirect.startsWith("/") && !redirect.startsWith("//")
+      ? redirect
+      : null;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -69,9 +74,12 @@ function LoginContent() {
         localStorage.setItem('user_session', 'true');
         localStorage.setItem('user_gender', data.user.gender || '');
         window.dispatchEvent(new Event("auth:login"));
-        router.push(data.user.role === 'business_owner' ? '/partners' : '/');
+        router.push(data.user.role === 'business_owner' ? '/partners' : (safeRedirect || '/'));
       } else if (data.otpPending) {
-        router.push(`/verify-otp?email=${data.user.email}&type=${data.user.role}`);
+        const nextUrl = safeRedirect
+          ? `/verify-otp?email=${encodeURIComponent(data.user.email)}&type=${encodeURIComponent(data.user.role)}&redirect=${encodeURIComponent(safeRedirect)}`
+          : `/verify-otp?email=${encodeURIComponent(data.user.email)}&type=${encodeURIComponent(data.user.role)}`;
+        router.push(nextUrl);
       } else {
         setError(data.message || 'Login failed');
       }

@@ -6,6 +6,7 @@ export interface ChildService {
   durationMinutes?: number;
   price: number;
   image?: string;
+  images?: string[];
   location?: string;
 }
 
@@ -17,7 +18,6 @@ export interface BusinessHour {
 
 export interface Service {
   _id: string;
-  parentServiceId?: string;
   title: string;
   description: string;
   categoryId: { _id: string; name: string } | null;
@@ -34,6 +34,17 @@ export interface Service {
   createdAt: string;
   updatedAt: string;
   slug: string;
+}
+
+export interface ChildServiceRow extends ChildService {
+  _id: string;
+  parentServiceId: string;
+  parentServiceTitle: string;
+  categoryId: Service['categoryId'];
+  subcategoryId: Service['subcategoryId'];
+  isPublished: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface ServicesResponse {

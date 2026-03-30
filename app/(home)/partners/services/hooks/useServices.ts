@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { Service } from '../types';
+import { ChildServiceRow, Service } from '../types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export const useServices = (businessId: string) => {
-  const [services, setServices] = useState<Service[]>([]);
-  const [filteredServices, setFilteredServices] = useState<Service[]>([]);
+  const [parentServices, setParentServices] = useState<Service[]>([]);
+  const [filteredChildServices, setFilteredChildServices] = useState<ChildServiceRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
     status: 'all',
@@ -14,27 +14,20 @@ export const useServices = (businessId: string) => {
     sortBy: 'newest'
   });
 
-  const mapChildServicesForListing = (apiServices: Service[]): Service[] => {
+  const mapChildServicesForListing = (apiServices: Service[]): ChildServiceRow[] => {
     return apiServices.flatMap((parentService) => {
       const childServices = Array.isArray(parentService.services) ? parentService.services : [];
 
-      if (childServices.length === 0) {
-        return [{ ...parentService, parentServiceId: parentService._id }];
-      }
-
       return childServices.map((childService, index) => ({
-        ...parentService,
+        ...childService,
         _id: childService._id || `${parentService._id}-${index}`,
         parentServiceId: parentService._id,
-        coverImage: childService.image || parentService.coverImage,
-        title: childService.name || parentService.title,
-        description: childService.description || parentService.description,
-        price: typeof childService.price === 'number' ? childService.price : parentService.price,
-        duration:
-          childService.duration ||
-          (typeof childService.durationMinutes === 'number'
-            ? `${childService.durationMinutes} minutes`
-            : parentService.duration),
+        parentServiceTitle: parentService.title,
+        categoryId: parentService.categoryId,
+        subcategoryId: parentService.subcategoryId,
+        isPublished: parentService.isPublished,
+        createdAt: parentService.createdAt,
+        updatedAt: parentService.updatedAt,
       }));
     });
   };
@@ -55,9 +48,9 @@ export const useServices = (businessId: string) => {
       
       const data = await response.json();
       if (data.services) {
-        const mappedServices = mapChildServicesForListing(data.services);
-        setServices(mappedServices);
-        setFilteredServices(mappedServices);
+        const normalizedParents = Array.isArray(data.services) ? data.services : [];
+        setParentServices(normalizedParents);
+        setFilteredChildServices(mapChildServicesForListing(normalizedParents));
       }
     } catch (error) {
       console.error('Error fetching services:', error);
@@ -75,11 +68,11 @@ export const useServices = (businessId: string) => {
 
   // Filter and sort
   useEffect(() => {
-    let result = [...services];
+    let result = mapChildServicesForListing(parentServices);
 
     if (filters.search) {
       result = result.filter(s => 
-        s.title.toLowerCase().includes(filters.search.toLowerCase()) ||
+        s.name.toLowerCase().includes(filters.search.toLowerCase()) ||
         s.description.toLowerCase().includes(filters.search.toLowerCase())
       );
     }
@@ -96,8 +89,8 @@ export const useServices = (businessId: string) => {
       result.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
     }
 
-    setFilteredServices(result);
-  }, [filters, services]);
+    setFilteredChildServices(result);
+  }, [filters, parentServices]);
 
   const updateFilter = (key: string, value: any) => {
     setFilters(prev => ({ ...prev, [key]: value }));
@@ -128,7 +121,9 @@ export const useServices = (businessId: string) => {
   };
 
   return {
-    services: filteredServices,
+    parentService: parentServices[0] || null,
+    parentServices,
+    childServices: filteredChildServices,
     loading,
     filters,
     updateFilter,

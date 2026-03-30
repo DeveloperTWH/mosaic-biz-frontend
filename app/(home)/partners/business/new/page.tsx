@@ -982,9 +982,9 @@ const handlePayAndSubmit = async () => {
 
       {/* Business License Documents Upload */}
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-3">
-          Upload Business License Document (Required)
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+ Upload Business License Document  <span className="text-red-500 ml-1">*</span>
+</label>
         <div className="flex items-center gap-4">
           <div className="flex-1 px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 text-sm">
             {selectedFiles['business-license'] ? selectedFiles['business-license'].name : 'No File Chosen'}

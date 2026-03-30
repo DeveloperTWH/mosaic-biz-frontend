@@ -7,6 +7,7 @@ import BusinessProfilePage from "@/app/(home)/partners/business-profile/page";
 import ProductsPage from "@/app/(home)/partners/products/page";
 import ServicesPage from "@/app/(home)/partners/services/page";
 import FoodsPage from "@/app/(home)/partners/foods/page";
+import InquiriesTable from "./components/InquiriesTable";
 
 type ListingType = "product" | "service" | "food";
 type DashboardTab =
@@ -22,6 +23,25 @@ interface Business {
   listingType?: ListingType;
 }
 
+interface VendorInquiry {
+  _id: string;
+  businessId: string;
+  businessName?: string;
+  source?: string;
+  customerName?: string;
+  customerEmail?: string;
+  customerPhone?: string;
+  revealCount?: number;
+  createdAt: string;
+  lastRevealedAt?: string;
+  customerId?: {
+    _id?: string;
+    name?: string;
+    email?: string;
+    mobile?: string;
+  };
+}
+
 const dashboardTabs = [
   { key: "edit-profile", label: "Edit Profile" },
   { key: "manage-listings", label: "Add/Edit Product/Services" },
@@ -33,6 +53,9 @@ export default function PartnerDashboardPage() {
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<DashboardTab>("edit-profile");
+  const [inquiries, setInquiries] = useState<VendorInquiry[]>([]);
+  const [inquiriesLoading, setInquiriesLoading] = useState(false);
+  const [inquiriesError, setInquiriesError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchBusinesses = async () => {
@@ -52,6 +75,35 @@ export default function PartnerDashboardPage() {
 
     fetchBusinesses();
   }, []);
+
+  useEffect(() => {
+    if (activeTab !== "inquiries") {
+      return;
+    }
+
+    const fetchInquiries = async () => {
+      try {
+        setInquiriesLoading(true);
+        setInquiriesError(null);
+
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/enquiries/vendor`,
+          { withCredentials: true }
+        );
+
+        setInquiries(response.data?.data ?? []);
+      } catch (error: any) {
+        console.error("Error fetching inquiries:", error);
+        setInquiriesError(
+          error?.response?.data?.message || "Failed to load inquiries."
+        );
+      } finally {
+        setInquiriesLoading(false);
+      }
+    };
+
+    fetchInquiries();
+  }, [activeTab]);
 
   const listingType = useMemo<ListingType>(() => {
     const activeBusiness = businesses.find((business) => business.isActive) ?? businesses[0];
@@ -103,14 +155,33 @@ export default function PartnerDashboardPage() {
     }
 
     if (activeTab === "inquiries") {
-      return (
-        <div className="rounded-2xl border border-dashed border-[#d9d0c2] bg-white p-8 text-center">
-          <h2 className="text-xl font-semibold text-[#1c1c1c]">Inquiries</h2>
-          <p className="mt-3 text-sm text-gray-600">
-           +No Data found
-          </p>
-        </div>
-      );
+      if (inquiriesLoading) {
+        return (
+          <div className="rounded-2xl border border-[#ebe2d3] bg-[#fcfaf6] p-8 text-center">
+            <p className="text-sm font-medium text-gray-600">Loading inquiries...</p>
+          </div>
+        );
+      }
+
+      if (inquiriesError) {
+        return (
+          <div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-center">
+            <h2 className="text-xl font-semibold text-red-700">Inquiries</h2>
+            <p className="mt-3 text-sm text-red-600">{inquiriesError}</p>
+          </div>
+        );
+      }
+
+      if (inquiries.length === 0) {
+        return (
+          <div className="rounded-2xl border border-dashed border-[#d9d0c2] bg-white p-8 text-center">
+            <h2 className="text-xl font-semibold text-[#1c1c1c]">Inquiries</h2>
+            <p className="mt-3 text-sm text-gray-600">No inquiries found.</p>
+          </div>
+        );
+      }
+
+      return <InquiriesTable inquiries={inquiries} />;
     }
 
     return (

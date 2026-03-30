@@ -597,8 +597,6 @@ verified: getDocumentCategoryVerified(
 
   const progress = getVerificationProgress();
   const availableVerificationTypes = getAvailableVerificationTypes();
-  const allRequiredVerificationsCompleted =
-    progress.totalRequired === 0 || progress.required === progress.totalRequired;
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -1451,7 +1449,7 @@ verified: getDocumentCategoryVerified(
                         <div className="flex gap-2">
                           <button
                             onClick={() => handleVerifyCategory(key, true)}
-                            disabled={isLoading || isVerified || !allRequiredVerificationsCompleted}
+                            disabled={isLoading || isVerified}
                             className={`flex-1 py-2 rounded-lg flex items-center justify-center gap-2 text-sm font-medium transition-all ${
                               isVerified 
                                 ? "bg-green-100 text-green-700 cursor-default" 

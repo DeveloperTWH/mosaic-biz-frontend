@@ -2,13 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, Loader, X } from 'lucide-react';
+import { Plus, Loader } from 'lucide-react';
 import { useServices } from './hooks/useServices';
-import { useServiceModal } from './hooks/useServiceModal';
+import { ChildServiceRow, Service } from './types';
+import BusinessInfoTable from './components/BusinessInfoTable';
 import ServicesTable from './components/ServicesTable';
 import ServiceFilters from './components/ServiceFilters';
 import ConfirmDialog from './components/ConformDialog';
-import EditServiceModal from './components/EditServiceModal';
+import EditBusinessInfoModal from './components/EditBusinessInfoModal';
+import EditChildServiceModal from './components/EditChildServiceModal';
 
 export default function ServicesPage() {
   const router = useRouter();
@@ -16,23 +18,22 @@ export default function ServicesPage() {
   const [loading, setLoading] = useState(true);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [serviceToDelete, setServiceToDelete] = useState<string | null>(null);
+  const [editingBusinessService, setEditingBusinessService] = useState<Service | null>(null);
+  const [editingChildService, setEditingChildService] = useState<{
+    parentService: Service;
+    childService: ChildServiceRow;
+  } | null>(null);
 
   const {
-    services,
+    parentService,
+    parentServices,
+    childServices,
     loading: servicesLoading,
     filters,
     updateFilter,
     deleteService,
     refreshServices
   } = useServices(businessId);
-
-  const {
-    selectedService,
-    modalType,
-    openViewModal,
-    openEditModal,
-    closeModal
-  } = useServiceModal();
 
   useEffect(() => {
     fetchBusinessId();
@@ -66,14 +67,25 @@ export default function ServicesPage() {
     if (deleted) {
       setShowDeleteConfirm(false);
       setServiceToDelete(null);
-      if (modalType === 'view' || modalType === 'edit') {
-        closeModal();
-      }
     }
   };
 
   const handleSaveSuccess = () => {
+    setEditingBusinessService(null);
+    setEditingChildService(null);
     refreshServices();
+  };
+
+  const handleEditChild = (childService: ChildServiceRow) => {
+    const matchedParentService = parentServices.find((service) => service._id === childService.parentServiceId);
+    if (!matchedParentService) {
+      return;
+    }
+
+    setEditingChildService({
+      parentService: matchedParentService,
+      childService,
+    });
   };
 
   if (loading || servicesLoading) {
@@ -91,8 +103,8 @@ export default function ServicesPage() {
 <div className="mb-6 flex items-start justify-between">
   {/* Left: title */}
   <div>
-    <h1 className="text-2xl font-bold text-gray-900">Services</h1>
-    <p className="text-sm text-gray-600 mt-1">Manage your services</p>
+    <h1>Service and business info</h1>
+    <p className="text-sm text-gray-600 mt-1">Manage your services and bussiness info</p>
   </div>
 
   {/* Right: buttons stacked vertically */}
@@ -117,114 +129,49 @@ export default function ServicesPage() {
         <ServiceFilters
           filters={filters}
           onFilterChange={updateFilter}
-          totalServices={services.length}
+          totalServices={childServices.length}
         />
 
         <div className="mt-4">
+          <BusinessInfoTable
+            service={parentService}
+            onEdit={setEditingBusinessService}
+          />
+        </div>
+
+        <div className="mt-6">
           <ServicesTable
-            services={services}
-            onView={openViewModal}
-            onEdit={openEditModal}
+            services={childServices}
+            onEdit={handleEditChild}
             onDelete={handleDeleteClick}
           />
         </div>
       </div>
 
-      {/* View Modal - Only CSS changed to match design */}
-      {modalType === 'view' && selectedService && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg max-w-3xl w-full overflow-hidden">
-            {/* Header */}
-            <div className="bg-[#c9a227] px-6 py-4 flex items-center justify-between">
-              <h2 className="text-white font-semibold text-lg">View Service Details</h2>
-              <button onClick={closeModal} className="text-white hover:text-gray-200">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            
-            {/* Content */}
-            <div className="p-6">
-              <div className="flex gap-6">
-                {/* Left - Image */}
-                <div className="w-48 h-48 flex-shrink-0">
-                  {selectedService.coverImage ? (
-                    <img 
-                      src={selectedService.coverImage} 
-                      alt={selectedService.title} 
-                      className="w-full h-full object-cover rounded-lg" 
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center text-gray-400">
-                      No Image
-                    </div>
-                  )}
-                </div>
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        title="Delete Service"
+        message="Are you sure you want to delete this  service?"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setShowDeleteConfirm(false)}
+      />
 
-                {/* Right - Details */}
-                <div className="flex-1 space-y-4">
-                  {/* Top Row */}
-                  <div className="grid grid-cols-3 gap-6">
-                    <div>
-                      <p className="text-xs text-gray-500 uppercase mb-1">Service Title</p>
-                      <p className="font-semibold text-gray-900">{selectedService.title}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500 uppercase mb-1">Service Duration</p>
-                      <p className="font-semibold text-gray-900">{selectedService.duration}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500 uppercase mb-1">Price</p>
-                      <p className="font-semibold text-gray-900">${selectedService.price}</p>
-                    </div>
-                  </div>
-
-                  {/* Description */}
-                  <div>
-                    <p className="text-xs text-gray-500 uppercase mb-2">Description</p>
-                    <p className="text-sm text-gray-600 leading-relaxed">{selectedService.description}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Footer Buttons */}
-            <div className="px-6 pb-6 flex gap-3">
-              <button 
-                onClick={() => {
-                  closeModal();
-                  openEditModal(selectedService._id);
-                }}
-                className="px-6 py-2 bg-blue-900 text-white text-sm font-medium rounded hover:bg-blue-800"
-              >
-                Edit Information
-              </button>
-              <button 
-                onClick={closeModal}
-                className="px-6 py-2 bg-gray-400 text-white text-sm font-medium rounded hover:bg-gray-500"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Edit Modal */}
-      {modalType === 'edit' && selectedService && (
-        <EditServiceModal
-          service={selectedService}
-          onClose={closeModal}
+      {editingBusinessService && (
+        <EditBusinessInfoModal
+          service={editingBusinessService}
+          onClose={() => setEditingBusinessService(null)}
           onSave={handleSaveSuccess}
         />
       )}
 
-      <ConfirmDialog
-        isOpen={showDeleteConfirm}
-        title="Delete Service"
-        message="Are you sure you want to delete this service?"
-        onConfirm={handleConfirmDelete}
-        onCancel={() => setShowDeleteConfirm(false)}
-      />
+      {editingChildService && (
+        <EditChildServiceModal
+          parentService={editingChildService.parentService}
+          childService={editingChildService.childService}
+          onClose={() => setEditingChildService(null)}
+          onSave={handleSaveSuccess}
+        />
+      )}
     </div>
   );
 }

@@ -453,8 +453,8 @@ export const useServiceForm = () => {
           .filter((child) => child.name.length > 0);
 
       const parentPayload = {
-        title: formData.title || 'Service',
-        description: formData.description || 'Service description',
+        title: formData.title || '',
+        description: formData.description || '',
         categoryId: formData.categoryId,
         subcategoryId: formData.subcategoryId,
         businessId: formData.businessId,
