@@ -524,6 +524,9 @@ export default function ServiceVendorProfilePage() {
     return new Date(today.getFullYear(), today.getMonth(), 1);
   });
 
+  
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
   useEffect(() => {
     if (!serviceId) { setError("Invalid service id."); setLoading(false); return; }
     (async () => {
@@ -966,17 +969,18 @@ export default function ServiceVendorProfilePage() {
 
     <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
       {galleryItems.map((img, i) => (
-        <div
-          key={`${img}-${i}`}
-          className="h-[78px] overflow-hidden bg-[#dfdfdf]"
-        >
-          <img
-            src={img}
-            alt={`Gallery ${i + 1}`}
-            className="h-full w-full object-cover hover:scale-110 transition-transform duration-300"
-          />
-        </div>
-      ))}
+  <div
+    key={`${img}-${i}`}
+    className="h-[78px] overflow-hidden bg-[#dfdfdf] cursor-pointer"
+    onClick={() => setSelectedImage(img)} // ✅ ADD THIS
+  >
+    <img
+      src={img}
+      alt={`Gallery ${i + 1}`}
+      className="h-full w-full object-cover hover:scale-110 transition-transform duration-300"
+    />
+  </div>
+))}
     </div>
   </div>
   )}
@@ -1121,12 +1125,6 @@ export default function ServiceVendorProfilePage() {
       >
         Book Now
       </button>
-
-<p className="border border-dashed border-[#d8d0ba] bg-[#fffdf4] px-3 py-2 text-[11px] text-gray-500 leading-relaxed mt-3">
-  On submission of this form, your booking request will be shared with the business. 
-  They will <span className="font-medium text-[#1d1d1d]">confirm or decline</span> it based on availability. 
-  We’ll keep you updated.
-</p>
     </div>
   ) : (
   <div className="space-y-4 p-5">
@@ -1353,6 +1351,7 @@ export default function ServiceVendorProfilePage() {
     >
       Request An Appointment
     </button>
+    <p>A booking fee may be required by the vendor to confirm your booking.</p>
 <p className="border border-dashed border-[#d8d0ba] bg-[#fffdf4] px-3 py-2 text-[11px] text-gray-500 leading-relaxed mt-3">
   On submission of this form, your booking request will be shared with the business. 
   They will <span className="font-medium text-[#1d1d1d]">confirm or decline</span> it based on availability. 
@@ -1422,6 +1421,34 @@ export default function ServiceVendorProfilePage() {
           {/* ── End RIGHT SIDEBAR ── */}
         </div>
       </div>
+
+      {/* 🔥 IMAGE MODAL */}
+{selectedImage && (
+  <div
+    className="fixed inset-0 z-[2000] bg-black/80 flex items-center justify-center p-4"
+    onClick={() => setSelectedImage(null)} // close on outside click
+  >
+    <div
+      className="relative max-w-4xl w-full"
+      onClick={(e) => e.stopPropagation()} // prevent close when clicking image
+    >
+      {/* Close Button */}
+      <button
+        onClick={() => setSelectedImage(null)}
+        className="absolute top-2 right-2 bg-white text-black px-3 py-1 text-sm font-semibold rounded"
+      >
+        ✕
+      </button>
+
+      {/* Image */}
+      <img
+        src={selectedImage}
+        alt="Preview"
+        className="w-full max-h-[80vh] object-contain rounded"
+      />
+    </div>
+  </div>
+)}
 
       <RevealConsentModal
         variant={revealModal ?? "consent"}

@@ -50,21 +50,41 @@ export default function ServiceImages({
             </button>
           </div>
         ) : (
-          <div className="w-full h-48 bg-gray-200 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
-            <input
-              type="file"
-              id="cover-upload"
-              className="hidden"
-              accept="image/*"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) onCoverUpload(file);
-              }}
-            />
-            <label htmlFor="cover-upload" className="cursor-pointer flex flex-col items-center">
-              <ImageIcon className="w-12 h-12 text-gray-400 mb-2" />
-            </label>
-          </div>
+<div className="w-full h-48 bg-gray-200 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
+  <input
+    type="file"
+    id="cover-upload"
+    className="hidden"
+    accept="image/*"
+    onChange={(e) => {
+      const file = e.target.files?.[0];
+
+      if (file) {
+        const maxSize = 5 * 1024 * 1024; // 5MB
+
+        if (file.size > maxSize) {
+          alert('Image must be less than 5MB');
+          e.currentTarget.value = '';
+          return;
+        }
+
+        onCoverUpload(file);
+      }
+
+      e.currentTarget.value = '';
+    }}
+  />
+
+  <label
+    htmlFor="cover-upload"
+    className="cursor-pointer flex flex-col items-center"
+  >
+    <ImageIcon className="w-12 h-12 text-gray-400 mb-2" />
+    <p className="text-xs text-gray-400">
+      Max 5MB
+    </p>
+  </label>
+</div>
         )}
       </div>
 
@@ -78,24 +98,40 @@ export default function ServiceImages({
         
         {/* Add Photo Button */}
         <div className="mb-3">
-          <input
-            type="file"
-            id="gallery-upload"
-            className="hidden"
-            accept="image/*"
-            multiple
-            onChange={(e) => {
-              const files = e.target.files ? Array.from(e.target.files) : [];
-              if (files.length > 0) onGalleryUpload(files);
-              e.currentTarget.value = '';
-            }}
-          />
+<input
+  type="file"
+  id="gallery-upload"
+  className="hidden"
+  accept="image/*"
+  multiple
+  onChange={(e) => {
+    const files = e.target.files ? Array.from(e.target.files) : [];
+    const maxSize = 5 * 1024 * 1024; // 5MB
+
+    const validFiles = files.filter((file) => {
+      if (file.size > maxSize) {
+        alert(`${file.name} is larger than 5MB`);
+        return false;
+      }
+      return true;
+    });
+
+    if (validFiles.length > 0) {
+      onGalleryUpload(validFiles);
+    }
+
+    e.currentTarget.value = '';
+  }}
+/>
           <label 
             htmlFor="gallery-upload" 
             className="inline-block px-6 py-2 bg-[#c9a227] text-white text-sm rounded cursor-pointer hover:bg-[#b8921f]"
           >
             Add Photo
           </label>
+          <p className="text-xs text-gray-400 mb-3">
+  Preferred image size: 1080 × 1080 pixels
+</p>
         </div>
 
         {/* Gallery Grid */}

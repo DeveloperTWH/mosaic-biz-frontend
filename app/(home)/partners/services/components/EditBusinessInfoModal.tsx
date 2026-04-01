@@ -13,6 +13,28 @@ interface Props {
   onSave: () => void;
 }
 
+const parseDurationToMinutes = (duration: unknown): number => {
+  if (typeof duration === 'number' && Number.isFinite(duration)) {
+    return Math.max(1, Math.round(duration));
+  }
+
+  if (typeof duration !== 'string') {
+    return 60;
+  }
+
+  const match = duration.match(/(\d+(\.\d+)?)/);
+  if (!match) {
+    return 60;
+  }
+
+  const value = parseFloat(match[1]);
+  if (!Number.isFinite(value)) {
+    return 60;
+  }
+
+  return /hour/i.test(duration) ? Math.max(1, Math.round(value * 60)) : Math.max(1, Math.round(value));
+};
+
 const normalizeChildServices = (services: Service['services']) =>
   (services || [])
     .map((child) => ({
@@ -22,9 +44,10 @@ const normalizeChildServices = (services: Service['services']) =>
       durationMinutes:
         typeof child.durationMinutes === 'number' && Number.isFinite(child.durationMinutes)
           ? child.durationMinutes
-          : child.duration
-          ? parseInt(String(child.duration), 10) || 60
-          : 60,
+          : parseDurationToMinutes(child.duration),
+      duration: `${typeof child.durationMinutes === 'number' && Number.isFinite(child.durationMinutes)
+        ? child.durationMinutes
+        : parseDurationToMinutes(child.duration)} minutes`,
       price: typeof child.price === 'number' && Number.isFinite(child.price) ? child.price : 0,
       images: Array.isArray(child.images) ? child.images : child.image ? [child.image] : [],
     }))

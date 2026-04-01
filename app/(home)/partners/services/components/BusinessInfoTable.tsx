@@ -26,7 +26,7 @@ export default function BusinessInfoTable({ service, onEdit }: Props) {
   return (
     <div className="bg-white border border-gray-200 rounded-md overflow-hidden">
       <div className="px-4 py-3 border-b border-gray-200 bg-gray-50">
-        <h2 className="text-sm font-semibold text-gray-900">Business Service Info</h2>
+        <h2 className="text-sm font-semibold text-gray-900">Business Profile</h2>
       </div>
 
       <div className="overflow-x-auto">
@@ -52,7 +52,7 @@ export default function BusinessInfoTable({ service, onEdit }: Props) {
                     </div>
                   )}
                   <div>
-                    <p className="font-medium text-gray-900">Business Info</p>
+                    <p className="font-medium text-gray-900">Business profile</p>
                   </div>
                 </div>
               </td>

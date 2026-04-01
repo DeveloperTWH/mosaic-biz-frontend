@@ -28,7 +28,12 @@ const parseDurationToMinutes = (duration: unknown): number => {
     return 60;
   }
 
-  return Math.max(1, Math.round(parseFloat(match[1])));
+  const value = parseFloat(match[1]);
+  if (!Number.isFinite(value)) {
+    return 60;
+  }
+
+  return /hour/i.test(duration) ? Math.max(1, Math.round(value * 60)) : Math.max(1, Math.round(value));
 };
 
 export default function EditChildServiceModal({ parentService, childService, onClose, onSave }: Props) {
@@ -110,6 +115,7 @@ export default function EditChildServiceModal({ parentService, childService, onC
           description,
           price: Number.isFinite(price) ? price : 0,
           durationMinutes: Number.isFinite(durationMinutes) ? durationMinutes : 60,
+          duration: `${Number.isFinite(durationMinutes) ? durationMinutes : 60} minutes`,
           image,
           images: image ? [image] : [],
         };

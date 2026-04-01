@@ -45,16 +45,18 @@ export default function ChildServices({
             <label className="block text-xs text-gray-500 mb-2">
               Service Image
             </label>
-
+<p className="text-xs text-gray-400 mb-2">
+  Preferred image size: 1080 × 1080 pixels
+</p>
             <div className="mb-2">
               {service.image ? (
                 <img
                   src={service.image}
                   alt={service.name || `Service ${index + 1}`}
-                  className="w-full h-36 object-cover rounded-md border border-gray-200"
+                 className="w-40 aspect-square object-cover rounded-md border border-gray-200"
                 />
               ) : (
-                <div className="w-full h-36 rounded-md border-2 border-dashed border-gray-300 bg-white flex items-center justify-center text-gray-400">
+                <div className="w-40 aspect-square rounded-md border-2 border-dashed border-gray-300 bg-white flex items-center justify-center text-gray-400">
                   <div className="flex flex-col items-center gap-1">
                     <ImagePlus className="w-6 h-6" />
                     <p className="text-xs">No image selected</p>
@@ -68,13 +70,23 @@ export default function ChildServices({
                 id={`child-image-${index}`}
                 type="file"
                 accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    onUploadImage(index, file);
-                  }
-                  e.currentTarget.value = '';
-                }}
+onChange={(e) => {
+  const file = e.target.files?.[0];
+
+  if (file) {
+    const maxSize = 5 * 1024 * 1024; // 5MB
+
+    if (file.size > maxSize) {
+      alert('Image must be less than 5MB');
+      e.currentTarget.value = '';
+      return;
+    }
+
+    onUploadImage(index, file);
+  }
+
+  e.currentTarget.value = '';
+}}
                 className="hidden"
               />
               <label

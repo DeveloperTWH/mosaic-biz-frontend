@@ -175,9 +175,9 @@ const steps = [
   { number: 3, label: "Subscription\nPayment", active: false },
   { number: 4, label: "Business Profile\nSetup", active: false },
   { number: 5, label: "Product / Service\nCreation", active: false },
-  { number: 6, label: "Payout & Bank\nSetup", active: false },
-  { number: 7, label: "Final Review", active: true },
-  { number: 8, label: "Go Live\nConfirmation", active: true },
+  // { number: 6, label: "Payout & Bank\nSetup", active: false },
+  { number: 6, label: "Final Review", active: true },
+  { number: 7, label: "Go Live\nConfirmation", active: true },
 ];
 
 

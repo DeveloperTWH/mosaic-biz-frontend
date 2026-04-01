@@ -190,7 +190,15 @@ const uploadToS3 = async (uploadUrl: string, file: File) => {
   if (!response.ok) throw new Error('Failed to upload file');
 };
 
-export default function BusinessProfilePage() {
+interface BusinessProfilePageProps {
+  embedded?: boolean;
+  onSaved?: () => void;
+}
+
+export default function BusinessProfilePage({
+  embedded = false,
+  onSaved,
+}: BusinessProfilePageProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -415,7 +423,12 @@ const validateForm = (): boolean => {
       });
 
       toast.success('Business profile updated successfully!');
-      router.push('/partners');
+
+      if (embedded) {
+        onSaved?.();
+      } else {
+        router.push('/partners');
+      }
       
     } catch (error: any) {
       console.error('Error saving profile:', error);
@@ -533,13 +546,15 @@ const validateForm = (): boolean => {
         
         {/* Header */}
         <div className="mb-6">
-          <button
-            onClick={() => router.back()}
-            className="flex items-center text-gray-600 hover:text-gray-900 mb-3 transition-colors text-sm"
-          >
-            <ArrowLeft className="w-4 h-4 mr-1" />
-            Back
-          </button>
+          {!embedded && (
+            <button
+              onClick={() => router.back()}
+              className="flex items-center text-gray-600 hover:text-gray-900 mb-3 transition-colors text-sm"
+            >
+              <ArrowLeft className="w-4 h-4 mr-1" />
+              Back
+            </button>
+          )}
           
           <h1 className="text-2xl font-bold text-gray-900">Set Up Your Business Profile</h1>
           {/* <p className="text-sm text-gray-600 mt-1">
@@ -679,17 +694,18 @@ const validateForm = (): boolean => {
                     className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-700 text-sm cursor-not-allowed"
                   />
                 </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">License Number</label>
-                  <input
-                    type="text"
-                    value={formData.licenseNumber}
-                    disabled
-                    onChange={(e) => handleInputChange('licenseNumber', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#c9a227] focus:border-transparent text-sm"
-                    placeholder=""
-                  />
-                </div>
+<div>
+  <label className="block text-xs font-medium text-gray-500 mb-1">
+    License Number
+  </label>
+  <input
+    type="text"
+    value={formData.licenseNumber}
+    disabled
+    className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-700 text-sm cursor-not-allowed"
+    placeholder=""
+  />
+</div>
                 <div>
                   <label className="block text-xs font-medium text-gray-500 mb-1">Business Type</label>
                   <input

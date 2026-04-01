@@ -50,7 +50,7 @@ export default function ServicesTable({ services, onEdit, onDelete }: Props) {
                     <div>
                       <span className="font-medium text-gray-900">{service.name}</span>
                       <p className="text-xs text-gray-500 mt-1">
-                        {service.parentServiceTitle || 'Business service'}
+                        {service.parentServiceTitle || ''}
                       </p>
                     </div>
                   </div>

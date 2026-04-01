@@ -155,7 +155,7 @@ export default function AddServicePage() {
               className="px-8 py-2.5 bg-[#c9a227] text-white rounded text-sm font-medium hover:bg-[#b8921f] flex items-center gap-2 disabled:opacity-50"
             >
               {saving ? <Loader className="w-4 h-4 animate-spin" /> : null}
-              {isUploading ? 'Uploading Images...' : formData.title ? 'Add Services' : 'Create Service'}
+              {isUploading ? 'Uploading Images...' : formData.title ? 'save profile' : 'Save profile'}
             </button>
             <button
               type="button"

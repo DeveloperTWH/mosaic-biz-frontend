@@ -67,6 +67,11 @@ const parseDurationToMinutes = (duration: unknown): number => {
   return /hour/i.test(duration) ? Math.max(1, Math.round(value * 60)) : Math.max(1, Math.round(value));
 };
 
+const formatDurationFromMinutes = (minutes: unknown): string => {
+  const normalizedMinutes = parseDurationToMinutes(minutes);
+  return `${normalizedMinutes} minutes`;
+};
+
 const normalizeBusinessHours = (hours: any[] = []) => {
   const hoursMap = new Map(
     hours.map((hour) => [hour.day, hour])
@@ -447,6 +452,9 @@ export const useServiceForm = () => {
             ...child,
             name: String(child?.name || '').trim(),
             durationMinutes: parseDurationToMinutes(
+              child?.durationMinutes ?? child?.duration
+            ),
+            duration: formatDurationFromMinutes(
               child?.durationMinutes ?? child?.duration
             ),
           }))

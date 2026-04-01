@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import axios from "axios";
@@ -282,7 +283,8 @@ export default function FinalReviewPage() {
     setExpandedStep(expandedStep === stepNumber ? null : stepNumber);
   };
 
-  const steps = [
+const steps = useMemo(() => {
+  const baseSteps = [
     { 
       number: "01", 
       title: "Business Verification", 
@@ -327,15 +329,77 @@ export default function FinalReviewPage() {
       number: "05", 
       title: "Product / Service Creation", 
       status: getStepStatus(5), 
-      link: "/partners/products" 
-    },
-    { 
-      number: "06", 
-      title: "Payout & Bank Setup", 
-      status: "incompleted", 
-      link: "/partners/payout-setup" 
-    },
+      link: "/partners/products"
+    }
   ];
+
+  // ✅ Only add Payout step if listingType is "product"
+  if (business?.listingType === "product") {
+    baseSteps.push({
+      number: "06",
+      title: "Payout & Bank Setup",
+      status: "incompleted",
+      link: "/partners/payout-setup"
+    });
+  }
+
+  return baseSteps;
+}, [business, onboardingData]);
+
+  // const steps = [
+  //   { 
+  //     number: "01", 
+  //     title: "Business Verification", 
+  //     status: getStepStatus(1), 
+  //     link: "/partners/business/new",
+  //     details: onboardingData ? {
+  //       points: onboardingData.details.stage1.points,
+  //       paymentStatus: onboardingData.details.stage1.paymentStatus
+  //     } : null
+  //   },
+  //   { 
+  //     number: "02", 
+  //     title: "Tier / Subscription Selection", 
+  //     status: getStepStatus(2), 
+  //     link: "/partners/tier-selection",
+  //     details: onboardingData ? {
+  //       plan: onboardingData.details.stage2.plan,
+  //       amount: onboardingData.details.stage2.amount
+  //     } : null
+  //   },
+  //   { 
+  //     number: "03", 
+  //     title: "Subscription Payment", 
+  //     status: getStepStatus(3), 
+  //     link: "/partners/tier-selection/success",
+  //     details: onboardingData ? {
+  //       status: onboardingData.details.stage1.paymentStatus,
+  //       date: onboardingData.details.stage2.subscribedAt
+  //     } : null
+  //   },
+  //   { 
+  //     number: "04", 
+  //     title: "Business Profile Setup", 
+  //     status: getStepStatus(4), 
+  //     link: "/partners/business-profile",
+  //     details: onboardingData ? {
+  //       hasLogo: onboardingData.details.stage3.hasLogo,
+  //       hasBio: onboardingData.details.stage3.hasBio
+  //     } : null
+  //   },
+  //   { 
+  //     number: "05", 
+  //     title: "Product / Service Creation", 
+  //     status: getStepStatus(5), 
+  //     link: "/partners/products" 
+  //   },
+  //   { 
+  //     number: "06", 
+  //     title: "Payout & Bank Setup", 
+  //     status: "incompleted", 
+  //     link: "/partners/payout-setup" 
+  //   },
+  // ];
 
   const openModal = (type: "terms" | "privacy" | "directory") => {
     setModalType(type);

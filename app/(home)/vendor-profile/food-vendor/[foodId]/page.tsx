@@ -346,6 +346,8 @@ export default function FoodVendorProfilePage() {
     return new Date(today.getFullYear(), today.getMonth(), 1);
   });
 
+ const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
   useEffect(() => {
     if (!foodId) {
       setError("Invalid food id.");
@@ -587,7 +589,21 @@ export default function FoodVendorProfilePage() {
             <div className="mt-6">
               <h3 className="mb-3 text-sm font-montserrat font-semibold text-[#c79b44]">Photo Gallery</h3>
               <div className="grid grid-cols-3 gap-1.5 sm:grid-cols-6">
-                {galleryItems.map((image, i) => (
+      {galleryItems.map((img, i) => (
+  <div
+    key={`${img}-${i}`}
+    className="h-[78px] overflow-hidden bg-[#dfdfdf] cursor-pointer"
+    onClick={() => setSelectedImage(img)} // ✅ ADD THIS
+  >
+    <img
+      src={img}
+      alt={`Gallery ${i + 1}`}
+      className="h-full w-full object-cover hover:scale-110 transition-transform duration-300"
+    />
+  </div>
+))}
+
+                {/* {galleryItems.map((image, i) => (
                   <div key={`${image}-${i}`} className="h-[78px] overflow-hidden bg-[#dfdfdf]">
                     <img
                       src={image}
@@ -595,7 +611,7 @@ export default function FoodVendorProfilePage() {
                       className="h-full w-full object-cover transition-transform duration-300 hover:scale-110"
                     />
                   </div>
-                ))}
+                ))} */}
               </div>
             </div>
             )}
@@ -777,11 +793,6 @@ export default function FoodVendorProfilePage() {
                   >
                     Book Now
                   </button>
-                  <p className="border border-dashed border-[#d8d0ba] bg-[#fffdf4] px-3 py-2 text-[11px] text-gray-500 leading-relaxed mt-3">
-  On submission of this form, your booking request will be shared with the business. 
-  They will <span className="font-medium text-[#1d1d1d]">confirm or decline</span> it based on availability. 
-  We’ll keep you updated.
-</p>
                 </div>
               ) : (
               <div className="space-y-4 p-5">
@@ -1021,6 +1032,33 @@ export default function FoodVendorProfilePage() {
           </div>
         </div>
       </div>
+            {/* 🔥 IMAGE MODAL */}
+{selectedImage && (
+  <div
+    className="fixed inset-0 z-[2000] bg-black/80 flex items-center justify-center p-4"
+    onClick={() => setSelectedImage(null)} // close on outside click
+  >
+    <div
+      className="relative max-w-4xl w-full"
+      onClick={(e) => e.stopPropagation()} // prevent close when clicking image
+    >
+      {/* Close Button */}
+      <button
+        onClick={() => setSelectedImage(null)}
+        className="absolute top-2 right-2 bg-white text-black px-3 py-1 text-sm font-semibold rounded"
+      >
+        ✕
+      </button>
+
+      {/* Image */}
+      <img
+        src={selectedImage}
+        alt="Preview"
+        className="w-full max-h-[80vh] object-contain rounded"
+      />
+    </div>
+  </div>
+)}
     </div>
   );
 }

@@ -17,6 +17,28 @@ interface EditableChildService extends ChildService {
   _id?: string;
 }
 
+const parseDurationToMinutes = (duration: unknown): number => {
+  if (typeof duration === 'number' && Number.isFinite(duration)) {
+    return Math.max(1, Math.round(duration));
+  }
+
+  if (typeof duration !== 'string') {
+    return 60;
+  }
+
+  const match = duration.match(/(\d+(\.\d+)?)/);
+  if (!match) {
+    return 60;
+  }
+
+  const value = parseFloat(match[1]);
+  if (!Number.isFinite(value)) {
+    return 60;
+  }
+
+  return /hour/i.test(duration) ? Math.max(1, Math.round(value * 60)) : Math.max(1, Math.round(value));
+};
+
 export default function EditServiceModal({ service, onClose, onSave }: Props) {
   const [saving, setSaving] = useState(false);
   
@@ -85,9 +107,10 @@ export default function EditServiceModal({ service, onClose, onSave }: Props) {
           durationMinutes:
             typeof item.durationMinutes === 'number' && Number.isFinite(item.durationMinutes)
               ? item.durationMinutes
-              : item.duration
-              ? parseInt(String(item.duration), 10) || 60
-              : 60,
+              : parseDurationToMinutes(item.duration),
+          duration: `${typeof item.durationMinutes === 'number' && Number.isFinite(item.durationMinutes)
+            ? item.durationMinutes
+            : parseDurationToMinutes(item.duration)} minutes`,
           price:
             typeof item.price === 'number' && Number.isFinite(item.price)
               ? item.price

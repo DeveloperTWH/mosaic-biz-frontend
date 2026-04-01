@@ -550,9 +550,9 @@ const saveDraft = async () => {
   try {
     setLoading(true);
     await saveStage1Draft(form);
-    toast.success('Draft saved successfully');
+    toast.success('data saved successfully');
   } catch (error: any) {
-    toast.error(error.message || 'Failed to save draft');
+    toast.error(error.message || 'Failed to save data');
   } finally {
     setLoading(false);
   }
@@ -1403,7 +1403,7 @@ const handlePayAndSubmit = async () => {
       className="w-full md:w-auto px-8 py-3 bg-[#1e3a5f] text-white rounded-lg hover:bg-[#162b46] transition-colors font-medium min-w-[160px]"
       disabled={loading}
     >
-      {loading ? 'Saving...' : 'Save Draft'}
+      {loading ? 'Saving...' : 'Save data'}
     </button>
 
     <button

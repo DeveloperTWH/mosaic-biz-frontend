@@ -15,7 +15,9 @@ type DashboardTab =
   | "manage-listings"
   | "location-timings"
   | "inquiries"
-  | "analytics";
+  | "analytics"
+  | "bookings"; // ✅ correct
+  
 
 interface Business {
   _id: string;
@@ -47,6 +49,8 @@ const dashboardTabs = [
   { key: "manage-listings", label: "Add/Edit Product/Services" },
   { key: "inquiries", label: "Inquiries" },
   { key: "analytics", label: "Analytics" },
+  { key: "bookings", label: "Bookings" },
+  
 ] as const;
 
 export default function PartnerDashboardPage() {
@@ -126,7 +130,7 @@ export default function PartnerDashboardPage() {
 
   const renderTabContent = () => {
     if (activeTab === "edit-profile") {
-      return <BusinessProfilePage />;
+      return <BusinessProfilePage embedded />;
     }
 
     if (activeTab === "manage-listings") {
@@ -186,7 +190,6 @@ export default function PartnerDashboardPage() {
 
     return (
       <div className="rounded-2xl border border-dashed border-[#d9d0c2] bg-white p-8 text-center">
-        <h2 className="text-xl font-semibold text-[#1c1c1c]">Analytics</h2>
         <p className="mt-3 text-sm text-gray-600">
           No data found
         </p>
@@ -206,7 +209,7 @@ export default function PartnerDashboardPage() {
 
           <div className="mb-8 overflow-x-auto">
             <div className="min-w-[760px] px-2">
-              <div className="grid grid-cols-4 gap-3">
+              <div className="grid grid-cols-5 gap-3">
                 {dashboardTabs.map((tab) => {
                   return (
                     <button
