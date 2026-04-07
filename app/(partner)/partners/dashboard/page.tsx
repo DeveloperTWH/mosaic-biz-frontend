@@ -8,6 +8,7 @@ import ProductsPage from "@/app/(home)/partners/products/page";
 import ServicesPage from "@/app/(home)/partners/services/page";
 import FoodsPage from "@/app/(home)/partners/foods/page";
 import InquiriesTable from "./components/InquiriesTable";
+import OrdersTab from "./components/OrdersTab";
 
 type ListingType = "product" | "service" | "food";
 type DashboardTab =
@@ -16,13 +17,14 @@ type DashboardTab =
   | "location-timings"
   | "inquiries"
   | "analytics"
-  | "bookings"; // ✅ correct
-  
+  | "bookings"
+  | "orders";
 
 interface Business {
   _id: string;
   isActive?: boolean;
   listingType?: ListingType;
+  bookingToolLink?: string;
 }
 
 interface VendorInquiry {
@@ -44,13 +46,25 @@ interface VendorInquiry {
   };
 }
 
-const dashboardTabs = [
+interface DashboardBooking {
+  _id: string;
+  status: string;
+  createdAt: string;
+  date?: string;
+  time?: string;
+  serviceTitle?: string;
+  customerInfo?: {
+    name?: string;
+    email?: string;
+    phone?: string;
+  };
+}
+
+const baseDashboardTabs = [
   { key: "edit-profile", label: "Edit Profile" },
   { key: "manage-listings", label: "Add/Edit Product/Services" },
   { key: "inquiries", label: "Inquiries" },
   { key: "analytics", label: "Analytics" },
-  { key: "bookings", label: "Bookings" },
-  
 ] as const;
 
 export default function PartnerDashboardPage() {
@@ -60,6 +74,10 @@ export default function PartnerDashboardPage() {
   const [inquiries, setInquiries] = useState<VendorInquiry[]>([]);
   const [inquiriesLoading, setInquiriesLoading] = useState(false);
   const [inquiriesError, setInquiriesError] = useState<string | null>(null);
+  const [bookings, setBookings] = useState<DashboardBooking[]>([]);
+  const [bookingsLoading, setBookingsLoading] = useState(false);
+  const [bookingsError, setBookingsError] = useState<string | null>(null);
+  const [hasBookingLink, setHasBookingLink] = useState(false);
 
   useEffect(() => {
     const fetchBusinesses = async () => {
@@ -79,6 +97,27 @@ export default function PartnerDashboardPage() {
 
     fetchBusinesses();
   }, []);
+
+  const activeBusiness = useMemo(
+    () => businesses.find((business) => business.isActive) ?? businesses[0],
+    [businesses]
+  );
+
+  const listingType = useMemo<ListingType>(() => {
+    return activeBusiness?.listingType ?? "product";
+  }, [activeBusiness]);
+
+  const listingLabel = useMemo(() => {
+    if (listingType === "service") {
+      return "Services";
+    }
+
+    if (listingType === "food") {
+      return "Food";
+    }
+
+    return "Products";
+  }, [listingType]);
 
   useEffect(() => {
     if (activeTab !== "inquiries") {
@@ -109,22 +148,112 @@ export default function PartnerDashboardPage() {
     fetchInquiries();
   }, [activeTab]);
 
-  const listingType = useMemo<ListingType>(() => {
-    const activeBusiness = businesses.find((business) => business.isActive) ?? businesses[0];
-    return activeBusiness?.listingType ?? "product";
-  }, [businesses]);
+  useEffect(() => {
+    const resolveBookingAvailability = async () => {
+      if (!activeBusiness?._id || activeBusiness.listingType === "product") {
+        setHasBookingLink(false);
+        return;
+      }
 
-  const listingLabel = useMemo(() => {
-    if (listingType === "service") {
-      return "Services";
+      if ((activeBusiness.bookingToolLink ?? "").trim()) {
+        setHasBookingLink(true);
+        return;
+      }
+
+      try {
+        if (activeBusiness.listingType === "service") {
+          const response = await axios.get(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/service/my-services`,
+            { withCredentials: true }
+          );
+
+          const services = Array.isArray(response.data?.services)
+            ? response.data.services
+            : [];
+
+          setHasBookingLink(
+            services.some(
+              (service: { bookingToolLink?: string }) =>
+                (service.bookingToolLink ?? "").trim().length > 0
+            )
+          );
+          return;
+        }
+
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/food/my-foods`,
+          { withCredentials: true }
+        );
+
+        const foods = Array.isArray(response.data?.foods) ? response.data.foods : [];
+
+        setHasBookingLink(
+          foods.some(
+            (food: { bookingToolLink?: string }) =>
+              (food.bookingToolLink ?? "").trim().length > 0
+          )
+        );
+      } catch (error) {
+        console.error("Error resolving booking link availability:", error);
+        setHasBookingLink(false);
+      }
+    };
+
+    resolveBookingAvailability();
+  }, [activeBusiness]);
+
+  useEffect(() => {
+    if (
+      activeTab !== "bookings" ||
+      !activeBusiness?._id ||
+      activeBusiness.listingType === "product"
+    ) {
+      return;
     }
 
-    if (listingType === "food") {
-      return "Food";
+    const fetchBookings = async () => {
+      try {
+        setBookingsLoading(true);
+        setBookingsError(null);
+
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/bookings/vendor?businessId=${activeBusiness._id}&status=`,
+          { withCredentials: true }
+        );
+
+        setBookings(response.data?.bookings ?? []);
+      } catch (error: any) {
+        console.error("Error fetching bookings:", error);
+        setBookingsError(
+          error?.response?.data?.message || "Failed to load bookings."
+        );
+      } finally {
+        setBookingsLoading(false);
+      }
+    };
+
+    fetchBookings();
+  }, [activeTab, activeBusiness]);
+
+  const dashboardTabs = useMemo(() => {
+    if (listingType === "product") {
+      return [...baseDashboardTabs, { key: "orders", label: "Orders" }] as const;
     }
 
-    return "Products";
-  }, [listingType]);
+    if (hasBookingLink) {
+      return [...baseDashboardTabs, { key: "bookings", label: "Bookings" }] as const;
+    }
+
+    return baseDashboardTabs;
+  }, [hasBookingLink, listingType]);
+
+  useEffect(() => {
+    const isActiveTabVisible = dashboardTabs.some((tab) => tab.key === activeTab);
+
+    if (!isActiveTabVisible) {
+      setActiveTab("edit-profile");
+    }
+  }, [activeTab, dashboardTabs]);
 
   const selectedTab = dashboardTabs.find((tab) => tab.key === activeTab);
 
@@ -152,7 +281,8 @@ export default function PartnerDashboardPage() {
             Add/Edit Location and Timings
           </h2>
           <p className="mt-3 text-sm text-gray-600">
-            This section will stay static for now. I can wire the real location and timing form next.
+            This section will stay static for now. I can wire the real location and
+            timing form next.
           </p>
         </div>
       );
@@ -188,11 +318,73 @@ export default function PartnerDashboardPage() {
       return <InquiriesTable inquiries={inquiries} />;
     }
 
+    if (activeTab === "orders") {
+      return (
+        <OrdersTab
+          businessId={activeBusiness?._id}
+          isActive={activeTab === "orders"}
+        />
+      );
+    }
+
+    if (activeTab === "bookings") {
+      if (bookingsLoading) {
+        return (
+          <div className="rounded-2xl border border-[#ebe2d3] bg-[#fcfaf6] p-8 text-center">
+            <p className="text-sm font-medium text-gray-600">Loading bookings...</p>
+          </div>
+        );
+      }
+
+      if (bookingsError) {
+        return (
+          <div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-center">
+            <h2 className="text-xl font-semibold text-red-700">Bookings</h2>
+            <p className="mt-3 text-sm text-red-600">{bookingsError}</p>
+          </div>
+        );
+      }
+
+      if (bookings.length === 0) {
+        return (
+          <div className="rounded-2xl border border-dashed border-[#d9d0c2] bg-white p-8 text-center">
+            <h2 className="text-xl font-semibold text-[#1c1c1c]">Bookings</h2>
+            <p className="mt-3 text-sm text-gray-600">No bookings found.</p>
+          </div>
+        );
+      }
+
+      return (
+        <div className="space-y-4">
+          {bookings.map((booking) => (
+            <div
+              key={booking._id}
+              className="rounded-2xl border border-[#ebe2d3] bg-[#fcfaf6] p-5"
+            >
+              <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                <div className="space-y-1">
+                  <h2 className="text-lg font-semibold text-[#1c1c1c]">
+                    {booking.serviceTitle || "Booking"}
+                  </h2>
+                  <p className="text-sm text-gray-600">
+                    Customer: {booking.customerInfo?.name || "N/A"}
+                  </p>
+                  <p className="text-sm text-gray-600">Status: {booking.status}</p>
+                </div>
+                <div className="text-sm text-gray-600 md:text-right">
+                  <p>{booking.date ? new Date(booking.date).toLocaleDateString() : "N/A"}</p>
+                  <p>{booking.time || "N/A"}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
     return (
       <div className="rounded-2xl border border-dashed border-[#d9d0c2] bg-white p-8 text-center">
-        <p className="mt-3 text-sm text-gray-600">
-          No data found
-        </p>
+        <p className="mt-3 text-sm text-gray-600">No data found</p>
       </div>
     );
   };
@@ -203,13 +395,13 @@ export default function PartnerDashboardPage() {
 
       <main className="min-h-screen bg-[#f7f2eb] pt-[110px]">
         <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
-          <h1 className="mb-8 text-2xl font-bold text-center text-gray-800 uppercase tracking-wide">
+          <h1 className="mb-8 text-center text-2xl font-bold uppercase tracking-wide text-gray-800">
             Vendor Dashboard
           </h1>
 
           <div className="mb-8 overflow-x-auto">
             <div className="min-w-[760px] px-2">
-              <div className="grid grid-cols-5 gap-3">
+              <div className={`grid gap-3 ${dashboardTabs.length === 5 ? "grid-cols-5" : "grid-cols-4"}`}>
                 {dashboardTabs.map((tab) => {
                   return (
                     <button
@@ -238,7 +430,7 @@ export default function PartnerDashboardPage() {
 
           <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
             <h3 className="mb-5 border-b border-gray-100 pb-3 font-semibold text-gray-900">
-               {selectedTab?.label}
+              {selectedTab?.label}
             </h3>
 
             {/* <div className="mb-6 rounded-xl bg-[#fcfaf7] px-4 py-3 text-sm text-gray-600">
@@ -253,6 +445,12 @@ export default function PartnerDashboardPage() {
                 <></>
               )}
             </div> */}
+
+            {!loading && (
+              <div className="mb-4 text-sm text-gray-500">
+                 listing type: <span className="font-medium capitalize">{listingLabel}</span>
+              </div>
+            )}
 
             {renderTabContent()}
           </div>

@@ -87,6 +87,8 @@ type PublicBusinessProductsResponse = {
   data?: PublicBusinessProductItem[];
 };
 
+type RevealFieldKey = "call" | "email" | "address" | "website";
+
 function toNumber(value: unknown): number {
   if (typeof value === "number") return Number.isFinite(value) ? value : 0;
   if (typeof value === "string") {
@@ -143,6 +145,77 @@ function getSafeExternalUrl(url?: string): string {
   return url.startsWith("http://") || url.startsWith("https://") ? url : `https://${url}`;
 }
 
+function buildRevealState(): Record<RevealFieldKey, boolean> {
+  return {
+    call: true,
+    email: true,
+    address: true,
+    website: true,
+  };
+}
+
+function RevealConsentModal({
+  variant,
+  open,
+  loading,
+  error,
+  onClose,
+  onConfirm,
+}: {
+  variant: "signin" | "consent";
+  open: boolean;
+  loading: boolean;
+  error: string | null;
+  onClose: () => void;
+  onConfirm: () => void;
+}) {
+  if (!open) return null;
+
+  const isSignIn = variant === "signin";
+
+  return (
+    <div className="fixed inset-0 z-[1200] flex items-center justify-center bg-black/50 px-4 py-6">
+      <div className="w-full max-w-xl border border-[#e3dcc7] bg-white shadow-2xl">
+        <div className="border-b border-[#ece6d9] px-6 py-5">
+          <h3 className="text-lg font-poppins font-semibold text-[#1A1F71]">
+            {isSignIn ? "Sign in to view contact details." : "Confirm contact permission"}
+          </h3>
+        </div>
+        <div className="space-y-4 px-6 py-5">
+          <p className="text-sm font-montserrat leading-6 text-[#4b5563]">
+            {isSignIn
+              ? "This helps us keep things transparent and ensures vendors can follow up on your enquiry. By continuing, you agree to be contacted by the vendor."
+              : "To view these details, please confirm that the vendor can contact you regarding your enquiry."}
+          </p>
+          {error ? (
+            <div className="border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+              {error}
+            </div>
+          ) : null}
+          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={loading}
+              className="h-11 min-w-[140px] border border-[#d6cfba] px-5 text-sm font-semibold uppercase tracking-wide text-[#4b5563] transition-colors hover:bg-[#f7f4ea] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={onConfirm}
+              disabled={loading}
+              className="h-11 min-w-[180px] bg-[#C7A040] px-5 text-sm font-semibold uppercase tracking-wide text-white transition-colors hover:bg-[#a88432] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {loading ? "Please wait..." : isSignIn ? "Sign In & Continue" : "I Agree"}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ProductVendorProfilePage() {
   const params = useParams();
   const router = useRouter();
@@ -163,13 +236,16 @@ export default function ProductVendorProfilePage() {
   const [apiTotal, setApiTotal] = useState(0);
   const [badgeSrc, setBadgeSrc] = useState<string | null>(null);
   const [revealedFields, setRevealedFields] = useState<
-    Record<"call" | "email" | "address" | "website", boolean>
+    Record<RevealFieldKey, boolean>
   >({
     call: false,
     email: false,
     address: false,
     website: false,
   });
+  const [revealModal, setRevealModal] = useState<"signin" | "consent" | null>(null);
+  const [revealLoading, setRevealLoading] = useState(false);
+  const [revealError, setRevealError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!businessId) {
@@ -256,8 +332,68 @@ export default function ProductVendorProfilePage() {
     setBadgeSrc(badgeImage);
   }, [badgeImage]);
 
-  const toggleReveal = (field: "call" | "email" | "address" | "website") => {
-    setRevealedFields((prev) => ({ ...prev, [field]: !prev[field] }));
+  const openRevealFlow = (field: RevealFieldKey) => {
+    if (revealedFields[field]) return;
+
+    const isLoggedIn = typeof window !== "undefined" && localStorage.getItem("user_session") === "true";
+    setRevealError(null);
+    setRevealModal(isLoggedIn ? "consent" : "signin");
+  };
+
+  const closeRevealModal = () => {
+    if (revealLoading) return;
+    setRevealModal(null);
+    setRevealError(null);
+  };
+
+  const handleRevealConfirm = async () => {
+    if (revealModal === "signin") {
+      const redirectPath =
+        typeof window !== "undefined"
+          ? `${window.location.pathname}${window.location.search}`
+          : `/vendor-profile/product-vendor/${businessId}`;
+      router.push(`/login?type=customer&redirect=${encodeURIComponent(redirectPath)}`);
+      return;
+    }
+
+    if (!businessId) {
+      setRevealError("Business details are unavailable right now. Please try again.");
+      return;
+    }
+
+    try {
+      setRevealLoading(true);
+      setRevealError(null);
+
+      const base = (process.env.NEXT_PUBLIC_API_BASE_URL || "").replace(/\/$/, "");
+      const response = await fetch(`${base}/api/enquiries/reveal`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ businessId }),
+      });
+
+      if (response.status === 401) {
+        setRevealModal("signin");
+        setRevealError("Please sign in to continue.");
+        return;
+      }
+
+      const payload = await response.json().catch(() => null);
+
+      if (!response.ok || payload?.success === false) {
+        throw new Error(payload?.message || payload?.error || "Unable to reveal contact details right now.");
+      }
+
+      setRevealedFields(buildRevealState());
+      setRevealModal(null);
+    } catch (err: any) {
+      setRevealError(err?.message || "Unable to reveal contact details right now.");
+    } finally {
+      setRevealLoading(false);
+    }
   };
 
   return (
@@ -415,7 +551,7 @@ export default function ProductVendorProfilePage() {
                     ) : (
                       <button
                         type="button"
-                        onClick={() => toggleReveal("call")}
+                        onClick={() => openRevealFlow("call")}
                         className="text-left text-[#1A1F71] underline hover:text-[#0d1150]"
                       >
                         Click to reveal
@@ -433,7 +569,7 @@ export default function ProductVendorProfilePage() {
                     ) : (
                       <button
                         type="button"
-                        onClick={() => toggleReveal("email")}
+                        onClick={() => openRevealFlow("email")}
                         className="text-left text-[#1A1F71] underline hover:text-[#0d1150]"
                       >
                         Click to reveal
@@ -451,7 +587,7 @@ export default function ProductVendorProfilePage() {
                     ) : (
                       <button
                         type="button"
-                        onClick={() => toggleReveal("address")}
+                        onClick={() => openRevealFlow("address")}
                         className="text-left text-[#1A1F71] underline hover:text-[#0d1150]"
                       >
                         Click to reveal
@@ -476,7 +612,7 @@ export default function ProductVendorProfilePage() {
                     ) : (
                       <button
                         type="button"
-                        onClick={() => toggleReveal("website")}
+                        onClick={() => openRevealFlow("website")}
                         className="text-left text-[#1A1F71] underline hover:text-[#0d1150]"
                       >
                         Click to reveal
@@ -641,6 +777,15 @@ export default function ProductVendorProfilePage() {
           <ClientTestimonials />
         </div>
       )}
+
+      <RevealConsentModal
+        variant={revealModal ?? "consent"}
+        open={revealModal !== null}
+        loading={revealLoading}
+        error={revealError}
+        onClose={closeRevealModal}
+        onConfirm={handleRevealConfirm}
+      />
     </div>
   );
 }
