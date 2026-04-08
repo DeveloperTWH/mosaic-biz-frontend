@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   AlertCircle,
@@ -27,7 +27,7 @@ type Business = {
   isActive?: boolean;
 };
 
-const Page = () => {
+const PayoutSetupPage = () => {
   const searchParams = useSearchParams();
 
   const [business, setBusiness] = useState<Business | null>(null);
@@ -297,4 +297,10 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default function Page() {
+  return (
+    <Suspense>
+      <PayoutSetupPage />
+    </Suspense>
+  );
+}

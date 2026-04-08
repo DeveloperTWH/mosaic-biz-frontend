@@ -450,7 +450,7 @@ const steps = useMemo(() => {
             >
               {/* Step Header - Always Visible */}
               <div className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-100 transition-colors"
-                   onClick={() => toggleStep(index + 1)}>
+                   onClick={() => step.number === "06" ? router.push(step.link) : toggleStep(index + 1)}>
                 <div className="flex items-center gap-4 flex-1">
                   {/* Number Badge */}
                   <span className="w-8 h-8 rounded-md bg-[#c9a227] flex items-center justify-center text-sm font-bold text-white">
