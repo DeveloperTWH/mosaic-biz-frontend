@@ -200,10 +200,7 @@ export default function OrdersTab({ businessId, isActive }: OrdersTabProps) {
     <div className="space-y-6">
       <div className="flex flex-col gap-3 rounded-2xl border border-[#ebe2d3] bg-[#fcfaf6] p-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-[#1c1c1c]">Order Management</h2>
-          <p className="text-sm text-gray-600">
-            Review vendor orders and update their fulfillment status.
-          </p>
+          <h2 className="text-lg font-semibold text-[#1c1c1c]">Manage Your Orders</h2>
         </div>
 
         <div className="w-full md:w-[220px]">
@@ -263,9 +260,9 @@ export default function OrdersTab({ businessId, isActive }: OrdersTabProps) {
                 <p className="text-sm text-gray-600">
                   Email: {order.userId?.email || "N/A"}
                 </p>
-                <p className="text-sm text-gray-600">
+                {/* <p className="text-sm text-gray-600">
                   Group Order ID: {order.groupOrderId || "N/A"}
-                </p>
+                </p> */}
               </div>
 
               <div className="space-y-1 text-sm text-gray-600 md:text-right">

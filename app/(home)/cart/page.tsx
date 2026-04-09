@@ -591,19 +591,19 @@ export default function CartPage() {
                                                 alert("Please add address");
                                                 return;
                                             }
-                                            // handlePlaceOrderFlow(
-                                            //     {
-                                            //         fullName: selectedAddress.fullName,
-                                            //         phone: selectedAddress.phone,
-                                            //         addressLine1: selectedAddress.addressLine1,
-                                            //         addressLine2: selectedAddress.addressLine2 ?? "",
-                                            //         city: selectedAddress.city ?? "",
-                                            //         state: selectedAddress.state ?? "",
-                                            //         country: selectedAddress.country ?? "",
-                                            //         postalCode: selectedAddress.postalCode ?? "", // map postalCode → pincode
-                                            //     },
-                                            //     userNote
-                                            // );
+                                            handlePlaceOrderFlow(
+                                                {
+                                                    fullName: selectedAddress.fullName,
+                                                    phone: selectedAddress.phone,
+                                                    addressLine1: selectedAddress.addressLine1,
+                                                    addressLine2: selectedAddress.addressLine2 ?? "",
+                                                    city: selectedAddress.city ?? "",
+                                                    state: selectedAddress.state ?? "",
+                                                    country: selectedAddress.country ?? "",
+                                                    postalCode: selectedAddress.postalCode ?? "", // map postalCode → pincode
+                                                },
+                                                userNote
+                                            );
                                         }}
                                     >
                                         Place Order

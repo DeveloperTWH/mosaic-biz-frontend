@@ -207,7 +207,7 @@ const OrderPage = () => {
                           rel="noopener noreferrer"
                           className="text-sm text-blue-600 hover:underline"
                         >
-                          Track Package
+                          Track Order
                         </a>
                       )}
 

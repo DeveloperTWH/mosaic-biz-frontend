@@ -448,7 +448,7 @@ export default function PartnerDashboardPage() {
 
             {!loading && (
               <div className="mb-4 text-sm text-gray-500">
-                 listing type: <span className="font-medium capitalize">{listingLabel}</span>
+                 Business type: <span className="font-medium capitalize">{listingLabel}</span>
               </div>
             )}
 
