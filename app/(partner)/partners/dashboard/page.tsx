@@ -9,6 +9,7 @@ import ServicesPage from "@/app/(home)/partners/services/page";
 import FoodsPage from "@/app/(home)/partners/foods/page";
 import InquiriesTable from "./components/InquiriesTable";
 import OrdersTab from "./components/OrdersTab";
+import BookingsTab from "./components/BookingsTab";
 
 type ListingType = "product" | "service" | "food";
 type DashboardTab =
@@ -46,20 +47,6 @@ interface VendorInquiry {
   };
 }
 
-interface DashboardBooking {
-  _id: string;
-  status: string;
-  createdAt: string;
-  date?: string;
-  time?: string;
-  serviceTitle?: string;
-  customerInfo?: {
-    name?: string;
-    email?: string;
-    phone?: string;
-  };
-}
-
 const baseDashboardTabs = [
   { key: "edit-profile", label: "Edit Profile" },
   { key: "manage-listings", label: "Add/Edit Product/Services" },
@@ -74,9 +61,6 @@ export default function PartnerDashboardPage() {
   const [inquiries, setInquiries] = useState<VendorInquiry[]>([]);
   const [inquiriesLoading, setInquiriesLoading] = useState(false);
   const [inquiriesError, setInquiriesError] = useState<string | null>(null);
-  const [bookings, setBookings] = useState<DashboardBooking[]>([]);
-  const [bookingsLoading, setBookingsLoading] = useState(false);
-  const [bookingsError, setBookingsError] = useState<string | null>(null);
   const [hasBookingLink, setHasBookingLink] = useState(false);
 
   useEffect(() => {
@@ -202,39 +186,6 @@ export default function PartnerDashboardPage() {
     resolveBookingAvailability();
   }, [activeBusiness]);
 
-  useEffect(() => {
-    if (
-      activeTab !== "bookings" ||
-      !activeBusiness?._id ||
-      activeBusiness.listingType === "product"
-    ) {
-      return;
-    }
-
-    const fetchBookings = async () => {
-      try {
-        setBookingsLoading(true);
-        setBookingsError(null);
-
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/bookings/vendor?businessId=${activeBusiness._id}&status=`,
-          { withCredentials: true }
-        );
-
-        setBookings(response.data?.bookings ?? []);
-      } catch (error: any) {
-        console.error("Error fetching bookings:", error);
-        setBookingsError(
-          error?.response?.data?.message || "Failed to load bookings."
-        );
-      } finally {
-        setBookingsLoading(false);
-      }
-    };
-
-    fetchBookings();
-  }, [activeTab, activeBusiness]);
-
   const dashboardTabs = useMemo(() => {
     if (listingType === "product") {
       return [...baseDashboardTabs, { key: "orders", label: "Orders" }] as const;
@@ -328,57 +279,12 @@ export default function PartnerDashboardPage() {
     }
 
     if (activeTab === "bookings") {
-      if (bookingsLoading) {
-        return (
-          <div className="rounded-2xl border border-[#ebe2d3] bg-[#fcfaf6] p-8 text-center">
-            <p className="text-sm font-medium text-gray-600">Loading bookings...</p>
-          </div>
-        );
-      }
-
-      if (bookingsError) {
-        return (
-          <div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-center">
-            <h2 className="text-xl font-semibold text-red-700">Bookings</h2>
-            <p className="mt-3 text-sm text-red-600">{bookingsError}</p>
-          </div>
-        );
-      }
-
-      if (bookings.length === 0) {
-        return (
-          <div className="rounded-2xl border border-dashed border-[#d9d0c2] bg-white p-8 text-center">
-            <h2 className="text-xl font-semibold text-[#1c1c1c]">Bookings</h2>
-            <p className="mt-3 text-sm text-gray-600">No bookings found.</p>
-          </div>
-        );
-      }
-
       return (
-        <div className="space-y-4">
-          {bookings.map((booking) => (
-            <div
-              key={booking._id}
-              className="rounded-2xl border border-[#ebe2d3] bg-[#fcfaf6] p-5"
-            >
-              <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-                <div className="space-y-1">
-                  <h2 className="text-lg font-semibold text-[#1c1c1c]">
-                    {booking.serviceTitle || "Booking"}
-                  </h2>
-                  <p className="text-sm text-gray-600">
-                    Customer: {booking.customerInfo?.name || "N/A"}
-                  </p>
-                  <p className="text-sm text-gray-600">Status: {booking.status}</p>
-                </div>
-                <div className="text-sm text-gray-600 md:text-right">
-                  <p>{booking.date ? new Date(booking.date).toLocaleDateString() : "N/A"}</p>
-                  <p>{booking.time || "N/A"}</p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        <BookingsTab
+          businessId={activeBusiness?._id}
+          listingType={listingType === "food" ? "food" : "service"}
+          isActive={activeTab === "bookings"}
+        />
       );
     }
 

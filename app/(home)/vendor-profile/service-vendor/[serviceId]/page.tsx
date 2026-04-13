@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { Eye } from "lucide-react";
+import { toast } from "react-toastify";
+import { createServiceBooking } from "@/lib/api/serviceBookings";
 import ClientTestimonials from "../../../Components/ClientTestimonials";
 import PublicSearchFilterBar from "../../../Components/PublicSearchFilterBar";
 import { buildSearchPageUrl, PublicSearchFilters } from "../../../Components/publicSearch";
@@ -523,6 +525,7 @@ export default function ServiceVendorProfilePage() {
     const today = new Date();
     return new Date(today.getFullYear(), today.getMonth(), 1);
   });
+  const [bookingSubmitting, setBookingSubmitting] = useState(false);
 
   
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -675,6 +678,56 @@ export default function ServiceVendorProfilePage() {
     Boolean(bookForm.date) &&
     Boolean(bookForm.timeSlot) &&
     bookForm.serviceTypes.length > 0;
+
+  const resetBookingForm = () => {
+    setBookForm({
+      name: "",
+      email: "",
+      phone: "",
+      date: "",
+      note: "",
+      serviceTypes: [],
+      timeSlot: "",
+    });
+  };
+
+  const handleBookingSubmit = async () => {
+    if (!bookingReady || !serviceId) return;
+
+    const isLoggedIn =
+      typeof window !== "undefined" && localStorage.getItem("user_session") === "true";
+
+    if (!isLoggedIn) {
+      const redirectPath =
+        typeof window !== "undefined"
+          ? `${window.location.pathname}${window.location.search}`
+          : `/vendor-profile/service-vendor/${serviceId}`;
+      router.push(`/login?type=customer&redirect=${encodeURIComponent(redirectPath)}`);
+      return;
+    }
+
+    try {
+      setBookingSubmitting(true);
+      await createServiceBooking({
+        serviceId,
+        name: bookForm.name.trim(),
+        email: bookForm.email.trim(),
+        phone: bookForm.phone.trim(),
+        services: selectedServices.map((service) => service.name),
+        date: bookForm.date,
+        slot: bookForm.timeSlot,
+      });
+
+      toast.success("Appointment request submitted successfully.");
+      resetBookingForm();
+    } catch (err: any) {
+      const message =
+        err?.message || "Unable to submit your booking request right now.";
+      toast.error(message);
+    } finally {
+      setBookingSubmitting(false);
+    }
+  };
 
   const todayName = new Date().toLocaleDateString("en-US", { weekday: "long" });
   const todayHours = businessHours.find(h => h.day === todayName);
@@ -1344,12 +1397,15 @@ export default function ServiceVendorProfilePage() {
 
     <button
       type="button"
-      disabled={!bookingReady}
+      onClick={handleBookingSubmit}
+      disabled={!bookingReady || bookingSubmitting}
       className={`h-10 w-full text-[11px] font-semibold uppercase tracking-wide text-white transition-colors ${
-        bookingReady ? "bg-[#C7A040] hover:bg-[#a88432]" : "bg-[#d7c796] cursor-not-allowed"
+        bookingReady && !bookingSubmitting
+          ? "bg-[#C7A040] hover:bg-[#a88432]"
+          : "bg-[#d7c796] cursor-not-allowed"
       }`}
     >
-      Request An Appointment
+      {bookingSubmitting ? "Submitting..." : "Request An Appointment"}
     </button>
     <p>A booking fee may be required by the vendor to confirm your booking.</p>
 <p className="border border-dashed border-[#d8d0ba] bg-[#fffdf4] px-3 py-2 text-[11px] text-gray-500 leading-relaxed mt-3">
