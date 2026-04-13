@@ -140,7 +140,7 @@ export default function PartnerDashboardPage() {
       }
 
       if ((activeBusiness.bookingToolLink ?? "").trim()) {
-        setHasBookingLink(true);
+        setHasBookingLink(false);
         return;
       }
 
@@ -156,7 +156,7 @@ export default function PartnerDashboardPage() {
             : [];
 
           setHasBookingLink(
-            services.some(
+            !services.some(
               (service: { bookingToolLink?: string }) =>
                 (service.bookingToolLink ?? "").trim().length > 0
             )
@@ -172,7 +172,7 @@ export default function PartnerDashboardPage() {
         const foods = Array.isArray(response.data?.foods) ? response.data.foods : [];
 
         setHasBookingLink(
-          foods.some(
+          !foods.some(
             (food: { bookingToolLink?: string }) =>
               (food.bookingToolLink ?? "").trim().length > 0
           )
