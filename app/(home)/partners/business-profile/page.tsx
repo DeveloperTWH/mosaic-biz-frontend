@@ -387,6 +387,16 @@ const validateForm = (): boolean => {
     newErrors.acceptMosaicPolicy = 'You must accept Mosaic Terms & Policy';
   }
 
+  if (hasOwnPolicy) {
+    if (!formData.refundPolicyDocument?.url) {
+      newErrors.refundPolicyDocument = 'Refund policy document is required';
+    }
+
+    if (!formData.termsDocument?.url) {
+      newErrors.termsDocument = 'Terms document is required';
+    }
+  }
+
   setErrors(newErrors);
   return Object.keys(newErrors).length === 0;
 };
@@ -1150,7 +1160,7 @@ const validateForm = (): boolean => {
             <div className="flex items-center gap-2 mb-4 mt-4">
               <FileText className="w-5 h-5 text-[#c9a227]" />
               <h2 className="text-lg font-semibold text-gray-900">Additional Information</h2>
-              <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">Optional</span>
+              <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">Conditional</span>
             </div>
             <div className="space-y-4">
 
@@ -1160,7 +1170,7 @@ const validateForm = (): boolean => {
       {/* Refund & Return Policy */}
       <div>
         <label className="block text-xs font-medium text-gray-500 mb-1">
-          Refund & Return Policy Document
+          Refund & Return Policy Document {hasOwnPolicy && <span className="text-red-500">*</span>}
         </label>
 
         <div className="flex items-center gap-4">
@@ -1214,12 +1224,16 @@ const validateForm = (): boolean => {
             View uploaded document
           </a>
         )}
+
+        {errors.refundPolicyDocument && (
+          <p className="mt-2 text-xs text-red-600">{errors.refundPolicyDocument}</p>
+        )}
       </div>
 
       {/* Terms */}
       <div>
         <label className="block text-xs font-medium text-gray-500 mb-1">
-          Terms & Conditions / Service Agreement Document
+          Terms & Conditions / Service Agreement Document {hasOwnPolicy && <span className="text-red-500">*</span>}
         </label>
 
         <div className="flex items-center gap-4">
@@ -1271,6 +1285,10 @@ const validateForm = (): boolean => {
             <FileText className="w-3 h-3" />
             View uploaded document
           </a>
+        )}
+
+        {errors.termsDocument && (
+          <p className="mt-2 text-xs text-red-600">{errors.termsDocument}</p>
         )}
       </div>
     </>

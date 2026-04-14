@@ -284,10 +284,10 @@ const PayoutSetupPage = () => {
             </button>
 
             <Link
-              href="/partners"
+              href="/partners/final-review"
               className="inline-flex items-center gap-2 rounded-lg border border-stone-300 bg-white px-5 py-3 text-sm font-medium text-slate-700 transition hover:bg-stone-50"
             >
-              Back
+              Continue
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>

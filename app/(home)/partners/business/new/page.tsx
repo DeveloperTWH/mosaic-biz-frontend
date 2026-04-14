@@ -37,6 +37,7 @@ interface VerificationPayment {
   status: 'pending' | 'completed' | 'failed';
 }
 
+type DraftStatus = 'draft' | 'submitted' | 'under_review' | 'approved' | 'rejected' | 'verified' | '';
 type BusinessType = 'product' | 'service' | 'food' | '';
 type OwnershipType = 'Limited Liability Company' | 'Sole Proprietor' | 'S-Corporation' | 'C-Corporation' | 'Nonprofit' | '';
 
@@ -332,6 +333,7 @@ const InputField: React.FC<InputFieldProps> = ({
 
 export default function VendorOnboardingStage1Page() {
   const [form, setForm] = useState<Stage1Form>(initialState);
+  const [draftStatus, setDraftStatus] = useState<DraftStatus>('');
   const [loading, setLoading] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [uploading, setUploading] = useState<Record<string, boolean>>({});
@@ -349,12 +351,14 @@ export default function VendorOnboardingStage1Page() {
   };
 
   const router = useRouter(); // Initialize router
+  const shouldHideProceedButton = draftStatus === 'verified' || draftStatus === 'rejected';
 
   useEffect(() => {
     const loadDraft = async () => {
       try {
         const draft = await getStage1Draft();
         if (draft) {
+          setDraftStatus((draft?.status || '') as DraftStatus);
           setForm(mapDraftToStage1Form(draft));
         }
       } catch (error: any) {
@@ -549,7 +553,11 @@ const saveDraft = async () => {
 
   try {
     setLoading(true);
-    await saveStage1Draft(form);
+    const response = await saveStage1Draft(form);
+    const nextStatus = response?.data?.status || response?.status;
+    if (nextStatus) {
+      setDraftStatus(nextStatus as DraftStatus);
+    }
     toast.success('data saved successfully');
   } catch (error: any) {
     toast.error(error.message || 'Failed to save data');
@@ -1406,13 +1414,15 @@ const handlePayAndSubmit = async () => {
       {loading ? 'Saving...' : 'Save data'}
     </button>
 
-    <button
-      onClick={handlePayAndSubmit}
-      className="w-full md:w-auto px-8 py-3 bg-[#c9a227] text-white rounded-lg hover:bg-[#b8921f] transition-colors font-medium min-w-[160px]"
-      disabled={loading}
-    >
-      {loading ? 'Processing...' : 'Proceed To Payment'}
-    </button>
+    {!shouldHideProceedButton && (
+      <button
+        onClick={handlePayAndSubmit}
+        className="w-full md:w-auto px-8 py-3 bg-[#c9a227] text-white rounded-lg hover:bg-[#b8921f] transition-colors font-medium min-w-[160px]"
+        disabled={loading}
+      >
+        {loading ? 'Processing...' : 'Proceed To Payment'}
+      </button>
+    )}
 
     {/* New Submit Button */}
     {/* <button

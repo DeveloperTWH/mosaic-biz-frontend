@@ -20,6 +20,9 @@ interface Business {
   businessName: string;
   logo?: string;
   listingType?: "product" | "service" | "food";
+  chargesEnabled?: boolean;
+  payoutsEnabled?: boolean;
+  isActive?: boolean;
   products?: Array<string | { _id?: string }>;
   services?: Array<string | { _id?: string }>;
   foods?: Array<string | { _id?: string }>;
@@ -239,7 +242,11 @@ export default function FinalReviewPage() {
         );
         
         if (businessResponse.data.businesses?.length > 0) {
-          setBusiness(businessResponse.data.businesses[0]);
+          const currentBusiness =
+            businessResponse.data.businesses.find((item: Business) => item.isActive) ??
+            businessResponse.data.businesses[0];
+
+          setBusiness(currentBusiness);
         }
         
       } catch (error) {
@@ -254,6 +261,12 @@ export default function FinalReviewPage() {
 
   // Determine step status based on onboarding data
   const getStepStatus = (stepNumber: number) => {
+    if (stepNumber === 6) {
+      return business?.chargesEnabled && business?.payoutsEnabled
+        ? "completed"
+        : "incompleted";
+    }
+
     if (!onboardingData) return "pending";
     
     switch(stepNumber) {
@@ -272,8 +285,6 @@ export default function FinalReviewPage() {
                ? "completed" : "pending";
       case 5: // Product / Service Creation
         return onboardingData.currentStage && onboardingData.currentStage >= 4 ? "completed" : "pending";
-      case 6: // Payout & Bank Setup
-        return "incompleted";
       default:
         return "pending";
     }
@@ -338,7 +349,7 @@ const steps = useMemo(() => {
     baseSteps.push({
       number: "06",
       title: "Payout & Bank Setup",
-      status: "incompleted",
+      status: getStepStatus(6),
       link: "/partners/payout-setup"
     });
   }
