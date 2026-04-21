@@ -87,8 +87,8 @@ function PaymentSuccessPage() {
       <h1 className="mb-6 text-3xl font-bold text-green-700">🧾 Payment Receipt</h1>
 
       <div className="mb-6 space-y-1 text-gray-800">
-        <p><strong>Payment ID:</strong> {paymentData.id}</p>
-        <p><strong>Status:</strong> {paymentData.status}</p>
+        {/* <p><strong>Payment ID:</strong> {paymentData.id}</p> */}
+        {/* <p><strong>Status:</strong> {paymentData.status}</p> */}
         <p><strong>Date:</strong> {date}</p>
         <p><strong>Amount Paid:</strong> ${formattedAmount} {paymentData.currency.toUpperCase()}</p>
         {paymentData.receipt_email && <p><strong>Receipt Email:</strong> {paymentData.receipt_email}</p>}
@@ -98,9 +98,9 @@ function PaymentSuccessPage() {
 
       {orders.map((order, orderIndex) => (
         <div key={order._id} className="mb-10">
-          <h2 className="flex items-center gap-2 mb-3 text-xl font-semibold text-gray-800">
+          {/* <h2 className="flex items-center gap-2 mb-3 text-xl font-semibold text-gray-800">
             <ShoppingCart/> Order #{orderIndex + 1} <span className="ml-4 text-sm font-normal text-blue-600">Status: {order.status}</span>
-          </h2>
+          </h2> */}
 
           <div className="border divide-y rounded-md bg-gray-50">
             {order.items.map((item, i) => (

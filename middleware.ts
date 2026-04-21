@@ -4,6 +4,10 @@ import { jwtVerify } from 'jose';
 const PUBLIC_PATHS = ['/', '/login', '/signup', '/signin'];
 const JWT_SECRET = new TextEncoder().encode('your_secret_key');
 
+type JWTPayload = {
+    role: string;
+};
+
 function clearClientSessionCookies(res: NextResponse) {
     res.cookies.set('user_gender', '', { maxAge: 0 });
     res.cookies.set('user_session', '', { maxAge: 0 });
@@ -16,6 +20,8 @@ function redirectUnauthorized(req: NextRequest, path: string) {
         NextResponse.redirect(new URL(redirectPath, req.url))
     );
 }
+
+
 
 export async function middleware(req: NextRequest) {
     const path = req.nextUrl.pathname;
@@ -32,25 +38,54 @@ export async function middleware(req: NextRequest) {
 
     const token = req.cookies.get('token')?.value;
 
+    // if (token && (path === '/login' || path === '/signup' || path === '/signin')) {
+    //     try {
+    //         const { payload } = (await jwtVerify(token, JWT_SECRET)) as {
+    //             payload: { role: string };
+    //         };
+
+    //         if (path === '/signin') {
+    //             if (payload.role === 'admin') {
+    //                 return NextResponse.redirect(new URL('/admin', req.url));
+    //             }
+
+    //             return NextResponse.next();
+    //         }
+
+    //         return NextResponse.redirect(new URL(getRedirectPathByRole(payload.role), req.url));
+    //     } catch {
+    //         return NextResponse.next();
+    //     }
+    // }
+
+
     if (token && (path === '/login' || path === '/signup' || path === '/signin')) {
-        try {
-            const { payload } = (await jwtVerify(token, JWT_SECRET)) as {
-                payload: { role: string };
-            };
+    try {
+        // const { payload } = await jwtVerify(token, JWT_SECRET);
+        const { payload } = await jwtVerify(token, JWT_SECRET);
+        const { role } = payload as JWTPayload;
 
-            if (path === '/signin') {
-                if (payload.role === 'admin') {
-                    return NextResponse.redirect(new URL('/admin', req.url));
-                }
 
-                return NextResponse.next();
-            }
+        const type = req.nextUrl.searchParams.get('type');
 
-            return NextResponse.redirect(new URL(getRedirectPathByRole(payload.role), req.url));
-        } catch {
+
+        if (path === '/signup' && type === 'vendor') {
             return NextResponse.next();
         }
+
+        if (path === '/signin') {
+            if (role === 'admin') {
+                return NextResponse.redirect(new URL('/admin', req.url));
+            }
+            return NextResponse.next();
+        }
+
+        // 🚫 Only redirect if NOT vendor signup
+        return NextResponse.redirect(new URL(getRedirectPathByRole(role), req.url));
+    } catch {
+        return NextResponse.next();
     }
+}
 
     if (PUBLIC_PATHS.includes(path)) {
         return NextResponse.next();

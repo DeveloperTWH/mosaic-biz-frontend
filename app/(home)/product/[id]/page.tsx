@@ -659,11 +659,14 @@ setMainImage(firstImage);
                 disabled={!isVariantSelected() || Boolean(selectedVariant && selectedVariant.stock <= 0)}
                 onClick={() => {
                   if (!selectedVariant?.variantId) { toast.error('Variant information is missing'); return; }
+                  const sizeValue = selectedVariant.attributes?.size || selectedVariant.attributes?.Size || 'default';
                   const queryParams = new URLSearchParams({
                     type: 'buy', productId: product._id, variantId: selectedVariant.variantId,
-                    quantity: '1', price: String(price.current),
+                    size: sizeValue,
+                    quantity: '1',
+                    shippingMethod: selectedShipping,
                   });
-                  window.location.href = `/checkout/address?${queryParams.toString()}`;
+                  router.push(`/checkout/buy-now?${queryParams.toString()}`);
                 }}
               >
                 Buy Now

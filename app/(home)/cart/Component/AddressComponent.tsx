@@ -437,21 +437,21 @@ useEffect(() => {
                   autoComplete="address-level2"
                 />
 
-                {/* ADDRESS LINE 2 WITH AUTOCOMPLETE (searchable street/locality) */}
-                <input
-                  ref={addr2Ref}
-                  className="p-2 border sm:col-span-2"
-                  placeholder="Address line 2 (search & select street/locality)"
-                  value={newAddress.addressLine2 ?? ""}
-                  onChange={(e) => setNewAddress({ ...newAddress, addressLine2: e.target.value })}
-                />
-
-                {/* ADDRESS LINE 1 (manual: house/flat no., building, etc.) */}
+                                {/* ADDRESS LINE 1 (manual: house/flat no., building, etc.) */}
                 <input
                   className="p-2 border sm:col-span-2"
                   placeholder="Address line 1 (House/Flat No., Building) *"
                   value={newAddress.addressLine1}
                   onChange={(e) => setNewAddress({ ...newAddress, addressLine1: e.target.value })}
+                />
+
+                {/* ADDRESS LINE 2 WITH AUTOCOMPLETE (searchable street/locality) */}
+                <input
+                  ref={addr2Ref}
+                  className="p-2 border sm:col-span-2"
+                  placeholder="Address line 2 (Landmark / street / locality)"
+                  value={newAddress.addressLine2 ?? ""}
+                  onChange={(e) => setNewAddress({ ...newAddress, addressLine2: e.target.value })}
                 />
 
                 {/* FULL NAME & PHONE */}

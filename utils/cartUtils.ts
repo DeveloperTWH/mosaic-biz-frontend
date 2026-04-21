@@ -190,6 +190,11 @@ export const addToCart = async (
 };
 
 
+const toId = (v: any) => (typeof v === "string" ? v : v?._id);
+
+const toVariantId = (v: any) =>
+  typeof v === "string" ? v : v?.variantId ?? v?._id;
+
 /**
  * Server -> Client mapper:
  * Your getCart controller returns items shaped like:
@@ -198,8 +203,8 @@ export const addToCart = async (
  */
 function mapApiItemToCartItem(apiItem: any): CartItem {
   return {
-    productId: apiItem.productId,
-    variantId: apiItem.variantId,
+    productId: toId(apiItem.productId),
+    variantId: toVariantId(apiItem.variantId),
     size: apiItem.size ?? apiItem.variant?.size, // be forgiving
     quantity: apiItem.quantity ?? 1,
     cartItemId: apiItem._id || apiItem.cartItemId, // if you later include it
@@ -474,8 +479,6 @@ const toNumber = (v: any): number =>
         ? Number(v.$numberDecimal) || 0
         : Number(v) || 0;
 
-const toId = (v: any) => (typeof v === "string" ? v : v?._id);
-
 const isSalePriceActive = (salePrice: number | null | undefined, discountEndDate?: string | null) => {
   if (salePrice == null) return false;
   if (!discountEndDate) return true;
@@ -570,6 +573,115 @@ async function getVariantsMini(
   return Object.fromEntries(list.map((v) => [v._id, v]));
 }
 
+const publicProductCache = new Map<string, Promise<any | null>>();
+
+async function getPublicProduct(productId: string): Promise<any | null> {
+  if (!productId) return null;
+
+  if (!publicProductCache.has(productId)) {
+    publicProductCache.set(
+      productId,
+      fetch(`${BASE}/api/public/product/${encodeURIComponent(productId)}`)
+        .then(async (res) => {
+          if (!res.ok) return null;
+          const data = await res.json().catch(() => ({}));
+          return data?.data ?? null;
+        })
+        .catch(() => null)
+    );
+  }
+
+  return publicProductCache.get(productId) ?? null;
+}
+
+const sameId = (a: unknown, b: unknown) => String(a ?? "") === String(b ?? "");
+
+const getBusinessIdFromProduct = (product: any) =>
+  typeof product?.businessId === "string"
+    ? product.businessId
+    : product?.businessId?._id ?? product?.business?._id;
+
+async function hydrateCartItemFromPublicProduct(item: CartItemDetailed): Promise<CartItemDetailed> {
+  const productId = String(item.productId || "");
+  if (!productId) return item;
+
+  const needsHydration =
+    !item.title ||
+    !item.imageUrl ||
+    !item.selectedSizePrice ||
+    Number(item.selectedSizePrice) <= 0 ||
+    item.stock == null ||
+    !item.shipping;
+
+  if (!needsHydration) return item;
+
+  const product = await getPublicProduct(productId);
+  if (!product) return item;
+
+  const variant = product.variants?.find((candidate: any) => {
+    return (
+      sameId(candidate?.variantId, item.variantId) ||
+      sameId(candidate?._id, item.variantId) ||
+      sameId(candidate?.id, item.variantId)
+    );
+  });
+
+  if (!variant) {
+    return {
+      ...item,
+      title: item.title ?? product.title,
+      imageUrl: item.imageUrl ?? product.coverImage ?? PLACEHOLDER_IMG,
+      businessId: item.businessId ?? getBusinessIdFromProduct(product),
+    };
+  }
+
+  const basePrice = toNumber(variant.price ?? item.price ?? item.selectedSizePrice);
+  const salePrice = variant.salePrice == null ? item.salePrice ?? null : toNumber(variant.salePrice);
+  const discountEndDate = variant.discountEndDate ?? item.discountEndDate ?? null;
+  const saleActive = isSalePriceActive(salePrice, discountEndDate);
+  const shippingMethod: ShippingType =
+    item.shippingMethod === "overnight" || item.shippingMethod === "local"
+      ? item.shippingMethod
+      : item.shippingType === "overnight" || item.shippingType === "local"
+        ? item.shippingType
+        : "standard";
+  const shipping = variant.shipping ?? product.shipping ?? item.shipping ?? null;
+  const hasLineShippingCost = item.shippingCost != null || item.shippingCharge != null;
+  const shippingCost = hasLineShippingCost
+    ? toNumber(item.shippingCost ?? item.shippingCharge)
+    : toNumber(shipping?.[shippingMethod]);
+  const selectedSizePrice =
+    item.selectedSizePrice && Number(item.selectedSizePrice) > 0
+      ? Number(item.selectedSizePrice)
+      : saleActive
+        ? salePrice ?? basePrice
+        : basePrice;
+
+  return {
+    ...item,
+    variantId: toVariantId(variant) ?? item.variantId,
+    size: item.size || variant.attributes?.size || variant.attributes?.Size || "default",
+    businessId: item.businessId ?? getBusinessIdFromProduct(product) ?? variant.businessId,
+    title: item.title ?? product.title ?? "Untitled",
+    imageUrl: item.imageUrl ?? variant.images?.[0] ?? product.coverImage ?? PLACEHOLDER_IMG,
+    color: item.color ?? variant.attributes?.Color ?? variant.attributes?.color,
+    label: item.label ?? variant.label,
+    sku: item.sku ?? variant.sku,
+    stock: item.stock ?? toNumber(variant.stock),
+    allowBackorder: item.allowBackorder ?? variant.allowBackorder ?? false,
+    price: basePrice,
+    salePrice,
+    discountEndDate,
+    selectedSizePrice,
+    shippingType: shippingMethod,
+    shippingMethod,
+    shippingCost,
+    shippingCharge: shippingCost,
+    shipping,
+    isSaleActive: saleActive,
+  };
+}
+
 // --- buildGuestCartDetailed (key change: no fallback to sizes[0]) ---
 async function buildGuestCartDetailed(): Promise<CartItemDetailed[]> {
   const stored = readGuestCart();
@@ -588,10 +700,9 @@ async function buildGuestCartDetailed(): Promise<CartItemDetailed[]> {
     getVariantsMini(variantIds, sizeFilters),
   ]);
 
-  const now = Date.now();
   const toNum = (x: any) => (x == null ? undefined : Number(x));
 
-  return items.map((it): CartItemDetailed => {
+  const detailedItems = items.map((it): CartItemDetailed => {
     const p = productMap[it.productId];
     const v = it.variantId ? variantMap[it.variantId] : undefined;
 
@@ -639,6 +750,8 @@ async function buildGuestCartDetailed(): Promise<CartItemDetailed[]> {
       isSaleActive,
     };
   });
+
+  return Promise.all(detailedItems.map(hydrateCartItemFromPublicProduct));
 }
 
 
@@ -661,7 +774,7 @@ export const getCartDetailed = async (): Promise<CartItemDetailed[]> => {
     const data = await res.json();
     const apiItems = data?.cart?.items ?? [];
 
-    return apiItems.map((it: any): CartItemDetailed => {
+    const detailedItems = apiItems.map((it: any): CartItemDetailed => {
       const price = toNumber(it.price);
       const salePrice = it.salePrice == null ? null : toNumber(it.salePrice);
       const discountEndISO =
@@ -680,7 +793,7 @@ export const getCartDetailed = async (): Promise<CartItemDetailed[]> => {
 
       return {
         productId: toId(it.productId),
-        variantId: toId(it.variantId),
+        variantId: toVariantId(it.variantId),
         size: it.size ?? it.variant?.size,
         quantity: it.quantity ?? 1,
         cartItemId: it._id || it.cartItemId,
@@ -709,6 +822,8 @@ export const getCartDetailed = async (): Promise<CartItemDetailed[]> => {
         isSaleActive,
       };
     });
+
+    return Promise.all(detailedItems.map(hydrateCartItemFromPublicProduct));
   }
 
   // Guest: return whatever is stored; (optional) enrich at add time
@@ -767,7 +882,11 @@ function toLineItem(it: CartItemDetailed) {
  * - Calls initiateOrder
  * - Redirects to /checkout/payment with orderId (you can also use clientSecret if you render Stripe there)
  */
-export async function handlePlaceOrderFlow(address: ShippingAddress, userNote?: string) {
+export async function handlePlaceOrderFlow(
+  address: ShippingAddress,
+  userNote?: string,
+  checkoutItems?: CartItemDetailed[]
+) {
   const loggedIn = await isUserLoggedIn();
   const paymentPage = "/checkout/payment";
 
@@ -776,8 +895,8 @@ export async function handlePlaceOrderFlow(address: ShippingAddress, userNote?: 
     return;
   }
 
-  // Build items from the current cart
-  const cart: CartItemDetailed[] = await getCartDetailed();
+  // Build items from either a product-only checkout or the current cart.
+  const cart: CartItemDetailed[] = checkoutItems ?? await getCartDetailed();
   if (!cart.length) {
     alert("Your cart is empty.");
     return;

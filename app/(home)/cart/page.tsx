@@ -293,7 +293,7 @@ export default function CartPage() {
             <div className="flex items-center justify-center min-h-[60vh]">
                 <div className="flex flex-col items-center gap-4 text-center">
                     <div className="w-12 h-12 border-4 border-yellow-400 rounded-full border-t-transparent animate-spin" />
-                    <p className="text-sm font-medium text-gray-600">Loading your cart…</p>
+                    <p className="text-sm font-medium text-gray-600">Loading your cart...</p>
                 </div>
             </div>
         );
@@ -364,7 +364,7 @@ export default function CartPage() {
                 <div className="text-xs text-gray-500">
                   {item.label ? `${item.label}: ` : ""}
                   {item.size}
-                  {item.color ? ` · ${item.color}` : ""}
+                  {item.color ? ` - ${item.color}` : ""}
                 </div>
 
                 {/* PRICE */}
@@ -600,7 +600,7 @@ export default function CartPage() {
                                                     city: selectedAddress.city ?? "",
                                                     state: selectedAddress.state ?? "",
                                                     country: selectedAddress.country ?? "",
-                                                    postalCode: selectedAddress.postalCode ?? "", // map postalCode → pincode
+                                                    postalCode: selectedAddress.postalCode ?? "",
                                                 },
                                                 userNote
                                             );
