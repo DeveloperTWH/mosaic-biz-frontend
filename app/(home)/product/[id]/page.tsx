@@ -577,7 +577,7 @@ setMainImage(firstImage);
             )}
 
             {/* Choose Your Shipping */}
-<div className="pt-2">
+{/* <div className="pt-2">
   <p className="text-sm font-semibold text-gray-800">Choose Your Shipping</p>
   <p className="text-xs text-gray-500">Select one shipping option</p>
 
@@ -603,7 +603,7 @@ setMainImage(firstImage);
       );
     })}
   </div>
-</div>
+</div> */}
 
             {/* Action Buttons */}
             <div className="flex gap-3 pt-2">
