@@ -4,7 +4,15 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { toast } from "react-toastify";
 import AddressComponent from "./Component/AddressComponent";
-import { getCartDetailed, updateCartQuantity, removeFromCart, handlePlaceOrderFlow } from "@/utils/cartUtils";
+import {
+    getCartDetailedResponse,
+    updateCartQuantity,
+    removeFromCart,
+    handlePlaceOrderFlow,
+    type CartPricingSummary,
+} from "@/utils/cartUtils";
+
+type DeliverySpeed = "standard" | "express" | "overnight" | "local";
 
 type CartItem = {
     productId: string;
@@ -19,12 +27,13 @@ type CartItem = {
     salePrice?: number | null;            // sale price (may be null)
     discountEndDate?: string | null;      // ISO string or null
     selectedSizePrice?: number;  // salePrice or price (already decided by backend)
-    shippingType?: "standard" | "overnight" | "local";
-    shippingMethod?: "standard" | "overnight" | "local";
+    shippingType?: "standard" | "express" | "overnight" | "local";
+    shippingMethod?: "standard" | "express" | "overnight" | "local";
     shippingCost?: number;
     shippingCharge?: number;
     shipping?: {
         standard?: number;
+        express?: number;
         overnight?: number;
         local?: number;
     } | null;
@@ -71,6 +80,9 @@ export default function CartPage() {
     const [selectedTab, setSelectedTab] = useState<"product" | "food">("product");
     const [itemsProduct, setItemsProduct] = useState<CartItem[]>([]);
     const [itemsFood] = useState<CartItem[]>([]); // keep for future Grocery integration
+    const [cartPricing, setCartPricing] = useState<CartPricingSummary | null>(null);
+    const [selectedDeliverySpeed, setSelectedDeliverySpeed] = useState<DeliverySpeed | undefined>(undefined);
+    const [deliverySpeedLoading, setDeliverySpeedLoading] = useState(false);
     const [loading, setLoading] = useState<boolean>(true);
     const [addresses, setAddresses] = useState<Address[]>([
         
@@ -98,13 +110,14 @@ export default function CartPage() {
 
     const getShippingLabel = (type?: CartItem["shippingType"] | CartItem["shippingMethod"]) => {
         if (!type) return "";
+        if (type === "overnight") return "Express";
         return type.replace(/^./, (char) => char.toUpperCase());
     };
 
     const getShippingOptions = (item: CartItem) => {
         if (!item.shipping) return [];
 
-        return (["standard", "overnight", "local"] as const)
+        return (["standard", "express", "overnight", "local"] as const)
             .map((type) => ({
                 type,
                 cost: Number(item.shipping?.[type] ?? 0),
@@ -112,13 +125,16 @@ export default function CartPage() {
             .filter((option) => option.cost > 0);
     };
 
-    const loadCart = useCallback(async () => {
+    const loadCart = useCallback(async (deliverySpeed?: DeliverySpeed) => {
         setLoading(true);
         try {
-            const res = await getCartDetailed();
-            // Support both shapes: array OR { items: [...] }
-            const list = Array.isArray(res) ? res : (res as any)?.items ?? [];
-            setItemsProduct(list as CartItem[]);
+            const res = await getCartDetailedResponse(deliverySpeed);
+            setItemsProduct(res.items as CartItem[]);
+            setCartPricing(res.pricing ?? null);
+            setSelectedDeliverySpeed(
+                (res.pricing?.selectedDeliverySpeed as DeliverySpeed | undefined) ??
+                deliverySpeed
+            );
         } catch (e) {
             console.error("Failed to load cart", e);
             toast.error("Failed to load cart");
@@ -130,6 +146,28 @@ export default function CartPage() {
     useEffect(() => {
         loadCart();
     }, [loadCart]);
+
+    const handleDeliverySpeedChange = async (deliverySpeed: DeliverySpeed) => {
+        if (!itemsProduct.length || deliverySpeedLoading) {
+            return;
+        }
+
+        setDeliverySpeedLoading(true);
+        try {
+            const res = await getCartDetailedResponse(deliverySpeed);
+            setItemsProduct(res.items as CartItem[]);
+            setCartPricing(res.pricing ?? null);
+            setSelectedDeliverySpeed(
+                (res.pricing?.selectedDeliverySpeed as DeliverySpeed | undefined) ??
+                deliverySpeed
+            );
+        } catch (error) {
+            console.error("Failed to update delivery speed", error);
+            toast.error("Failed to update delivery speed");
+        } finally {
+            setDeliverySpeedLoading(false);
+        }
+    };
 
     const inc = async (line: CartItem) => {
         const nextQty = (line.quantity || 0) + 1;
@@ -150,9 +188,10 @@ export default function CartPage() {
 
         try {
             await updateCartQuantity(line.productId, line.variantId, line.size, nextQty);
+            await loadCart(selectedDeliverySpeed);
         } catch (e: any) {
             toast.error(e?.message || "Failed to update");
-            loadCart(); // re-sync
+            loadCart(selectedDeliverySpeed); // re-sync
         }
     };
 
@@ -175,9 +214,10 @@ export default function CartPage() {
 
         try {
             await updateCartQuantity(line.productId, line.variantId, line.size, nextQty);
+            await loadCart(selectedDeliverySpeed);
         } catch (e: any) {
             toast.error(e?.message || "Failed to update");
-            loadCart(); // re-sync
+            loadCart(selectedDeliverySpeed); // re-sync
         }
     };
 
@@ -189,9 +229,10 @@ export default function CartPage() {
 
         try {
             await removeFromCart(line.productId, line.variantId, line.size);
+            await loadCart(selectedDeliverySpeed);
         } catch (e: any) {
             toast.error(e?.message || "Failed to remove");
-            loadCart(); // re-sync
+            loadCart(selectedDeliverySpeed); // re-sync
         }
     };
 
@@ -204,7 +245,11 @@ export default function CartPage() {
         0
     );
     const totalQtyProduct = itemsProduct.reduce((sum, it) => sum + (it.quantity || 0), 0);
-    const businessId = itemsProduct[0]?.businessId;
+    const businessId = cartPricing?.business?._id ?? itemsProduct[0]?.businessId;
+
+    const effectiveSubtotalProduct = cartPricing?.subtotalAmount ?? subtotalProduct;
+    const effectiveShippingTotalProduct = cartPricing?.shipping?.amount ?? shippingTotalProduct;
+    const effectiveTotalQtyProduct = cartPricing?.totalQuantity ?? totalQtyProduct;
 
     const totalSavingsProduct = useMemo(() => {
         return itemsProduct.reduce((sum, it: any) => {
@@ -222,11 +267,11 @@ export default function CartPage() {
 
     useEffect(() => {
         setAppliedDiscount(null);
-    }, [subtotalProduct, shippingTotalProduct, businessId]);
+    }, [effectiveSubtotalProduct, effectiveShippingTotalProduct, businessId]);
 
     const discountAmountProduct = appliedDiscount?.discountAmount ?? 0;
-    const discountedSubtotalProduct = appliedDiscount?.finalAmount ?? subtotalProduct;
-    const payableTotalProduct = Math.max(0, discountedSubtotalProduct + shippingTotalProduct);
+    const discountedSubtotalProduct = appliedDiscount?.finalAmount ?? effectiveSubtotalProduct;
+    const payableTotalProduct = Math.max(0, discountedSubtotalProduct + effectiveShippingTotalProduct);
 
     const selectedAddress = addresses.find(a => a.id === selectedAddressId);
 
@@ -287,6 +332,29 @@ export default function CartPage() {
         setCouponCode("");
     };
 
+    const handleAddressesChange = useCallback((nextAddresses: Address[]) => {
+        setAddresses(nextAddresses);
+
+        if (!nextAddresses.length) {
+            setSelectedAddressId(undefined);
+            return;
+        }
+
+        setSelectedAddressId((currentSelectedId) => {
+            if (
+                currentSelectedId &&
+                nextAddresses.some((address) => address.id === currentSelectedId)
+            ) {
+                return currentSelectedId;
+            }
+
+            return (
+                nextAddresses.find((address) => address.isDefault)?.id ??
+                nextAddresses[0]?.id
+            );
+        });
+    }, []);
+
 
     if (loading) {
         return (
@@ -310,7 +378,7 @@ export default function CartPage() {
                                 }`}
                             onClick={() => setSelectedTab("product")}
                         >
-                            Items  ({itemsProduct.length})
+                            Items  ({effectiveTotalQtyProduct})
                         </button>
                         {/* <button
                             className={`sm:p-5 p-2 pt-3 sm:text-lg text-sm font-semibold ${selectedTab === "food" ? "border-b-4 border-blue-500" : "text-gray-800"
@@ -326,11 +394,59 @@ export default function CartPage() {
                         addresses={addresses}
                         selectedAddressId={selectedAddressId}
                         onSelect={setSelectedAddressId}
+                        onAddressesChange={handleAddressesChange}
                         onAdd={(addr) => {
-                            setAddresses(prev => [...prev, addr]);
                             setSelectedAddressId(addr.id);
                         }}
                     />
+
+                    {selectedTab === "product" &&
+                    itemsProduct.length > 0 &&
+                    cartPricing?.availableDeliverySpeeds &&
+                    cartPricing.availableDeliverySpeeds.length > 0 ? (
+                        <div className="mt-6 rounded-md border border-gray-200 bg-white p-4">
+                            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                <div>
+                                    <h3 className="text-sm font-semibold text-gray-800">
+                                        Delivery Type
+                                    </h3>
+                                    <p className="mt-1 text-xs text-gray-500">
+                                        Choose Standard, Express, or Local shipping for this cart.
+                                    </p>
+                                </div>
+
+                                {deliverySpeedLoading && (
+                                    <div className="text-xs text-blue-600">
+                                        Updating shipping...
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="mt-4 flex flex-wrap gap-3">
+                                {cartPricing.availableDeliverySpeeds.map((speed) => {
+                                    const isActive = selectedDeliverySpeed === speed;
+
+                                    return (
+                                        <button
+                                            key={speed}
+                                            type="button"
+                                            onClick={() =>
+                                                handleDeliverySpeedChange(speed as DeliverySpeed)
+                                            }
+                                            disabled={deliverySpeedLoading}
+                                            className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
+                                                isActive
+                                                    ? "border-blue-900 bg-blue-900 text-white"
+                                                    : "border-gray-300 bg-white text-gray-700 hover:border-blue-400"
+                                            } disabled:cursor-not-allowed disabled:opacity-60`}
+                                        >
+                                            {getShippingLabel(speed as DeliverySpeed)}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    ) : null}
 
                     {/* Cart Items */}
 {selectedTab === "product" ? (
@@ -429,6 +545,20 @@ export default function CartPage() {
                 const shippingOptions = getShippingOptions(item);
                 const effectiveShippingCost = getEffectiveShippingCost(item);
                 const effectiveShippingMethod = getEffectiveShippingMethod(item);
+                const summaryDeliverySpeed = cartPricing?.shipping?.deliverySpeed;
+                const summaryMethod = cartPricing?.shipping?.method;
+
+                if (summaryDeliverySpeed || summaryMethod) {
+                  return (
+                    <>
+                      Shipping:{" "}
+                      {summaryDeliverySpeed
+                        ? `${getShippingLabel(summaryDeliverySpeed)} delivery`
+                        : "Calculated at cart level"}
+                      {summaryMethod ? ` (${summaryMethod === "flat_rate" ? "Flat rate" : "Quantity based"})` : ""}
+                    </>
+                  );
+                }
 
                 if (effectiveShippingMethod) {
                   return (
@@ -518,13 +648,33 @@ export default function CartPage() {
 
                                 <div className="flex justify-between mt-3 text-sm text-gray-600">
                                     <div>Product Price</div>
-                                    <div>${subtotalProduct.toFixed(2)}</div>
+                                    <div>${effectiveSubtotalProduct.toFixed(2)}</div>
                                 </div>
 
                                 <div className="flex justify-between mt-3 text-sm text-gray-600">
                                     <div>Shipping</div>
-                                    <div>${shippingTotalProduct.toFixed(2)}</div>
+                                    <div>${effectiveShippingTotalProduct.toFixed(2)}</div>
                                 </div>
+
+                                {cartPricing?.shipping && (
+                                    <div className="mt-2 text-xs text-gray-500">
+                                        {cartPricing.shipping.method === "quantity_based"
+                                            ? `Calculated by quantity tier`
+                                            : `Calculated by flat rate`}
+                                        {cartPricing.shipping.deliverySpeed
+                                            ? ` • ${getShippingLabel(cartPricing.shipping.deliverySpeed)} delivery`
+                                            : ""}
+                                        {cartPricing.shipping.freeShippingApplied
+                                            ? " • Free shipping applied"
+                                            : ""}
+                                    </div>
+                                )}
+
+                                {cartPricing?.shippingError && (
+                                    <div className="mt-2 text-xs text-red-600">
+                                        {cartPricing.shippingError}
+                                    </div>
+                                )}
 
                                 <div className="mt-5">
                                     <label className="block mb-2 text-sm font-medium text-gray-700">
@@ -539,9 +689,9 @@ export default function CartPage() {
                                             className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded outline-none focus:border-blue-500"
                                         />
                                         <button
-                                            type="button"
-                                            onClick={applyCoupon}
-                                            disabled={applyingCoupon || itemsProduct.length === 0}
+                                                    type="button"
+                                                    onClick={applyCoupon}
+                                                    disabled={applyingCoupon || itemsProduct.length === 0}
                                             className="px-4 py-2 text-sm font-medium text-white bg-blue-900 rounded disabled:cursor-not-allowed disabled:opacity-60"
                                         >
                                             {applyingCoupon ? "Applying..." : "Apply"}
@@ -602,7 +752,9 @@ export default function CartPage() {
                                                     country: selectedAddress.country ?? "",
                                                     postalCode: selectedAddress.postalCode ?? "",
                                                 },
-                                                userNote
+                                                userNote,
+                                                undefined,
+                                                selectedDeliverySpeed
                                             );
                                         }}
                                     >

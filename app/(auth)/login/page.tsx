@@ -14,12 +14,14 @@ function LoginContent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   const searchParams = useSearchParams()
   const pathname = usePathname()
 
   const type = searchParams.get('type')
   const redirect = searchParams.get('redirect')
+  const resetStatus = searchParams.get('reset')
   const isValidType = type === 'vendor' || type === 'customer'
 
   const role = type === 'vendor' ? 'business_owner' : 'customer';
@@ -31,7 +33,7 @@ function LoginContent() {
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/google` +
       `?role=${encodeURIComponent(role)}` +
       `&redirect=${encodeURIComponent(returnTo)}`;
-    window.location.href = url; // full-page redirect
+    window.location.href = url;
   };
 
   if (!isValidType) {
@@ -50,6 +52,12 @@ function LoginContent() {
     redirect && redirect.startsWith("/") && !redirect.startsWith("//")
       ? redirect
       : null;
+
+  useEffect(() => {
+    if (resetStatus === 'success') {
+      setSuccessMessage('Password reset successful. Please sign in with your new password.');
+    }
+  }, [resetStatus]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -91,17 +99,18 @@ function LoginContent() {
     }
   };
 
-   return (
+  return (
     <div className="min-h-screen grid grid-cols-1 md:grid-cols-2">
       <header className="w-full px-0 py-4 flex items-center justify-between bg-white md:bg-transparent absolute top-0 left-20 z-20">
         <span className="text-xl font-bold tracking-wide text-blue-900 md:text-white">
           <img
-          src="/login/logo.png"
-          alt="background"
-          className=""
-        />
+            src="/login/logo.png"
+            alt="background"
+            className=""
+          />
         </span>
       </header>
+
       {/* Left Section */}
       <div className="relative hidden md:flex items-center justify-center bg-gradient-to-br from-blue-950 via-blue-900 to-teal-800 text-white">
         <img
@@ -110,13 +119,67 @@ function LoginContent() {
           className="absolute inset-0 w-full h-full object-cover opacity-30"
         />
         <div className="relative z-10 max-w-md px-10">
-          <h1 className="text-4xl font-bold font-poppins mb-4">
-            WELCOME <span className="text-amber-400 font-bold">BACK</span>
-          </h1>
-          <p className="text-sm text-gray-200 font-monsterrat font-thin leading-relaxed">
-           Lorem ipsum dolor sit amet consectetur adipisicing elitsed eiusmod tempor enim minim veniam quis notru exercit ation Lorem ipsum dolor sit amet.Veniam quis notru exercit.
-          </p>
+          {type === 'vendor' ? (
+            <>
+              <h1 className="text-4xl font-bold font-poppins mb-3 leading-tight">
+                WELCOME BACK TO YOUR{" "}
+                <span className="text-amber-400 font-bold">STOREFRONT</span>
+              </h1>
+              <p className="text-sm text-gray-200 font-montserrat font-thin leading-relaxed mb-8">
+                Sign in to manage your products, track orders, and grow your business on Mosaic BizHub.
+              </p>
+
+              <div className="space-y-5">
+                <div>
+                  <p className="text-sm font-semibold font-poppins text-white">Your Business, Your Dashboard</p>
+                  <div className="mt-4 h-px w-full bg-white/20" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold font-poppins text-white">Manage Your Storefront</p>
+                  <p className="text-xs font-thin font-montserrat text-gray-300 mt-1">Update listings, pricing, and inventory from a single dashboard.</p>
+                  <div className="mt-4 h-px w-full bg-white/20" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold font-poppins text-white">Track &amp; Fulfil Orders</p>
+                  <p className="text-xs font-thin font-montserrat text-gray-300 mt-1">View incoming orders, manage shipments, and keep customers informed.</p>
+                  <div className="mt-4 h-px w-full bg-white/20" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold font-poppins text-white">Grow Your Reach</p>
+                  <p className="text-xs font-thin font-montserrat text-gray-300 mt-1">Connect with customers who are actively looking to support businesses like yours.</p>
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <h1 className="text-4xl font-bold font-poppins mb-3 leading-tight">
+                WELCOME BACK,{" "}
+                <span className="text-amber-400 font-bold">CHANGEMAKER</span>
+              </h1>
+              <p className="text-sm text-gray-200 font-montserrat font-thin leading-relaxed mb-8">
+                Sign in to continue shopping authentic products and supporting the businesses that matter.
+              </p>
+
+              <div className="space-y-5">
+                <div>
+                  <p className="text-sm font-semibold font-poppins text-white">Pick Up Where You Left Off</p>
+                  <p className="text-xs font-thin font-montserrat text-gray-300 mt-1">Access your cart &amp; browse right where you stopped.</p>
+                  <div className="mt-4 h-px w-full bg-white/20" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold font-poppins text-white">Track Every Order</p>
+                  <p className="text-xs font-thin font-montserrat text-gray-300 mt-1">Stay updated on deliveries and revisit your purchase history anytime.</p>
+                  <div className="mt-4 h-px w-full bg-white/20" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold font-poppins text-white">Keep Making an Impact</p>
+                  <p className="text-xs font-thin font-montserrat text-gray-300 mt-1">Every return visit means more support for minority-owned businesses.</p>
+                </div>
+              </div>
+            </>
+          )}
         </div>
+
       </div>
 
       {/* Right Section */}
@@ -127,26 +190,25 @@ function LoginContent() {
           </span>
           <h2 className="text-3xl font-bold text-gray-900 mb-2">SIGN IN</h2>
 
-
-            <div className="flex flex-col justify-start mb-5">
-              <hr className="h-[2px] w-[80px] bg-gray-700" />
-              <hr className="h-[2px] w-[80px] mt-[2px] mb-4 bg-gray-700" />
-            </div>
+          <div className="flex flex-col justify-start mb-5">
+            <hr className="h-[2px] w-[80px] bg-gray-700" />
+            <hr className="h-[2px] w-[80px] mt-[2px] mb-4 bg-gray-700" />
+          </div>
 
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
               <label className="block text-base font-medium text-gray-700 mb-2 font-poppins">
                 Email <span className="text-red-500">*</span>
               </label>
-<input
-  name="email"
-  type="email"
-  required
-  value={email}
-  onChange={(e) => setEmail(e.target.value)}
-  placeholder="Enter your email"
-  className="w-full rounded-md border border-gray-300 px-6 py-2 font-medium font-poppins focus:outline-none focus:ring-2 focus:ring-blue-900"
-/>
+              <input
+                name="email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                className="w-full rounded-md border border-gray-300 px-6 py-2 font-medium font-poppins focus:outline-none focus:ring-2 focus:ring-blue-900"
+              />
             </div>
             <div>
               <label className="block text-base font-medium text-gray-700 mb-2 font-poppins">
@@ -176,16 +238,25 @@ function LoginContent() {
                 <input type="checkbox" className="rounded border-gray-300" />
                 Keep Me Signed In
               </label>
-              <a href="#" className="text-blue-900 font-medium hover:underline">
+              <Link
+                href={`/forgot-password?type=${encodeURIComponent(type)}`}
+                className="text-blue-900 font-medium hover:underline"
+              >
                 Forget Password
-              </a>
+              </Link>
             </div>
 
+            {successMessage && (
+              <div className="p-2 text-sm text-green-700 bg-green-100 border border-green-300 rounded">
+                {successMessage}
+              </div>
+            )}
+
             {error && (
-  <div className="p-2 text-sm text-red-600 bg-red-100 border border-red-300 rounded">
-    {error}
-  </div>
-)}
+              <div className="p-2 text-sm text-red-600 bg-red-100 border border-red-300 rounded">
+                {error}
+              </div>
+            )}
 
             <button
               type="submit"
@@ -193,33 +264,12 @@ function LoginContent() {
             >
               {loading ? 'Signing In...' : 'Sign In'}
             </button>
-
           </form>
 
           <div className="my-4" />
 
-          <div className="flex items-center justify-center gap-4">
-            {/* <button className="h-10 w-10 rounded-full border flex items-center justify-center hover:bg-gray-100">
-              <Image
-              src={"/login/facebookLogo.png"}
-              alt={"facebook"}
-              width={40}
-              height={40} 
-              />
-              
-            </button>
-            <button className="h-10 w-10 rounded-full border flex items-center justify-center hover:bg-gray-100">
-              <Image
-              src={"/login/googleLogo.png"}
-              alt={"facebook"}
-              width={40}
-              height={40} 
-              />
-            </button> */}
-          </div>
-
           <p className="mt-6 text-center underline text-[16px] text-gray-600">
-            New Customer?{" "}
+            New Here?{" "}
             <a href={`/signup?type=${type}`}>
               Create Account
             </a>
@@ -228,123 +278,6 @@ function LoginContent() {
       </div>
     </div>
   );
-
-  return (
-    <div className="min-h-screen bg-black flex items-center justify-center bg-[url('/login/footer-bg.jpg')] bg-cover bg-center relative p-1 py-10">
-      <div className="fixed z-50 p-2 text-white bg-gray-700 rounded-lg cursor-pointer top-4 right-4" onClick={() => router.push("/")}>
-        <X size={20} />
-      </div>
-
-      <div className="z-10 w-full max-w-md p-8 bg-white shadow-xl rounded-xl">
-        <Link href="/">
-          <div className="mb-6 text-center">
-            <Image src="/logo.png" alt="Logo" width={350} height={100} className="mx-auto" />
-          </div>
-        </Link>
-
-        <div className="mb-4 text-lg font-bold text-center">{title}</div>
-
-        <div className="flex justify-center mb-6 border-b border-gray-300">
-          <Link
-            href={`/login?type=${type}`}
-            className={`px-4 py-2 font-semibold ${pathname.includes('/login') ? 'border-b-2 border-black' : 'text-gray-500'}`}
-          >
-            Sign In
-          </Link>
-          <Link
-            href={`/signup?type=${type}`}
-            className={`px-4 py-2 font-semibold ${pathname.includes('/signup') ? 'border-b-2 border-black' : 'text-gray-500'}`}
-          >
-            Create Account
-          </Link>
-        </div>
-
-    <form className="space-y-4" onSubmit={handleSubmit}>
-  <div>
-    <label className="block text-sm font-medium font-poppins text-gray-700 mb-1">
-      Email <span className="text-red-500">*</span>
-    </label>
-    <input
-      name="email"
-      type="email"
-      required
-      value={email}
-      onChange={(e) => setEmail(e.target.value)}
-      className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-900"
-    />
-  </div>
-
-  <div>
-    <label className="block text-sm font-medium font-poppins text-gray-700 mb-1">
-      Password <span className="text-red-500">*</span>
-    </label>
-    <div className="relative">
-      <input
-        type={showPassword ? "text" : "password"}
-        name="password"
-        required
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-900"
-      />
-      <button
-        type="button"
-        onClick={() => setShowPassword(!showPassword)}
-        className="absolute inset-y-0 right-2 flex items-center text-gray-500"
-      >
-        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-      </button>
-    </div>
-  </div>
-
-  <div className="flex items-center justify-between text-sm">
-    <label className="flex items-center gap-2 text-gray-600">
-      <input type="checkbox" className="rounded border-gray-300" />
-      Keep Me Signed In
-    </label>
-    <a href="#" className="text-blue-900 font-medium hover:underline">
-      Forget Password
-    </a>
-  </div>
-
-  <button
-    type="submit"
-    className="w-full bg-blue-900 text-white py-2 text-[16px] font-montserrat hover:bg-blue-800 transition"
-    disabled={loading}
-  >
-    {loading ? 'Signing In...' : 'Sign In'}
-  </button>
-</form>
-
-
-
-        <div className="flex justify-center mt-4 space-x-4">
-          {/* <button
-            type="button"
-            onClick={handleGoogleLoginRedirect}
-            className="w-10 h-10 text-black bg-gray-200 rounded-full"
-            aria-label="Continue with Google"
-            title="Continue with Google"
-          >
-            G
-          </button> */}
-        </div>
-
-        <p className="mt-4 text-sm text-center">
-          New {type}?{' '}
-          <Link href={`/signup?type=${type}`} className="font-bold underline">
-            Create Account
-          </Link>
-        </p>
-      </div>
-
-      <footer className="absolute w-full text-sm text-yellow-500 bottom-2">
-        <div className="pr-5 w-[80%] mx-auto">
-          <p>Copyright 2025. All Rights Reserved.</p>
-        </div>
-      </footer>
-    </div>
-  )
 }
 
 export default function LoginPage() {

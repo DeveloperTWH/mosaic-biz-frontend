@@ -432,7 +432,7 @@ function SignupContent() {
                 <span className="text-amber-400 font-bold font-poppins">MINORITY-OWNED BUSINESSES</span>
               </h1>
               <p className="text-sm font-thin font-montserrat text-gray-200 mb-10">
-                Lorem ipsum dolor sit amet consectetur adipisicing elitsed eiusmod tempor enim minim veniam quis notru exercit ation Lorem ipsum dolor sit amet.Veniam quis notru exercit.
+                Join a thriving marketplace where your everyday purchases make a meaningful impact. Discover unique products from talented minority entrepreneurs, shop with confidence knowing every seller is verified, and become part of a community dedicated to building economic opportunity and representation.
               </p>
 
               <div className="space-y-6">

@@ -10,12 +10,13 @@ interface CartItem {
   salePrice?: number | null;
   discountEndDate?: string | null;
   selectedSizePrice?: number;
-  shippingType?: 'standard' | 'overnight' | 'local';
-  shippingMethod?: 'standard' | 'overnight' | 'local';
+  shippingType?: 'standard' | 'express' | 'overnight' | 'local';
+  shippingMethod?: 'standard' | 'express' | 'overnight' | 'local';
   shippingCost?: number;
   shippingCharge?: number;
   shipping?: {
     standard?: number;
+    express?: number;
     overnight?: number;
     local?: number;
   } | null;
@@ -48,7 +49,41 @@ export interface CartItemDetailed extends CartItem {
   isSaleActive?: boolean;               // convenience flag
 }
 
-type ShippingType = 'standard' | 'overnight' | 'local';
+type ShippingType = 'standard' | 'express' | 'overnight' | 'local';
+type DeliverySpeed = 'standard' | 'express' | 'overnight' | 'local';
+
+export interface CartPricingSummary {
+  business?: {
+    _id?: string;
+    businessName?: string;
+    slug?: string;
+  };
+  availableDeliverySpeeds?: DeliverySpeed[];
+  selectedDeliverySpeed?: DeliverySpeed;
+  subtotalAmount?: number;
+  totalQuantity?: number;
+  shipping?: {
+    deliverySpeed?: DeliverySpeed;
+    amount?: number;
+    method?: "flat_rate" | "quantity_based" | string;
+    freeShippingApplied?: boolean;
+    freeShippingThreshold?: number | null;
+    matchedTier?: {
+      minQuantity?: number | null;
+      maxQuantity?: number | null;
+    } | null;
+  } | null;
+  shippingError?: string | null;
+  totalAmount?: number;
+  currency?: string;
+}
+
+export interface CartDetailedResponse {
+  items: CartItemDetailed[];
+  pricing?: CartPricingSummary | null;
+  totalItems?: number;
+  businessId?: string;
+}
 
 type GuestCartItemMeta = {
   price?: number;
@@ -61,6 +96,7 @@ type GuestCartItemMeta = {
   shippingCharge?: number;
   shipping?: {
     standard?: number;
+    express?: number;
     overnight?: number;
     local?: number;
   } | null;
@@ -544,6 +580,7 @@ type VariantMini = {
   sizes?: SizeMini[];                 // <-- exists on response (filtered to the requested size)
   shipping?: {
     standard?: number;
+    express?: number;
     overnight?: number;
     local?: number;
   } | null;
@@ -713,7 +750,11 @@ async function buildGuestCartDetailed(): Promise<CartItemDetailed[]> {
     const salePrice = toNum(sizeObj?.salePrice) ?? toNum(it.salePrice) ?? null;
     const discountEndISO = sizeObj?.discountEndDate ?? it.discountEndDate ?? null;
     const shippingType: ShippingType =
-      it.shippingType === 'overnight' || it.shippingType === 'local' ? it.shippingType : 'standard';
+      it.shippingType === 'express' ||
+      it.shippingType === 'overnight' ||
+      it.shippingType === 'local'
+        ? it.shippingType
+        : 'standard';
     const variantShippingCost = v?.shipping?.[shippingType];
     const shippingCost = toNum(variantShippingCost) ?? toNum(it.shippingCost) ?? 0;
 
@@ -764,11 +805,24 @@ async function buildGuestCartDetailed(): Promise<CartItemDetailed[]> {
 
 // --- detailed getter (preserves all price fields) ---
 export const getCartDetailed = async (): Promise<CartItemDetailed[]> => {
+  const data = await getCartDetailedResponse();
+  return data.items;
+};
+
+export const getCartDetailedResponse = async (
+  deliverySpeed?: DeliverySpeed
+): Promise<CartDetailedResponse> => {
   const loggedIn = await isUserLoggedIn();
 
   if (loggedIn) {
-    const res = await fetch(`${BASE}/api/cart`, { credentials: "include" });
-    if (res.status === 404) return [];
+    const params = new URLSearchParams();
+    if (deliverySpeed) {
+      params.set("deliverySpeed", deliverySpeed);
+    }
+
+    const url = `${BASE}/api/cart${params.toString() ? `?${params.toString()}` : ""}`;
+    const res = await fetch(url, { credentials: "include" });
+    if (res.status === 404) return { items: [], pricing: null };
     if (!res.ok) throw new Error("Failed to fetch cart");
 
     const data = await res.json();
@@ -782,6 +836,7 @@ export const getCartDetailed = async (): Promise<CartItemDetailed[]> => {
       const shipping = it.shipping
         ? {
             standard: toNumber(it.shipping.standard),
+            express: toNumber(it.shipping.express),
             overnight: toNumber(it.shipping.overnight),
             local: toNumber(it.shipping.local),
           }
@@ -823,19 +878,55 @@ export const getCartDetailed = async (): Promise<CartItemDetailed[]> => {
       };
     });
 
-    return Promise.all(detailedItems.map(hydrateCartItemFromPublicProduct));
+    const items = await Promise.all(detailedItems.map(hydrateCartItemFromPublicProduct));
+
+    return {
+      items,
+      pricing: data?.cart?.pricing
+        ? {
+            business: data.cart.pricing.business,
+            availableDeliverySpeeds: Array.isArray(data.cart.pricing.availableDeliverySpeeds)
+              ? data.cart.pricing.availableDeliverySpeeds
+              : [],
+            selectedDeliverySpeed: data.cart.pricing.selectedDeliverySpeed,
+            subtotalAmount: toNumber(data.cart.pricing.subtotalAmount),
+            totalQuantity: toNumber(data.cart.pricing.totalQuantity),
+            shipping: data.cart.pricing.shipping
+              ? {
+                  deliverySpeed: data.cart.pricing.shipping.deliverySpeed,
+                  amount: toNumber(data.cart.pricing.shipping.amount),
+                  method: data.cart.pricing.shipping.method,
+                  freeShippingApplied: Boolean(
+                    data.cart.pricing.shipping.freeShippingApplied
+                  ),
+                  freeShippingThreshold:
+                    data.cart.pricing.shipping.freeShippingThreshold == null
+                      ? null
+                      : toNumber(data.cart.pricing.shipping.freeShippingThreshold),
+                  matchedTier: data.cart.pricing.shipping.matchedTier ?? null,
+                }
+              : null,
+            shippingError: data.cart.pricing.shippingError ?? null,
+            totalAmount: toNumber(data.cart.pricing.totalAmount),
+            currency: data.cart.pricing.currency ?? "USD",
+          }
+        : null,
+      totalItems: toNumber(data?.cart?.totalItems),
+      businessId: toId(data?.cart?.businessId),
+    };
   }
 
   // Guest: return whatever is stored; (optional) enrich at add time
   try {
-    // const raw = localStorage.getItem("guest_cart");
-    // if (!raw) return [];
-    // const parsed = JSON.parse(raw);
-    // const items = Array.isArray(parsed) ? parsed : parsed?.items ?? [];
-    // return items as CartItemDetailed[];
-    return buildGuestCartDetailed();
+    const items = await buildGuestCartDetailed();
+    return {
+      items,
+      pricing: null,
+      totalItems: items.reduce((sum, item) => sum + (item.quantity ?? 0), 0),
+      businessId: items[0]?.businessId,
+    };
   } catch {
-    return [];
+    return { items: [], pricing: null };
   }
 };
 
@@ -885,7 +976,8 @@ function toLineItem(it: CartItemDetailed) {
 export async function handlePlaceOrderFlow(
   address: ShippingAddress,
   userNote?: string,
-  checkoutItems?: CartItemDetailed[]
+  checkoutItems?: CartItemDetailed[],
+  selectedDeliverySpeed?: DeliverySpeed
 ) {
   const loggedIn = await isUserLoggedIn();
   const paymentPage = "/checkout/payment";
@@ -921,6 +1013,7 @@ export async function handlePlaceOrderFlow(
       items,
       shippingAddress: address,
       userNote: userNote ?? "",
+      selectedDeliverySpeed,
     }),
   });
 

@@ -237,13 +237,22 @@ const Navbar = () => {
                 {showDropdown && (
                   <div className="absolute right-0 z-50 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl w-48">
                     {isCustomer ? (
-                      <Link
-                        href="/customer/order"
-                        className="block px-4 py-3 text-sm text-gray-700 rounded-t-lg hover:bg-gray-100 font-medium"
-                        onClick={() => setShowDropdown(false)}
-                      >
-                        My Orders
-                      </Link>
+                      <>
+                        <Link
+                          href="/customer/order"
+                          className="block px-4 py-3 text-sm text-gray-700 rounded-t-lg hover:bg-gray-100 font-medium"
+                          onClick={() => setShowDropdown(false)}
+                        >
+                          My Orders
+                        </Link>
+                        <Link
+                          href="/customer/bookings"
+                          className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 font-medium"
+                          onClick={() => setShowDropdown(false)}
+                        >
+                          My Bookings
+                        </Link>
+                      </>
                     ) : (
                       <Link
                         href="/partners/dashboard"
@@ -410,13 +419,22 @@ const Navbar = () => {
                   )}
                 </Link>
                 {isCustomer ? (
-                  <Link
-                    href="/customer/order"
-                    onClick={() => setIsOpen(false)}
-                    className="block px-4 py-3 text-gray-800 hover:bg-gray-100 rounded font-medium"
-                  >
-                    My Orders
-                  </Link>
+                  <>
+                    <Link
+                      href="/customer/order"
+                      onClick={() => setIsOpen(false)}
+                      className="block px-4 py-3 text-gray-800 hover:bg-gray-100 rounded font-medium"
+                    >
+                      My Orders
+                    </Link>
+                    <Link
+                      href="/customer/bookings"
+                      onClick={() => setIsOpen(false)}
+                      className="block px-4 py-3 text-gray-800 hover:bg-gray-100 rounded font-medium"
+                    >
+                      My Bookings
+                    </Link>
+                  </>
                 ) : (
                   <Link
                     href="/partners/dashboard"

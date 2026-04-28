@@ -10,11 +10,13 @@ import FoodsPage from "@/app/(home)/partners/foods/page";
 import InquiriesTable from "./components/InquiriesTable";
 import OrdersTab from "./components/OrdersTab";
 import BookingsTab from "./components/BookingsTab";
+import ShippingSettingsTab from "./components/ShippingSettingsTab";
 
 type ListingType = "product" | "service" | "food";
 type DashboardTab =
   | "edit-profile"
   | "manage-listings"
+  | "shipping-settings"
   | "location-timings"
   | "inquiries"
   | "analytics"
@@ -188,7 +190,11 @@ export default function PartnerDashboardPage() {
 
   const dashboardTabs = useMemo(() => {
     if (listingType === "product") {
-      return [...baseDashboardTabs, { key: "orders", label: "Orders" }] as const;
+      return [
+        ...baseDashboardTabs,
+        { key: "shipping-settings", label: "Shipping Settings" },
+        { key: "orders", label: "Orders" },
+      ] as const;
     }
 
     if (hasBookingLink) {
@@ -278,6 +284,15 @@ export default function PartnerDashboardPage() {
       );
     }
 
+    if (activeTab === "shipping-settings") {
+      return (
+        <ShippingSettingsTab
+          businessId={activeBusiness?._id}
+          isActive={activeTab === "shipping-settings"}
+        />
+      );
+    }
+
     if (activeTab === "bookings") {
       return (
         <BookingsTab
@@ -307,7 +322,15 @@ export default function PartnerDashboardPage() {
 
           <div className="mb-8 overflow-x-auto">
             <div className="min-w-[760px] px-2">
-              <div className={`grid gap-3 ${dashboardTabs.length === 5 ? "grid-cols-5" : "grid-cols-4"}`}>
+              <div
+                className={`grid gap-3 ${
+                  dashboardTabs.length === 6
+                    ? "grid-cols-6"
+                    : dashboardTabs.length === 5
+                      ? "grid-cols-5"
+                      : "grid-cols-4"
+                }`}
+              >
                 {dashboardTabs.map((tab) => {
                   return (
                     <button

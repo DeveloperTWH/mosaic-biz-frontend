@@ -80,12 +80,12 @@ const OrderPage = () => {
                   <option value="">Select Status</option>
                   <option value="ordered">Ordered</option>
                   <option value="accepted">Accepted</option>
-                  <option value="rejected">Rejected</option>
+                  {/* <option value="rejected">Rejected</option> */}
                   <option value="shipped">Shipped</option>
                   <option value="delivered">Delivered</option>
                   <option value="cancelled">Cancelled</option>
-                  <option value="returned">Returned</option>
-                  <option value="refunded">Refunded</option>
+                  {/* <option value="returned">Returned</option>
+                  <option value="refunded">Refunded</option> */}
                 </select>
               </div>
 
