@@ -389,65 +389,6 @@ export default function CartPage() {
                         </button> */}
                     </div>
 
-                    {/* Delivery Address */}
-                    <AddressComponent
-                        addresses={addresses}
-                        selectedAddressId={selectedAddressId}
-                        onSelect={setSelectedAddressId}
-                        onAddressesChange={handleAddressesChange}
-                        onAdd={(addr) => {
-                            setSelectedAddressId(addr.id);
-                        }}
-                    />
-
-                    {selectedTab === "product" &&
-                    itemsProduct.length > 0 &&
-                    cartPricing?.availableDeliverySpeeds &&
-                    cartPricing.availableDeliverySpeeds.length > 0 ? (
-                        <div className="mt-6 rounded-md border border-gray-200 bg-white p-4">
-                            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                                <div>
-                                    <h3 className="text-sm font-semibold text-gray-800">
-                                        Delivery Type
-                                    </h3>
-                                    <p className="mt-1 text-xs text-gray-500">
-                                        Choose Standard, Express, or Local shipping for this cart.
-                                    </p>
-                                </div>
-
-                                {deliverySpeedLoading && (
-                                    <div className="text-xs text-blue-600">
-                                        Updating shipping...
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="mt-4 flex flex-wrap gap-3">
-                                {cartPricing.availableDeliverySpeeds.map((speed) => {
-                                    const isActive = selectedDeliverySpeed === speed;
-
-                                    return (
-                                        <button
-                                            key={speed}
-                                            type="button"
-                                            onClick={() =>
-                                                handleDeliverySpeedChange(speed as DeliverySpeed)
-                                            }
-                                            disabled={deliverySpeedLoading}
-                                            className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
-                                                isActive
-                                                    ? "border-blue-900 bg-blue-900 text-white"
-                                                    : "border-gray-300 bg-white text-gray-700 hover:border-blue-400"
-                                            } disabled:cursor-not-allowed disabled:opacity-60`}
-                                        >
-                                            {getShippingLabel(speed as DeliverySpeed)}
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                        </div>
-                    ) : null}
-
                     {/* Cart Items */}
 {selectedTab === "product" ? (
   <div className="mt-6 space-y-6 bg-white">
@@ -555,7 +496,7 @@ export default function CartPage() {
                       {summaryDeliverySpeed
                         ? `${getShippingLabel(summaryDeliverySpeed)} delivery`
                         : "Calculated at cart level"}
-                      {summaryMethod ? ` (${summaryMethod === "flat_rate" ? "Flat rate" : "Quantity based"})` : ""}
+                      {/* {summaryMethod ? ` (${summaryMethod === "flat_rate" ? "Flat rate" : "Quantity based"})` : ""} */}
                     </>
                   );
                 }
@@ -630,6 +571,73 @@ export default function CartPage() {
     )}
   </div>
 ) : null}
+
+                    {selectedTab === "product" &&
+                    itemsProduct.length > 0 &&
+                    cartPricing?.availableDeliverySpeeds &&
+                    cartPricing.availableDeliverySpeeds.length > 0 ? (
+                        <div className="mt-6 rounded-md border border-gray-200 bg-white p-4">
+                            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                <div>
+                                    <h3 className="text-sm font-semibold text-gray-800">
+                                        Shipping Speed
+                                    </h3>
+                                    <p className="mt-1 text-xs text-gray-500">
+                                        Choose shipping Speed for your order
+                                    </p>
+                                    {selectedDeliverySpeed ? (
+                                        <p className="mt-2 text-sm font-medium text-gray-700">
+                                            Selected: {getShippingLabel(selectedDeliverySpeed)} - $
+                                            {effectiveShippingTotalProduct.toFixed(2)}
+                                        </p>
+                                    ) : null}
+                                </div>
+
+                                {deliverySpeedLoading && (
+                                    <div className="text-xs text-blue-600">
+                                        Updating shipping...
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="mt-4 flex flex-wrap gap-3">
+                                {cartPricing.availableDeliverySpeeds.map((speed) => {
+                                    const isActive = selectedDeliverySpeed === speed;
+
+                                    return (
+                                        <button
+                                            key={speed}
+                                            type="button"
+                                            onClick={() =>
+                                                handleDeliverySpeedChange(speed as DeliverySpeed)
+                                            }
+                                            disabled={deliverySpeedLoading}
+                                            className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
+                                                isActive
+                                                    ? "border-blue-900 bg-blue-900 text-white"
+                                                    : "border-gray-300 bg-white text-gray-700 hover:border-blue-400"
+                                            } disabled:cursor-not-allowed disabled:opacity-60`}
+                                        >
+                                            {getShippingLabel(speed as DeliverySpeed)}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    ) : null}
+
+                    {/* Delivery Address */}
+                    <div className="mt-6">
+                        <AddressComponent
+                            addresses={addresses}
+                            selectedAddressId={selectedAddressId}
+                            onSelect={setSelectedAddressId}
+                            onAddressesChange={handleAddressesChange}
+                            onAdd={(addr) => {
+                                setSelectedAddressId(addr.id);
+                            }}
+                        />
+                    </div>
                 </div>
 
                 {/* Price Details */}
@@ -656,7 +664,7 @@ export default function CartPage() {
                                     <div>${effectiveShippingTotalProduct.toFixed(2)}</div>
                                 </div>
 
-                                {cartPricing?.shipping && (
+                                {/* {cartPricing?.shipping && (
                                     <div className="mt-2 text-xs text-gray-500">
                                         {cartPricing.shipping.method === "quantity_based"
                                             ? `Calculated by quantity tier`
@@ -668,7 +676,7 @@ export default function CartPage() {
                                             ? " • Free shipping applied"
                                             : ""}
                                     </div>
-                                )}
+                                )} */}
 
                                 {cartPricing?.shippingError && (
                                     <div className="mt-2 text-xs text-red-600">

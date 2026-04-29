@@ -144,6 +144,15 @@ function parseQuantity(value: string) {
   return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
 }
 
+const panelClassName = "rounded-2xl border border-[#ebe2d3] bg-[#fcfaf6]";
+const inputClassName =
+  "h-11 w-full rounded-xl border border-[#ddd3c4] bg-white px-3 font-montserrat text-sm text-[#1c1c1c] placeholder:text-[#9b907e] outline-none transition focus:border-[#c9a44a] focus:ring-2 focus:ring-[#f1e1ae]";
+const inputWithIconClassName = `${inputClassName} pl-9`;
+const tierLabelClassName =
+  "mb-2 block font-montserrat text-[11px] font-semibold uppercase tracking-[0.16em] text-[#7f7464]";
+const sectionEyebrowClassName =
+  "font-montserrat text-xs font-semibold uppercase tracking-[0.22em] text-[#8e816d]";
+
 export default function ShippingSettingsTab({
   businessId,
   isActive,
@@ -465,8 +474,8 @@ export default function ShippingSettingsTab({
 
   if (loading) {
     return (
-      <div className="rounded-[28px] border border-[#e3d7c7] bg-[#fbf7f0] p-8 text-center shadow-[6px_6px_0_0_#2b241f]">
-        <p className="font-montserrat text-sm font-medium text-[#5f5a53]">
+      <div className={`${panelClassName} p-8 text-center`}>
+        <p className="font-montserrat text-sm font-medium text-gray-600">
           Loading shipping settings...
         </p>
       </div>
@@ -475,12 +484,12 @@ export default function ShippingSettingsTab({
 
   return (
     <>
-      <div className="rounded-[28px] border-2 border-[#2b241f] bg-[#f9f4eb] p-5 shadow-[8px_8px_0_0_#2b241f] sm:p-7">
-        <div className="border-b-2 border-[#2b241f] pb-4">
-          <h2 className="font-poppins text-[26px] font-semibold text-[#2b241f]">
+      <div className={`${panelClassName} p-5 sm:p-6`}>
+        <div className="border-b border-[#e6dccd] pb-4">
+          <h2 className="font-poppins text-[26px] font-semibold text-[#1c1c1c]">
             Shipping Settings
           </h2>
-          <p className="mt-1 font-montserrat text-sm text-[#6d675f]">
+          <p className="mt-1 font-montserrat text-sm text-gray-600">
             Choose how shipping is calculated for your store and save rates for each
             delivery speed.
           </p>
@@ -493,7 +502,7 @@ export default function ShippingSettingsTab({
         )}
 
         <div className="mt-6">
-          <p className="font-montserrat text-xs uppercase tracking-[0.22em] text-[#928572]">
+          <p className={sectionEyebrowClassName}>
             Shipping Method
           </p>
 
@@ -519,10 +528,10 @@ export default function ShippingSettingsTab({
                   key={option.key}
                   type="button"
                   onClick={() => switchMethod(option.key)}
-                  className={`rounded-[24px] border-2 p-5 text-left transition ${
+                  className={`rounded-[24px] border p-5 text-left transition ${
                     selected
-                      ? "border-[#2b241f] bg-[#2f2923] text-white shadow-[6px_6px_0_0_#c7b79e]"
-                      : "border-dashed border-[#b6ab98] bg-[#fffdf8] text-[#2b241f] hover:border-[#2b241f]"
+                      ? "border-[#c9a44a] bg-white text-[#1c1c1c] shadow-sm"
+                      : "border-dashed border-[#d6cbbb] bg-white text-[#1c1c1c] hover:border-[#c9a44a]"
                   }`}
                 >
                   <div className="flex items-start justify-between gap-3">
@@ -530,13 +539,13 @@ export default function ShippingSettingsTab({
                       <span
                         className={`mt-1 h-5 w-5 rounded-full border-2 ${
                           selected
-                            ? "border-white bg-white/15 ring-4 ring-white/15"
-                            : "border-[#2b241f] bg-transparent"
+                            ? "border-[#c9a44a] bg-[#fff4cf] ring-4 ring-[#f7edd0]"
+                            : "border-[#8e816d] bg-transparent"
                         }`}
                       >
                         <span
                           className={`mx-auto mt-[3px] block h-2.5 w-2.5 rounded-full ${
-                            selected ? "bg-white" : "bg-transparent"
+                            selected ? "bg-[#c9a44a]" : "bg-transparent"
                           }`}
                         />
                       </span>
@@ -544,7 +553,7 @@ export default function ShippingSettingsTab({
                     </div>
 
                     {selected && (
-                      <span className="rounded-full border border-white/30 px-3 py-1 font-montserrat text-[11px] uppercase tracking-[0.18em] text-white/90">
+                      <span className="rounded-full border border-[#ead9a4] bg-[#fff7da] px-3 py-1 font-montserrat text-[11px] uppercase tracking-[0.18em] text-[#8a6a18]">
                         Selected
                       </span>
                     )}
@@ -552,7 +561,7 @@ export default function ShippingSettingsTab({
 
                   <p
                     className={`mt-4 max-w-md font-montserrat text-sm leading-6 ${
-                      selected ? "text-white/80" : "text-[#6d675f]"
+                      selected ? "text-gray-700" : "text-gray-600"
                     }`}
                   >
                     {option.description}
@@ -565,11 +574,11 @@ export default function ShippingSettingsTab({
 
         {method === "flat_rate" ? (
           <div className="mt-6">
-            <p className="font-montserrat text-xs uppercase tracking-[0.22em] text-[#928572]">
+            <p className={sectionEyebrowClassName}>
               Delivery Speed Rates
             </p>
 
-            <div className="mt-3 overflow-hidden rounded-[24px] border-2 border-[#2b241f] bg-[#fffdf8]">
+            <div className="mt-3 overflow-hidden rounded-2xl border border-[#e6dccd] bg-white">
               {[
                 {
                   key: "standard" as const,
@@ -594,7 +603,7 @@ export default function ShippingSettingsTab({
                   }`}
                 >
                   <div>
-                    <h3 className="font-poppins text-xl font-semibold text-[#2b241f]">
+                    <h3 className="font-poppins text-xl font-semibold text-[#1c1c1c]">
                       {speed.label}
                     </h3>
                     <p className="font-montserrat text-sm text-[#8a8175]">
@@ -602,8 +611,10 @@ export default function ShippingSettingsTab({
                     </p>
                   </div>
 
-                  <label className="flex items-center gap-3">
-                    <span className="font-poppins text-xl text-[#5c544a]">$</span>
+                  <label className="relative flex items-center">
+                    <span className="pointer-events-none absolute left-3 font-poppins text-lg text-[#7f7464]">
+                      $
+                    </span>
                     <input
                       type="number"
                       min="0"
@@ -613,7 +624,7 @@ export default function ShippingSettingsTab({
                         handleFlatRateChange(speed.key, event.target.value)
                       }
                       placeholder="0.00"
-                      className="h-12 w-full rounded-[16px] border border-[#d6cbbb] bg-[#f1ede6] px-4 font-montserrat text-sm text-[#2b241f] outline-none transition focus:border-[#2b241f]"
+                      className={inputWithIconClassName}
                     />
                   </label>
                 </div>
@@ -624,10 +635,10 @@ export default function ShippingSettingsTab({
           <div className="mt-6">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <p className="font-montserrat text-xs uppercase tracking-[0.22em] text-[#928572]">
+                <p className={sectionEyebrowClassName}>
                   Quantity Tiers
                 </p>
-                <p className="mt-1 font-montserrat text-sm text-[#6d675f]">
+                <p className="mt-1 font-montserrat text-sm text-gray-600">
                   Create continuous quantity ranges and assign rates for each delivery
                   speed.
                 </p>
@@ -636,12 +647,18 @@ export default function ShippingSettingsTab({
 
             <div className="mt-4 space-y-3">
               <div className="hidden grid-cols-[1.3fr_1fr_1fr_1fr_52px] gap-3 px-2 lg:grid">
-                {["Qty Range", "Standard", "Express", "Local", ""].map((label) => (
+                {[
+                  { label: "Qty Range", className: "pl-3" },
+                  { label: "Standard", className: "pl-9" },
+                  { label: "Express", className: "pl-9" },
+                  { label: "Local", className: "pl-9" },
+                  { label: "", className: "" },
+                ].map((column) => (
                   <p
-                    key={label || "action"}
-                    className="font-montserrat text-xs uppercase tracking-[0.2em] text-[#928572]"
+                    key={column.label || "action"}
+                    className={`font-montserrat text-xs font-semibold uppercase tracking-[0.2em] text-[#8e816d] ${column.className}`}
                   >
-                    {label}
+                    {column.label}
                   </p>
                 ))}
               </div>
@@ -649,10 +666,10 @@ export default function ShippingSettingsTab({
               {quantityTiers.map((tier) => (
                 <div
                   key={tier.id}
-                  className="grid gap-3 rounded-[22px] border border-[#dfd4c5] bg-[#fffdf8] p-4 lg:grid-cols-[1.3fr_1fr_1fr_1fr_52px] lg:items-center"
+                  className="grid gap-3 rounded-2xl border border-[#e6dccd] bg-white p-4 lg:grid-cols-[1.3fr_1fr_1fr_1fr_52px] lg:items-start"
                 >
                   <div>
-                    <p className="mb-2 font-montserrat text-[11px] uppercase tracking-[0.16em] text-[#928572] lg:hidden">
+                    <p className={`${tierLabelClassName} lg:hidden`}>
                       Qty Range
                     </p>
                     <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
@@ -664,10 +681,10 @@ export default function ShippingSettingsTab({
                         onChange={(event) =>
                           handleTierChange(tier.id, "minQuantity", event.target.value)
                         }
-                        placeholder="1"
-                        className="h-11 rounded-[14px] border border-[#d6cbbb] bg-[#f1ede6] px-3 font-montserrat text-sm text-[#2b241f] outline-none transition focus:border-[#2b241f]"
+                        placeholder="Min qty"
+                        className={inputClassName}
                       />
-                      <span className="font-poppins text-lg text-[#5c544a]">-</span>
+                      <span className="font-poppins text-lg text-[#7f7464]">-</span>
                       <input
                         type="number"
                         min="1"
@@ -676,30 +693,38 @@ export default function ShippingSettingsTab({
                         onChange={(event) =>
                           handleTierChange(tier.id, "maxQuantity", event.target.value)
                         }
-                        placeholder="No max"
-                        className="h-11 rounded-[14px] border border-[#d6cbbb] bg-[#f1ede6] px-3 font-montserrat text-sm text-[#2b241f] outline-none transition focus:border-[#2b241f]"
+                        placeholder="Max qty"
+                        className={inputClassName}
                       />
                     </div>
                   </div>
 
-                  {(["standard", "express", "local"] as const).map((speed) => (
-                    <label key={speed} className="flex items-center gap-3">
-                      <span className="font-poppins text-xl text-[#5c544a]">$</span>
+                  {(
+                    [
+                      { key: "standard", label: "Standard" },
+                      { key: "express", label: "Express" },
+                      { key: "local", label: "Local" },
+                    ] as const
+                  ).map((speed) => (
+                    <label key={speed.key} className="block">
                       <div className="w-full">
-                        <p className="mb-2 font-montserrat text-[11px] uppercase tracking-[0.16em] text-[#928572] lg:hidden">
-                          {speed}
-                        </p>
-                        <input
-                          type="number"
-                          min="0"
-                          step="0.01"
-                          value={tier.rates[speed]}
-                          onChange={(event) =>
-                            handleTierRateChange(tier.id, speed, event.target.value)
-                          }
-                          placeholder="0.00"
-                          className="h-11 w-full rounded-[14px] border border-[#d6cbbb] bg-[#f1ede6] px-3 font-montserrat text-sm text-[#2b241f] outline-none transition focus:border-[#2b241f]"
-                        />
+                        <p className={`${tierLabelClassName} lg:hidden`}>{speed.label}</p>
+                        <div className="relative">
+                          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 font-poppins text-lg text-[#7f7464]">
+                            $
+                          </span>
+                          <input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={tier.rates[speed.key]}
+                            onChange={(event) =>
+                              handleTierRateChange(tier.id, speed.key, event.target.value)
+                            }
+                            placeholder={`${speed.label} rate`}
+                            className={inputWithIconClassName}
+                          />
+                        </div>
                       </div>
                     </label>
                   ))}
@@ -708,10 +733,10 @@ export default function ShippingSettingsTab({
                     type="button"
                     onClick={() => removeTier(tier.id)}
                     disabled={quantityTiers.length === 1}
-                    className="h-11 rounded-[14px] border border-transparent font-poppins text-2xl text-[#b54e3b] transition hover:border-[#e7d4cf] hover:bg-[#fff5f2] disabled:cursor-not-allowed disabled:text-[#d9c4bf]"
+                    className="h-11 rounded-xl border border-transparent font-poppins text-2xl leading-none text-[#b54e3b] transition hover:border-[#f0d4ce] hover:bg-[#fff5f2] disabled:cursor-not-allowed disabled:text-[#d9c4bf]"
                     aria-label="Remove tier"
                   >
-                    ×
+                    &times;
                   </button>
                 </div>
               ))}
@@ -719,7 +744,7 @@ export default function ShippingSettingsTab({
               <button
                 type="button"
                 onClick={addTier}
-                className="w-full rounded-[20px] border-2 border-dashed border-[#2b241f] bg-[#fff9ef] px-4 py-3 font-poppins text-lg font-semibold text-[#2b241f] transition hover:bg-[#f5ecdc]"
+                className="w-full rounded-2xl border border-dashed border-[#d6cbbb] bg-white px-4 py-3 font-poppins text-lg font-semibold text-[#1c1c1c] transition hover:border-[#c9a44a] hover:bg-[#fffaf0]"
               >
                 + Add Tier
               </button>
@@ -727,7 +752,7 @@ export default function ShippingSettingsTab({
           </div>
         )}
 
-        <div className="mt-6 rounded-[22px] border border-dashed border-[#d8cbb5] bg-[#fffaf2] p-4 sm:p-5">
+        <div className="mt-6 rounded-2xl border border-dashed border-[#d8cbb5] bg-white p-4 sm:p-5">
           <label className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <div className="flex items-center gap-3">
               <input
@@ -736,13 +761,15 @@ export default function ShippingSettingsTab({
                 onChange={(event) => setFreeShippingEnabled(event.target.checked)}
                 className="h-5 w-5 rounded border-[#a28e70] text-[#2b241f] focus:ring-[#2b241f]"
               />
-              <span className="font-poppins text-xl font-medium text-[#2b241f]">
+              <span className="font-poppins text-xl font-medium text-[#1c1c1c]">
                 Free shipping over
               </span>
             </div>
 
-            <div className="flex flex-1 items-center gap-3">
-              <span className="font-poppins text-xl text-[#5c544a]">$</span>
+            <div className="relative flex flex-1 items-center">
+              <span className="pointer-events-none absolute left-3 font-poppins text-lg text-[#7f7464]">
+                $
+              </span>
               <input
                 type="number"
                 min="0"
@@ -751,9 +778,9 @@ export default function ShippingSettingsTab({
                 onChange={(event) => setFreeShippingThreshold(event.target.value)}
                 disabled={!freeShippingEnabled}
                 placeholder="0.00"
-                className="h-11 w-full max-w-[220px] rounded-[14px] border border-[#d6cbbb] bg-[#f1ede6] px-3 font-montserrat text-sm text-[#2b241f] outline-none transition focus:border-[#2b241f] disabled:cursor-not-allowed disabled:opacity-50"
+                className={`${inputWithIconClassName} max-w-[220px] disabled:cursor-not-allowed disabled:bg-[#f6f2ea] disabled:text-[#9b907e]`}
               />
-              <span className="font-montserrat text-sm text-[#8a8175]">(cart subtotal)</span>
+              <span className="ml-3 font-montserrat text-sm text-[#8a8175]">(cart subtotal)</span>
             </div>
           </label>
         </div>
@@ -763,7 +790,7 @@ export default function ShippingSettingsTab({
             type="button"
             onClick={discardChanges}
             disabled={!isDirty || saving}
-            className="rounded-[16px] border-2 border-[#2b241f] bg-white px-5 py-3 font-poppins text-lg font-medium text-[#2b241f] transition hover:bg-[#f7f1e7] disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-xl border border-[#d6cbbb] bg-white px-5 py-3 font-poppins text-lg font-medium text-[#1c1c1c] transition hover:border-[#c9a44a] hover:bg-[#fffaf0] disabled:cursor-not-allowed disabled:opacity-50"
           >
             Discard
           </button>
@@ -771,7 +798,7 @@ export default function ShippingSettingsTab({
             type="button"
             onClick={handleSave}
             disabled={saving}
-            className="rounded-[16px] border-2 border-[#2b241f] bg-[#2f2923] px-5 py-3 font-poppins text-lg font-medium text-white shadow-[4px_4px_0_0_#c7b79e] transition hover:bg-[#433b33] disabled:cursor-not-allowed disabled:opacity-60"
+            className="rounded-xl bg-blue-900 px-5 py-3 font-poppins text-lg font-medium text-white transition bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {saving ? "Saving..." : "Save Shipping Settings"}
           </button>
@@ -780,11 +807,11 @@ export default function ShippingSettingsTab({
 
       {confirmSwitchTo && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#2b241f]/45 px-4">
-          <div className="w-full max-w-xl rounded-[20px] border-2 border-[#2b241f] bg-[#fffdf8] p-5 shadow-[8px_8px_0_0_#2b241f] sm:p-6">
-            <h3 className="font-poppins text-[28px] font-semibold text-[#2b241f]">
+          <div className="w-full max-w-xl rounded-2xl border border-[#ebe2d3] bg-white p-5 shadow-xl sm:p-6">
+            <h3 className="font-poppins text-[28px] font-semibold text-[#1c1c1c]">
               Switch to {confirmSwitchTo === "flat_rate" ? "Flat Rate" : "Quantity Based"}?
             </h3>
-            <p className="mt-3 font-montserrat text-sm leading-7 text-[#5f5a53]">
+            <p className="mt-3 font-montserrat text-sm leading-7 text-gray-600">
               {confirmSwitchTo === "flat_rate"
                 ? `You have ${quantityTiers.length} quantity ${
                     quantityTiers.length === 1 ? "tier" : "tiers"
@@ -792,19 +819,19 @@ export default function ShippingSettingsTab({
                 : "You already entered flat-rate values. Switching methods will clear those rates permanently."}
             </p>
 
-            <div className="mt-5 border-t border-dashed border-[#d7ccbe] pt-5">
+            <div className="mt-5 border-t border-dashed border-[#e6dccd] pt-5">
               <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
                 <button
                   type="button"
                   onClick={() => setConfirmSwitchTo(null)}
-                  className="rounded-[14px] border-2 border-[#2b241f] bg-white px-5 py-2.5 font-poppins text-lg font-medium text-[#2b241f] transition hover:bg-[#f7f1e7]"
+                  className="rounded-xl border border-[#d6cbbb] bg-white px-5 py-2.5 font-poppins text-lg font-medium text-[#1c1c1c] transition hover:border-[#c9a44a] hover:bg-[#fffaf0]"
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
                   onClick={confirmSwitch}
-                  className="rounded-[14px] border-2 border-[#9e3729] bg-[#b54331] px-5 py-2.5 font-poppins text-lg font-medium text-white transition hover:bg-[#9f3729]"
+                  className="rounded-xl bg-[#b54331] px-5 py-2.5 font-poppins text-lg font-medium text-white transition hover:bg-[#9f3729]"
                 >
                   Yes, Switch
                 </button>
@@ -816,3 +843,4 @@ export default function ShippingSettingsTab({
     </>
   );
 }
+
