@@ -20,6 +20,10 @@ export default function AddProductPage() {
     businesses,
     categories,
     subcategories,
+    taxCategories,
+    taxEnabled,
+    registeredTaxState,
+    taxLoading,
     uploading,
     uploadProgress,
     handleInputChange,
@@ -84,6 +88,10 @@ export default function AddProductPage() {
                 businesses={businesses}
                 categories={categories}
                 subcategories={subcategories}
+                taxCategories={taxCategories}
+                taxEnabled={taxEnabled}
+                registeredTaxState={registeredTaxState}
+                taxLoading={taxLoading}
                 onInputChange={handleInputChange}
                 onToggleVariants={toggleHasVariants}
               />

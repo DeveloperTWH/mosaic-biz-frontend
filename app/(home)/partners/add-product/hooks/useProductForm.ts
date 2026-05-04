@@ -12,6 +12,7 @@ import {
   Attribute,
   MetaField,
   Discount,
+  TaxCategoryRate,
   SelectedFile,
   UploadProgress,
   UploadResponse,
@@ -37,7 +38,8 @@ const initialFormData: ProductFormData = {
     discountType: 'percentage',
     discountValue: 0,
     costValue: 0
-  }
+  },
+  taxCategory: null
 };
 
 // Generate SKU
@@ -60,6 +62,10 @@ export const useProductForm = () => {
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
+  const [taxCategories, setTaxCategories] = useState<TaxCategoryRate[]>([]);
+  const [taxEnabled, setTaxEnabled] = useState(false);
+  const [registeredTaxState, setRegisteredTaxState] = useState('');
+  const [taxLoading, setTaxLoading] = useState(false);
   
   // Upload states
   const [uploading, setUploading] = useState<Record<string, boolean>>({});
@@ -133,13 +139,79 @@ export const useProductForm = () => {
     }
   }, [formData.categoryId]);
 
+  const fetchTaxSettings = async (businessId: string) => {
+    if (!businessId) {
+      setTaxCategories([]);
+      setTaxEnabled(false);
+      setRegisteredTaxState('');
+      setFormData(prev => ({ ...prev, taxCategory: null }));
+      return;
+    }
+
+    try {
+      setTaxLoading(true);
+
+      const response = await axios.get(
+        `${API_BASE_URL}/api/business/${businessId}/tax-settings`,
+        { withCredentials: true }
+      );
+
+      const settings = response.data?.taxSettings;
+      const normalizedCategories: TaxCategoryRate[] = Array.isArray(settings?.categories)
+        ? settings.categories.map((category: any) => ({
+            code: category?.code ?? '',
+            label: category?.label ?? 'Untitled Category',
+            rate: Number(category?.rate ?? 0),
+          }))
+        : [];
+
+      setTaxCategories(normalizedCategories);
+      setTaxEnabled(Boolean(settings?.enabled));
+      setRegisteredTaxState(settings?.registeredState ?? '');
+
+      setFormData(prev => {
+        const hasSelectedCategory = prev.taxCategory
+          ? normalizedCategories.some((category) => category.code === prev.taxCategory?.code)
+          : false;
+
+        return {
+          ...prev,
+          taxCategory: hasSelectedCategory ? prev.taxCategory : null,
+        };
+      });
+    } catch (error) {
+      console.error('Error fetching tax settings:', error);
+      setTaxCategories([]);
+      setTaxEnabled(false);
+      setRegisteredTaxState('');
+      setFormData(prev => ({ ...prev, taxCategory: null }));
+    } finally {
+      setTaxLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTaxSettings(formData.businessId);
+  }, [formData.businessId]);
+
   // Handle input changes
   const handleInputChange = (field: keyof ProductFormData, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData(prev => ({
+      ...prev,
+      [field]: value,
+      ...(field === 'businessId' ? { taxCategory: null } : {}),
+    }));
     if (errors[field]) {
       setErrors(prev => {
         const newErrors = { ...prev };
         delete newErrors[field];
+        return newErrors;
+      });
+    }
+    if (field === 'businessId' && errors.taxCategory) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors.taxCategory;
         return newErrors;
       });
     }
@@ -510,6 +582,9 @@ const toggleHasVariants = (value: boolean) => {
     if (!formData.subCategoryId) newErrors.subCategoryId = 'Subcategory is required';
     if (!formData.featureImage.trim()) newErrors.featureImage = 'Cover image is required';
     if (!formData.galleryImages.length) newErrors.galleryImages = 'At least one gallery image is required';
+    if (taxEnabled && !formData.taxCategory) {
+      newErrors.taxCategory = 'Tax category is required when tax settings are enabled';
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -538,6 +613,7 @@ const toggleHasVariants = (value: boolean) => {
         key: field.metaFieldName,
         value: field.metaFieldValue
       })),
+      taxCategory: formData.taxCategory || undefined,
       discount: formData.discount.discountValue > 0 ? {
         type: formData.discount.discountType,
         amount: formData.discount.discountValue,
@@ -637,6 +713,10 @@ const toggleHasVariants = (value: boolean) => {
     businesses,
     categories,
     subcategories,
+    taxCategories,
+    taxEnabled,
+    registeredTaxState,
+    taxLoading,
     uploading,
     uploadProgress,
     selectedFiles,

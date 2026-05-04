@@ -33,6 +33,15 @@ export interface Discount {
   costValue: number;
 }
 
+export interface TaxCategoryRef {
+  code: string;
+  label: string;
+}
+
+export interface TaxCategoryRate extends TaxCategoryRef {
+  rate: number;
+}
+
 export interface ProductFormData {
   productTitle: string;
   categoryId: string;
@@ -46,6 +55,7 @@ export interface ProductFormData {
   variants: Variant[];
   metaFields: MetaField[];
   discount: Discount;
+  taxCategory: TaxCategoryRef | null;
 }
 
 export interface FormErrors {
@@ -165,6 +175,7 @@ export interface ApiProductPayload {
   galleryImages: string[];
   metaFields: ApiMetaField[];
   discount?: ApiDiscount;
+  taxCategory?: TaxCategoryRef;
   variants: ApiVariant[];
   isPublished: boolean;
 }
@@ -195,6 +206,7 @@ export interface ProductResponse {
   galleryImages: string[];
   metaFields: ApiMetaField[];
   discount?: ApiDiscount;
+  taxCategory?: TaxCategoryRef | null;
   variants: string[] | ApiVariant[];
   isPublished: boolean;
   isDeleted: boolean;

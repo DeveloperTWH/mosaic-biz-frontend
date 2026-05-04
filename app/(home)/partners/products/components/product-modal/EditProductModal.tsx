@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { X, Save, Loader } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { Product } from '../../types/index';
+import { Product, TaxCategoryRate } from '../../types/index';
 import { useProductUpload } from '../../hooks/useProductUpload';
 import RichTextEditor from '../../../add-product/components/RichTextEditor';
 
@@ -28,6 +29,10 @@ export default function EditProductModal({ product, onClose, onSave }: Props) {
   const [loading, setLoading] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const { uploading, handleFileUpload } = useProductUpload();
+  const [taxCategories, setTaxCategories] = useState<TaxCategoryRate[]>([]);
+  const [taxEnabled, setTaxEnabled] = useState(false);
+  const [registeredTaxState, setRegisteredTaxState] = useState('');
+  const [taxLoading, setTaxLoading] = useState(false);
   
   // Product form state
   const [productForm, setProductForm] = useState({
@@ -41,7 +46,8 @@ export default function EditProductModal({ product, onClose, onSave }: Props) {
     galleryImages: [] as string[],
     metaFields: [] as { key: string; value: string }[],
     discount: { type: 'percentage' as 'percentage' | 'fixed', amount: 0, minCartValue: 0 },
-    isPublished: true
+    isPublished: true,
+    taxCategory: null as Product['taxCategory'],
   });
 
   // Variants state
@@ -79,7 +85,8 @@ export default function EditProductModal({ product, onClose, onSave }: Props) {
           amount: product.discount.amount,
           minCartValue: product.discount.minCartValue
         } : { type: 'percentage', amount: 0, minCartValue: 0 },
-        isPublished: product.isPublished
+        isPublished: product.isPublished,
+        taxCategory: product.taxCategory || null,
       });
 
       if (product.variants) {
@@ -100,6 +107,59 @@ export default function EditProductModal({ product, onClose, onSave }: Props) {
         })));
       }
     }
+  }, [product]);
+
+  useEffect(() => {
+    const fetchTaxSettings = async () => {
+      if (!product?.businessId) {
+        setTaxCategories([]);
+        setTaxEnabled(false);
+        setRegisteredTaxState('');
+        return;
+      }
+
+      try {
+        setTaxLoading(true);
+
+        const response = await axios.get(
+          `${API_BASE_URL}/api/business/${product.businessId}/tax-settings`,
+          { withCredentials: true }
+        );
+
+        const settings = response.data?.taxSettings;
+        const normalizedCategories: TaxCategoryRate[] = Array.isArray(settings?.categories)
+          ? settings.categories.map((category: any) => ({
+              code: category?.code ?? '',
+              label: category?.label ?? 'Untitled Category',
+              rate: Number(category?.rate ?? 0),
+            }))
+          : [];
+
+        setTaxCategories(normalizedCategories);
+        setTaxEnabled(Boolean(settings?.enabled));
+        setRegisteredTaxState(settings?.registeredState ?? '');
+
+        setProductForm((prev) => {
+          const hasSelectedCategory = prev.taxCategory
+            ? normalizedCategories.some((category) => category.code === prev.taxCategory?.code)
+            : false;
+
+          return {
+            ...prev,
+            taxCategory: hasSelectedCategory ? prev.taxCategory : null,
+          };
+        });
+      } catch (error) {
+        console.error('Error fetching tax settings:', error);
+        setTaxCategories([]);
+        setTaxEnabled(false);
+        setRegisteredTaxState('');
+      } finally {
+        setTaxLoading(false);
+      }
+    };
+
+    fetchTaxSettings();
   }, [product]);
 
   const toVariantPayload = (variant: any) => {
@@ -165,11 +225,19 @@ export default function EditProductModal({ product, onClose, onSave }: Props) {
         throw new Error('Please enter SKU for all variants before saving.');
       }
 
+      if (taxEnabled && !productForm.taxCategory) {
+        throw new Error('Tax category is required when tax settings are enabled.');
+      }
+
       const productRes = await fetch(`${API_BASE_URL}/api/product/${product._id}`, {
         method: 'PUT',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...productForm, variants: variantsPayload })
+        body: JSON.stringify({
+          ...productForm,
+          taxCategory: productForm.taxCategory || undefined,
+          variants: variantsPayload,
+        })
       });
       const productData = await productRes.json();
       if (!productRes.ok || !productData.success) {
@@ -233,6 +301,78 @@ export default function EditProductModal({ product, onClose, onSave }: Props) {
             onTitleChange={(title) => setProductForm({ ...productForm, title })}
             onStatusChange={(isPublished) => setProductForm({ ...productForm, isPublished })}
           />
+
+          <div className="rounded-md border border-[#f0bc83] bg-[#fffaf4] p-4">
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <label className="block text-xs font-medium uppercase tracking-wide text-[#b45d19] mb-1">
+                    Tax Category {taxEnabled ? '*' : ''}
+                  </label>
+                  <p className="text-sm text-gray-700">
+                    Registered state: {registeredTaxState || 'Not configured'}
+                  </p>
+                </div>
+                <span
+                  className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${
+                    taxEnabled
+                      ? 'bg-green-100 text-green-700'
+                      : 'bg-gray-200 text-gray-600'
+                  }`}
+                >
+                  {taxLoading ? 'Loading...' : taxEnabled ? 'Tax enabled' : 'Tax disabled'}
+                </span>
+              </div>
+
+              <div>
+                <select
+                  value={productForm.taxCategory?.code || ''}
+                  onChange={(e) => {
+                    const selected = taxCategories.find((category) => category.code === e.target.value);
+                    setProductForm((prev) => ({
+                      ...prev,
+                      taxCategory: selected
+                        ? { code: selected.code, label: selected.label }
+                        : null,
+                    }));
+                  }}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-[#c9a227] focus:border-[#c9a227] bg-white"
+                  disabled={taxLoading || taxCategories.length === 0}
+                >
+                  <option value="">
+                    {taxLoading
+                      ? 'Loading tax categories...'
+                      : taxCategories.length > 0
+                        ? 'Choose Tax Category'
+                        : 'No tax categories available'}
+                  </option>
+                  {taxCategories.map((category) => (
+                    <option key={category.code} value={category.code}>
+                      {category.label}
+                    </option>
+                  ))}
+                </select>
+
+                {productForm.taxCategory ? (
+                  <p className="mt-2 text-xs text-gray-500">
+                    Rate for this category:{' '}
+                    {(
+                      taxCategories.find((category) => category.code === productForm.taxCategory?.code)?.rate ?? 0
+                    ).toFixed(2)}
+                    %
+                  </p>
+                ) : taxEnabled ? (
+                  <p className="mt-2 text-xs text-gray-500">
+                    Select the tax category that matches this product.
+                  </p>
+                ) : (
+                  <p className="mt-2 text-xs text-gray-500">
+                    Tax is currently disabled for this business.
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
 
           {/* Description */}
           <div>

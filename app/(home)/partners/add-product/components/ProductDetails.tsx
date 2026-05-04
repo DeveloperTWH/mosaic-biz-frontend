@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ProductFormData, Business, Category, Subcategory } from '../types';
+import { ProductFormData, Business, Category, Subcategory, TaxCategoryRate } from '../types';
 import RichTextEditor from './RichTextEditor';
 import CategoryRequestModal from '../../components/CategoryRequestModal';
 
@@ -11,6 +11,10 @@ interface Props {
   businesses: Business[];
   categories: Category[];
   subcategories: Subcategory[];
+  taxCategories: TaxCategoryRate[];
+  taxEnabled: boolean;
+  registeredTaxState: string;
+  taxLoading: boolean;
   onInputChange: (field: keyof ProductFormData, value: any) => void;
   onToggleVariants: (value: boolean) => void;
 }
@@ -21,6 +25,10 @@ export default function ProductDetails({
   businesses,
   categories,
   subcategories,
+  taxCategories,
+  taxEnabled,
+  registeredTaxState,
+  taxLoading,
   onInputChange,
   onToggleVariants,
 }: Props) {
@@ -29,6 +37,9 @@ export default function ProductDetails({
   const selectedCategory = categories.find((category) => category._id === formData.categoryId);
   const selectedSubcategory = subcategories.find(
     (subcategory) => subcategory._id === formData.subCategoryId
+  );
+  const selectedTaxCategory = taxCategories.find(
+    (category) => category.code === formData.taxCategory?.code
   );
 
   return (
@@ -57,6 +68,28 @@ export default function ProductDetails({
             {errors.businessId && <p className="mt-1 text-xs text-red-600">{errors.businessId}</p>}
           </div>
 
+          <div className="rounded-md border border-gray-200 bg-[#fcfaf7] p-4">
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
+                  Tax Configuration
+                </p>
+                <p className="mt-1 text-sm text-gray-700">
+                  Registered state: {registeredTaxState || 'Not configured'}
+                </p>
+              </div>
+              <span
+                className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${
+                  taxEnabled
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-gray-200 text-gray-600'
+                }`}
+              >
+                {taxLoading ? 'Loading...' : taxEnabled ? 'Tax enabled' : 'Tax disabled'}
+              </span>
+            </div>
+          </div>
+
           {/* Product Title */}
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">
@@ -70,6 +103,51 @@ export default function ProductDetails({
               placeholder="Enter product title"
             />
             {errors.productTitle && <p className="mt-1 text-xs text-red-600">{errors.productTitle}</p>}
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">
+              Tax Category {taxEnabled ? '*' : ''}
+            </label>
+            <select
+              value={formData.taxCategory?.code || ''}
+              onChange={(e) => {
+                const selected = taxCategories.find((category) => category.code === e.target.value);
+                onInputChange('taxCategory', selected ? {
+                  code: selected.code,
+                  label: selected.label,
+                } : null);
+              }}
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-[#c9a227] focus:border-[#c9a227] bg-white"
+              disabled={taxLoading || taxCategories.length === 0}
+            >
+              <option value="">
+                {taxLoading
+                  ? 'Loading tax categories...'
+                  : taxCategories.length > 0
+                    ? 'Choose Tax Category'
+                    : 'No tax categories available'}
+              </option>
+              {taxCategories.map((category) => (
+                <option key={category.code} value={category.code}>
+                  {category.label}
+                </option>
+              ))}
+            </select>
+            {selectedTaxCategory ? (
+              <p className="mt-1 text-xs text-gray-500">
+                Rate for this category: {selectedTaxCategory.rate.toFixed(2)}%
+              </p>
+            ) : taxEnabled ? (
+              <p className="mt-1 text-xs text-gray-500">
+                Select the tax category that matches this product.
+              </p>
+            ) : (
+              <p className="mt-1 text-xs text-gray-500">
+                Tax is currently disabled for this business.
+              </p>
+            )}
+            {errors.taxCategory && <p className="mt-1 text-xs text-red-600">{errors.taxCategory}</p>}
           </div>
 
           {/* Category and Subcategory */}

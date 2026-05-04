@@ -124,6 +124,10 @@ function isAbortError(e: any) {
   return e?.name === "AbortError" || e?.code === 20 || /aborted/i.test(e?.message || "");
 }
 
+function stripHtml(html: string): string {
+  return html.replace(/<[^>]*>/g, "");
+}
+
 /* ---------- data hook (abort-safe + retry) ---------- */
 function useRankedProducts() {
   const [items, setItems] = useState<RankedItem[] | null>(null);
@@ -310,7 +314,12 @@ function ProductCard({ item }: { item: RankedItem }) {
   // const href = item.slug ? `/product/${item.slug}` : `/product/${item._id}`;
   const href = `/product/${item._id}`;
   const title = pickTitle(item);
-  const description = item.description;
+  const description = item.description ?? "";
+  const strippedDescription = stripHtml(description);
+  const trimmedDescription =
+    strippedDescription.length > 100
+      ? `${strippedDescription.slice(0, 100).trimEnd()}...`
+      : strippedDescription;
   const images = gatherImages(item);
   const { price, salePrice, effective, onSale, size, label, color } = pickPrice(item);
   const rating = pickRating(item);
@@ -406,7 +415,7 @@ function ProductCard({ item }: { item: RankedItem }) {
 
         <p
           className="mb-2 text-xs text-gray-600"
-          title={description || ""}
+          title={strippedDescription}
           style={{
             display: "-webkit-box",
             WebkitLineClamp: 2,        // clamp to 2 lines; bump to 3 if you prefer
@@ -416,7 +425,7 @@ function ProductCard({ item }: { item: RankedItem }) {
             wordBreak: "break-word",
           }}
         >
-          {description || ""}
+          {trimmedDescription || ""}
         </p>
 
 

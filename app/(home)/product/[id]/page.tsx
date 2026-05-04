@@ -14,6 +14,7 @@ import {
   getCartDetailed,
   updateCartQuantity,
   removeFromCart,
+  resolveDisplayPrice,
 } from '@/utils/cartUtils';
 import { toggleWishlist, isProductWishlisted } from '@/utils/wishlistUtils';
 import PublicSearchFilterBar from "../../Components/PublicSearchFilterBar";
@@ -160,20 +161,44 @@ setMainImage(firstImage);
     }
   }, [product?._id, selectedVariant?.variantId]);
 
+  const toNumber = (value: unknown): number => {
+    if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
+    if (typeof value === 'string') {
+      const parsed = parseFloat(value);
+      return Number.isFinite(parsed) ? parsed : 0;
+    }
+    if (value && typeof value === 'object' && '$numberDecimal' in (value as Record<string, unknown>)) {
+      const parsed = parseFloat(String((value as Record<string, unknown>).$numberDecimal));
+      return Number.isFinite(parsed) ? parsed : 0;
+    }
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  };
+
   const calculatePrice = () => {
     if (!selectedVariant) return { current: 0, original: 0, discount: 0, onSale: false };
-    const base = Number(selectedVariant.price) || 0;
-    const sale = selectedVariant.salePrice != null ? Number(selectedVariant.salePrice) : null;
+    const base =
+      toNumber(selectedVariant.priceInclTax ?? selectedVariant.price ?? product?.priceInclTax ?? product?.price) || 0;
+    const sale =
+      selectedVariant.salePriceInclTax != null || selectedVariant.salePrice != null
+        ? toNumber(
+            selectedVariant.salePriceInclTax ??
+              selectedVariant.salePrice ??
+              product?.salePriceInclTax ??
+              product?.salePrice
+          )
+        : null;
     const onSale =
       sale != null &&
       (!selectedVariant.discountEndDate || new Date(selectedVariant.discountEndDate).getTime() > Date.now());
+    const resolved = resolveDisplayPrice(base, sale, onSale);
     return {
-      current: onSale ? (sale as number) : base,
-      original: base,
-      discount: onSale && base > 0 && (sale as number) < base
-        ? Math.round(((base - (sale as number)) / base) * 100)
+      current: resolved.current,
+      original: resolved.original,
+      discount: resolved.onSale && resolved.original > 0
+        ? Math.round(((resolved.original - resolved.current) / resolved.original) * 100)
         : 0,
-      onSale
+      onSale: resolved.onSale
     };
   };
 
@@ -220,20 +245,6 @@ setMainImage(firstImage);
   ...(product?.galleryImages || [])
 ];
 
-  const toNumber = (value: unknown): number => {
-    if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
-    if (typeof value === 'string') {
-      const parsed = parseFloat(value);
-      return Number.isFinite(parsed) ? parsed : 0;
-    }
-    if (value && typeof value === 'object' && '$numberDecimal' in (value as Record<string, unknown>)) {
-      const parsed = parseFloat(String((value as Record<string, unknown>).$numberDecimal));
-      return Number.isFinite(parsed) ? parsed : 0;
-    }
-    const parsed = Number(value);
-    return Number.isFinite(parsed) ? parsed : 0;
-  };
-
   const formatMoney = (value: unknown): string => toNumber(value).toFixed(2);
 
   const resolvedShipping = {
@@ -254,10 +265,34 @@ setMainImage(firstImage);
       const basePrice = toNumber(selectedVariant.price);
       const variantSalePrice =
         selectedVariant.salePrice == null ? null : toNumber(selectedVariant.salePrice);
+      const basePriceInclTax = toNumber(
+        selectedVariant.priceInclTax ?? product.priceInclTax ?? basePrice
+      );
+      const basePriceExclTax = toNumber(
+        selectedVariant.priceExclTax ?? product.priceExclTax ?? basePrice
+      );
+      const variantSalePriceInclTax =
+        selectedVariant.salePriceInclTax == null && product.salePriceInclTax == null
+          ? variantSalePrice
+          : toNumber(selectedVariant.salePriceInclTax ?? product.salePriceInclTax);
+      const variantSalePriceExclTax =
+        selectedVariant.salePriceExclTax == null && product.salePriceExclTax == null
+          ? variantSalePrice
+          : toNumber(selectedVariant.salePriceExclTax ?? product.salePriceExclTax);
       const discountEndDate = selectedVariant.discountEndDate ?? null;
       const saleActive =
         variantSalePrice != null &&
         (!discountEndDate || new Date(discountEndDate).getTime() > Date.now());
+      const resolvedUnitPriceInclTax = resolveDisplayPrice(
+        basePriceInclTax,
+        variantSalePriceInclTax ?? variantSalePrice,
+        saleActive
+      );
+      const resolvedUnitPriceExclTax = resolveDisplayPrice(
+        basePriceExclTax,
+        variantSalePriceExclTax ?? variantSalePrice,
+        saleActive
+      );
       const res = await addToCart(
         product._id,
         selectedVariant.variantId,
@@ -267,8 +302,17 @@ setMainImage(firstImage);
           {
             price: basePrice,
             salePrice: variantSalePrice,
+            taxCategory: selectedVariant.taxCategory ?? product.taxCategory ?? null,
+            taxRate: toNumber(selectedVariant.taxRate ?? product.taxRate),
+            taxIncluded: selectedVariant.taxIncluded ?? product.taxIncluded ?? true,
+            priceExclTax: basePriceExclTax,
+            priceInclTax: basePriceInclTax,
+            salePriceExclTax: variantSalePriceExclTax,
+            salePriceInclTax: variantSalePriceInclTax,
             discountEndDate,
-            selectedSizePrice: saleActive ? variantSalePrice ?? basePrice : basePrice,
+            selectedSizePrice: resolvedUnitPriceInclTax.current,
+            selectedSizePriceExclTax: resolvedUnitPriceExclTax.current,
+            selectedSizePriceInclTax: resolvedUnitPriceInclTax.current,
             shippingType: selectedShipping,
             shippingMethod: selectedShipping,
             shippingCost: toNumber(resolvedShipping[selectedShipping]),
@@ -512,8 +556,20 @@ setMainImage(firstImage);
         )}
       </>
     )}
+
+    {(selectedVariant?.taxIncluded ?? product.taxIncluded) && (
+      <span className="rounded border border-green-200 bg-green-50 px-2 py-1 text-xs font-medium text-green-700">
+        Tax incl.
+      </span>
+    )}
   </div>
 )}
+
+            {(selectedVariant?.taxIncluded ?? product.taxIncluded) && (
+              <p className="text-xs text-gray-500 -mt-1">
+                Price shown includes tax. Detailed tax breakdown appears in cart
+              </p>
+            )}
 
             {/* Attributes */}
             {attributeGroups.size > 0 && (

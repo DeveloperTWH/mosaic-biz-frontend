@@ -27,6 +27,19 @@ interface CartItem {
   allowBackorder?: boolean;
   title?: string;
   sku?: string;
+  taxCategory?: {
+    code: string;
+    label: string;
+  } | null;
+  taxRate?: number;
+  taxIncluded?: boolean;
+  priceExclTax?: number;
+  priceInclTax?: number;
+  salePriceExclTax?: number | null;
+  salePriceInclTax?: number | null;
+  selectedSizePriceExclTax?: number;
+  selectedSizePriceInclTax?: number;
+  lineTaxAmount?: number;
 }
 
 export interface CartItemDetailed extends CartItem {
@@ -60,7 +73,11 @@ export interface CartPricingSummary {
   };
   availableDeliverySpeeds?: DeliverySpeed[];
   selectedDeliverySpeed?: DeliverySpeed;
+  subtotalExclTax?: number;
   subtotalAmount?: number;
+  subtotalInclTax?: number;
+  taxAmount?: number;
+  taxIncluded?: boolean;
   totalQuantity?: number;
   shipping?: {
     deliverySpeed?: DeliverySpeed;
@@ -75,6 +92,7 @@ export interface CartPricingSummary {
   } | null;
   shippingError?: string | null;
   totalAmount?: number;
+  totalInclTax?: number;
   currency?: string;
 }
 
@@ -90,6 +108,19 @@ type GuestCartItemMeta = {
   salePrice?: number | null;
   discountEndDate?: string | null;
   selectedSizePrice?: number;
+  taxCategory?: {
+    code: string;
+    label: string;
+  } | null;
+  taxRate?: number;
+  taxIncluded?: boolean;
+  priceExclTax?: number;
+  priceInclTax?: number;
+  salePriceExclTax?: number | null;
+  salePriceInclTax?: number | null;
+  selectedSizePriceExclTax?: number;
+  selectedSizePriceInclTax?: number;
+  lineTaxAmount?: number;
   shippingType?: ShippingType;
   shippingMethod?: ShippingType;
   shippingCost?: number;
@@ -521,6 +552,29 @@ const isSalePriceActive = (salePrice: number | null | undefined, discountEndDate
   return new Date(discountEndDate).getTime() > Date.now();
 };
 
+export const resolveDisplayPrice = (
+  basePrice: number | null | undefined,
+  salePrice: number | null | undefined,
+  saleActive: boolean
+) => {
+  const base = toNumber(basePrice);
+  const sale = salePrice == null ? null : toNumber(salePrice);
+
+  if (!saleActive || sale == null || sale <= 0) {
+    return {
+      current: base,
+      original: base,
+      onSale: false,
+    };
+  }
+
+  return {
+    current: sale,
+    original: base > 0 ? base : sale,
+    onSale: base > 0 && base !== sale,
+  };
+};
+
 
 
 
@@ -558,6 +612,16 @@ type ProductMini = {
   price?: number;
   salePrice?: number | null;
   discountEndDate?: string | null;
+  taxCategory?: {
+    code: string;
+    label: string;
+  } | null;
+  taxRate?: number;
+  taxIncluded?: boolean;
+  priceExclTax?: number;
+  priceInclTax?: number;
+  salePriceExclTax?: number | null;
+  salePriceInclTax?: number | null;
 };
 
 type SizeMini = {
@@ -567,6 +631,16 @@ type SizeMini = {
   salePrice?: number | null;
   discountEndDate?: string | null;
   sku?: string;
+  taxCategory?: {
+    code: string;
+    label: string;
+  } | null;
+  taxRate?: number;
+  taxIncluded?: boolean;
+  priceExclTax?: number;
+  priceInclTax?: number;
+  salePriceExclTax?: number | null;
+  salePriceInclTax?: number | null;
 };
 
 // Replace your VariantMini with this:
@@ -584,6 +658,16 @@ type VariantMini = {
     overnight?: number;
     local?: number;
   } | null;
+  taxCategory?: {
+    code: string;
+    label: string;
+  } | null;
+  taxRate?: number;
+  taxIncluded?: boolean;
+  priceExclTax?: number;
+  priceInclTax?: number;
+  salePriceExclTax?: number | null;
+  salePriceInclTax?: number | null;
 };
 
 // --- API fetchers (batch) ---
@@ -674,6 +758,20 @@ async function hydrateCartItemFromPublicProduct(item: CartItemDetailed): Promise
 
   const basePrice = toNumber(variant.price ?? item.price ?? item.selectedSizePrice);
   const salePrice = variant.salePrice == null ? item.salePrice ?? null : toNumber(variant.salePrice);
+  const priceExclTax = toNumber(
+    variant.priceExclTax ?? product.priceExclTax ?? item.priceExclTax ?? basePrice
+  );
+  const priceInclTax = toNumber(
+    variant.priceInclTax ?? product.priceInclTax ?? item.priceInclTax ?? item.selectedSizePrice ?? basePrice
+  );
+  const salePriceExclTax =
+    variant.salePriceExclTax == null && product.salePriceExclTax == null && item.salePriceExclTax == null
+      ? salePrice
+      : toNumber(variant.salePriceExclTax ?? product.salePriceExclTax ?? item.salePriceExclTax);
+  const salePriceInclTax =
+    variant.salePriceInclTax == null && product.salePriceInclTax == null && item.salePriceInclTax == null
+      ? salePrice
+      : toNumber(variant.salePriceInclTax ?? product.salePriceInclTax ?? item.salePriceInclTax);
   const discountEndDate = variant.discountEndDate ?? item.discountEndDate ?? null;
   const saleActive = isSalePriceActive(salePrice, discountEndDate);
   const shippingMethod: ShippingType =
@@ -687,12 +785,27 @@ async function hydrateCartItemFromPublicProduct(item: CartItemDetailed): Promise
   const shippingCost = hasLineShippingCost
     ? toNumber(item.shippingCost ?? item.shippingCharge)
     : toNumber(shipping?.[shippingMethod]);
+  const resolvedPriceExclTax = resolveDisplayPrice(
+    priceExclTax,
+    salePriceExclTax ?? salePrice,
+    saleActive
+  );
+  const resolvedPriceInclTax = resolveDisplayPrice(
+    priceInclTax,
+    salePriceInclTax ?? salePrice,
+    saleActive
+  );
   const selectedSizePrice =
     item.selectedSizePrice && Number(item.selectedSizePrice) > 0
       ? Number(item.selectedSizePrice)
-      : saleActive
-        ? salePrice ?? basePrice
-        : basePrice;
+      : resolvedPriceInclTax.current;
+  const selectedSizePriceExclTax = resolvedPriceExclTax.current;
+  const selectedSizePriceInclTax = resolvedPriceInclTax.current;
+  const taxRate = toNumber(variant.taxRate ?? product.taxRate ?? item.taxRate);
+  const lineTaxAmount =
+    item.lineTaxAmount != null
+      ? toNumber(item.lineTaxAmount)
+      : Math.max(0, selectedSizePriceInclTax - selectedSizePriceExclTax) * Number(item.quantity ?? 1);
 
   return {
     ...item,
@@ -708,8 +821,18 @@ async function hydrateCartItemFromPublicProduct(item: CartItemDetailed): Promise
     allowBackorder: item.allowBackorder ?? variant.allowBackorder ?? false,
     price: basePrice,
     salePrice,
+    taxCategory: item.taxCategory ?? variant.taxCategory ?? product.taxCategory ?? null,
+    taxRate,
+    taxIncluded: item.taxIncluded ?? variant.taxIncluded ?? product.taxIncluded ?? true,
+    priceExclTax,
+    priceInclTax,
+    salePriceExclTax,
+    salePriceInclTax,
     discountEndDate,
     selectedSizePrice,
+    selectedSizePriceExclTax,
+    selectedSizePriceInclTax,
+    lineTaxAmount,
     shippingType: shippingMethod,
     shippingMethod,
     shippingCost,
@@ -748,6 +871,30 @@ async function buildGuestCartDetailed(): Promise<CartItemDetailed[]> {
 
     const price = toNum(sizeObj?.price) ?? toNum(it.price) ?? 0;
     const salePrice = toNum(sizeObj?.salePrice) ?? toNum(it.salePrice) ?? null;
+    const priceExclTax =
+      toNum(sizeObj?.priceExclTax) ??
+      toNum(v?.priceExclTax) ??
+      toNum(p?.priceExclTax) ??
+      toNum(it.priceExclTax) ??
+      price;
+    const priceInclTax =
+      toNum(sizeObj?.priceInclTax) ??
+      toNum(v?.priceInclTax) ??
+      toNum(p?.priceInclTax) ??
+      toNum(it.priceInclTax) ??
+      price;
+    const salePriceExclTax =
+      toNum(sizeObj?.salePriceExclTax) ??
+      toNum(v?.salePriceExclTax) ??
+      toNum(p?.salePriceExclTax) ??
+      toNum(it.salePriceExclTax) ??
+      salePrice;
+    const salePriceInclTax =
+      toNum(sizeObj?.salePriceInclTax) ??
+      toNum(v?.salePriceInclTax) ??
+      toNum(p?.salePriceInclTax) ??
+      toNum(it.salePriceInclTax) ??
+      salePrice;
     const discountEndISO = sizeObj?.discountEndDate ?? it.discountEndDate ?? null;
     const shippingType: ShippingType =
       it.shippingType === 'express' ||
@@ -760,15 +907,36 @@ async function buildGuestCartDetailed(): Promise<CartItemDetailed[]> {
 
     const isSaleActive = isSalePriceActive(salePrice, discountEndISO);
 
+    const resolvedPriceExclTax = resolveDisplayPrice(
+      priceExclTax,
+      salePriceExclTax ?? salePrice,
+      isSaleActive
+    );
+    const resolvedPriceInclTax = resolveDisplayPrice(
+      priceInclTax,
+      salePriceInclTax ?? salePrice,
+      isSaleActive
+    );
     const selectedSizePrice =
       toNum(it.selectedSizePrice) ??
-      (isSaleActive ? salePrice ?? price : price);
+      resolvedPriceInclTax.current;
+    const selectedSizePriceExclTax =
+      toNum(it.selectedSizePriceExclTax) ??
+      resolvedPriceExclTax.current;
+    const selectedSizePriceInclTax =
+      toNum(it.selectedSizePriceInclTax) ??
+      resolvedPriceInclTax.current;
+    const quantity = it.quantity ?? 1;
+    const taxRate = toNum(sizeObj?.taxRate) ?? toNum(v?.taxRate) ?? toNum(p?.taxRate) ?? toNum(it.taxRate) ?? 0;
+    const lineTaxAmount =
+      toNum(it.lineTaxAmount) ??
+      Math.max(0, selectedSizePriceInclTax - selectedSizePriceExclTax) * quantity;
 
     return {
       productId: it.productId,
       variantId: it.variantId,
       size: it.size,
-      quantity: it.quantity ?? 1,
+      quantity,
 
       businessId: stored?.businessId,
       title: p?.title ?? it.title ?? "Untitled",
@@ -781,8 +949,18 @@ async function buildGuestCartDetailed(): Promise<CartItemDetailed[]> {
 
       price,
       salePrice,
+      taxCategory: it.taxCategory ?? sizeObj?.taxCategory ?? v?.taxCategory ?? p?.taxCategory ?? null,
+      taxRate,
+      taxIncluded: it.taxIncluded ?? sizeObj?.taxIncluded ?? v?.taxIncluded ?? p?.taxIncluded ?? true,
+      priceExclTax,
+      priceInclTax,
+      salePriceExclTax,
+      salePriceInclTax,
       discountEndDate: discountEndISO,
       selectedSizePrice,
+      selectedSizePriceExclTax,
+      selectedSizePriceInclTax,
+      lineTaxAmount,
       shippingType,
       shippingCost,
       shippingCharge: shippingCost,
@@ -831,6 +1009,12 @@ export const getCartDetailedResponse = async (
     const detailedItems = apiItems.map((it: any): CartItemDetailed => {
       const price = toNumber(it.price);
       const salePrice = it.salePrice == null ? null : toNumber(it.salePrice);
+      const priceExclTax = toNumber(it.priceExclTax ?? it.productId?.priceExclTax);
+      const priceInclTax = toNumber(it.priceInclTax ?? it.productId?.priceInclTax ?? it.selectedSizePrice);
+      const salePriceExclTax =
+        it.salePriceExclTax == null ? null : toNumber(it.salePriceExclTax);
+      const salePriceInclTax =
+        it.salePriceInclTax == null ? null : toNumber(it.salePriceInclTax);
       const discountEndISO =
         it.discountEndDate ? new Date(it.discountEndDate).toISOString() : null;
       const shipping = it.shipping
@@ -865,8 +1049,18 @@ export const getCartDetailedResponse = async (
         // prices
         price,
         salePrice,
+        taxCategory: it.taxCategory ?? null,
+        taxRate: toNumber(it.taxRate),
+        taxIncluded: it.taxIncluded ?? true,
+        priceExclTax,
+        priceInclTax,
+        salePriceExclTax,
+        salePriceInclTax,
         discountEndDate: discountEndISO,
         selectedSizePrice: toNumber(it.selectedSizePrice),
+        selectedSizePriceExclTax: toNumber(it.selectedSizePriceExclTax ?? priceExclTax),
+        selectedSizePriceInclTax: toNumber(it.selectedSizePriceInclTax ?? priceInclTax ?? it.selectedSizePrice),
+        lineTaxAmount: toNumber(it.lineTaxAmount),
         shippingType: shippingMethod,
         shippingMethod,
         shippingCost: shippingCharge,
@@ -889,7 +1083,17 @@ export const getCartDetailedResponse = async (
               ? data.cart.pricing.availableDeliverySpeeds
               : [],
             selectedDeliverySpeed: data.cart.pricing.selectedDeliverySpeed,
+            subtotalExclTax: toNumber(
+              data.cart.pricing.subtotalExclTax ??
+              data.cart.pricing.subtotalExclTaxAmount
+            ),
             subtotalAmount: toNumber(data.cart.pricing.subtotalAmount),
+            subtotalInclTax: toNumber(data.cart.pricing.subtotalInclTax ?? data.cart.pricing.subtotalAmount),
+            taxAmount: toNumber(
+              data.cart.pricing.taxAmount ??
+              data.cart.pricing.taxTotal
+            ),
+            taxIncluded: data.cart.pricing.taxIncluded ?? true,
             totalQuantity: toNumber(data.cart.pricing.totalQuantity),
             shipping: data.cart.pricing.shipping
               ? {
@@ -908,6 +1112,7 @@ export const getCartDetailedResponse = async (
               : null,
             shippingError: data.cart.pricing.shippingError ?? null,
             totalAmount: toNumber(data.cart.pricing.totalAmount),
+            totalInclTax: toNumber(data.cart.pricing.totalInclTax ?? data.cart.pricing.totalAmount),
             currency: data.cart.pricing.currency ?? "USD",
           }
         : null,

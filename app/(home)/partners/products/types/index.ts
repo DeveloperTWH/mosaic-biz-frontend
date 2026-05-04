@@ -50,6 +50,15 @@ export interface ProductMetaField {
   _id?: string;
 }
 
+export interface TaxCategoryRef {
+  code: string;
+  label: string;
+}
+
+export interface TaxCategoryRate extends TaxCategoryRef {
+  rate: number;
+}
+
 export interface Product {
   _id: string;
   title: string;
@@ -64,6 +73,7 @@ export interface Product {
   galleryImages: string[];
   metaFields: ProductMetaField[];
   discount: ProductDiscount | null;
+  taxCategory?: TaxCategoryRef | null;
   variants?: ProductVariant[];
   isPublished: boolean;
   isDeleted: boolean;
@@ -294,6 +304,7 @@ export interface ApiProductPayload {
   galleryImages: string[];
   metaFields: ApiMetaField[];
   discount?: ApiDiscount;
+  taxCategory?: TaxCategoryRef;
   variants: ApiVariant[];
   isPublished: boolean;
 }

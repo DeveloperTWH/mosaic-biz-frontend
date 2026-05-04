@@ -129,6 +129,10 @@ function isAbortError(e: any) {
   return e?.name === "AbortError" || e?.code === 20 || /aborted/i.test(e?.message || "");
 }
 
+function stripHtml(html: string): string {
+  return html.replace(/<[^>]*>/g, "");
+}
+
 /* ---------- data hook for featured products ---------- */
 function useFeaturedProducts(searchFilters?: { businessType: string; location: string; minority: string }) {
   const [items, setItems] = React.useState<FeaturedProduct[] | null>(null);
@@ -315,8 +319,11 @@ export default function ShopProducts() {
 /* ---------- Featured Product Card ---------- */
 function FeaturedProductCard({ item }: { item: FeaturedProduct }) {
   const description = item.description ?? "";
+  const strippedDescription = stripHtml(description);
   const trimmedDescription =
-    description.length > 100 ? `${description.slice(0, 100).trimEnd()}...` : description;
+    strippedDescription.length > 100
+      ? `${strippedDescription.slice(0, 100).trimEnd()}...`
+      : strippedDescription;
 
   return (
     <Link

@@ -11,12 +11,14 @@ import InquiriesTable from "./components/InquiriesTable";
 import OrdersTab from "./components/OrdersTab";
 import BookingsTab from "./components/BookingsTab";
 import ShippingSettingsTab from "./components/ShippingSettingsTab";
+import TaxSettingsTab from "./components/TaxSettingsTab";
 
 type ListingType = "product" | "service" | "food";
 type DashboardTab =
   | "edit-profile"
   | "manage-listings"
   | "shipping-settings"
+  | "tax-settings"
   | "location-timings"
   | "inquiries"
   | "analytics"
@@ -193,6 +195,7 @@ export default function PartnerDashboardPage() {
       return [
         ...baseDashboardTabs,
         { key: "shipping-settings", label: "Shipping Settings" },
+        { key: "tax-settings", label: "Tax Settings" },
         { key: "orders", label: "Orders" },
       ] as const;
     }
@@ -213,6 +216,7 @@ export default function PartnerDashboardPage() {
   }, [activeTab, dashboardTabs]);
 
   const selectedTab = dashboardTabs.find((tab) => tab.key === activeTab);
+  const dashboardTabCount = Number(dashboardTabs.length);
 
   const renderTabContent = () => {
     if (activeTab === "edit-profile") {
@@ -293,6 +297,15 @@ export default function PartnerDashboardPage() {
       );
     }
 
+    if (activeTab === "tax-settings") {
+      return (
+        <TaxSettingsTab
+          businessId={activeBusiness?._id}
+          isActive={activeTab === "tax-settings"}
+        />
+      );
+    }
+
     if (activeTab === "bookings") {
       return (
         <BookingsTab
@@ -324,9 +337,11 @@ export default function PartnerDashboardPage() {
             <div className="min-w-[760px] px-2">
               <div
                 className={`grid gap-3 ${
-                  dashboardTabs.length === 6
+                  dashboardTabCount === 7
+                    ? "grid-cols-7"
+                    : dashboardTabCount === 6
                     ? "grid-cols-6"
-                    : dashboardTabs.length === 5
+                    : dashboardTabCount === 5
                       ? "grid-cols-5"
                       : "grid-cols-4"
                 }`}

@@ -4,7 +4,7 @@ import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
 import AddressComponent, { Address } from "../../cart/Component/AddressComponent";
-import { CartItemDetailed, handlePlaceOrderFlow } from "@/utils/cartUtils";
+import { CartItemDetailed, handlePlaceOrderFlow, resolveDisplayPrice } from "@/utils/cartUtils";
 
 type BuyNowItem = CartItemDetailed & {
   shipping?: {
@@ -92,9 +92,29 @@ function BuyNowContent() {
 
       const basePrice = toNumber(variant.price);
       const salePrice = variant.salePrice == null ? null : toNumber(variant.salePrice);
+      const priceExclTax = toNumber(variant.priceExclTax ?? product.priceExclTax ?? basePrice);
+      const priceInclTax = toNumber(variant.priceInclTax ?? product.priceInclTax ?? basePrice);
+      const salePriceExclTax =
+        variant.salePriceExclTax == null && product.salePriceExclTax == null
+          ? salePrice
+          : toNumber(variant.salePriceExclTax ?? product.salePriceExclTax);
+      const salePriceInclTax =
+        variant.salePriceInclTax == null && product.salePriceInclTax == null
+          ? salePrice
+          : toNumber(variant.salePriceInclTax ?? product.salePriceInclTax);
       const discountEndDate = variant.discountEndDate ?? null;
       const saleActive = isSaleActive(salePrice, discountEndDate);
-      const selectedSizePrice = saleActive ? salePrice ?? basePrice : basePrice;
+      const resolvedPriceExclTax = resolveDisplayPrice(
+        priceExclTax,
+        salePriceExclTax ?? salePrice,
+        saleActive
+      );
+      const resolvedPriceInclTax = resolveDisplayPrice(
+        priceInclTax,
+        salePriceInclTax ?? salePrice,
+        saleActive
+      );
+      const selectedSizePrice = resolvedPriceInclTax.current;
       const shipping = variant.shipping ?? product.shipping ?? null;
       const shippingCost = toNumber(shipping?.[shippingMethod]);
 
@@ -113,8 +133,18 @@ function BuyNowContent() {
         sku: variant.sku,
         price: basePrice,
         salePrice,
+        taxCategory: variant.taxCategory ?? product.taxCategory ?? null,
+        taxRate: toNumber(variant.taxRate ?? product.taxRate),
+        taxIncluded: variant.taxIncluded ?? product.taxIncluded ?? true,
+        priceExclTax,
+        priceInclTax,
+        salePriceExclTax,
+        salePriceInclTax,
         discountEndDate,
         selectedSizePrice,
+        selectedSizePriceExclTax: resolvedPriceExclTax.current,
+        selectedSizePriceInclTax: resolvedPriceInclTax.current,
+        lineTaxAmount: Math.max(0, resolvedPriceInclTax.current - resolvedPriceExclTax.current),
         shippingType: shippingMethod,
         shippingMethod,
         shippingCost,
@@ -146,12 +176,13 @@ function BuyNowContent() {
   const totalSavings = useMemo(() => {
     if (!item) return 0;
 
-    const base = Number(item.price ?? item.selectedSizePrice ?? 0);
-    const effective = item.isSaleActive
-      ? Number(item.salePrice)
-      : Number(item.selectedSizePrice ?? base);
+    const resolved = resolveDisplayPrice(
+      Number(item.priceInclTax ?? item.selectedSizePriceInclTax ?? item.price ?? item.selectedSizePrice ?? 0),
+      item.salePriceInclTax ?? item.salePrice ?? null,
+      Boolean(item.isSaleActive)
+    );
 
-    return Math.max(0, base - effective) * (item.quantity ?? 1);
+    return Math.max(0, resolved.original - resolved.current) * (item.quantity ?? 1);
   }, [item]);
 
   useEffect(() => {
@@ -290,13 +321,28 @@ function BuyNowContent() {
                       </div>
 
                       <div className="mt-2">
-                        {item.isSaleActive && item.salePrice != null && Number(item.price) > Number(item.selectedSizePrice) ? (
-                          <div className="flex flex-wrap items-center gap-2">
-                            <span className="text-base text-gray-800">${Number(item.selectedSizePrice).toFixed(2)}</span>
-                            <span className="text-sm text-gray-400 line-through">${Number(item.price).toFixed(2)}</span>
-                          </div>
-                        ) : (
-                          <span className="text-base text-gray-800">${Number(item.selectedSizePrice ?? 0).toFixed(2)}</span>
+                        {(() => {
+                          const resolved = resolveDisplayPrice(
+                            Number(item.priceInclTax ?? item.selectedSizePriceInclTax ?? item.price ?? item.selectedSizePrice ?? 0),
+                            item.salePriceInclTax ?? item.salePrice ?? null,
+                            Boolean(item.isSaleActive)
+                          );
+
+                          if (resolved.onSale) {
+                            return (
+                              <div className="flex flex-wrap items-center gap-2">
+                                <span className="text-base text-gray-800">${resolved.current.toFixed(2)}</span>
+                                <span className="text-sm text-gray-400 line-through">${resolved.original.toFixed(2)}</span>
+                              </div>
+                            );
+                          }
+
+                          return (
+                            <span className="text-base text-gray-800">${resolved.current.toFixed(2)}</span>
+                          );
+                        })()}
+                        {(item.taxIncluded ?? true) && (
+                          <div className="mt-1 text-xs text-gray-500">Tax included. Breakdown shown before payment.</div>
                         )}
                       </div>
                     </div>
@@ -346,6 +392,12 @@ function BuyNowContent() {
                 <div>Product Price</div>
                 <div>${subtotal.toFixed(2)}</div>
               </div>
+
+              {item && (item.taxIncluded ?? true) && (
+                <div className="mt-2 text-xs text-gray-500">
+                  Product prices are shown tax-inclusive.
+                </div>
+              )}
 
               <div className="flex justify-between mt-3 text-sm text-gray-600">
                 <div>Shipping</div>

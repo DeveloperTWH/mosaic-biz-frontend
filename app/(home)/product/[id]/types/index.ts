@@ -14,6 +14,11 @@ export interface BusinessInfo {
   businessType?: string;
 }
 
+export interface TaxCategoryRef {
+  code: string;
+  label: string;
+}
+
 // ============================================
 // Variant Types
 // ============================================
@@ -46,6 +51,13 @@ export interface Variant {
   averageRating?: number;
   totalReviews?: number;
   allowBackorder?: boolean;
+  taxCategory?: TaxCategoryRef | null;
+  taxRate?: number;
+  taxIncluded?: boolean;
+  priceExclTax?: number;
+  priceInclTax?: number;
+  salePriceExclTax?: number | null;
+  salePriceInclTax?: number | null;
 }
 
 // ============================================
@@ -88,6 +100,7 @@ export interface ProductDetailItem {
   ownerId: string;
   businessId: BusinessInfo | string;
   price: number;
+  salePrice?: number | null;
   attributes: Attribute[];
   shipping: Shipping;
   coverImage: string;
@@ -107,6 +120,13 @@ export interface ProductDetailItem {
   weight?: string;
   netQuantity?: string;
   genericName?: string;
+  taxCategory?: TaxCategoryRef | null;
+  taxRate?: number;
+  taxIncluded?: boolean;
+  priceExclTax?: number;
+  priceInclTax?: number;
+  salePriceExclTax?: number | null;
+  salePriceInclTax?: number | null;
 }
 
 // ============================================

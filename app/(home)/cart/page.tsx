@@ -10,6 +10,7 @@ import {
     removeFromCart,
     handlePlaceOrderFlow,
     type CartPricingSummary,
+    resolveDisplayPrice,
 } from "@/utils/cartUtils";
 
 type DeliverySpeed = "standard" | "express" | "overnight" | "local";
@@ -42,7 +43,19 @@ type CartItem = {
     title?: string;
     sku?: string;
     isSaleActive?: boolean;
-
+    taxIncluded?: boolean;
+    taxRate?: number;
+    priceExclTax?: number;
+    priceInclTax?: number;
+    salePriceExclTax?: number | null;
+    salePriceInclTax?: number | null;
+    selectedSizePriceExclTax?: number;
+    selectedSizePriceInclTax?: number;
+    lineTaxAmount?: number;
+    taxCategory?: {
+        code: string;
+        label: string;
+    } | null;
 };
 
 type AppliedDiscount = {
@@ -253,14 +266,12 @@ export default function CartPage() {
 
     const totalSavingsProduct = useMemo(() => {
         return itemsProduct.reduce((sum, it: any) => {
-            const base = Number(it.price ?? it.selectedSizePrice ?? 0);
-            const saleActive = isSaleActive(it.salePrice, it.discountEndDate);
-
-            const effective = saleActive
-                ? Number(it.salePrice)
-                : Number(it.selectedSizePrice ?? base);
-
-            const perUnitSaving = Math.max(0, base - effective);
+            const resolved = resolveDisplayPrice(
+                Number(it.priceInclTax ?? it.selectedSizePriceInclTax ?? it.price ?? it.selectedSizePrice ?? 0),
+                it.salePriceInclTax ?? it.salePrice ?? null,
+                it.isSaleActive ?? isSaleActive(it.salePrice, it.discountEndDate)
+            );
+            const perUnitSaving = Math.max(0, resolved.original - resolved.current);
             return sum + perUnitSaving * (it.quantity ?? 1);
         }, 0);
     }, [itemsProduct]);
@@ -272,6 +283,12 @@ export default function CartPage() {
     const discountAmountProduct = appliedDiscount?.discountAmount ?? 0;
     const discountedSubtotalProduct = appliedDiscount?.finalAmount ?? effectiveSubtotalProduct;
     const payableTotalProduct = Math.max(0, discountedSubtotalProduct + effectiveShippingTotalProduct);
+    const effectiveTaxAmountProduct =
+        cartPricing?.taxAmount ??
+        itemsProduct.reduce((sum, item) => sum + Number(item.lineTaxAmount ?? 0), 0);
+    const effectiveSubtotalExclTaxProduct =
+        cartPricing?.subtotalExclTax ??
+        Math.max(0, effectiveSubtotalProduct - effectiveTaxAmountProduct);
 
     const selectedAddress = addresses.find(a => a.id === selectedAddressId);
 
@@ -424,31 +441,43 @@ export default function CartPage() {
                   {item.color ? ` - ${item.color}` : ""}
                 </div>
 
+                {item.taxCategory && (
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                    <span className="rounded border border-gray-300 bg-gray-50 px-2 py-1 text-[11px] text-gray-700">
+                      {item.taxCategory.label} · {Number(item.taxRate ?? 0).toFixed(2).replace(/\.00$/, "")}%
+                    </span>
+                  </div>
+                )}
+
                 {/* PRICE */}
                 <div className="mt-2">
                   {(() => {
-                    const effectivePrice = Number(
-                      item.selectedSizePrice ?? item.salePrice ?? item.price ?? 0
-                    );
-                    const originalPrice = Number(item.price ?? effectivePrice);
-                    const sale = item.salePrice != null ? Number(item.salePrice) : null;
-                    const saleActive =
+                    const resolved = resolveDisplayPrice(
+                      Number(
+                        item.priceInclTax ??
+                        item.selectedSizePriceInclTax ??
+                        item.price ??
+                        item.selectedSizePrice ??
+                        0
+                      ),
+                      item.salePriceInclTax ?? item.salePrice ?? null,
                       item.isSaleActive ??
-                      isSaleActive(sale, item.discountEndDate);
+                        isSaleActive(item.salePrice, item.discountEndDate)
+                    );
 
-                    if (saleActive && sale != null && originalPrice > effectivePrice) {
+                    if (resolved.onSale) {
                       const pct =
-                        originalPrice > 0
-                          ? Math.round(((originalPrice - effectivePrice) / originalPrice) * 100)
+                        resolved.original > 0
+                          ? Math.round(((resolved.original - resolved.current) / resolved.original) * 100)
                           : 0;
 
                       return (
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="text-base text-gray-800">
-                            ${effectivePrice.toFixed(2)}
+                            ${resolved.current.toFixed(2)}
                           </span>
                           <span className="text-sm text-gray-400 line-through">
-                            ${originalPrice.toFixed(2)}
+                            ${resolved.original.toFixed(2)}
                           </span>
                           {pct > 0 && (
                             <span className="text-sm text-green-600">
@@ -460,11 +489,30 @@ export default function CartPage() {
                     }
 
                     return (
-                      <span className="text-base text-gray-800">
-                        ${effectivePrice.toFixed(2)}
-                      </span>
+                      <div className="flex flex-col gap-1">
+                        <span className="text-base text-gray-800">
+                          ${resolved.current.toFixed(2)}
+                        </span>
+                        {(item.taxIncluded ?? true) && (
+                          <span className="text-xs text-gray-500">
+                            Tax included
+                          </span>
+                        )}
+                      </div>
                     );
                   })()}
+                </div>
+
+                <div className="mt-2 flex flex-wrap items-center gap-4 text-xs text-gray-500">
+                  <span>
+                    Qty: {item.quantity}
+                  </span>
+                  {/* <span>
+                    Line Total: ${(Number(item.selectedSizePriceInclTax ?? item.selectedSizePrice ?? 0) * Number(item.quantity ?? 0)).toFixed(2)}
+                  </span> */}
+                  <span className={Number(item.lineTaxAmount ?? 0) === 0 ? "text-green-600" : "text-gray-600"}>
+                    Tax: ${Number(item.lineTaxAmount ?? 0).toFixed(2)}
+                  </span>
                 </div>
               </div>
             </div>
@@ -654,9 +702,27 @@ export default function CartPage() {
                                     <div>{totalQtyProduct}</div>
                                 </div> */}
 
-                                <div className="flex justify-between mt-3 text-sm text-gray-600">
-                                    <div>Product Price</div>
+                                {/* <div className="flex justify-between mt-3 text-sm text-gray-600">
+                                    <div>Total Product Price</div>
                                     <div>${effectiveSubtotalProduct.toFixed(2)}</div>
+                                </div>
+
+                                {itemsProduct.length > 0 && itemsProduct.some((item) => item.taxIncluded ?? true) && (
+                                    <div className="mt-2 text-xs text-gray-500">
+                                        tax-inclusive
+                                    </div>
+                                )} */}
+
+                                <div className="flex justify-between mt-3 text-sm text-gray-600">
+                                    <div>Subtotal Excl. Tax</div>
+                                    <div>${effectiveSubtotalExclTaxProduct.toFixed(2)}</div>
+                                </div>
+
+                                <div className="flex justify-between mt-3 text-sm text-gray-600">
+                                    <div>Tax Total</div>
+                                    <div className={effectiveTaxAmountProduct === 0 ? "text-green-600" : ""}>
+                                        ${effectiveTaxAmountProduct.toFixed(2)}
+                                    </div>
                                 </div>
 
                                 <div className="flex justify-between mt-3 text-sm text-gray-600">
