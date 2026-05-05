@@ -112,6 +112,8 @@ export interface ProductDetailItem {
   createdAt: string;
   updatedAt: string;
   slug: string;
+  averageRating?: number;
+  totalReviews?: number;
   __v: number;
   business?: BusinessInfo;
   variants: Variant[];

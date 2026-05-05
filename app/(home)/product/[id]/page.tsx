@@ -1,13 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { Heart, ChevronDown } from "lucide-react";
+import { Heart, PenTool } from "lucide-react";
 import SimilarProduct from "./Component/SimilarProduct";
 import { ProductDetailItem, Variant, BusinessInfo } from "./types/index";
 import { toast } from 'react-toastify';
+import { Review } from "@/types/review";
 import {
   addToCart,
   getCart,
@@ -58,6 +59,58 @@ const getAvailableOptions = (
   return Array.from(options);
 };
 
+interface ReviewSummary {
+  totalReviews: number;
+  averageRating: number;
+  ratingBreakdown: Record<number, number>;
+}
+
+interface ProductReviewsResponse {
+  success: boolean;
+  data: {
+    summary: ReviewSummary;
+    pagination: {
+      total: number;
+      page: number;
+      limit: number;
+      totalPages: number;
+    };
+    reviews: Review[];
+  };
+}
+
+const emptyRatingBreakdown: Record<number, number> = {
+  1: 0,
+  2: 0,
+  3: 0,
+  4: 0,
+  5: 0,
+};
+
+const renderStarIcons = (rating: number, sizeClass = 'w-4 h-4') =>
+  [1, 2, 3, 4, 5].map((star) => {
+    const filled = rating >= star;
+    const partial = rating < star && rating > star - 1;
+
+    return (
+      <div key={star} className={`relative ${sizeClass}`}>
+        <svg className={`${sizeClass} text-gray-200 fill-current`} viewBox="0 0 24 24">
+          <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+        </svg>
+        {(filled || partial) && (
+          <div
+            className="absolute inset-0 overflow-hidden"
+            style={{ width: filled ? '100%' : `${Math.max(0, Math.min(100, (rating - (star - 1)) * 100))}%` }}
+          >
+            <svg className={`${sizeClass} text-yellow-400 fill-current`} viewBox="0 0 24 24">
+              <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+            </svg>
+          </div>
+        )}
+      </div>
+    );
+  });
+
 export default function ProductDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -78,6 +131,40 @@ export default function ProductDetailPage() {
   });
   const [selectedShipping, setSelectedShipping] = useState<'standard' | 'overnight' | 'local'>('standard');
   const [showVendorSwitchDialog, setShowVendorSwitchDialog] = useState(false);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviewSummary, setReviewSummary] = useState<ReviewSummary>({
+    totalReviews: 0,
+    averageRating: 0,
+    ratingBreakdown: emptyRatingBreakdown,
+  });
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [reviewsSubmitting, setReviewsSubmitting] = useState(false);
+  const [reviewFormOpen, setReviewFormOpen] = useState(false);
+  const [showAllReviews, setShowAllReviews] = useState(false);
+  const [reviewForm, setReviewForm] = useState({
+    rating: 5,
+    comment: '',
+  });
+
+  const fetchReviews = useCallback(async (productId: string) => {
+    setReviewsLoading(true);
+    try {
+      const res = await axios.get<ProductReviewsResponse>(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/product/${productId}/reviews?page=1&limit=10`
+      );
+      const summary = res.data.data.summary;
+      setReviewSummary({
+        totalReviews: summary?.totalReviews ?? 0,
+        averageRating: summary?.averageRating ?? 0,
+        ratingBreakdown: { ...emptyRatingBreakdown, ...(summary?.ratingBreakdown ?? {}) },
+      });
+      setReviews(res.data.data.reviews ?? []);
+    } catch {
+      setReviews([]);
+    } finally {
+      setReviewsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     if (!id) return;
@@ -86,6 +173,12 @@ export default function ProductDetailPage() {
         const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/public/product/${id}`);
         const p: ProductDetailItem = res.data.data;
         setProduct(p);
+        setReviewSummary({
+          totalReviews: Number(p.totalReviews) || 0,
+          averageRating: Number(p.averageRating) || 0,
+          ratingBreakdown: emptyRatingBreakdown,
+        });
+        await fetchReviews(p._id);
 
         if (p.variants && p.variants.length > 0) {
           const groups = getAttributeGroups(p.variants);
@@ -117,7 +210,7 @@ export default function ProductDetailPage() {
       }
     };
     loadProduct();
-  }, [id]);
+  }, [fetchReviews, id]);
 
   const handleSelectShipping = (type: 'standard' | 'overnight' | 'local') => {
   console.log('Selected shipping:', type);
@@ -160,6 +253,10 @@ setMainImage(firstImage);
       setLoadingQty(false);
     }
   }, [product?._id, selectedVariant?.variantId]);
+
+  useEffect(() => {
+    refreshCartQty();
+  }, [refreshCartQty]);
 
   const toNumber = (value: unknown): number => {
     if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
@@ -235,6 +332,9 @@ setMainImage(firstImage);
 
   const isColor = (key: string) => key.toLowerCase().includes('color');
   const sellerBusinessId = getBusinessId();
+  const totalReviews = reviewSummary.totalReviews || Number(product?.totalReviews) || 0;
+  const averageRating = reviewSummary.averageRating || Number(product?.averageRating) || 0;
+  const visibleReviews = showAllReviews ? reviews : reviews.slice(0, 4);
 
   const handleSearch = () => {
     router.push(buildSearchPageUrl(filters));
@@ -246,6 +346,12 @@ setMainImage(firstImage);
 ];
 
   const formatMoney = (value: unknown): string => toNumber(value).toFixed(2);
+  const formatReviewDate = (value: string): string =>
+    new Intl.DateTimeFormat('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    }).format(new Date(value));
 
   const resolvedShipping = {
     standard: selectedVariant?.shipping?.standard ?? product?.shipping?.standard ?? 0,
@@ -354,6 +460,52 @@ setMainImage(firstImage);
       toast.error(err?.message || 'Failed to check cart.');
     }
   }, [isBlocking, performAddToCart, selectedVariant]);
+
+  const openReviewForm = () => {
+    setReviewFormOpen((prev) => !prev);
+  };
+
+  const handleReviewSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!product?._id) return;
+
+    if (!reviewForm.comment.trim()) {
+      toast.error('Please enter your review comment.');
+      return;
+    }
+
+    setReviewsSubmitting(true);
+    try {
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/product/${product._id}/reviews`,
+        {
+          rating: reviewForm.rating,
+          comment: reviewForm.comment.trim(),
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true,
+        }
+      );
+
+      toast.success('Review submitted successfully.');
+      setReviewForm({ rating: 5, comment: '' });
+      setReviewFormOpen(false);
+      await fetchReviews(product._id);
+    } catch (err: any) {
+      if (err?.response?.status === 401) {
+        toast.info('Please log in as a customer to submit a review.');
+        router.push('/login?type=customer');
+        return;
+      }
+      toast.error(err?.response?.data?.message || 'Failed to submit review.');
+    } finally {
+      setReviewsSubmitting(false);
+    }
+  };
 
   if (!product) {
     return (
@@ -522,13 +674,11 @@ setMainImage(firstImage);
             {/* Rating */}
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-0.5">
-                {[1, 2, 3, 4, 5].map(star => (
-                  <svg key={star} className="w-3.5 h-3.5 text-yellow-400 fill-current" viewBox="0 0 24 24">
-                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-                  </svg>
-                ))}
+                {renderStarIcons(averageRating, 'w-3.5 h-3.5')}
               </div>
-              <span className="text-xs text-gray-500 underline cursor-pointer"> 0 Ratings & 0 Reviews</span>
+              <span className="text-xs text-gray-500 underline cursor-pointer">
+                {averageRating > 0 ? averageRating.toFixed(1) : '0.0'} Ratings & {totalReviews} Reviews
+              </span>
             </div>
 
             {/* Price (hide when 0) */}
@@ -857,7 +1007,11 @@ setMainImage(firstImage);
                     </div>
                   )}
                 </div>
-                <button className="mt-4 px-5 py-2 bg-[#c79b44] text-white text-xs font-semibold rounded hover:bg-[#b08a3a] transition-colors uppercase tracking-wide">
+                <button
+                  type="button"
+                  onClick={openReviewForm}
+                  className="mt-4 px-5 py-2 bg-[#c79b44] text-white text-xs font-semibold rounded hover:bg-[#b08a3a] transition-colors uppercase tracking-wide"
+                >
                   Add Review
                 </button>
               </div>
@@ -871,22 +1025,112 @@ setMainImage(firstImage);
               >
                 Ratings & Reviews
               </h3>
-              <div className="flex items-center gap-6">
-                <div className="text-center">
-                  <div className="text-5xl font-bold text-gray-900">0</div>
-                  <div className="flex items-center justify-center gap-0.5 mt-1">
-                    {[1, 2, 3, 4, 5].map(star => (
-                      <svg key={star} className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 24 24">
-                        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-                      </svg>
-                    ))}
-                  </div>
-                  <p className="mt-1 text-xs text-gray-500">0 Ratings & 0 Reviews</p>
+              <div className="text-center md:text-left">
+                <div className="text-5xl font-bold text-gray-900">
+                  {averageRating > 0 ? averageRating.toFixed(1) : '0.0'}
                 </div>
+                <div className="flex items-center justify-center gap-0.5 mt-1 md:justify-start">
+                  {renderStarIcons(averageRating)}
+                </div>
+                <p className="mt-1 text-xs text-gray-500">{totalReviews} Ratings & {totalReviews} Reviews</p>
               </div>
-              <button className="mt-4 px-7 py-2.5 font-semibold text-white bg-[#1e3a5f] rounded hover:bg-[#152a45] transition-colors uppercase tracking-wide text-xs">
-                Rate Product
+              <button
+                type="button"
+                onClick={openReviewForm}
+                className="mt-4 inline-flex items-center gap-2 px-7 py-2.5 font-semibold text-white bg-[#1e3a5f] rounded hover:bg-[#152a45] transition-colors uppercase tracking-wide text-xs"
+              >
+                <PenTool className="w-4 h-4" />
+                {reviewFormOpen ? 'Close Review Form' : 'Rate Product'}
               </button>
+
+              {reviewFormOpen && (
+                <form onSubmit={handleReviewSubmit} className="mt-5 space-y-4 rounded-xl border border-gray-200 bg-[#faf8f3] p-4">
+                  <div>
+                    <label className="mb-2 block text-sm font-semibold text-gray-800">Your Rating</label>
+                    <div className="flex items-center gap-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          type="button"
+                          onClick={() => setReviewForm((prev) => ({ ...prev, rating: star }))}
+                          className="transition-transform hover:scale-105"
+                          aria-label={`Rate ${star} star${star > 1 ? 's' : ''}`}
+                        >
+                          <svg
+                            className={`h-8 w-8 ${
+                              star <= reviewForm.rating ? 'text-yellow-400' : 'text-gray-300'
+                            } fill-current`}
+                            viewBox="0 0 24 24"
+                          >
+                            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                          </svg>
+                        </button>
+                      ))}
+                    </div>
+                    <p className="mt-2 text-xs text-gray-500">Selected: {reviewForm.rating} / 5</p>
+                  </div>
+
+                  <div>
+                    <label htmlFor="review-comment" className="mb-2 block text-sm font-semibold text-gray-800">
+                      Your Review
+                    </label>
+                    <textarea
+                      id="review-comment"
+                      value={reviewForm.comment}
+                      onChange={(e) => setReviewForm((prev) => ({ ...prev, comment: e.target.value }))}
+                      placeholder="Share your experience with this product"
+                      className="min-h-[120px] w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 outline-none transition-colors focus:border-[#c79b44]"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={reviewsSubmitting}
+                    className="rounded-md bg-[#c79b44] px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#b08a3a] disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {reviewsSubmitting ? 'Submitting...' : 'Submit Review'}
+                  </button>
+                </form>
+              )}
+
+              <div className="mt-6 space-y-4">
+                {reviewsLoading ? (
+                  <div className="rounded-lg border border-dashed border-gray-200 px-4 py-6 text-sm text-gray-500">
+                    Loading reviews...
+                  </div>
+                ) : visibleReviews.length > 0 ? (
+                  <>
+                    {visibleReviews.map((review) => (
+                      <div key={review._id} className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                        <div className="flex items-start justify-between gap-4">
+                          <div>
+                            <p className="text-sm font-semibold text-gray-900">{review.userId?.name || 'Anonymous'}</p>
+                            <p className="mt-1 text-xs text-gray-500">{formatReviewDate(review.createdAt)}</p>
+                          </div>
+                          <div className="flex items-center gap-0.5">
+                            {renderStarIcons(review.rating, 'w-3.5 h-3.5')}
+                          </div>
+                        </div>
+                        <p className="mt-3 text-sm leading-6 text-gray-700">{review.comment}</p>
+                      </div>
+                    ))}
+
+                    {reviews.length > 4 && (
+                      <button
+                        type="button"
+                        onClick={() => setShowAllReviews((prev) => !prev)}
+                        className="text-sm font-semibold text-[#1e3a5f] underline underline-offset-2"
+                      >
+                        {showAllReviews ? 'Show Less Reviews' : 'Show More Reviews'}
+                      </button>
+                    )}
+                  </>
+                ) : (
+                  <div className="rounded-lg border border-dashed border-gray-200 px-4 py-6 text-sm text-gray-500">
+                    No reviews yet. Be the first to rate this product.
+                  </div>
+                )}
+              </div>
             </div>
 
           </div>

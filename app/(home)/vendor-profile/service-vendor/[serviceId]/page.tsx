@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { Eye } from "lucide-react";
 import { toast } from "react-toastify";
 import { createServiceBooking } from "@/lib/api/serviceBookings";
+import { Review } from "@/types/review";
 import ClientTestimonials from "../../../Components/ClientTestimonials";
 import PublicSearchFilterBar from "../../../Components/PublicSearchFilterBar";
 import { buildSearchPageUrl, PublicSearchFilters } from "../../../Components/publicSearch";
@@ -112,6 +113,26 @@ type ApiResponse = {
 };
 
 type RevealFieldKey = "call" | "email" | "address" | "website";
+
+type ReviewSummary = {
+  totalReviews: number;
+  averageRating: number;
+  ratingBreakdown: Record<number, number>;
+};
+
+type ListingReviewsResponse = {
+  success: boolean;
+  data: {
+    summary: ReviewSummary;
+    pagination: {
+      total: number;
+      page: number;
+      limit: number;
+      totalPages: number;
+    };
+    reviews: Review[];
+  };
+};
 
 /* ─────────────── Helpers ─────────────── */
 function formatBusinessAddress(address?: Business["address"]) {
@@ -412,6 +433,14 @@ function StarRating({ rating }: { rating: number }) {
   );
 }
 
+function formatReviewDate(value: string) {
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(new Date(value));
+}
+
 /* ─────────────── Main Page ─────────────── */
 function buildRevealState(): Record<RevealFieldKey, boolean> {
   return {
@@ -510,6 +539,20 @@ export default function ServiceVendorProfilePage() {
   const [revealModal, setRevealModal] = useState<"signin" | "consent" | null>(null);
   const [revealLoading, setRevealLoading] = useState(false);
   const [revealError, setRevealError] = useState<string | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviewSummary, setReviewSummary] = useState<ReviewSummary>({
+    totalReviews: 0,
+    averageRating: 0,
+    ratingBreakdown: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+  });
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [reviewsSubmitting, setReviewsSubmitting] = useState(false);
+  const [reviewFormOpen, setReviewFormOpen] = useState(false);
+  const [showAllReviews, setShowAllReviews] = useState(false);
+  const [reviewForm, setReviewForm] = useState({
+    rating: 5,
+    comment: "",
+  });
 
   /* book-service form */
   const [bookForm, setBookForm] = useState({
@@ -530,6 +573,32 @@ export default function ServiceVendorProfilePage() {
   
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
+  const fetchReviews = useCallback(async (listingId: string) => {
+    setReviewsLoading(true);
+    try {
+      const base = (process.env.NEXT_PUBLIC_API_BASE_URL || "").replace(/\/$/, "");
+      const res = await fetch(`${base}/api/service/${listingId}/reviews?page=1&limit=10`, {
+        headers: { Accept: "application/json" },
+        cache: "no-store",
+      });
+      if (!res.ok) throw new Error("Failed to load reviews.");
+
+      const json = (await res.json()) as ListingReviewsResponse;
+      if (!json.success) throw new Error("Failed to load reviews.");
+
+      setReviewSummary({
+        totalReviews: json.data.summary?.totalReviews ?? 0,
+        averageRating: json.data.summary?.averageRating ?? 0,
+        ratingBreakdown: json.data.summary?.ratingBreakdown ?? { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+      });
+      setReviews(json.data.reviews ?? []);
+    } catch {
+      setReviews([]);
+    } finally {
+      setReviewsLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     if (!serviceId) { setError("Invalid service id."); setLoading(false); return; }
     (async () => {
@@ -546,6 +615,11 @@ export default function ServiceVendorProfilePage() {
       finally { setLoading(false); }
     })();
   }, [serviceId]);
+
+  useEffect(() => {
+    if (!serviceId) return;
+    fetchReviews(serviceId);
+  }, [fetchReviews, serviceId]);
 
   const badgeImage = getBadgeImage(data?.businessBadge);
 
@@ -651,6 +725,9 @@ export default function ServiceVendorProfilePage() {
     googleReviewLink, communityServiceLink, refundPolicyDocumentUrl, termsDocumentUrl,
     category, subcategory
   } = data;
+  const resolvedAverageRating = reviewSummary.averageRating || averageRating || 0;
+  const resolvedTotalReviews = reviewSummary.totalReviews || totalReviews || 0;
+  const visibleReviews = showAllReviews ? reviews : reviews.slice(0, 4);
 
   const toggleServiceSelection = (serviceIdToToggle: string) => {
     setBookForm(prev => {
@@ -806,6 +883,60 @@ export default function ServiceVendorProfilePage() {
     }
   };
 
+  const openReviewForm = () => {
+    setReviewFormOpen((prev) => !prev);
+  };
+
+  const handleReviewSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!serviceId) return;
+    if (!reviewForm.comment.trim()) {
+      toast.error("Please enter your review comment.");
+      return;
+    }
+
+    try {
+      setReviewsSubmitting(true);
+      const base = (process.env.NEXT_PUBLIC_API_BASE_URL || "").replace(/\/$/, "");
+      const response = await fetch(`${base}/api/service/${serviceId}/reviews`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          rating: reviewForm.rating,
+          comment: reviewForm.comment.trim(),
+        }),
+      });
+
+      if (response.status === 401) {
+        const redirectPath =
+          typeof window !== "undefined"
+            ? `${window.location.pathname}${window.location.search}`
+            : `/vendor-profile/service-vendor/${serviceId}`;
+        toast.info("Please log in as a customer to submit a review.");
+        router.push(`/login?type=customer&redirect=${encodeURIComponent(redirectPath)}`);
+        return;
+      }
+
+      const payload = await response.json().catch(() => null);
+      if (!response.ok || payload?.success === false) {
+        throw new Error(payload?.message || "Failed to submit review.");
+      }
+
+      toast.success("Review submitted successfully.");
+      setReviewForm({ rating: 5, comment: "" });
+      setReviewFormOpen(false);
+      await fetchReviews(serviceId);
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to submit review.");
+    } finally {
+      setReviewsSubmitting(false);
+    }
+  };
+
 
 
   return (
@@ -947,9 +1078,9 @@ export default function ServiceVendorProfilePage() {
                 ))}
               </div>
               <div className="flex items-center gap-2 mt-2">
-                <StarRating rating={averageRating} />
-                {totalReviews > 0 && (
-                  <span className="text-[11px] text-[#8c8c8c]">{averageRating.toFixed(1)} Ratings And {totalReviews} Reviews</span>
+                <StarRating rating={resolvedAverageRating} />
+                {resolvedTotalReviews > 0 && (
+                  <span className="text-[11px] text-[#8c8c8c]">{resolvedAverageRating.toFixed(1)} Ratings And {resolvedTotalReviews} Reviews</span>
                 )}
               </div>
               {(businessDescription || description) && (
@@ -957,12 +1088,101 @@ export default function ServiceVendorProfilePage() {
   {businessDescription || description}
 </p>
               )}
-              <button className="mt-4 flex h-8 items-center gap-2 border border-[#c79b44] px-3 text-[11px] font-semibold uppercase tracking-wide text-[#c79b44] hover:bg-[#c79b44] hover:text-white transition-colors">
+              <button
+                type="button"
+                onClick={openReviewForm}
+                className="mt-4 flex h-8 items-center gap-2 border border-[#c79b44] px-3 text-[11px] font-semibold uppercase tracking-wide text-[#c79b44] hover:bg-[#c79b44] hover:text-white transition-colors"
+              >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
-                Add Review
+                {reviewFormOpen ? "Close Review" : "Add Review"}
               </button>
+
+              {reviewFormOpen && (
+                <form onSubmit={handleReviewSubmit} className="mt-5 space-y-4 border border-[#e6dfcb] bg-[#faf8f3] p-4">
+                  <div>
+                    <label className="mb-2 block text-sm font-semibold text-[#1b1b1b]">Your Rating</label>
+                    <div className="flex items-center gap-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          type="button"
+                          onClick={() => setReviewForm((prev) => ({ ...prev, rating: star }))}
+                          className="transition-transform hover:scale-105"
+                          aria-label={`Rate ${star} star${star > 1 ? "s" : ""}`}
+                        >
+                          <svg
+                            className={`h-8 w-8 ${star <= reviewForm.rating ? "text-[#c79b44]" : "text-gray-300"} fill-current`}
+                            viewBox="0 0 20 20"
+                          >
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
+                        </button>
+                      ))}
+                    </div>
+                    <p className="mt-2 text-xs text-[#8c8c8c]">Selected: {reviewForm.rating} / 5</p>
+                  </div>
+
+                  <div>
+                    <label htmlFor="service-review-comment" className="mb-2 block text-sm font-semibold text-[#1b1b1b]">
+                      Your Review
+                    </label>
+                    <textarea
+                      id="service-review-comment"
+                      value={reviewForm.comment}
+                      onChange={(e) => setReviewForm((prev) => ({ ...prev, comment: e.target.value }))}
+                      placeholder="Share your experience with this service"
+                      className="min-h-[120px] w-full border border-[#d8d1bc] bg-white px-3 py-2 text-sm text-[#1b1b1b] outline-none transition-colors focus:border-[#c79b44]"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={reviewsSubmitting}
+                    className="bg-[#c79b44] px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#a88432] disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {reviewsSubmitting ? "Submitting..." : "Submit Review"}
+                  </button>
+                </form>
+              )}
+
+              <div className="mt-5 space-y-4">
+                {reviewsLoading ? (
+                  <div className="border border-dashed border-[#e6dfcb] px-4 py-6 text-sm text-[#8c8c8c]">
+                    Loading reviews...
+                  </div>
+                ) : visibleReviews.length > 0 ? (
+                  <>
+                    {visibleReviews.map((review) => (
+                      <div key={review._id} className="border border-[#ece6d8] bg-white p-4 shadow-sm">
+                        <div className="flex items-start justify-between gap-4">
+                          <div>
+                            <p className="text-sm font-semibold text-[#1b1b1b]">{review.userId?.name || "Anonymous"}</p>
+                            <p className="mt-1 text-xs text-[#8c8c8c]">{formatReviewDate(review.createdAt)}</p>
+                          </div>
+                          <StarRating rating={review.rating} />
+                        </div>
+                        <p className="mt-3 text-sm font-montserrat leading-6 text-[#4b5563]">{review.comment}</p>
+                      </div>
+                    ))}
+
+                    {reviews.length > 4 && (
+                      <button
+                        type="button"
+                        onClick={() => setShowAllReviews((prev) => !prev)}
+                        className="text-sm font-semibold text-[#1A1F71] underline underline-offset-2"
+                      >
+                        {showAllReviews ? "Show Less Reviews" : "Show More Reviews"}
+                      </button>
+                    )}
+                  </>
+                ) : (
+                  <div className="border border-dashed border-[#e6dfcb] px-4 py-6 text-sm text-[#8c8c8c]">
+                    No reviews yet. Be the first to review this service.
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Offered Services */}
