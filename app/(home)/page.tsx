@@ -1,4 +1,5 @@
 import AboutMinority from "./Components/AboutMinority";
+import BetaAnnouncementModal from "./Components/BetaAnnouncementModal";
 import BookServices from "./Components/BookServices";
 import BrowseFoodAndGrocery from "./Components/BrowsbyFoodndGrocerry";
 import BrowseServices from "./Components/BrowsServices";
@@ -18,6 +19,7 @@ import WhyChooseUs from "./Components/WhyChooseUs";
 export default function Home() {
   return (
     <>
+      <BetaAnnouncementModal />
       <Hero />
       <ShopProducts />
       <BrowseServices showAllService={true}/>
