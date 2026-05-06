@@ -138,6 +138,19 @@ export default function CartPage() {
             .filter((option) => option.cost > 0);
     };
 
+    const getShippingCostForSpeed = (item: CartItem, speed?: DeliverySpeed) => {
+        if (!speed) {
+            return getEffectiveShippingCost(item);
+        }
+
+        const speedCost = item.shipping?.[speed];
+        if (speedCost != null) {
+            return Number(speedCost);
+        }
+
+        return getEffectiveShippingCost(item);
+    };
+
     const loadCart = useCallback(async (deliverySpeed?: DeliverySpeed) => {
         setLoading(true);
         try {
@@ -162,6 +175,11 @@ export default function CartPage() {
 
     const handleDeliverySpeedChange = async (deliverySpeed: DeliverySpeed) => {
         if (!itemsProduct.length || deliverySpeedLoading) {
+            return;
+        }
+
+        if (!cartPricing?.availableDeliverySpeeds?.length) {
+            setSelectedDeliverySpeed(deliverySpeed);
             return;
         }
 
@@ -261,8 +279,37 @@ export default function CartPage() {
     const businessId = cartPricing?.business?._id ?? itemsProduct[0]?.businessId;
 
     const effectiveSubtotalProduct = cartPricing?.subtotalAmount ?? subtotalProduct;
-    const effectiveShippingTotalProduct = cartPricing?.shipping?.amount ?? shippingTotalProduct;
     const effectiveTotalQtyProduct = cartPricing?.totalQuantity ?? totalQtyProduct;
+    const availableDeliverySpeeds = useMemo<DeliverySpeed[]>(() => {
+        if (cartPricing?.availableDeliverySpeeds?.length) {
+            return cartPricing.availableDeliverySpeeds;
+        }
+
+        const derivedSpeeds = new Set<DeliverySpeed>();
+        itemsProduct.forEach((item) => {
+            getShippingOptions(item).forEach((option) => {
+                derivedSpeeds.add(option.type);
+            });
+        });
+
+        return Array.from(derivedSpeeds);
+    }, [cartPricing?.availableDeliverySpeeds, itemsProduct]);
+    const fallbackSelectedDeliverySpeed = useMemo<DeliverySpeed | undefined>(() => {
+        return (
+            selectedDeliverySpeed ??
+            (getEffectiveShippingMethod(itemsProduct[0]) as DeliverySpeed | undefined) ??
+            availableDeliverySpeeds[0]
+        );
+    }, [availableDeliverySpeeds, itemsProduct, selectedDeliverySpeed]);
+    const derivedShippingTotalProduct = useMemo(() => {
+        const activeSpeed = fallbackSelectedDeliverySpeed;
+
+        return itemsProduct.reduce((sum, item) => {
+            return sum + getShippingCostForSpeed(item, activeSpeed) * (item.quantity || 0);
+        }, 0);
+    }, [fallbackSelectedDeliverySpeed, itemsProduct]);
+    const effectiveShippingTotalProduct =
+        cartPricing?.shipping?.amount ?? derivedShippingTotalProduct;
 
     const totalSavingsProduct = useMemo(() => {
         return itemsProduct.reduce((sum, it: any) => {
@@ -279,6 +326,15 @@ export default function CartPage() {
     useEffect(() => {
         setAppliedDiscount(null);
     }, [effectiveSubtotalProduct, effectiveShippingTotalProduct, businessId]);
+
+    useEffect(() => {
+        if (!selectedDeliverySpeed && availableDeliverySpeeds.length > 0) {
+            setSelectedDeliverySpeed(
+                (getEffectiveShippingMethod(itemsProduct[0]) as DeliverySpeed | undefined) ??
+                availableDeliverySpeeds[0]
+            );
+        }
+    }, [availableDeliverySpeeds, itemsProduct, selectedDeliverySpeed]);
 
     const discountAmountProduct = appliedDiscount?.discountAmount ?? 0;
     const discountedSubtotalProduct = appliedDiscount?.finalAmount ?? effectiveSubtotalProduct;
@@ -622,8 +678,7 @@ export default function CartPage() {
 
                     {selectedTab === "product" &&
                     itemsProduct.length > 0 &&
-                    cartPricing?.availableDeliverySpeeds &&
-                    cartPricing.availableDeliverySpeeds.length > 0 ? (
+                    availableDeliverySpeeds.length > 0 ? (
                         <div className="mt-6 rounded-md border border-gray-200 bg-white p-4">
                             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                                 <div>
@@ -649,7 +704,7 @@ export default function CartPage() {
                             </div>
 
                             <div className="mt-4 flex flex-wrap gap-3">
-                                {cartPricing.availableDeliverySpeeds.map((speed) => {
+                                {availableDeliverySpeeds.map((speed) => {
                                     const isActive = selectedDeliverySpeed === speed;
 
                                     return (
