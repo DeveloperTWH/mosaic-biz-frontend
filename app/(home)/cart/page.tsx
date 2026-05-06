@@ -134,8 +134,9 @@ export default function CartPage() {
             .map((type) => ({
                 type,
                 cost: Number(item.shipping?.[type] ?? 0),
+                isDefined: item.shipping?.[type] != null,
             }))
-            .filter((option) => option.cost > 0);
+            .filter((option) => option.isDefined);
     };
 
     const getShippingCostForSpeed = (item: CartItem, speed?: DeliverySpeed) => {
@@ -290,6 +291,11 @@ export default function CartPage() {
             getShippingOptions(item).forEach((option) => {
                 derivedSpeeds.add(option.type);
             });
+
+            const effectiveMethod = getEffectiveShippingMethod(item);
+            if (effectiveMethod && getEffectiveShippingCost(item) >= 0) {
+                derivedSpeeds.add(effectiveMethod as DeliverySpeed);
+            }
         });
 
         return Array.from(derivedSpeeds);

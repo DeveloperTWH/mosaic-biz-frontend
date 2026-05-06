@@ -64,6 +64,28 @@ export interface CartItemDetailed extends CartItem {
 
 type ShippingType = 'standard' | 'express' | 'overnight' | 'local';
 type DeliverySpeed = 'standard' | 'express' | 'overnight' | 'local';
+type BusinessShippingSpeed = 'standard' | 'express' | 'local';
+type BusinessShippingSettings = {
+  method?: 'flat_rate' | 'quantity_based';
+  flatRate?: {
+    standard?: number;
+    express?: number;
+    local?: number;
+  } | null;
+  freeShipping?: {
+    enabled?: boolean;
+    threshold?: number | null;
+  } | null;
+  quantityTiers?: Array<{
+    minQuantity?: number | null;
+    maxQuantity?: number | null;
+    rates?: {
+      standard?: number;
+      express?: number;
+      local?: number;
+    } | null;
+  }> | null;
+};
 
 export interface CartPricingSummary {
   business?: {
@@ -609,6 +631,8 @@ type ProductMini = {
   _id: string;
   title?: string;
   coverImage?: string | null;
+  businessId?: string;
+  slug?: string;
   price?: number;
   salePrice?: number | null;
   discountEndDate?: string | null;
@@ -622,6 +646,19 @@ type ProductMini = {
   priceInclTax?: number;
   salePriceExclTax?: number | null;
   salePriceInclTax?: number | null;
+  shipping?: {
+    standard?: number;
+    express?: number;
+    overnight?: number;
+    local?: number;
+  } | null;
+  businessShippingSettings?: BusinessShippingSettings | null;
+  business?: {
+    _id?: string;
+    businessName?: string;
+    slug?: string;
+    shippingSettings?: BusinessShippingSettings | null;
+  } | null;
 };
 
 type SizeMini = {
@@ -692,6 +729,92 @@ async function getVariantsMini(
   if (!res.ok) return {};
   const list: VariantMini[] = await res.json();
   return Object.fromEntries(list.map((v) => [v._id, v]));
+}
+
+function toBusinessShippingSpeed(type: ShippingType): BusinessShippingSpeed {
+  if (type === "local") return "local";
+  if (type === "express" || type === "overnight") return "express";
+  return "standard";
+}
+
+function resolveBusinessShippingCost(
+  settings: BusinessShippingSettings | null | undefined,
+  type: ShippingType,
+  totalQuantity: number,
+  subtotalAmount?: number
+): number | undefined {
+  if (!settings) return undefined;
+
+  const freeShippingEnabled = Boolean(settings.freeShipping?.enabled);
+  const freeShippingThreshold = settings.freeShipping?.threshold;
+  if (
+    freeShippingEnabled &&
+    freeShippingThreshold != null &&
+    subtotalAmount != null &&
+    subtotalAmount >= Number(freeShippingThreshold)
+  ) {
+    return 0;
+  }
+
+  const speed = toBusinessShippingSpeed(type);
+
+  if (settings.method === "quantity_based") {
+    const matchedTier = settings.quantityTiers?.find((tier) => {
+      const min = Number(tier.minQuantity ?? 0);
+      const max = tier.maxQuantity == null ? null : Number(tier.maxQuantity);
+      return totalQuantity >= min && (max == null || totalQuantity <= max);
+    });
+
+    const tierRate = matchedTier?.rates?.[speed];
+    if (tierRate != null) {
+      return Number(tierRate);
+    }
+  }
+
+  const flatRate = settings.flatRate?.[speed];
+  return flatRate == null ? undefined : Number(flatRate);
+}
+
+function buildBusinessShippingOptions(
+  settings: BusinessShippingSettings | null | undefined,
+  subtotalAmount?: number
+): CartItem["shipping"] {
+  if (!settings) return null;
+
+  const freeShippingEnabled = Boolean(settings.freeShipping?.enabled);
+  const freeShippingThreshold = settings.freeShipping?.threshold;
+  const freeShippingApplied =
+    freeShippingEnabled &&
+    freeShippingThreshold != null &&
+    subtotalAmount != null &&
+    subtotalAmount >= Number(freeShippingThreshold);
+
+  if (freeShippingApplied) {
+    return {
+      standard: 0,
+      express: 0,
+      overnight: 0,
+      local: 0,
+    };
+  }
+
+  const standard = settings.flatRate?.standard;
+  const express = settings.flatRate?.express;
+  const local = settings.flatRate?.local;
+
+  const hasAnyFlatRate =
+    standard != null || express != null || local != null;
+
+  if (!hasAnyFlatRate && settings.method !== "quantity_based") {
+    return null;
+  }
+
+  return {
+    standard: standard == null ? undefined : Number(standard),
+    express: express == null ? undefined : Number(express),
+    overnight: express == null ? undefined : Number(express),
+    local: local == null ? undefined : Number(local),
+  };
 }
 
 const publicProductCache = new Map<string, Promise<any | null>>();
@@ -843,10 +966,11 @@ async function hydrateCartItemFromPublicProduct(item: CartItemDetailed): Promise
 }
 
 // --- buildGuestCartDetailed (key change: no fallback to sizes[0]) ---
-async function buildGuestCartDetailed(): Promise<CartItemDetailed[]> {
+async function buildGuestCartDetailed(deliverySpeed?: DeliverySpeed): Promise<CartItemDetailed[]> {
   const stored = readGuestCart();
   const items = stored?.items ?? [];
   if (!items.length) return [];
+  const totalGuestQuantity = items.reduce((sum, item) => sum + Number(item.quantity ?? 0), 0);
 
   const productIds = items.map((i) => i.productId).filter(Boolean) as string[];
   const variantIds = items.map((i) => i.variantId).filter(Boolean) as string[];
@@ -861,6 +985,28 @@ async function buildGuestCartDetailed(): Promise<CartItemDetailed[]> {
   ]);
 
   const toNum = (x: any) => (x == null ? undefined : Number(x));
+
+  // Compute guestSubtotal from FETCHED prices so the free-shipping threshold
+  // check uses accurate product prices (not stale/missing localStorage values).
+  const guestSubtotal = items.reduce((sum, item) => {
+    const p = productMap[item.productId];
+    const v = item.variantId ? variantMap[item.variantId] : undefined;
+    const sizeKey = item.size ? String(item.size).toUpperCase() : undefined;
+    const sizeObj = v?.sizes?.find((s) => s.size === sizeKey);
+    const isOnSale = isSalePriceActive(
+      toNumber(sizeObj?.salePrice ?? item.salePrice),
+      sizeObj?.discountEndDate ?? item.discountEndDate ?? null
+    );
+    const unitPrice =
+      (isOnSale ? (toNumber(sizeObj?.salePrice) || toNumber(item.salePrice)) : 0) ||
+      toNumber(sizeObj?.price) ||
+      toNumber(v?.priceInclTax) ||
+      toNumber(p?.priceInclTax) ||
+      toNumber(item.selectedSizePrice) ||
+      toNumber(item.price) ||
+      0;
+    return sum + unitPrice * Number(item.quantity ?? 0);
+  }, 0);
 
   const detailedItems = items.map((it): CartItemDetailed => {
     const p = productMap[it.productId];
@@ -896,14 +1042,51 @@ async function buildGuestCartDetailed(): Promise<CartItemDetailed[]> {
       toNum(it.salePriceInclTax) ??
       salePrice;
     const discountEndISO = sizeObj?.discountEndDate ?? it.discountEndDate ?? null;
-    const shippingType: ShippingType =
-      it.shippingType === 'express' ||
-      it.shippingType === 'overnight' ||
-      it.shippingType === 'local'
-        ? it.shippingType
-        : 'standard';
-    const variantShippingCost = v?.shipping?.[shippingType];
-    const shippingCost = toNum(variantShippingCost) ?? toNum(it.shippingCost) ?? 0;
+    // If the caller requested a specific speed, honour it; otherwise fall back
+    // to whatever was stored in localStorage for this item.
+    const shippingType: ShippingType = deliverySpeed && (
+      deliverySpeed === 'express' ||
+      deliverySpeed === 'overnight' ||
+      deliverySpeed === 'local' ||
+      deliverySpeed === 'standard'
+    )
+      ? deliverySpeed
+      : it.shippingMethod === 'express' ||
+          it.shippingMethod === 'overnight' ||
+          it.shippingMethod === 'local'
+        ? it.shippingMethod
+        : it.shippingType === 'express' ||
+            it.shippingType === 'overnight' ||
+            it.shippingType === 'local'
+          ? it.shippingType
+          : 'standard';
+    const businessShippingSettings =
+      p?.businessShippingSettings ??
+      p?.business?.shippingSettings ??
+      null;
+    const businessShipping =
+      buildBusinessShippingOptions(businessShippingSettings, guestSubtotal);
+    // Prefer business shipping over product/variant level — but skip explicit nulls
+    const shipping =
+      (v?.shipping != null ? v.shipping : undefined) ??
+      (p?.shipping != null ? p.shipping : undefined) ??
+      businessShipping ??
+      it.shipping ??
+      null;
+    // Resolve the concrete cost for the chosen speed.
+    // We avoid wrapping in toNum so that a returned 0 (free shipping) is kept as 0
+    // rather than being treated as "not found" by the ?? chain.
+    const resolvedBizCost = resolveBusinessShippingCost(
+      businessShippingSettings,
+      shippingType,
+      totalGuestQuantity,
+      guestSubtotal
+    );
+    const shippingCost =
+      (resolvedBizCost != null ? resolvedBizCost : undefined) ??
+      toNum(shipping?.[shippingType]) ??
+      toNum(it.shippingCost ?? it.shippingCharge) ??
+      0;
 
     const isSaleActive = isSalePriceActive(salePrice, discountEndISO);
 
@@ -962,9 +1145,10 @@ async function buildGuestCartDetailed(): Promise<CartItemDetailed[]> {
       selectedSizePriceInclTax,
       lineTaxAmount,
       shippingType,
+      shippingMethod: shippingType,
       shippingCost,
       shippingCharge: shippingCost,
-      shipping: v?.shipping ?? it.shipping ?? null,
+      shipping,
 
       isSaleActive,
     };
@@ -1121,13 +1305,72 @@ export const getCartDetailedResponse = async (
     };
   }
 
-  // Guest: return whatever is stored; (optional) enrich at add time
+  // Guest: build detailed items and compute pricing summary
   try {
-    const items = await buildGuestCartDetailed();
+    const items = await buildGuestCartDetailed(deliverySpeed);
+    const totalItems = items.reduce((sum, item) => sum + (item.quantity ?? 0), 0);
+    const totalQuantity = totalItems;
+
+    // Build a best-effort pricing summary so the cart page can display shipping correctly
+    const subtotalAmount = items.reduce(
+      (sum, it) => sum + toNumber(it.selectedSizePrice ?? it.priceInclTax ?? it.price ?? 0) * (it.quantity ?? 1),
+      0
+    );
+    const subtotalExclTax = items.reduce(
+      (sum, it) => sum + toNumber(it.selectedSizePriceExclTax ?? it.priceExclTax ?? 0) * (it.quantity ?? 1),
+      0
+    );
+    const taxAmount = items.reduce((sum, it) => sum + toNumber(it.lineTaxAmount ?? 0), 0);
+
+    // Derive shipping from the first item's business settings (single-business cart)
+    const firstItem = items[0];
+    const shippingAmount = items.reduce(
+      (sum, it) => sum + toNumber(it.shippingCost ?? it.shippingCharge ?? 0),
+      0
+    );
+    // Active speed = caller-requested or first item's stored method
+    const selectedDeliverySpeed = deliverySpeed ?? firstItem?.shippingMethod ?? firstItem?.shippingType;
+    const businessShippingSettings =
+      (firstItem as any)?._businessShippingSettings ?? null;
+    const freeShippingApplied =
+      businessShippingSettings?.freeShipping?.enabled === true &&
+      businessShippingSettings?.freeShipping?.threshold != null &&
+      subtotalAmount >= Number(businessShippingSettings.freeShipping.threshold);
+
+    // Available speeds = keys from the shipping object that have defined values
+    const availableSpeeds: DeliverySpeed[] = firstItem?.shipping
+      ? (Object.entries(firstItem.shipping) as [string, number | undefined][])
+          .filter(([, v]) => v != null)
+          .map(([k]) => k as DeliverySpeed)
+      : selectedDeliverySpeed
+      ? [selectedDeliverySpeed as DeliverySpeed]
+      : [];
+
+    const pricing: CartPricingSummary = {
+      subtotalAmount,
+      subtotalExclTax,
+      subtotalInclTax: subtotalAmount,
+      taxAmount,
+      taxIncluded: firstItem?.taxIncluded ?? true,
+      totalQuantity,
+      availableDeliverySpeeds: availableSpeeds,
+      selectedDeliverySpeed: selectedDeliverySpeed as DeliverySpeed | undefined,
+      shipping: shippingAmount > 0 || freeShippingApplied
+        ? {
+            amount: shippingAmount,
+            deliverySpeed: selectedDeliverySpeed as DeliverySpeed | undefined,
+            method: 'flat_rate',
+            freeShippingApplied,
+          }
+        : null,
+      totalAmount: subtotalAmount + shippingAmount,
+      currency: 'USD',
+    };
+
     return {
       items,
-      pricing: null,
-      totalItems: items.reduce((sum, item) => sum + (item.quantity ?? 0), 0),
+      pricing,
+      totalItems,
       businessId: items[0]?.businessId,
     };
   } catch {
