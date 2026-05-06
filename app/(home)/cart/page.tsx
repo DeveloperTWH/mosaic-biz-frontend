@@ -118,8 +118,8 @@ export default function CartPage() {
     const getEffectiveShippingCost = (item: CartItem) =>
         Number(item.shippingCost ?? item.shippingCharge ?? 0);
 
-    const getEffectiveShippingMethod = (item: CartItem) =>
-        item.shippingMethod ?? item.shippingType;
+    const getEffectiveShippingMethod = (item?: CartItem) =>
+        item?.shippingMethod ?? item?.shippingType;
 
     const getShippingLabel = (type?: CartItem["shippingType"] | CartItem["shippingMethod"]) => {
         if (!type) return "";
