@@ -790,12 +790,7 @@ function buildBusinessShippingOptions(
     subtotalAmount >= Number(freeShippingThreshold);
 
   if (freeShippingApplied) {
-    return {
-      standard: 0,
-      express: 0,
-      overnight: 0,
-      local: 0,
-    };
+    return { standard: 0, express: 0, local: 0 };
   }
 
   const standard = settings.flatRate?.standard;
@@ -809,13 +804,15 @@ function buildBusinessShippingOptions(
     return null;
   }
 
+  // NOTE: 'overnight' is intentionally excluded — the backend maps overnight→express.
+  // Including both would cause two "Express" buttons in the UI.
   return {
     standard: standard == null ? undefined : Number(standard),
     express: express == null ? undefined : Number(express),
-    overnight: express == null ? undefined : Number(express),
     local: local == null ? undefined : Number(local),
   };
 }
+
 
 const publicProductCache = new Map<string, Promise<any | null>>();
 
@@ -897,17 +894,13 @@ async function hydrateCartItemFromPublicProduct(item: CartItemDetailed): Promise
       : toNumber(variant.salePriceInclTax ?? product.salePriceInclTax ?? item.salePriceInclTax);
   const discountEndDate = variant.discountEndDate ?? item.discountEndDate ?? null;
   const saleActive = isSalePriceActive(salePrice, discountEndDate);
-  const shippingMethod: ShippingType =
-    item.shippingMethod === "overnight" || item.shippingMethod === "local"
+  const shippingMethod =
+    (item.shippingMethod === "overnight" || item.shippingMethod === "local"
       ? item.shippingMethod
       : item.shippingType === "overnight" || item.shippingType === "local"
         ? item.shippingType
-        : "standard";
-  const shipping = variant.shipping ?? product.shipping ?? item.shipping ?? null;
-  const hasLineShippingCost = item.shippingCost != null || item.shippingCharge != null;
-  const shippingCost = hasLineShippingCost
-    ? toNumber(item.shippingCost ?? item.shippingCharge)
-    : toNumber(shipping?.[shippingMethod]);
+        : "standard");
+
   const resolvedPriceExclTax = resolveDisplayPrice(
     priceExclTax,
     salePriceExclTax ?? salePrice,
@@ -922,6 +915,44 @@ async function hydrateCartItemFromPublicProduct(item: CartItemDetailed): Promise
     item.selectedSizePrice && Number(item.selectedSizePrice) > 0
       ? Number(item.selectedSizePrice)
       : resolvedPriceInclTax.current;
+
+  // Business shipping settings — present when the public product API returns
+  // business data, which happens for products accessed post-login-sync too.
+  const businessShippingSettings =
+    product.businessShippingSettings ??
+    product.business?.shippingSettings ??
+    null;
+
+  // Use item subtotal so free-shipping threshold is accurate per item
+  const itemSubtotal = selectedSizePrice * Number(item.quantity ?? 1);
+
+  const businessShipping = buildBusinessShippingOptions(businessShippingSettings, itemSubtotal);
+
+  // Shipping object: variant > product > business-derived > existing
+  const shipping =
+    (variant.shipping != null ? variant.shipping : undefined) ??
+    (product.shipping != null ? product.shipping : undefined) ??
+    businessShipping ??
+    item.shipping ??
+    null;
+
+  // Resolve cost — business settings take priority so a server-synced cart
+  // with shippingCost = 0 gets the correct flat rate applied here.
+  const resolvedBizCost = resolveBusinessShippingCost(
+    businessShippingSettings,
+    shippingMethod,
+    Number(item.quantity ?? 1),
+    itemSubtotal
+  );
+  const shippingCost =
+    (resolvedBizCost != null ? resolvedBizCost : undefined) ??
+    toNumber(shipping?.[shippingMethod]) ??
+    // Only keep the stored cost when it is genuinely > 0
+    (toNumber(item.shippingCost ?? item.shippingCharge) > 0
+      ? toNumber(item.shippingCost ?? item.shippingCharge)
+      : undefined) ??
+    0;
+
   const selectedSizePriceExclTax = resolvedPriceExclTax.current;
   const selectedSizePriceInclTax = resolvedPriceInclTax.current;
   const taxRate = toNumber(variant.taxRate ?? product.taxRate ?? item.taxRate);
@@ -1154,8 +1185,13 @@ async function buildGuestCartDetailed(deliverySpeed?: DeliverySpeed): Promise<Ca
     };
   });
 
-  return Promise.all(detailedItems.map(hydrateCartItemFromPublicProduct));
+  // Items are already fully hydrated from productMap/variantMap above.
+  // Do NOT pass through hydrateCartItemFromPublicProduct — it fetches from the
+  // public product API which lacks businessShippingSettings, and would overwrite
+  // the correctly computed shippingCost with 0.
+  return detailedItems;
 }
+
 
 
 
@@ -1324,10 +1360,10 @@ export const getCartDetailedResponse = async (
 
     // Derive shipping from the first item's business settings (single-business cart)
     const firstItem = items[0];
-    const shippingAmount = items.reduce(
-      (sum, it) => sum + toNumber(it.shippingCost ?? it.shippingCharge ?? 0),
-      0
-    );
+    // Shipping is ORDER-level (flat-rate or quantity-based), NOT per item.
+    // buildGuestCartDetailed calls resolveBusinessShippingCost with totalGuestQuantity
+    // so every item already holds the same cart-level cost — just take it once.
+    const shippingAmount = toNumber(firstItem?.shippingCost ?? firstItem?.shippingCharge ?? 0);
     // Active speed = caller-requested or first item's stored method
     const selectedDeliverySpeed = deliverySpeed ?? firstItem?.shippingMethod ?? firstItem?.shippingType;
     const businessShippingSettings =
