@@ -45,6 +45,8 @@ const DashboardPage = () => {
   const { businessid } = useParams();  // Here `businessid` corresponds to [businessid] in the route
 
   useEffect(() => {
+
+
     if (!businessid) {
       console.log('Slug is not available yet.');
       return;  // Don't fetch if slug is not available yet
@@ -60,6 +62,7 @@ const DashboardPage = () => {
 
         if (response.status === 200) {
           const { business, subscription, subscriptionPlan } = response.data.data;
+
 
           setBusinessData(business);
           setSubscription(subscription);

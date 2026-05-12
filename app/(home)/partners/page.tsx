@@ -148,7 +148,11 @@ const Page: React.FC = () => {
       );
 
       if (response.data.success) {
+        
         setOnboardingStatus(response.data);
+
+        if(response.data.data.currentStage === 4)
+                router.push("/partners/dashboard")
       }
     } catch (error) {
       console.error("Error fetching onboarding status:", error);

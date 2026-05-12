@@ -82,7 +82,9 @@ function LoginContent() {
         localStorage.setItem('user_session', 'true');
         localStorage.setItem('user_gender', data.user.gender || '');
         window.dispatchEvent(new Event("auth:login"));
+  
         router.push(data.user.role === 'business_owner' ? '/partners' : (safeRedirect || '/'));
+
       } else if (data.otpPending) {
         const nextUrl = safeRedirect
           ? `/verify-otp?email=${encodeURIComponent(data.user.email)}&type=${encodeURIComponent(data.user.role)}&redirect=${encodeURIComponent(safeRedirect)}`
