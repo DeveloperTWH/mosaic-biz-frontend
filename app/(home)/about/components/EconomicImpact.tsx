@@ -4,7 +4,7 @@ export default function EconomicImpact() {
       <div className="flex flex-col md:flex-row gap-6 items-center">
         {/* Image Section */}
         <div className="w-full md:w-1/2 flex justify-center">
-          <img src="/about/economic.png" alt="Economic Impact" className="md:w-[100%]" />
+          <img src="/about/Economic.png" alt="Economic Impact" className="md:w-[100%]" />
         </div>
 
         {/* Text Section */}
