@@ -194,6 +194,10 @@ export const useProductForm = () => {
     fetchTaxSettings(formData.businessId);
   }, [formData.businessId]);
 
+  const refreshTaxSettings = () => {
+    fetchTaxSettings(formData.businessId);
+  };
+
   // Handle input changes
   const handleInputChange = (field: keyof ProductFormData, value: any) => {
     setFormData(prev => ({
@@ -717,6 +721,7 @@ const toggleHasVariants = (value: boolean) => {
     taxEnabled,
     registeredTaxState,
     taxLoading,
+    refreshTaxSettings,
     uploading,
     uploadProgress,
     selectedFiles,

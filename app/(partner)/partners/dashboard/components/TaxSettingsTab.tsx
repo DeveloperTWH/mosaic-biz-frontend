@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 interface TaxSettingsTabProps {
   businessId?: string;
   isActive: boolean;
+  onSettingsSaved?: () => void;
 }
 
 interface TaxCategoryRate {
@@ -78,6 +79,7 @@ function parseRate(value: string) {
 export default function TaxSettingsTab({
   businessId,
   isActive,
+  onSettingsSaved,
 }: TaxSettingsTabProps) {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -207,6 +209,7 @@ export default function TaxSettingsTab({
       );
 
       applyNormalizedSettings(normalizeSettings(response.data?.taxSettings));
+      onSettingsSaved?.();
       toast.success(response.data?.message || "Tax settings saved successfully.");
     } catch (saveError: any) {
       console.error("Error saving tax settings:", saveError);

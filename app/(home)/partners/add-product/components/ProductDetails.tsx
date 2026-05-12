@@ -1,9 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
+import { Settings, X } from 'lucide-react';
 import { ProductFormData, Business, Category, Subcategory, TaxCategoryRate } from '../types';
 import RichTextEditor from './RichTextEditor';
 import CategoryRequestModal from '../../components/CategoryRequestModal';
+import TaxSettingsTab from '@/app/(partner)/partners/dashboard/components/TaxSettingsTab';
 
 interface Props {
   formData: ProductFormData;
@@ -17,6 +19,7 @@ interface Props {
   taxLoading: boolean;
   onInputChange: (field: keyof ProductFormData, value: any) => void;
   onToggleVariants: (value: boolean) => void;
+  onTaxSettingsUpdated: () => void;
 }
 
 export default function ProductDetails({
@@ -31,8 +34,10 @@ export default function ProductDetails({
   taxLoading,
   onInputChange,
   onToggleVariants,
+  onTaxSettingsUpdated,
 }: Props) {
   const [isCategoryRequestOpen, setIsCategoryRequestOpen] = useState(false);
+  const [isTaxSettingsOpen, setIsTaxSettingsOpen] = useState(false);
 
   const selectedCategory = categories.find((category) => category._id === formData.categoryId);
   const selectedSubcategory = subcategories.find(
@@ -69,7 +74,7 @@ export default function ProductDetails({
           </div>
 
           <div className="rounded-md border border-gray-200 bg-[#fcfaf7] p-4">
-            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
                   Tax Configuration
@@ -78,16 +83,38 @@ export default function ProductDetails({
                   Registered state: {registeredTaxState || 'Not configured'}
                 </p>
               </div>
-              <span
-                className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${
-                  taxEnabled
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-gray-200 text-gray-600'
-                }`}
+              <button
+                type="button"
+                role="switch"
+                aria-checked={taxEnabled}
+                onClick={() => setIsTaxSettingsOpen(true)}
+                disabled={!formData.businessId || taxLoading}
+                className="inline-flex w-full items-center justify-between gap-3 rounded-md border border-gray-300 bg-white px-3 py-2 text-left transition hover:border-[#c9a227] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
               >
-                {taxLoading ? 'Loading...' : taxEnabled ? 'Tax enabled' : 'Tax disabled'}
-              </span>
+                <span className="flex items-center gap-2">
+                  <Settings className="h-4 w-4 text-[#c9a227]" />
+                  <span className="text-sm font-medium text-gray-800">
+                    {taxLoading ? 'Loading taxes...' : taxEnabled ? 'Manage taxes' : 'Enable taxes'}
+                  </span>
+                </span>
+                <span
+                  className={`relative h-5 w-9 rounded-full transition ${
+                    taxEnabled ? 'bg-[#c9a227]' : 'bg-gray-300'
+                  }`}
+                >
+                  <span
+                    className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition ${
+                      taxEnabled ? 'left-4' : 'left-0.5'
+                    }`}
+                  />
+                </span>
+              </button>
             </div>
+            {!formData.businessId && (
+              <p className="mt-2 text-xs text-gray-500">
+                Select a business before configuring taxes.
+              </p>
+            )}
           </div>
 
           {/* Product Title */}
@@ -246,6 +273,36 @@ export default function ProductDetails({
         initialCategoryName={selectedCategory?.name}
         initialSubcategoryName={selectedSubcategory?.name}
       />
+
+      {isTaxSettingsOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-6">
+          <div className="max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-md bg-white shadow-xl">
+            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 bg-white px-5 py-4">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Tax Management</h3>
+                <p className="text-sm text-gray-500">
+                  Enable tax collection and manage category rates for this business.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsTaxSettingsOpen(false)}
+                className="rounded-md p-2 text-gray-500 transition hover:bg-gray-100 hover:text-gray-800"
+                aria-label="Close tax management"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="p-5">
+              <TaxSettingsTab
+                businessId={formData.businessId}
+                isActive={isTaxSettingsOpen}
+                onSettingsSaved={onTaxSettingsUpdated}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

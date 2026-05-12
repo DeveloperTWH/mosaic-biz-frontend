@@ -24,6 +24,7 @@ export default function AddProductPage() {
     taxEnabled,
     registeredTaxState,
     taxLoading,
+    refreshTaxSettings,
     uploading,
     uploadProgress,
     handleInputChange,
@@ -92,6 +93,7 @@ export default function AddProductPage() {
                 taxEnabled={taxEnabled}
                 registeredTaxState={registeredTaxState}
                 taxLoading={taxLoading}
+                onTaxSettingsUpdated={refreshTaxSettings}
                 onInputChange={handleInputChange}
                 onToggleVariants={toggleHasVariants}
               />
