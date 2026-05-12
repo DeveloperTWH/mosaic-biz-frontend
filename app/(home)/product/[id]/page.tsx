@@ -866,7 +866,9 @@ setMainImage(firstImage);
                 </button>
               )}
 
-              <button
+
+              {/* uncomment later */}
+              {/* <button
                 className="flex-1 py-2.5 font-semibold text-white bg-[#c79b44] rounded hover:bg-[#b08a3a] transition-colors text-sm uppercase tracking-wide disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={!isVariantSelected() || Boolean(selectedVariant && selectedVariant.stock <= 0)}
                 onClick={() => {
@@ -882,7 +884,7 @@ setMainImage(firstImage);
                 }}
               >
                 Buy Now
-              </button>
+              </button> */}
             </div>
 
             {/* Product Details Table — RIGHT COLUMN */}
