@@ -17,44 +17,45 @@ export default function Footer() {
           <div>
             <h4 className="text-lg font-semibold mb-4 text-white font-poppins">GET TO KNOW US</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="#" className="text-custom-yellow font-montserrat">About Us</Link></li>
-              <li><Link href="#" className="text-custom-yellow font-montserrat">Contact Us</Link></li>
-              <li><Link href="#" className="text-custom-yellow font-montserrat">FAQs</Link></li>
-              <li><Link href="#" className="text-custom-yellow font-montserrat">Blogs</Link></li>
+              <li><Link href="/about" className="text-custom-yellow font-montserrat">About Us</Link></li>
+              <li><Link href="/contact" className="text-custom-yellow font-montserrat">Contact Us</Link></li>
+              <li><Link href="/faq" className="text-custom-yellow font-montserrat">FAQs</Link></li>
+              {/* <li><Link href="#" className="text-custom-yellow font-montserrat">Blogs</Link></li> */}
             </ul>
           </div>
 
-          {/* Column 2 - LET'S HELP YOU */}
-          <div>
-            <h4 className="text-lg font-semibold mb-4 text-white font-poppins">LET'S HELP YOU</h4>
+           <div>
+            <h4 className="text-lg font-semibold mb-4 text-white font-poppins">FOR VENDORS </h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="#" className="text-custom-yellow font-montserrat">Shop</Link></li>
-              <li><Link href="#" className="text-custom-yellow font-montserrat">My Account</Link></li>
-              <li><Link href="#" className="text-custom-yellow font-montserrat">Wishlist</Link></li>
-              <li><Link href="#" className="text-custom-yellow font-montserrat">Request A Quote</Link></li>
+              <li><Link href="/signup?type=vendor" className="text-custom-yellow font-montserrat">Become a Vendor </Link></li>
+              <li><Link href="/vendor/trustbadge" className="text-custom-yellow font-montserrat">Trust Badges – Vendor </Link></li>
+              <li><Link href="/vender/terms" className="text-custom-yellow font-montserrat">Terms and Conditions – Vendor </Link></li>
+              <li><Link href="#" className="text-custom-yellow font-montserrat">Vendor Login</Link></li>
             </ul>
           </div>
+
 
           {/* Column 3 - EXPLORE */}
           <div>
-            <h4 className="text-lg font-semibold mb-4 text-white font-poppins">EXPLORE</h4>
+            <h4 className="text-lg font-semibold mb-4 text-white font-poppins">FOR CONSUMERS </h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="#" className="text-custom-yellow font-montserrat">Order</Link></li>
-              <li><Link href="#" className="text-custom-yellow font-montserrat">Shipping And Delivery</Link></li>
-              <li><Link href="#" className="text-custom-yellow font-montserrat">Return And Exchange Policy</Link></li>
-              <li><Link href="#" className="text-custom-yellow font-montserrat">Privacy Policy</Link></li>
-              <li><Link href="#" className="text-custom-yellow font-montserrat">Terms Of Services</Link></li>
+              <li><Link href="#" className="text-custom-yellow font-montserrat">How to Use this App </Link></li>
+              <li><Link href="#" className="text-custom-yellow font-montserrat">Trust Badges – Consumer </Link></li>
+              <li><Link href="#" className="text-custom-yellow font-montserrat">Terms and Conditions – Consumer </Link></li>
+              <li><Link href="#" className="text-custom-yellow font-montserrat">Consumer Login </Link></li>
             </ul>
           </div>
 
           {/* Column 4 - DISCOVER */}
           <div>
-            <h4 className="text-lg font-semibold mb-4 text-white font-poppins">DISCOVER</h4>
+            <h4 className="text-lg font-semibold mb-4 text-white font-poppins">IMPORTANT LINKS </h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="#" className="text-custom-yellow font-montserrat">Shop</Link></li>
-              <li><Link href="#" className="text-custom-yellow font-montserrat">My Account</Link></li>
-              <li><Link href="#" className="text-custom-yellow font-montserrat">Wishlist</Link></li>
-              <li><Link href="#" className="text-custom-yellow font-montserrat">Request A Quote</Link></li>
+              <li><Link href="#" className="text-custom-yellow font-montserrat">Products</Link></li>
+              <li><Link href="#" className="text-custom-yellow font-montserrat">Services </Link></li>
+              <li><Link href="#" className="text-custom-yellow font-montserrat">Foods </Link></li>
+              <li><Link href="/privacy" className="text-custom-yellow font-montserrat">Privacy Policy </Link></li>
+              <li><Link href="#" className="text-custom-yellow font-montserrat">Refunds and Returns </Link></li>
+                <li><Link href="#" className="text-custom-yellow font-montserrat">Dispute Resolution Process </Link></li>
             </ul>
           </div>
         </div>

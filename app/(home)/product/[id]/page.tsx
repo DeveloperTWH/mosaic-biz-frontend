@@ -498,7 +498,6 @@ setMainImage(firstImage);
     } catch (err: any) {
       if (err?.response?.status === 401) {
         toast.info('Please log in as a customer to submit a review.');
-        console.log("ProductId " + id)
         // localStorage.setItem("product_id", id ?? "")
         // router.push('/login?type=customer');
                 const redirectPath =

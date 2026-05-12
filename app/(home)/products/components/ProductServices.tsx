@@ -352,6 +352,7 @@ function buildBadgeImagePath(badge: string): string {
 }
 
 function ProductCard({ item }: { item: RankedItem }) {
+
   const href = `/product/${item._id}`;
   const title = pickTitle(item);
   const description = item.description ?? "";
@@ -388,7 +389,7 @@ function ProductCard({ item }: { item: RankedItem }) {
   return (
 
     <Link href={href} className="block">
-    <div className="bg-green p-2 border-2 border-[#D9D9D9] w-full max-w-[300px] h-[460px] shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col cursor-pointer">
+    <div className="bg-green p-2 border-2 border-[#D9D9D9] w-full max-w-[300px] h-[480px] shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col cursor-pointer">
       {/* Product Image - Square (1:1 like Best Sellers) */}
       <div className="relative w-full aspect-square overflow-hidden bg-gray-100 flex-shrink-0">
         {images[0] ? (
