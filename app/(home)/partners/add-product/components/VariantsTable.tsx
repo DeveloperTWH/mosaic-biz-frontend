@@ -78,7 +78,7 @@ export default function VariantsTable({
         </span> */}
       </div>
 
-      {hasVariants && (
+      {/* {hasVariants && (
         <div className="mb-4 p-4 bg-gray-50 rounded-lg">
           <h3 className="text-sm font-medium text-gray-700 mb-3">Bulk Update Shipping</h3>
 
@@ -104,7 +104,7 @@ export default function VariantsTable({
             )}
           </div>
         </div>
-      )}
+      )} */}
 
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
@@ -130,9 +130,9 @@ export default function VariantsTable({
               <th className="py-3 px-2 text-left">Old Price</th>
               <th className="py-3 px-2 text-left">New Price</th>
               <th className="py-3 px-2 text-left">Availability</th>
-              <th className="py-3 px-2 text-left">Standard shippiing</th>
+              {/* <th className="py-3 px-2 text-left">Standard shippiing</th>
               <th className="py-3 px-2 text-left">Overnigh shippingt</th>
-              <th className="py-3 px-2 text-left">Local shipping</th>
+              <th className="py-3 px-2 text-left">Local shipping</th> */}
               <th className="py-3 px-2 text-left"></th>
             </tr>
           </thead>
@@ -286,7 +286,7 @@ export default function VariantsTable({
                 </td>
 
                 {/* Shipping */}
-                {(['standardShipping', 'overnightShipping', 'localShipping'] as const).map(
+                {/* {(['standardShipping', 'overnightShipping', 'localShipping'] as const).map(
                   (field) => (
                     <td key={field} className="py-2 px-2">
                       <input
@@ -301,7 +301,7 @@ export default function VariantsTable({
                       />
                     </td>
                   )
-                )}
+                )} */}
 
                 {/* Remove */}
 <td className="py-2 px-2">

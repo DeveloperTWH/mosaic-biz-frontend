@@ -150,7 +150,7 @@ export default function VariationAttributes({
             )}
 
             {/* Generate Variants button below attributes, centered */}
-            {/* {attributes.length >= 1 && (
+            {attributes.length >= 1 && (
               <div className="flex justify-center mt-4">
                 <button
                   type="button"
@@ -161,7 +161,7 @@ export default function VariationAttributes({
                   Generate Variants
                 </button>
               </div>
-            )} */}
+            )}
           </>
         )}
       </div>

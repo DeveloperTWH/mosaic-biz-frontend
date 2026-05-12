@@ -239,9 +239,9 @@ export default function TaxSettingsTab({
           <h2 className="font-poppins text-[22px] font-semibold text-[#1c1c1c] sm:text-[24px]">
             Tax Settings
           </h2>
-          <span className="rounded-full border border-[#f2c184] bg-[#fff3dd] px-3 py-1 font-montserrat text-[11px] font-semibold uppercase tracking-[0.16em] text-[#d06c16]">
+          {/* <span className="rounded-full border border-[#f2c184] bg-[#fff3dd] px-3 py-1 font-montserrat text-[11px] font-semibold uppercase tracking-[0.16em] text-[#d06c16]">
             MVP
-          </span>
+          </span> */}
         </div>
         <p className="mt-1 font-montserrat text-sm text-gray-600">
           Set your rates per category for your registered state.
