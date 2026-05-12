@@ -228,8 +228,8 @@ if (!token) {
                     <h3 className="mb-2 text-lg font-bold">CALL US:</h3>
                     <hr className="h-[2px] w-[50px] bg-white" />
                     <hr className="h-[2px] w-[50px] bg-white mt-[1px] mb-5" />
-                    <p>+1 234 56 7890</p>
-                    <p>For Vendors: +9876 54 3201</p>
+                    <p>+1 202.810.9450 </p>
+                    <p>For Vendors: 888.845.4210</p>
                 </div>
 
                 <div className="px-10 py-8 text-white bg-gradient-skyblue">
@@ -237,7 +237,8 @@ if (!token) {
                     <h3 className="mb-2 text-lg font-bold">EMAIL US:</h3>
                     <hr className="h-[2px] w-[50px] bg-white" />
                     <hr className="h-[2px] w-[50px] bg-white mt-[1px] mb-5" />
-                    <p>Mosaicbizhub@gmail.com</p>
+                    <p>info@mosaicbizhub.com
+</p>
                 </div>
 
                 <div className="px-10 py-8 text-white bg-gradient-yellow">

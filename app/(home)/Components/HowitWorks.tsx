@@ -138,10 +138,10 @@ export default function HowItWorks() {
 
 function FeaturedVendors() {
   const images = [
-    "/Middle-banner.png",
-    "/Middle-banner.png",
-    "/Middle-banner.png",
-    "/Middle-banner.png",
+    "/Middle-banner.jpg",
+    "/Middle-banner-2.jpg",
+    "/Middle-banner-3.jpg",
+    "/Middle-banner-4.jpg",
   ];
 
   return (

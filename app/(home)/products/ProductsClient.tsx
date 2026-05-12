@@ -239,13 +239,13 @@ const Page = () => {
                 </div>
 
                 <div className='flex flex-col items-center'>
-                    <p className='text-3xl'>BEST SELLERS</p>
+                    <p className='text-3xl'>What’s Hot. What’s Trusted. What’s Moving</p>
                     <div className="flex flex-col items-center justify-center">
                         <hr className="h-[2px] w-[100px] bg-gray-700" />
                         <hr className="h-[2px] w-[100px] mt-[2px] mb-4 bg-gray-700" />
                     </div>
 <p className='w-[50%] text-[14px] text-[#2E2E2E] text-center font-normal font-montserrat'>
-    A dynamic carousel of best-selling items with animated “Top Pick” badges and 5-star ratings.
+   Discover top-rated products and services that customers love—updated in real time
 </p>
                 </div>
 
@@ -266,7 +266,7 @@ const Page = () => {
                         },
                         1280: {
                             slidesPerView: 4,
-                            spaceBetween: 30,
+                            spaceBetween: 0,
                         },
                     }}
                     navigation={{

@@ -29,8 +29,8 @@ export default function Footer() {
             <ul className="space-y-2 text-sm">
               <li><Link href="/signup?type=vendor" className="text-custom-yellow font-montserrat">Become a Vendor </Link></li>
               <li><Link href="/vendor/trustbadge" className="text-custom-yellow font-montserrat">Trust Badges – Vendor </Link></li>
-              <li><Link href="/vender/terms" className="text-custom-yellow font-montserrat">Terms and Conditions – Vendor </Link></li>
-              <li><Link href="#" className="text-custom-yellow font-montserrat">Vendor Login</Link></li>
+              <li><Link href="/vendor/terms" className="text-custom-yellow font-montserrat">Terms and Conditions – Vendor </Link></li>
+              <li><Link href="/login?type=vendor" className="text-custom-yellow font-montserrat">Vendor Login</Link></li>
             </ul>
           </div>
 
@@ -39,9 +39,9 @@ export default function Footer() {
           <div>
             <h4 className="text-lg font-semibold mb-4 text-white font-poppins">FOR CONSUMERS </h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="#" className="text-custom-yellow font-montserrat">How to Use this App </Link></li>
-              <li><Link href="#" className="text-custom-yellow font-montserrat">Trust Badges – Consumer </Link></li>
-              <li><Link href="#" className="text-custom-yellow font-montserrat">Terms and Conditions – Consumer </Link></li>
+              <li><Link href="/how-to-use-this-app" className="text-custom-yellow font-montserrat">How to Use this App </Link></li>
+              <li><Link href="/consumer/trustbadge" className="text-custom-yellow font-montserrat">Trust Badges – Consumer </Link></li>
+              <li><Link href="/consumer/terms" className="text-custom-yellow font-montserrat">Terms and Conditions – Consumer </Link></li>
               <li><Link href="#" className="text-custom-yellow font-montserrat">Consumer Login </Link></li>
             </ul>
           </div>
@@ -50,12 +50,12 @@ export default function Footer() {
           <div>
             <h4 className="text-lg font-semibold mb-4 text-white font-poppins">IMPORTANT LINKS </h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="#" className="text-custom-yellow font-montserrat">Products</Link></li>
-              <li><Link href="#" className="text-custom-yellow font-montserrat">Services </Link></li>
-              <li><Link href="#" className="text-custom-yellow font-montserrat">Foods </Link></li>
+              <li><Link href="/products" className="text-custom-yellow font-montserrat">Products</Link></li>
+              <li><Link href="/services" className="text-custom-yellow font-montserrat">Services </Link></li>
+              <li><Link href="/foods" className="text-custom-yellow font-montserrat">Foods </Link></li>
               <li><Link href="/privacy" className="text-custom-yellow font-montserrat">Privacy Policy </Link></li>
-              <li><Link href="#" className="text-custom-yellow font-montserrat">Refunds and Returns </Link></li>
-                <li><Link href="#" className="text-custom-yellow font-montserrat">Dispute Resolution Process </Link></li>
+              <li><Link href="/refund-return" className="text-custom-yellow font-montserrat">Refunds and Returns </Link></li>
+                <li><Link href="/dispute" className="text-custom-yellow font-montserrat">Dispute Resolution Process </Link></li>
             </ul>
           </div>
         </div>
