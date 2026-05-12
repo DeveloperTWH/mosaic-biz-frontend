@@ -322,7 +322,7 @@ const steps = [
         {/* Action Buttons */}
         <div className="flex items-center justify-center gap-4">
           
-    <Link href="/partners">
+    <Link href="/partners/dashboard">
       <button className="px-10 py-3 border border-gray-300 text-gray-700 rounded text-sm font-medium hover:bg-gray-50 transition-colors">
         Go To Dashboard
       </button>
