@@ -28,6 +28,8 @@ type RankedItem = {
   coverImage?: string;
   variantRatingAvg?: number;
   variantRatingCount?: number;
+  totalReviews?:number;
+  averageRating : number;
   firstEligible?: {
     variantId: string;
     label?: string;
@@ -137,6 +139,7 @@ const Page = () => {
             });
             const responseData = res.data || {};
             const apiProducts = Array.isArray(responseData.data) ? responseData.data : [];
+            // console.log("api", apiProducts)
             setProducts(apiProducts);
             setTotalProducts(Number(responseData.total ?? apiProducts.length ?? 0));
             setCurrentPage(Number(responseData.page ?? params.page ?? 1));
@@ -356,6 +359,7 @@ function useRankedProducts() {
         setError(null);
         try {
             const url = buildRankedUrl();
+            console.log(url)
             const res = await fetch(url, {
                 signal: controller.signal,
                 headers: { Accept: "application/json" },
@@ -370,6 +374,7 @@ function useRankedProducts() {
                 throw new Error("Unexpected response shape (missing items[])");
             }
             if (!mountedRef.current) return;
+      
             setItems(data.items.slice(0, PAGE_SIZE));
         } catch (e: any) {
             if (isAbortError(e)) return;
@@ -430,7 +435,7 @@ function gatherImages(p: RankedItem): string[] {
 }
 
 function pickRatingCount(p: RankedItem): number {
-    return Number(p.variantRatingCount ?? 0) || 0;
+    return Number(p.averageRating ?? 0) || 0;
 }
 
 function pickPrice(p: RankedItem) {
@@ -460,7 +465,7 @@ function pickPrice(p: RankedItem) {
 }
 
 function pickRating(p: RankedItem): number {
-    const raw = p.variantRatingAvg ?? 0;
+    const raw = p.averageRating ?? 0;
     const n = typeof raw === "number" ? raw : Number(raw) || 0;
     return Math.max(0, Math.min(5, n));
 }
@@ -481,7 +486,9 @@ function ProductCard({ item }: { item: RankedItem }) {
     const { price, effective, onSale } = pickPrice(item);
     const rating = pickRating(item);
     const ratingCount = pickRatingCount(item);
-    const reviewCount = 5;
+
+    // const avgRating = item.averageRating
+    const reviewCount = item.totalReviews;
 
     const fullStars = Math.floor(rating);
     const fractional = rating % 1;

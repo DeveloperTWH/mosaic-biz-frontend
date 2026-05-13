@@ -29,6 +29,7 @@ type RankedItem = {
   coverImage?: string;
   variantRatingAvg?: number;
   variantRatingCount?: number;
+  totalReviews : number;
   firstEligible?: {
     variantId: string;
     label?: string;
@@ -290,8 +291,8 @@ function gatherImages(p: RankedItem): string[] {
   return out.length ? out : ["/ShopProduct/Aria-SK6-Helmet 1.png"];
 }
 
-function pickRatingCount(p: RankedItem): number {
-  return Number(p.variantRatingCount ?? 0) || 0;
+function pickRatingCount(p: any): number {
+  return Number(p.averageRating ?? 0) || 0;
 }
 
 function pickPrice(p: RankedItem) {
@@ -313,8 +314,8 @@ function pickPrice(p: RankedItem) {
   const effective = onSale ? (salePrice as number) : price;
   return { price, salePrice, effective, onSale, size: fe.size, label: fe.label, color: fe.color };
 }
-function pickRating(p: RankedItem): number {
-  const raw = p.variantRatingAvg ?? 0;
+function pickRating(p: any): number {
+  const raw = p.averageRating ?? 0;
   const n = typeof raw === "number" ? raw : Number(raw) || 0;
   return Math.max(0, Math.min(5, n));
 }
@@ -353,6 +354,7 @@ function buildBadgeImagePath(badge: string): string {
 
 function ProductCard({ item }: { item: RankedItem }) {
 
+  
   const href = `/product/${item._id}`;
   const title = pickTitle(item);
   const description = item.description ?? "";
@@ -363,7 +365,7 @@ function ProductCard({ item }: { item: RankedItem }) {
   const { price: variantPrice, effective, onSale } = pickPrice(item);
   const rating = pickRating(item);
   const ratingCount = pickRatingCount(item);
-  const reviewCount = 5;
+  const reviewCount = item.totalReviews || 0;
   const badge = pickBadgeValue(item as any);
   const badgeImagePath = badge ? buildBadgeImagePath(badge) : null;
   
