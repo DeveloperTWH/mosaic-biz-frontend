@@ -1222,6 +1222,7 @@ export const getCartDetailedResponse = async (
     const url = `${BASE}/api/cart${params.toString() ? `?${params.toString()}` : ""}`;
 
     const res = await fetch(url, { credentials: "include" });
+
     if (res.status === 404) return { items: [], pricing: null };
     if (!res.ok) throw new Error("Failed to fetch cart");
 

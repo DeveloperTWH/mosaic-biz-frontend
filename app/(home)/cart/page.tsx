@@ -52,6 +52,7 @@ type CartItem = {
     selectedSizePriceExclTax?: number;
     selectedSizePriceInclTax?: number;
     lineTaxAmount?: number;
+    vendorState?: string;
     taxCategory?: {
         code: string;
         label: string;
@@ -559,11 +560,11 @@ export default function CartPage() {
                         <span className="text-base text-gray-800">
                           ${resolved.current.toFixed(2)}
                         </span>
-                        {(item.taxIncluded ?? true) && (
+                        {/* {(item.taxIncluded ?? true) && (
                           <span className="text-xs text-gray-500">
                             Tax included : ${Number(item.lineTaxAmount ?? 0).toFixed(2)}
                           </span>
-                        )}
+                        )} */}
                       </div>
                     );
                   })()}
@@ -611,7 +612,7 @@ export default function CartPage() {
                     <>
                       Shipping:{" "}
                       {summaryDeliverySpeed
-                        ? `${getShippingLabel(summaryDeliverySpeed)} delivery`
+                        ? `${getShippingLabel(summaryDeliverySpeed)} delivery  ${selectedDeliverySpeed === "standard" ? "5-7 Days" : selectedDeliverySpeed === "express" ? "2-4 Days" : "1-2 Days"}`
                         : "Calculated at cart level"}
                       {/* {summaryMethod ? ` (${summaryMethod === "flat_rate" ? "Flat rate" : "Quantity based"})` : ""} */}
                     </>
@@ -719,7 +720,22 @@ export default function CartPage() {
                             <div className="mt-4 flex flex-wrap gap-3">
                                 {availableDeliverySpeeds.map((speed) => {
                                     const isActive = selectedDeliverySpeed === speed;
-                                    // if(selectedAddress?.state)
+                                   if(speed == "local"){
+                                    let localVendor = true;
+                                    itemsProduct.forEach((item)=>{
+                                        console.log(item.vendorState)
+                                        console.log("userAddress : ", selectedAddress?.state)
+                                        if(item.vendorState !== selectedAddress?.state)
+                                        {
+                                           localVendor = false
+                                            return null;
+                                        }
+                                    })
+
+                                    if(!localVendor)
+                                        return null;
+
+                                   }
 
                                     return (
                                         <button
