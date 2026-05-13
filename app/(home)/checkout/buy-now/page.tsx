@@ -6,9 +6,13 @@ import { toast } from "react-toastify";
 import AddressComponent, { Address } from "../../cart/Component/AddressComponent";
 import { CartItemDetailed, handlePlaceOrderFlow, resolveDisplayPrice } from "@/utils/cartUtils";
 
+type DeliverySpeed = "standard" | "express" | "overnight" | "local";
+
 type BuyNowItem = CartItemDetailed & {
+  vendorState?: string;
   shipping?: {
     standard?: number;
+    express?: number;
     overnight?: number;
     local?: number;
   } | null;
@@ -46,16 +50,55 @@ function BuyNowContent() {
   const productId = searchParams.get("productId") || "";
   const variantId = searchParams.get("variantId") || "";
   const size = searchParams.get("size") || "default";
-  const shippingMethod = (searchParams.get("shippingMethod") || "standard") as "standard" | "overnight" | "local";
+  const initialShippingMethod = (searchParams.get("shippingMethod") || "standard") as DeliverySpeed;
+  const initialQuantity = Math.max(1, Number(searchParams.get("quantity") || "1"));
 
+  const [selectedTab] = useState<"product" | "food">("product");
   const [item, setItem] = useState<BuyNowItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [selectedAddressId, setSelectedAddressId] = useState<string | undefined>();
+  const [selectedDeliverySpeed, setSelectedDeliverySpeed] = useState<DeliverySpeed | undefined>(undefined);
+  const [deliverySpeedLoading, setDeliverySpeedLoading] = useState(false);
   const [userNote] = useState("");
   const [couponCode, setCouponCode] = useState("");
   const [applyingCoupon, setApplyingCoupon] = useState(false);
   const [appliedDiscount, setAppliedDiscount] = useState<AppliedDiscount | null>(null);
+
+  const getEffectiveShippingCost = (line: BuyNowItem) =>
+    Number(line.shippingCost ?? line.shippingCharge ?? 0);
+
+  const getEffectiveShippingMethod = (line?: BuyNowItem) =>
+    line?.shippingMethod ?? line?.shippingType;
+
+  const getShippingLabel = (type?: DeliverySpeed) => {
+    if (!type) return "";
+    if (type === "overnight") return "Express";
+    return type.replace(/^./, (char) => char.toUpperCase());
+  };
+
+  const getShippingOptions = (line: BuyNowItem) => {
+    if (!line.shipping) return [];
+
+    return (["standard", "express", "overnight", "local"] as const)
+      .map((type) => ({
+        type,
+        cost: Number(line.shipping?.[type] ?? 0),
+        isDefined: line.shipping?.[type] != null,
+      }))
+      .filter((option) => option.isDefined);
+  };
+
+  const getShippingCostForSpeed = (line: BuyNowItem, speed?: DeliverySpeed) => {
+    if (!speed) return getEffectiveShippingCost(line);
+
+    const speedCost = line.shipping?.[speed];
+    if (speedCost != null) {
+      return Number(speedCost);
+    }
+
+    return getEffectiveShippingCost(line);
+  };
 
   const loadBuyNowItem = useCallback(async () => {
     if (!productId || !variantId) {
@@ -114,16 +157,25 @@ function BuyNowContent() {
         salePriceInclTax ?? salePrice,
         saleActive
       );
-      const selectedSizePrice = resolvedPriceInclTax.current;
       const shipping = variant.shipping ?? product.shipping ?? null;
-      const shippingCost = toNumber(shipping?.[shippingMethod]);
+      const normalizedShippingMethod =
+        shipping?.[initialShippingMethod] != null
+          ? initialShippingMethod
+          : (["standard", "express", "overnight", "local"] as const).find(
+              (speed) => shipping?.[speed] != null
+            ) ?? "standard";
+      const shippingCost = toNumber(shipping?.[normalizedShippingMethod]);
+      const vendorState =
+        product?.businessId?.state ??
+        product?.business?.state ??
+        product?.state;
 
       setItem({
         productId: product._id,
         variantId: variant.variantId,
         businessId: typeof product.businessId === "string" ? product.businessId : product.businessId?._id,
         size,
-        quantity: 1,
+        quantity: initialQuantity,
         imageUrl: variant.images?.[0] || product.coverImage,
         color: variant.attributes?.Color || variant.attributes?.color,
         label: variant.sku,
@@ -141,17 +193,19 @@ function BuyNowContent() {
         salePriceExclTax,
         salePriceInclTax,
         discountEndDate,
-        selectedSizePrice,
+        selectedSizePrice: resolvedPriceInclTax.current,
         selectedSizePriceExclTax: resolvedPriceExclTax.current,
         selectedSizePriceInclTax: resolvedPriceInclTax.current,
-        lineTaxAmount: Math.max(0, resolvedPriceInclTax.current - resolvedPriceExclTax.current),
-        shippingType: shippingMethod,
-        shippingMethod,
+        lineTaxAmount: Math.max(0, resolvedPriceInclTax.current - resolvedPriceExclTax.current) * initialQuantity,
+        shippingType: normalizedShippingMethod,
+        shippingMethod: normalizedShippingMethod,
         shippingCost,
         shippingCharge: shippingCost,
         shipping,
         isSaleActive: saleActive,
+        vendorState,
       });
+      setSelectedDeliverySpeed(normalizedShippingMethod);
     } catch (error) {
       console.error("Failed to load buy now item", error);
       toast.error("Failed to load product");
@@ -159,35 +213,121 @@ function BuyNowContent() {
     } finally {
       setLoading(false);
     }
-  }, [productId, shippingMethod, size, variantId]);
+  }, [initialQuantity, initialShippingMethod, productId, size, variantId]);
 
   useEffect(() => {
     loadBuyNowItem();
   }, [loadBuyNowItem]);
 
-  const subtotal = item ? Number(item.selectedSizePrice ?? 0) * (item.quantity || 0) : 0;
-  const shippingTotal = item ? Number(item.shippingCost ?? item.shippingCharge ?? 0) * (item.quantity || 0) : 0;
+  const handleAddressesChange = useCallback((nextAddresses: Address[]) => {
+    setAddresses(nextAddresses);
+
+    if (!nextAddresses.length) {
+      setSelectedAddressId(undefined);
+      return;
+    }
+
+    setSelectedAddressId((currentSelectedId) => {
+      if (currentSelectedId && nextAddresses.some((address) => address.id === currentSelectedId)) {
+        return currentSelectedId;
+      }
+
+      return nextAddresses.find((address) => address.isDefault)?.id ?? nextAddresses[0]?.id;
+    });
+  }, []);
+
+  const handleDeliverySpeedChange = async (deliverySpeed: DeliverySpeed) => {
+    if (!item || deliverySpeedLoading) {
+      return;
+    }
+
+    setDeliverySpeedLoading(true);
+    try {
+      const shippingCost = getShippingCostForSpeed(item, deliverySpeed);
+      setSelectedDeliverySpeed(deliverySpeed);
+      setItem((current) =>
+        current
+          ? {
+              ...current,
+              shippingType: deliverySpeed,
+              shippingMethod: deliverySpeed,
+              shippingCost,
+              shippingCharge: shippingCost,
+            }
+          : current
+      );
+    } finally {
+      setDeliverySpeedLoading(false);
+    }
+  };
+
+  const itemsProduct = useMemo(() => (item ? [item] : []), [item]);
+  const subtotalProduct = itemsProduct.reduce(
+    (sum, currentItem) => sum + (Number(currentItem.selectedSizePrice) || 0) * (currentItem.quantity || 0),
+    0
+  );
+  const totalQtyProduct = itemsProduct.reduce((sum, currentItem) => sum + (currentItem.quantity || 0), 0);
+  const availableDeliverySpeeds = useMemo<DeliverySpeed[]>(() => {
+    if (!item) return [];
+
+    const derivedSpeeds = new Set<DeliverySpeed>();
+    getShippingOptions(item).forEach((option) => {
+      derivedSpeeds.add(option.type);
+    });
+
+    const effectiveMethod = getEffectiveShippingMethod(item);
+    if (effectiveMethod) {
+      derivedSpeeds.add(effectiveMethod as DeliverySpeed);
+    }
+
+    return Array.from(derivedSpeeds);
+  }, [item]);
+  const fallbackSelectedDeliverySpeed = useMemo<DeliverySpeed | undefined>(() => {
+    return selectedDeliverySpeed ?? (getEffectiveShippingMethod(item ?? undefined) as DeliverySpeed | undefined) ?? availableDeliverySpeeds[0];
+  }, [availableDeliverySpeeds, item, selectedDeliverySpeed]);
+  const effectiveShippingTotalProduct = useMemo(() => {
+    if (!item) return 0;
+    return getShippingCostForSpeed(item, fallbackSelectedDeliverySpeed);
+  }, [fallbackSelectedDeliverySpeed, item]);
+  const effectiveTaxAmountProduct = itemsProduct.reduce(
+    (sum, currentItem) => sum + Number(currentItem.lineTaxAmount ?? 0),
+    0
+  );
+  const effectiveSubtotalExclTaxProduct = Math.max(0, subtotalProduct - effectiveTaxAmountProduct);
   const businessId = item?.businessId;
   const selectedAddress = addresses.find((address) => address.id === selectedAddressId);
-  const discountAmount = appliedDiscount?.discountAmount ?? 0;
-  const discountedSubtotal = appliedDiscount?.finalAmount ?? subtotal;
-  const payableTotal = Math.max(0, discountedSubtotal + shippingTotal);
 
-  const totalSavings = useMemo(() => {
-    if (!item) return 0;
+  const totalSavingsProduct = useMemo(() => {
+    return itemsProduct.reduce((sum, currentItem) => {
+      const resolved = resolveDisplayPrice(
+        Number(
+          currentItem.priceInclTax ??
+            currentItem.selectedSizePriceInclTax ??
+            currentItem.price ??
+            currentItem.selectedSizePrice ??
+            0
+        ),
+        currentItem.salePriceInclTax ?? currentItem.salePrice ?? null,
+        currentItem.isSaleActive ?? isSaleActive(currentItem.salePrice, currentItem.discountEndDate)
+      );
+      const perUnitSaving = Math.max(0, resolved.original - resolved.current);
+      return sum + perUnitSaving * (currentItem.quantity ?? 1);
+    }, 0);
+  }, [itemsProduct]);
 
-    const resolved = resolveDisplayPrice(
-      Number(item.priceInclTax ?? item.selectedSizePriceInclTax ?? item.price ?? item.selectedSizePrice ?? 0),
-      item.salePriceInclTax ?? item.salePrice ?? null,
-      Boolean(item.isSaleActive)
-    );
-
-    return Math.max(0, resolved.original - resolved.current) * (item.quantity ?? 1);
-  }, [item]);
+  useEffect(() => {
+    if (!selectedDeliverySpeed && availableDeliverySpeeds.length > 0) {
+      setSelectedDeliverySpeed(availableDeliverySpeeds[0]);
+    }
+  }, [availableDeliverySpeeds, selectedDeliverySpeed]);
 
   useEffect(() => {
     setAppliedDiscount(null);
-  }, [subtotal, shippingTotal, businessId]);
+  }, [businessId, effectiveShippingTotalProduct, subtotalProduct]);
+
+  const discountAmountProduct = appliedDiscount?.discountAmount ?? 0;
+  const discountedSubtotalProduct = appliedDiscount?.finalAmount ?? subtotalProduct;
+  const payableTotalProduct = Math.max(0, discountedSubtotalProduct + effectiveShippingTotalProduct);
 
   const applyCoupon = async () => {
     const trimmedCoupon = couponCode.trim();
@@ -199,6 +339,11 @@ function BuyNowContent() {
 
     if (!businessId) {
       toast.error("Business information is missing for this product");
+      return;
+    }
+
+    if (subtotalProduct <= 0) {
+      toast.error("No item available for checkout");
       return;
     }
 
@@ -214,7 +359,7 @@ function BuyNowContent() {
         body: JSON.stringify({
           couponCode: trimmedCoupon,
           businessId,
-          amount: subtotal,
+          amount: subtotalProduct,
         }),
       });
 
@@ -236,41 +381,47 @@ function BuyNowContent() {
     }
   };
 
-  const changeQuantity = (nextQuantity: number) => {
-    if (!item) return;
-    if (nextQuantity < 1) return;
-    if (item.stock != null && nextQuantity > item.stock && !item.allowBackorder) {
-      toast.error("Not enough stock for this product");
-      return;
-    }
-    setItem({ ...item, quantity: nextQuantity });
+  const removeCoupon = () => {
+    setAppliedDiscount(null);
+    setCouponCode("");
   };
 
-  const placeOrder = () => {
-    if (!item) {
-      toast.error("No item to checkout");
+  const inc = async () => {
+    if (!item) return;
+
+    const nextQty = (item.quantity || 0) + 1;
+    if (item.stock != null && nextQty > item.stock && !item.allowBackorder) {
+      toast.error("Not enough stock for this size");
       return;
     }
 
-    if (!selectedAddress) {
-      alert("Please add address");
+    setItem({
+      ...item,
+      quantity: nextQty,
+      lineTaxAmount: Math.max(
+        0,
+        Number(item.selectedSizePriceInclTax ?? 0) - Number(item.selectedSizePriceExclTax ?? 0)
+      ) * nextQty,
+    });
+  };
+
+  const dec = async () => {
+    if (!item) return;
+
+    const nextQty = (item.quantity || 0) - 1;
+    if (nextQty <= 0) {
+      setItem(null);
       return;
     }
 
-    handlePlaceOrderFlow(
-      {
-        fullName: selectedAddress.fullName,
-        phone: selectedAddress.phone,
-        addressLine1: selectedAddress.addressLine1,
-        addressLine2: selectedAddress.addressLine2 ?? "",
-        city: selectedAddress.city ?? "",
-        state: selectedAddress.state ?? "",
-        country: selectedAddress.country ?? "",
-        postalCode: selectedAddress.postalCode ?? "",
-      },
-      userNote,
-      [item]
-    );
+    setItem({
+      ...item,
+      quantity: nextQty,
+      lineTaxAmount: Math.max(
+        0,
+        Number(item.selectedSizePriceInclTax ?? 0) - Number(item.selectedSizePriceExclTax ?? 0)
+      ) * nextQty,
+    });
   };
 
   if (loading) {
@@ -278,7 +429,7 @@ function BuyNowContent() {
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="flex flex-col items-center gap-4 text-center">
           <div className="w-12 h-12 border-4 border-yellow-400 rounded-full border-t-transparent animate-spin" />
-          <p className="text-sm font-medium text-gray-600">Preparing checkout...</p>
+          <p className="text-sm font-medium text-gray-600">Loading your cart...</p>
         </div>
       </div>
     );
@@ -288,96 +439,213 @@ function BuyNowContent() {
     <div className="bg-[#ebecef]">
       <div className="flex flex-wrap gap-5 px-4 py-6 mx-auto max-w-7xl">
         <div className="w-full lg:w-[68%]">
+          <div className="flex gap-5 px-5 mb-8 bg-white">
+            <button
+              className={`sm:p-5 p-2 pt-3 sm:text-lg text-sm font-semibold ${
+                selectedTab === "product" ? "border-b-4 border-blue-500" : "text-gray-800"
+              }`}
+            >
+              Items ({totalQtyProduct})
+            </button>
+          </div>
 
-          <AddressComponent
-            addresses={addresses}
-            selectedAddressId={selectedAddressId}
-            onSelect={setSelectedAddressId}
-            onAdd={(address) => {
-              setAddresses((prev) => [...prev, address]);
-              setSelectedAddressId(address.id);
-            }}
-          />
+          {selectedTab === "product" ? (
+            <div className="mt-6 space-y-6 bg-white">
+              {itemsProduct.length === 0 ? (
+                <div className="p-8 text-center text-gray-600">Unable to load this product for checkout.</div>
+              ) : (
+                itemsProduct.map((currentItem) => (
+                  <div
+                    key={`${currentItem.productId}-${currentItem.variantId}-${currentItem.size}`}
+                    className="p-4 border border-gray-200 rounded-md"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex gap-4 min-w-0">
+                        <img
+                          className="object-contain flex-shrink-0 w-20 h-20 rounded bg-gray-50"
+                          src={currentItem.imageUrl || "/placeholder.png"}
+                          alt={currentItem.title || "Product"}
+                        />
 
-          <div className="mt-6 space-y-6 bg-white">
-            {!item ? (
-              <div className="p-8 text-center text-gray-600">Unable to load this product for checkout.</div>
-            ) : (
-              <div className="p-4 border border-gray-200 rounded-md">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex gap-4 min-w-0">
-                    <img
-                      className="object-contain flex-shrink-0 w-20 h-20 rounded bg-gray-50"
-                      src={item.imageUrl || "/placeholder.png"}
-                      alt={item.title || "Product"}
-                    />
+                        <div className="min-w-0">
+                          <div className="font-semibold text-gray-800 truncate">
+                            {currentItem.title || "Product"}
+                          </div>
 
-                    <div className="min-w-0">
-                      <div className="font-semibold text-gray-800 truncate">{item.title || "Product"}</div>
-                      <div className="text-xs text-gray-500">
-                        {item.sku ? `${item.sku}: ` : ""}
-                        {item.size}
-                        {item.color ? ` - ${item.color}` : ""}
+                          <div className="text-xs text-gray-500">
+                            {currentItem.color ? `${currentItem.color}: ` : ""}
+                            {currentItem.size}
+                          </div>
+
+                          <div className="mt-2">
+                            {(() => {
+                              const resolved = resolveDisplayPrice(
+                                Number(
+                                  currentItem.priceInclTax ??
+                                    currentItem.selectedSizePriceInclTax ??
+                                    currentItem.price ??
+                                    currentItem.selectedSizePrice ??
+                                    0
+                                ),
+                                currentItem.salePriceInclTax ?? currentItem.salePrice ?? null,
+                                currentItem.isSaleActive ??
+                                  isSaleActive(currentItem.salePrice, currentItem.discountEndDate)
+                              );
+
+                              if (resolved.onSale) {
+                                const pct =
+                                  resolved.original > 0
+                                    ? Math.round(((resolved.original - resolved.current) / resolved.original) * 100)
+                                    : 0;
+
+                                return (
+                                  <div className="flex flex-wrap items-center gap-2">
+                                    <span className="text-base text-gray-800">${resolved.current.toFixed(2)}</span>
+                                    <span className="text-sm text-gray-400 line-through">
+                                      ${resolved.original.toFixed(2)}
+                                    </span>
+                                    {pct > 0 && <span className="text-sm text-green-600">{pct}% OFF</span>}
+                                  </div>
+                                );
+                              }
+
+                              return (
+                                <div className="flex flex-col gap-1">
+                                  <span className="text-base text-gray-800">${resolved.current.toFixed(2)}</span>
+                                </div>
+                              );
+                            })()}
+                          </div>
+
+                          <div className="flex flex-wrap items-center gap-4 mt-2 text-xs text-gray-500">
+                            <span>Tax included : ${Number(currentItem.lineTaxAmount ?? 0).toFixed(2)}</span>
+                          </div>
+                        </div>
                       </div>
+                    </div>
 
-                      <div className="mt-2">
+                    <div className="flex items-center justify-between mt-4">
+                      <div className="text-xs text-gray-500">
                         {(() => {
-                          const resolved = resolveDisplayPrice(
-                            Number(item.priceInclTax ?? item.selectedSizePriceInclTax ?? item.price ?? item.selectedSizePrice ?? 0),
-                            item.salePriceInclTax ?? item.salePrice ?? null,
-                            Boolean(item.isSaleActive)
+                          const shippingOptions = getShippingOptions(currentItem);
+                          const effectiveShippingCost = getShippingCostForSpeed(
+                            currentItem,
+                            fallbackSelectedDeliverySpeed
                           );
+                          const effectiveShippingMethod =
+                            fallbackSelectedDeliverySpeed ?? getEffectiveShippingMethod(currentItem);
 
-                          if (resolved.onSale) {
+                          if (effectiveShippingMethod) {
                             return (
-                              <div className="flex flex-wrap items-center gap-2">
-                                <span className="text-base text-gray-800">${resolved.current.toFixed(2)}</span>
-                                <span className="text-sm text-gray-400 line-through">${resolved.original.toFixed(2)}</span>
-                              </div>
+                              <>
+                                Shipping: {getShippingLabel(effectiveShippingMethod as DeliverySpeed)} $
+                                {effectiveShippingCost.toFixed(2)}
+                              </>
                             );
                           }
 
-                          return (
-                            <span className="text-base text-gray-800">${resolved.current.toFixed(2)}</span>
-                          );
+                          if (shippingOptions.length > 0) {
+                            return (
+                              <>
+                                Shipping:{" "}
+                                {shippingOptions
+                                  .map((option) => `${getShippingLabel(option.type)} $${option.cost.toFixed(2)}`)
+                                  .join(" | ")}
+                              </>
+                            );
+                          }
+
+                          return null;
                         })()}
-                        {(item.taxIncluded ?? true) && (
-                          <div className="mt-1 text-xs text-gray-500">Tax included. Breakdown shown before payment.</div>
-                        )}
+                      </div>
+
+                      <div className="flex items-center gap-6">
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={dec}
+                            className="flex items-center justify-center w-8 h-8 bg-gray-200 rounded-full"
+                            disabled={currentItem.quantity <= 1}
+                          >
+                            -
+                          </button>
+
+                          <div className="w-6 text-sm text-center">{currentItem.quantity}</div>
+
+                          <button
+                            onClick={inc}
+                            className="flex items-center justify-center w-8 h-8 bg-gray-200 rounded-full"
+                          >
+                            +
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
+                ))
+              )}
+            </div>
+          ) : null}
+
+          {selectedTab === "product" && itemsProduct.length > 0 && availableDeliverySpeeds.length > 0 ? (
+            <div className="mt-6 bg-white border border-gray-200 rounded-md p-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-800">Shipping Speed</h3>
+                  <p className="mt-1 text-xs text-gray-500">Choose shipping Speed for your order</p>
+                  {selectedDeliverySpeed ? (
+                    <p className="mt-2 text-sm font-medium text-gray-700">
+                      Selected: {getShippingLabel(selectedDeliverySpeed)} - ${effectiveShippingTotalProduct.toFixed(2)}
+                    </p>
+                  ) : null}
                 </div>
 
-                <div className="flex items-center justify-between mt-4">
-                  <div className="text-xs text-gray-500">
-                    Shipping: {shippingMethod.replace(/^./, (char) => char.toUpperCase())} $
-                    {Number(item.shippingCost ?? 0).toFixed(2)}
-                  </div>
-
-                  <div className="flex items-center gap-6">
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => changeQuantity((item.quantity || 1) - 1)}
-                        className="flex items-center justify-center w-8 h-8 bg-gray-200 rounded-full"
-                        disabled={item.quantity <= 1}
-                      >
-                        -
-                      </button>
-
-                      <div className="w-6 text-sm text-center">{item.quantity}</div>
-
-                      <button
-                        onClick={() => changeQuantity((item.quantity || 1) + 1)}
-                        className="flex items-center justify-center w-8 h-8 bg-gray-200 rounded-full"
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                {deliverySpeedLoading && <div className="text-xs text-blue-600">Updating shipping...</div>}
               </div>
-            )}
+
+              <div className="flex flex-wrap gap-3 mt-4">
+                {availableDeliverySpeeds.map((speed) => {
+                  const isActive = selectedDeliverySpeed === speed;
+
+                  if (speed === "local") {
+                    const localVendor = item?.vendorState && selectedAddress?.state
+                      ? item.vendorState === selectedAddress.state
+                      : true;
+
+                    if (!localVendor) {
+                      return null;
+                    }
+                  }
+
+                  return (
+                    <button
+                      key={speed}
+                      type="button"
+                      onClick={() => handleDeliverySpeedChange(speed)}
+                      disabled={deliverySpeedLoading}
+                      className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
+                        isActive
+                          ? "border-blue-900 bg-blue-900 text-white"
+                          : "border-gray-300 bg-white text-gray-700 hover:border-blue-400"
+                      } disabled:cursor-not-allowed disabled:opacity-60`}
+                    >
+                      {getShippingLabel(speed)}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ) : null}
+
+          <div className="mt-6">
+            <AddressComponent
+              addresses={addresses}
+              selectedAddressId={selectedAddressId}
+              onSelect={setSelectedAddressId}
+              onAddressesChange={handleAddressesChange}
+              onAdd={(address) => {
+                setSelectedAddressId(address.id);
+              }}
+            />
           </div>
         </div>
 
@@ -387,86 +655,109 @@ function BuyNowContent() {
               <h3 className="pt-2 text-lg text-gray-800">Price Details</h3>
             </div>
 
-            <div className="p-5">
-              <div className="flex justify-between mt-3 text-sm text-gray-600">
-                <div>Product Price</div>
-                <div>${subtotal.toFixed(2)}</div>
-              </div>
-
-              {item && (item.taxIncluded ?? true) && (
-                <div className="mt-2 text-xs text-gray-500">
-                  Product prices are shown tax-inclusive.
-                </div>
-              )}
-
-              <div className="flex justify-between mt-3 text-sm text-gray-600">
-                <div>Shipping</div>
-                <div>${shippingTotal.toFixed(2)}</div>
-              </div>
-
-              <div className="mt-5">
-                <label className="block mb-2 text-sm font-medium text-gray-700">Discount Coupon</label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={couponCode}
-                    onChange={(event) => setCouponCode(event.target.value.toUpperCase())}
-                    placeholder="Enter coupon code"
-                    className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded outline-none focus:border-blue-500"
-                  />
-                  <button
-                    type="button"
-                    onClick={applyCoupon}
-                    disabled={applyingCoupon || !item}
-                    className="px-4 py-2 text-sm font-medium text-white bg-blue-900 rounded disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    {applyingCoupon ? "Applying..." : "Apply"}
-                  </button>
+            {selectedTab === "product" ? (
+              <div className="p-5">
+                <div className="flex justify-between mt-3 text-sm text-gray-600">
+                  <div>Subtotal Excl. Tax</div>
+                  <div>${effectiveSubtotalExclTaxProduct.toFixed(2)}</div>
                 </div>
 
-                {appliedDiscount && (
-                  <div className="flex items-center justify-between mt-2 text-sm">
-                    <span className="text-green-600">Applied: {appliedDiscount.couponCode}</span>
+                <div className="flex justify-between mt-3 text-sm text-gray-600">
+                  <div>Tax Total</div>
+                  <div className={effectiveTaxAmountProduct === 0 ? "text-green-600" : ""}>
+                    ${effectiveTaxAmountProduct.toFixed(2)}
+                  </div>
+                </div>
+
+                <div className="flex justify-between mt-3 text-sm text-gray-600">
+                  <div>Shipping</div>
+                  <div>${effectiveShippingTotalProduct.toFixed(2)}</div>
+                </div>
+
+                <div className="mt-5">
+                  <label className="block mb-2 text-sm font-medium text-gray-700">Discount Coupon</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={couponCode}
+                      onChange={(event) => setCouponCode(event.target.value.toUpperCase())}
+                      placeholder="Enter coupon code"
+                      className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded outline-none focus:border-blue-500"
+                    />
                     <button
                       type="button"
-                      onClick={() => {
-                        setAppliedDiscount(null);
-                        setCouponCode("");
-                      }}
-                      className="text-red-600"
+                      onClick={applyCoupon}
+                      disabled={applyingCoupon || itemsProduct.length === 0}
+                      className="px-4 py-2 text-sm font-medium text-white bg-blue-900 rounded disabled:cursor-not-allowed disabled:opacity-60"
                     >
-                      Remove
+                      {applyingCoupon ? "Applying..." : "Apply"}
                     </button>
                   </div>
-                )}
-              </div>
 
-              <div className="flex justify-between mt-4 text-sm text-gray-600">
-                <div>Discount</div>
-                <div className={discountAmount > 0 ? "text-green-600" : ""}>${discountAmount.toFixed(2)}</div>
-              </div>
-
-              <div className="flex justify-between mt-4 text-lg font-semibold text-gray-900">
-                <div>Total</div>
-                <div>${payableTotal.toFixed(2)}</div>
-              </div>
-
-              {totalSavings > 0 && (
-                <div className="mt-2 text-sm font-medium text-green-600">
-                  You will save ${totalSavings.toFixed(2)} on this order
+                  {appliedDiscount && (
+                    <div className="flex items-center justify-between mt-2 text-sm">
+                      <span className="text-green-600">Applied: {appliedDiscount.couponCode}</span>
+                      <button type="button" onClick={removeCoupon} className="text-red-600">
+                        Remove
+                      </button>
+                    </div>
+                  )}
                 </div>
-              )}
 
-              <div className="flex items-center justify-end mt-5 space-x-2">
-                <button
-                  className="px-4 py-2 text-white bg-blue-900 disabled:cursor-not-allowed disabled:opacity-60"
-                  disabled={!item}
-                  onClick={placeOrder}
-                >
-                  Place Order
-                </button>
+                <div className="flex justify-between mt-4 text-sm text-gray-600">
+                  <div>Discount</div>
+                  <div className={discountAmountProduct > 0 ? "text-green-600" : ""}>
+                    ${discountAmountProduct.toFixed(2)}
+                  </div>
+                </div>
+
+                <div className="flex justify-between mt-4 text-lg font-semibold text-gray-900">
+                  <div>Total</div>
+                  <div>${payableTotalProduct.toFixed(2)}</div>
+                </div>
+
+                {totalSavingsProduct > 0 && (
+                  <div className="mt-2 text-sm font-medium text-green-600">
+                    You will save ${totalSavingsProduct.toFixed(2)} on this order
+                  </div>
+                )}
+
+                <div className="flex items-center justify-end mt-5 space-x-2">
+                  <button
+                    className="px-4 py-2 text-white bg-blue-900 disabled:cursor-not-allowed disabled:opacity-60"
+                    disabled={itemsProduct.length === 0}
+                    onClick={() => {
+                      if (!selectedAddress) {
+                        alert("Please add address");
+                        return;
+                      }
+
+                      handlePlaceOrderFlow(
+                        {
+                          fullName: selectedAddress.fullName,
+                          phone: selectedAddress.phone,
+                          addressLine1: selectedAddress.addressLine1,
+                          addressLine2: selectedAddress.addressLine2 ?? "",
+                          city: selectedAddress.city ?? "",
+                          state: selectedAddress.state ?? "",
+                          country: selectedAddress.country ?? "",
+                          postalCode: selectedAddress.postalCode ?? "",
+                        },
+                        userNote,
+                        itemsProduct,
+                        selectedDeliverySpeed
+                      );
+                    }}
+                  >
+                    Place Order
+                  </button>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="p-5">
+                <div className="text-sm text-gray-600">Grocery checkout coming soon.</div>
+              </div>
+            )}
           </div>
         </div>
       </div>
