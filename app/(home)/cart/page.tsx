@@ -156,6 +156,7 @@ export default function CartPage() {
         setLoading(true);
         try {
             const res = await getCartDetailedResponse(deliverySpeed);
+
             setItemsProduct(res.items as CartItem[]);
             setCartPricing(res.pricing ?? null);
             setSelectedDeliverySpeed(
@@ -498,18 +499,19 @@ export default function CartPage() {
                 </div>
 
                 <div className="text-xs text-gray-500">
-                  {item.label ? `${item.label}: ` : ""}
+                  {/* {item.label ? `${item.label}: ` : ""} */}
+                  {item.color ? `${item.color}: ` : ""}
                   {item.size}
-                  {item.color ? ` - ${item.color}` : ""}
+                  {/* {item.color ? ` - ${item.color}` : ""} */}
                 </div>
-
+{/* 
                 {item.taxCategory && (
                   <div className="mt-2 flex flex-wrap items-center gap-2">
                     <span className="rounded border border-gray-300 bg-gray-50 px-2 py-1 text-[11px] text-gray-700">
                       {item.taxCategory.label} · {Number(item.taxRate ?? 0).toFixed(2).replace(/\.00$/, "")}%
                     </span>
                   </div>
-                )}
+                )} */}
 
                 {/* PRICE */}
                 <div className="mt-2">
@@ -546,6 +548,8 @@ export default function CartPage() {
                               {pct}% OFF
                             </span>
                           )}
+
+
                         </div>
                       );
                     }
@@ -557,7 +561,7 @@ export default function CartPage() {
                         </span>
                         {(item.taxIncluded ?? true) && (
                           <span className="text-xs text-gray-500">
-                            Tax included
+                            Tax included : ${Number(item.lineTaxAmount ?? 0).toFixed(2)}
                           </span>
                         )}
                       </div>
@@ -566,15 +570,18 @@ export default function CartPage() {
                 </div>
 
                 <div className="mt-2 flex flex-wrap items-center gap-4 text-xs text-gray-500">
-                  <span>
+                    <span className="text-xs text-gray-500">
+                            Tax included : ${Number(item.lineTaxAmount ?? 0).toFixed(2)}
+                    </span>
+                  {/* <span>
                     Qty: {item.quantity}
-                  </span>
+                  </span> */}
                   {/* <span>
                     Line Total: ${(Number(item.selectedSizePriceInclTax ?? item.selectedSizePrice ?? 0) * Number(item.quantity ?? 0)).toFixed(2)}
                   </span> */}
-                  <span className={Number(item.lineTaxAmount ?? 0) === 0 ? "text-green-600" : "text-gray-600"}>
+                  {/* <span className={Number(item.lineTaxAmount ?? 0) === 0 ? "text-green-600" : "text-gray-600"}>
                     Tax: ${Number(item.lineTaxAmount ?? 0).toFixed(2)}
-                  </span>
+                  </span> */}
                 </div>
               </div>
             </div>
@@ -712,6 +719,7 @@ export default function CartPage() {
                             <div className="mt-4 flex flex-wrap gap-3">
                                 {availableDeliverySpeeds.map((speed) => {
                                     const isActive = selectedDeliverySpeed === speed;
+                                    // if(selectedAddress?.state)
 
                                     return (
                                         <button

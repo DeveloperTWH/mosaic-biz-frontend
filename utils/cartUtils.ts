@@ -51,7 +51,7 @@ export interface CartItemDetailed extends CartItem {
   title?: string;
   sku?: string;
   businessId?: string;
-
+  vendorState?:string;
   // prices
   price?: number;                       // base price from API
   salePrice?: number | null;            // sale price (may be null)
@@ -123,6 +123,7 @@ export interface CartDetailedResponse {
   pricing?: CartPricingSummary | null;
   totalItems?: number;
   businessId?: string;
+  vendorState?:string;
 }
 
 type GuestCartItemMeta = {
@@ -1219,12 +1220,15 @@ export const getCartDetailedResponse = async (
     }
 
     const url = `${BASE}/api/cart${params.toString() ? `?${params.toString()}` : ""}`;
+
     const res = await fetch(url, { credentials: "include" });
     if (res.status === 404) return { items: [], pricing: null };
     if (!res.ok) throw new Error("Failed to fetch cart");
 
     const data = await res.json();
     const apiItems = data?.cart?.items ?? [];
+
+   
 
     const detailedItems = apiItems.map((it: any): CartItemDetailed => {
       const price = toNumber(it.price);
@@ -1265,6 +1269,7 @@ export const getCartDetailedResponse = async (
         allowBackorder: it.allowBackorder ?? it.variantId?.allowBackorder ?? false,
         title: it.title ?? it.productId?.title,
         businessId: toId(it.businessId),
+        vendorState : it.state,
 
         // prices
         price,
@@ -1338,6 +1343,7 @@ export const getCartDetailedResponse = async (
         : null,
       totalItems: toNumber(data?.cart?.totalItems),
       businessId: toId(data?.cart?.businessId),
+
     };
   }
 

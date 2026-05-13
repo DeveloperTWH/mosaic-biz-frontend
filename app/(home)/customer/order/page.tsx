@@ -217,14 +217,14 @@ const OrderPage = () => {
                         </button>
                       )}
 
-                      {(order.status === "ordered" || order.status === "accepted") && (
+                      {/* {(order.status === "ordered" || order.status === "accepted") && (
                         <button
                           onClick={() => handleCancelOrder(order._id)}
                           className="text-sm text-red-600 hover:underline"
                         >
                           Cancel Order
                         </button>
-                      )}
+                      )} */}
                     </div>
                   </div>
                 </div>
