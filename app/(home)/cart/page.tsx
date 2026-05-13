@@ -723,8 +723,7 @@ export default function CartPage() {
                                    if(speed == "local"){
                                     let localVendor = true;
                                     itemsProduct.forEach((item)=>{
-                                        console.log(item.vendorState)
-                                        console.log("userAddress : ", selectedAddress?.state)
+                                    
                                         if(item.vendorState !== selectedAddress?.state)
                                         {
                                            localVendor = false
@@ -913,7 +912,8 @@ export default function CartPage() {
                                                 },
                                                 userNote,
                                                 undefined,
-                                                selectedDeliverySpeed
+                                                selectedDeliverySpeed,
+                                                "cart"
                                             );
                                         }}
                                     >

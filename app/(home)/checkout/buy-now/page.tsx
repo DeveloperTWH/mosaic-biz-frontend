@@ -112,7 +112,6 @@ function BuyNowContent() {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/public/product/${productId}`);
       const data = await res.json().catch(() => ({}));
 
-      console.log(data)
       if (!res.ok) {
         toast.error(data?.message || "Failed to load product");
         setItem(null);
@@ -749,7 +748,8 @@ function BuyNowContent() {
                         },
                         userNote,
                         itemsProduct,
-                        selectedDeliverySpeed
+                        selectedDeliverySpeed,
+                        "buy-now"
                       );
                     }}
                   >

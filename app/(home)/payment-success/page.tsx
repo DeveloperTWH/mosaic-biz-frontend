@@ -4,7 +4,7 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Suspense } from 'react';
-import { ShoppingCart } from 'lucide-react';
+import { removeFromCart } from '@/utils/cartUtils';
 
 interface PaymentData {
   amount: number;
@@ -39,6 +39,7 @@ function PaymentSuccessPage() {
   const searchParams = useSearchParams();
   const paymentIntentId = searchParams.get('payment_intent');
   const redirectStatus = searchParams.get('redirect_status');
+  const source = searchParams.get('source');
 
   const [paymentData, setPaymentData] = useState<PaymentData | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
@@ -66,6 +67,54 @@ function PaymentSuccessPage() {
 
     fetchPaymentDetails();
   }, [paymentIntentId]);
+
+  useEffect(() => {
+    const clearPurchasedCartItems = async () => {
+      if (!paymentIntentId || redirectStatus !== 'succeeded' || source !== 'cart') {
+        return;
+      }
+
+      const processedKey = `cart_checkout_cleared_${paymentIntentId}`;
+      if (sessionStorage.getItem(processedKey) === 'true') {
+        return;
+      }
+
+      const raw = sessionStorage.getItem('pending_cart_checkout_items');
+      if (!raw) {
+        sessionStorage.setItem(processedKey, 'true');
+        return;
+      }
+
+      try {
+        const items = JSON.parse(raw) as Array<{
+          productId?: string;
+          variantId?: string;
+          size?: string;
+        }>;
+
+        const validItems = items.filter(
+          (item) => item.productId && item.variantId && item.size
+        );
+
+        await Promise.allSettled(
+          validItems.map((item) =>
+            removeFromCart(
+              String(item.productId),
+              String(item.variantId),
+              String(item.size)
+            )
+          )
+        );
+      } catch (error) {
+        console.error('Failed to clear purchased cart items', error);
+      } finally {
+        sessionStorage.setItem(processedKey, 'true');
+        sessionStorage.removeItem('pending_cart_checkout_items');
+      }
+    };
+
+    clearPurchasedCartItems();
+  }, [paymentIntentId, redirectStatus, source]);
 
   if (!paymentIntentId || redirectStatus !== 'succeeded') {
     return <div className="p-8 text-center text-red-600">Payment failed or invalid session</div>;

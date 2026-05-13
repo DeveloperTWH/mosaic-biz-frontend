@@ -1468,7 +1468,8 @@ export async function handlePlaceOrderFlow(
   address: ShippingAddress,
   userNote?: string,
   checkoutItems?: CartItemDetailed[],
-  selectedDeliverySpeed?: DeliverySpeed
+  selectedDeliverySpeed?: DeliverySpeed,
+  checkoutSource: "cart" | "buy-now" = checkoutItems ? "buy-now" : "cart"
 ) {
   const loggedIn = await isUserLoggedIn();
   const paymentPage = "/checkout/payment";
@@ -1518,9 +1519,19 @@ export async function handlePlaceOrderFlow(
   const data = await res.json();
   const { orderId, groupOrderId, clientSecret } = data;
 
+  if (typeof window !== "undefined" && checkoutSource === "cart") {
+    const cartItemsToClear = cart.map((item) => ({
+      productId: String(item.productId),
+      variantId: String(item.variantId),
+      size: String(item.size),
+    }));
+    sessionStorage.setItem("pending_cart_checkout_items", JSON.stringify(cartItemsToClear));
+  }
+
   // Redirect to payment page; pass what you need there
   const url = new URL(paymentPage, window.location.origin);
   url.searchParams.set("orderId", String(orderId));
+  url.searchParams.set("source", checkoutSource);
   if (groupOrderId) url.searchParams.set("groupOrderId", String(groupOrderId));
   if (clientSecret) url.searchParams.set("clientSecret", String(clientSecret));
   window.location.href = url.toString();

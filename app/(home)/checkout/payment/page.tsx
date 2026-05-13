@@ -15,8 +15,10 @@ import type { StripeError, PaymentIntentResult, PaymentIntent } from '@stripe/st
 function CheckoutForm({ clientSecret }: { clientSecret: string }) {
   const stripe = useStripe();
   const elements = useElements();
+  const searchParams = useSearchParams();
   const [status, setStatus] = useState<string>('');
   const [amount, setAmount] = useState<number | null>(null);
+  const source = searchParams.get('source') || 'cart';
 
   useEffect(() => {
     const fetchIntent = async () => {
@@ -37,7 +39,7 @@ function CheckoutForm({ clientSecret }: { clientSecret: string }) {
       await stripe.confirmPayment({
         elements,
         confirmParams: {
-          return_url: `${process.env.NEXT_PUBLIC_CLIENT_BASE_URL}/payment-success`,
+          return_url: `${process.env.NEXT_PUBLIC_CLIENT_BASE_URL}/payment-success?source=${encodeURIComponent(source)}`,
         },
       });
 

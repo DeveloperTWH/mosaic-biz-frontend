@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { Order } from '@/types/order'
+import Link from "next/link";
 
 const OrderPage = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -145,7 +146,8 @@ const OrderPage = () => {
                       key={item._id || idx}
                       className="flex items-center justify-between mb-3 last:mb-0"
                     >
-                      <div className="flex items-center">
+                      
+                      <Link href={"/product/"+ item.productId._id} className="flex items-center">
                         {/* Product Image */}
                         {item.productId?.coverImage && (
                           <img
@@ -164,7 +166,7 @@ const OrderPage = () => {
                             Quantity: {item.quantity}
                           </p>
                         </div>
-                      </div>
+                      </Link>
                     </div>
                   ))}
 
