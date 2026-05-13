@@ -187,6 +187,24 @@ const Navbar = () => {
                 <Link href="/privacy" className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-medium font-poppins">
                   Privacy Policy
                 </Link>
+                 <Link href="/dispute" className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-medium font-poppins">
+                  Dispute Resolution Process 
+                </Link>
+                 <Link href="/refund-return" className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-medium font-poppins">
+                  Refunds and Returns 
+                </Link>
+                <Link href="/consumer/terms" className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-medium font-poppins">
+                  Terms and Conditions – Consumer 
+                </Link>
+                <Link href="/vendor/terms" className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-medium font-poppins">
+                  Terms and Conditions – Vendor 
+                </Link>
+                <Link href="/consumer/trustbadge" className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-medium font-poppins">
+                  Trust Badges – Consumer 
+                </Link>
+                <Link href="/vendor/trustbadge" className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-medium font-poppins">
+                  Trust Badges – Vendor 
+                </Link>
               </div>
             )}
 
