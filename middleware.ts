@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
 
 const PUBLIC_PATHS = ['/', '/login', '/signup', '/signin'];
-const JWT_SECRET = new TextEncoder().encode('your_secret_key');
+const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
+
 
 type JWTPayload = {
     role: string;
