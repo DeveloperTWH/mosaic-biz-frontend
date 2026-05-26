@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { toast } from "react-toastify";
 import { useRouter, useSearchParams } from "next/navigation";
 
-const SignIn = () => {
+const SignInContent = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false); // Global loader
@@ -139,4 +139,16 @@ const SignIn = () => {
   );
 };
 
-export default SignIn;
+export default function SignIn() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-screen bg-gray-100">
+          <div className="animate-spin rounded-full border-t-4 border-blue-600 w-16 h-16"></div>
+        </div>
+      }
+    >
+      <SignInContent />
+    </Suspense>
+  );
+}
