@@ -86,9 +86,10 @@ function LoginContent() {
         router.push(data.user.role === 'business_owner' ? '/partners' : (safeRedirect || '/'));
 
       } else if (data.otpPending) {
+        const otpType = data.user.role === 'business_owner' ? 'vendor' : data.user.role;
         const nextUrl = safeRedirect
-          ? `/verify-otp?email=${encodeURIComponent(data.user.email)}&type=${encodeURIComponent(data.user.role)}&redirect=${encodeURIComponent(safeRedirect)}`
-          : `/verify-otp?email=${encodeURIComponent(data.user.email)}&type=${encodeURIComponent(data.user.role)}`;
+          ? `/verify-otp?email=${encodeURIComponent(data.user.email)}&type=${encodeURIComponent(otpType)}&redirect=${encodeURIComponent(safeRedirect)}`
+          : `/verify-otp?email=${encodeURIComponent(data.user.email)}&type=${encodeURIComponent(otpType)}`;
         router.push(nextUrl);
       } else {
         setError(data.message || 'Login failed');

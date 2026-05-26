@@ -133,6 +133,14 @@ export default function CheckoutAddressPage() {
 
     setIsLoading(true);
     try {
+      console.log('[checkout] initiating order', {
+        apiUrl: `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/orders/initiate`,
+        itemCount: cartItems.length,
+        customerEmail,
+        address,
+        items: cartItems,
+      });
+
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/orders/initiate`,
         {
@@ -143,10 +151,17 @@ export default function CheckoutAddressPage() {
         { withCredentials: true }
       );
 
+      console.log('[checkout] initiate response', response.data);
+
       const { clientSecret, groupOrderId } = response.data;
       toast.success('Proceeding to payment...');
       router.push(`/checkout/payment?clientSecret=${clientSecret}&groupOrderId=${groupOrderId}`);
     } catch (err: any) {
+      console.error('[checkout] initiate failed', {
+        message: err?.message,
+        status: err?.response?.status,
+        response: err?.response?.data,
+      });
       toast.error(err?.response?.data?.message || 'Failed to create order');
     } finally {
       setIsLoading(false);

@@ -13,7 +13,8 @@ function VerifyOtpPage() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const email = searchParams.get('email');
-    const type = searchParams.get('type'); // 'vendor' or 'customer'
+    const typeParam = searchParams.get('type');
+    const type = typeParam === 'business_owner' ? 'vendor' : typeParam; // 'vendor' or 'customer'
     const redirect = searchParams.get('redirect');
     const safeRedirect =
         redirect && redirect.startsWith('/') && !redirect.startsWith('//')

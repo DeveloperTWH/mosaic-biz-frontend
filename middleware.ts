@@ -10,9 +10,15 @@ type JWTPayload = {
 };
 
 function clearClientSessionCookies(res: NextResponse) {
+    res.cookies.set('auth_token', '', { maxAge: 0 });
+    res.cookies.set('token', '', { maxAge: 0 });
     res.cookies.set('user_gender', '', { maxAge: 0 });
     res.cookies.set('user_session', '', { maxAge: 0 });
     return res;
+}
+
+function getAuthToken(req: NextRequest) {
+    return req.cookies.get('token')?.value || req.cookies.get('auth_token')?.value;
 }
 
 function redirectUnauthorized(req: NextRequest, path: string) {
@@ -37,7 +43,7 @@ export async function middleware(req: NextRequest) {
         return NextResponse.next();
     }
 
-    const token = req.cookies.get('token')?.value;
+    const token = getAuthToken(req);
 
     // if (token && (path === '/login' || path === '/signup' || path === '/signin')) {
     //     try {
@@ -92,6 +98,18 @@ export async function middleware(req: NextRequest) {
         return NextResponse.next();
     }
 
+    // Partner/customer auth is validated against the API using credentialed requests.
+    // When the API lives on a different origin, its auth cookie may not be readable
+    // from Next middleware, so we avoid blocking these routes here.
+    if (
+        path.startsWith('/admin') ||
+        path.startsWith('/partners') ||
+        path.startsWith('/customer') ||
+        path === '/dashboard'
+    ) {
+        return NextResponse.next();
+    }
+
     if (!token) {
         return redirectUnauthorized(req, path);
     }
@@ -101,22 +119,6 @@ export async function middleware(req: NextRequest) {
             payload: { role: string };
         };
         const role = payload.role;
-
-        if (path === '/dashboard') {
-            return NextResponse.redirect(new URL(getRedirectPathByRole(role), req.url));
-        }
-
-        if (path.startsWith('/admin') && role !== 'admin') {
-            return NextResponse.redirect(new URL('/signin', req.url));
-        }
-
-        if (path.startsWith('/partners') && role !== 'business_owner') {
-            return NextResponse.redirect(new URL(getRedirectPathByRole(role), req.url));
-        }
-
-        if (path.startsWith('/customer') && role !== 'customer') {
-            return NextResponse.redirect(new URL(getRedirectPathByRole(role), req.url));
-        }
 
         return NextResponse.next();
     } catch {

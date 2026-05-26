@@ -97,10 +97,14 @@ const Page: React.FC = () => {
       })
       .catch((error) => {
         console.error("Error fetching business data:", error);
+        if (error.response?.status === 401 || error.response?.status === 403) {
+          router.push("/login?type=vendor&redirect=%2Fpartners");
+          return;
+        }
         setLoading(false);
         setOnboardingLoading(false);
       });
-  }, []);
+  }, [router]);
 
   const checkApplicationId = async () => {
     try {
@@ -150,9 +154,6 @@ const Page: React.FC = () => {
       if (response.data.success) {
         
         setOnboardingStatus(response.data);
-
-        if(response.data.data.currentStage === 4)
-                router.push("/partners/dashboard")
       }
     } catch (error) {
       console.error("Error fetching onboarding status:", error);

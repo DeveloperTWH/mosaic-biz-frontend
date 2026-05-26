@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
@@ -12,6 +12,12 @@ const SignIn = () => {
   const [error, setError] = useState(""); // Error message state
 
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect");
+  const safeRedirect =
+    redirect && redirect.startsWith("/") && !redirect.startsWith("//")
+      ? redirect
+      : "/admin";
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -43,9 +49,14 @@ const SignIn = () => {
         toast.success("Welcome!");
         localStorage.setItem("user_session", "true");
         localStorage.setItem("user_gender", data.user.gender || "");
-        router.push('/admin');
+        localStorage.setItem("user_name", data.user.name || "");
+        router.push(safeRedirect);
       } else if (data.otpPending) {
-        router.push(`/verify-otp?email=${data.user.email}&type=${data.user.role}`);
+        router.push(
+          `/verify-otp?email=${encodeURIComponent(data.user.email)}&type=${encodeURIComponent(
+            data.user.role
+          )}&redirect=${encodeURIComponent(safeRedirect)}`
+        );
       } else {
         setError(data.message || "Login failed");
       }

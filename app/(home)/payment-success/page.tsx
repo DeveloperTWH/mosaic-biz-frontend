@@ -50,16 +50,29 @@ function PaymentSuccessPage() {
       if (!paymentIntentId) return;
 
       try {
+        console.log('[payment-success] fetching receipt details', {
+          apiUrl: `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/orders/retrieve-intent/${paymentIntentId}`,
+          paymentIntentId,
+          redirectStatus,
+          source,
+        });
+
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/orders/retrieve-intent/${paymentIntentId}`,
           { credentials: 'include' }
         );
         const data = await res.json();
 
+        console.log('[payment-success] retrieve-intent response', {
+          status: res.status,
+          ok: res.ok,
+          data,
+        });
+
         setPaymentData(data.paymentIntent);
         setOrders(data.orders || []);
       } catch (err) {
-        console.error('Failed to fetch payment details', err);
+        console.error('[payment-success] failed to fetch payment details', err);
       } finally {
         setLoading(false);
       }
@@ -69,6 +82,12 @@ function PaymentSuccessPage() {
   }, [paymentIntentId]);
 
   useEffect(() => {
+    console.log('[payment-success] page params', {
+      paymentIntentId,
+      redirectStatus,
+      source,
+    });
+
     const clearPurchasedCartItems = async () => {
       if (!paymentIntentId || redirectStatus !== 'succeeded' || source !== 'cart') {
         return;

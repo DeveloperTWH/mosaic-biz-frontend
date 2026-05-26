@@ -23,7 +23,11 @@ function CheckoutForm({ clientSecret }: { clientSecret: string }) {
   useEffect(() => {
     const fetchIntent = async () => {
       if (!stripe || !clientSecret) return;
+      console.log('[checkout-payment] retrieving payment intent', {
+        clientSecret,
+      });
       const result: PaymentIntentResult = await stripe.retrievePaymentIntent(clientSecret);
+      console.log('[checkout-payment] retrievePaymentIntent result', result);
       if (result.paymentIntent) {
         setAmount(result.paymentIntent.amount || 0);
       }
@@ -33,7 +37,19 @@ function CheckoutForm({ clientSecret }: { clientSecret: string }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!stripe || !elements) return;
+    if (!stripe || !elements) {
+      console.warn('[checkout-payment] stripe or elements not ready', {
+        stripeReady: Boolean(stripe),
+        elementsReady: Boolean(elements),
+      });
+      return;
+    }
+
+    console.log('[checkout-payment] confirming payment', {
+      clientSecret,
+      source,
+      returnUrl: `${process.env.NEXT_PUBLIC_CLIENT_BASE_URL}/payment-success?source=${encodeURIComponent(source)}`,
+    });
 
     const { error, paymentIntent }: { error?: StripeError; paymentIntent?: PaymentIntent } =
       await stripe.confirmPayment({
@@ -42,6 +58,11 @@ function CheckoutForm({ clientSecret }: { clientSecret: string }) {
           return_url: `${process.env.NEXT_PUBLIC_CLIENT_BASE_URL}/payment-success?source=${encodeURIComponent(source)}`,
         },
       });
+
+    console.log('[checkout-payment] confirmPayment result', {
+      error,
+      paymentIntent,
+    });
 
     if (error) {
       setStatus(`❌ Payment failed: ${error.message}`);
@@ -78,6 +99,14 @@ function CheckoutForm({ clientSecret }: { clientSecret: string }) {
 function CheckoutClient() {
   const searchParams = useSearchParams();
   const clientSecret = searchParams.get('clientSecret') || '';
+
+  useEffect(() => {
+    console.log('[checkout-payment] page loaded', {
+      clientSecret,
+      groupOrderId: searchParams.get('groupOrderId'),
+      source: searchParams.get('source'),
+    });
+  }, [clientSecret, searchParams]);
 
   if (!clientSecret) return <p className="text-center">Missing client secret</p>;
 

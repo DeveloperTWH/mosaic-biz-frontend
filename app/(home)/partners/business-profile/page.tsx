@@ -437,7 +437,7 @@ const validateForm = (): boolean => {
       if (embedded) {
         onSaved?.();
       } else {
-        router.push('/partners');
+        router.push('/partners/dashboard');
       }
       
     } catch (error: any) {
