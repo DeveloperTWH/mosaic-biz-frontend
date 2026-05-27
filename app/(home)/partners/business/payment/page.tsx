@@ -2,11 +2,10 @@
 'use client';
 
 import { Suspense } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { AlertCircle, Loader, CheckCircle, Lock, ArrowLeft } from 'lucide-react';
 import { FaCcVisa, FaCcMastercard, FaCcAmex } from "react-icons/fa";
-import Link from 'next/link';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { submitStage1 } from '@/lib/api/vendorOnboarding';
@@ -36,28 +35,37 @@ const CheckIcon = () => (
 
 // Payment Form Component
 function VendorPaymentForm({ 
-  clientSecret, 
   onSuccess, 
   onError 
 }: { 
-  clientSecret: string; 
   onSuccess: () => void;
   onError: (error: string) => void;
 }) {
   const stripe = useStripe();
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isPaymentElementReady, setIsPaymentElementReady] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!stripe || !elements) {
+    if (!stripe || !elements || !isPaymentElementReady) {
+      if (!isPaymentElementReady) {
+        onError('Payment form is still loading. Please wait a moment and try again.');
+      }
       return;
     }
     
     setIsProcessing(true);
     
     try {
+      const { error: submitError } = await elements.submit();
+
+      if (submitError) {
+        onError(submitError.message || 'Please check your payment details and try again.');
+        return;
+      }
+
       const { error, paymentIntent } = await stripe.confirmPayment({
         elements,
         confirmParams: {
@@ -87,12 +95,12 @@ function VendorPaymentForm({
   return (
     <form onSubmit={handleSubmit}>
       <div style={{ marginBottom: '1.5rem' }}>
-        <PaymentElement />
+        <PaymentElement onReady={() => setIsPaymentElementReady(true)} />
       </div>
       
       <button
         type="submit"
-        disabled={!stripe || isProcessing}
+        disabled={!stripe || isProcessing || !isPaymentElementReady}
         style={{
           width: '100%',
           padding: '0.875rem',
@@ -121,7 +129,6 @@ function VendorPaymentForm({
 // Main content component that uses useSearchParams
 function VendorBusinessPaymentContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -468,6 +475,7 @@ function VendorBusinessPaymentContent() {
             ) : (
               <>
                 <Elements 
+                  key={clientSecret}
                   stripe={stripePromise} 
                   options={{
                     clientSecret: clientSecret,
@@ -486,7 +494,6 @@ function VendorBusinessPaymentContent() {
                   }}
                 >
                   <VendorPaymentForm 
-                    clientSecret={clientSecret}
                     onSuccess={handlePaymentSuccess}
                     onError={(error) => setError(error)}
                   />
