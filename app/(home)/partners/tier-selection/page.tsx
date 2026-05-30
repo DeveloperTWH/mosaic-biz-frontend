@@ -53,7 +53,16 @@ const TierSelectionContent: React.FC = () => {
         // Fetch subscription plans
         const plansResponse = await fetchSubscriptionPlans();
         if (plansResponse.success && plansResponse.data) {
-          setPlans(plansResponse.data);
+          const tierOrder = (name: string) => {
+            const n = name.toLowerCase();
+            if (n.includes('silver') || n.includes('basic')) return 0;
+            if (n.includes('gold') || n.includes('standard')) return 1;
+            return 2; // platinum / premium
+          };
+          const sorted = [...plansResponse.data].sort(
+            (a, b) => tierOrder(a.name) - tierOrder(b.name)
+          );
+          setPlans(sorted);
         } else {
           throw new Error('Failed to fetch subscription plans');
         }
@@ -98,7 +107,7 @@ const TierSelectionContent: React.FC = () => {
 
   // Determine badge based on plan name
   const getBadge = (planName: string) => {
-    if (planName.toLowerCase() === 'gold' || planName.toLowerCase() === 'standard') {
+    if (planName.toLowerCase().includes('gold') || planName.toLowerCase().includes('standard')) {
       return 'Recommended';
     }
     return undefined;

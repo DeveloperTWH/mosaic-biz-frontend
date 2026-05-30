@@ -24,7 +24,7 @@ const TierCard: React.FC<TierCardProps> = ({
   const getPlanConfig = () => {
     const name = plan.name.toLowerCase();
 
-    if (name === 'gold' || name === 'standard') {
+    if (name.includes('gold') || name.includes('standard')) {
       return {
         headerBg: 'bg-[#FDF8F0]',
         buttonBg: 'bg-[#D4AF37]',
@@ -53,7 +53,7 @@ const TierCard: React.FC<TierCardProps> = ({
       };
     }
 
-    if (name === 'platinum' || name === 'premium') {
+    if (name.includes('platinum') || name.includes('premium')) {
       return {
         headerBg: 'bg-[#F3F4F6]',
         buttonBg: 'bg-[#1E3A8A]',
