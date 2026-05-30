@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 interface ShippingSettingsTabProps {
   businessId?: string;
   isActive: boolean;
+  onNextTab?: () => void;
 }
 
 type ShippingMethod = "flat_rate" | "quantity_based";
@@ -156,6 +157,7 @@ const sectionEyebrowClassName =
 export default function ShippingSettingsTab({
   businessId,
   isActive,
+  onNextTab,
 }: ShippingSettingsTabProps) {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -802,6 +804,15 @@ export default function ShippingSettingsTab({
           >
             {saving ? "Saving..." : "Save Shipping Settings"}
           </button>
+          {onNextTab && (
+            <button
+              type="button"
+              onClick={onNextTab}
+              className="rounded-xl bg-[#c9a227] px-5 py-3 font-poppins text-lg font-medium text-white transition hover:bg-[#b8921f] shadow-sm"
+            >
+              Next
+            </button>
+          )}
         </div>
       </div>
 

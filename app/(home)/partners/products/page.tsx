@@ -12,8 +12,11 @@ import EditProductModal from './components/product-modal/EditProductModal';
 import ConfirmDialog from './components/ConfirmDialog'; // You'll need to create this
 import AddDiscountModal from './components/AddDiscountModal';
 import ViewDiscountsModal from './components/ViewDiscountsModal';
+interface ProductsPageProps {
+  onNextTab?: () => void;
+}
 
-export default function ProductsPage() {
+export default function ProductsPage({ onNextTab }: ProductsPageProps = {}) {
   const router = useRouter();
   const [businessId, setBusinessId] = useState<string>('');
   const [loadingBusiness, setLoadingBusiness] = useState(true);
@@ -143,12 +146,17 @@ export default function ProductsPage() {
       <Plus className="w-4 h-4" />
       Add Product
     </button>
-
     <button
-      onClick={() => router.push('/partners/final-review')}
+      onClick={() => {
+        if (onNextTab) {
+          onNextTab();
+        } else {
+          router.push('/partners/final-review');
+        }
+      }}
       className="px-4 py-1 bg-blue-900 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
     >
-      publish
+      Next
     </button>
   </div>
 </div>

@@ -4,8 +4,8 @@ import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import axios from "axios";
-import { 
-  ChevronDown, ChevronUp, Check, X, Eye, 
+import {
+  ChevronDown, ChevronUp, Check, X, Eye,
   Building2, FileText, Calendar, DollarSign,
   User, Globe, Link as LinkIcon, MapPin, Clock,
   Phone, Mail, Award, CheckCircle, XCircle,
@@ -136,7 +136,7 @@ export default function FinalReviewPage() {
   const [verificationDetails, setVerificationDetails] = useState<BusinessVerificationDetails | null>(null);
   const [profileDetails, setProfileDetails] = useState<BusinessProfileDetails | null>(null);
   const [loading, setLoading] = useState(true);
-  
+
   // Accordion state
   const [expandedStep, setExpandedStep] = useState<number | null>(null);
   const [selectedDoc, setSelectedDoc] = useState<string | null>(null);
@@ -146,22 +146,22 @@ export default function FinalReviewPage() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        
+
         // First, get application ID
         const appIdResponse = await axios.get(
           `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/vendor-onboarding/applicationId`,
           { withCredentials: true }
         );
-        
+
         if (appIdResponse.data.success && appIdResponse.data.applicationId) {
           const appId = appIdResponse.data.applicationId;
-          
+
           // Fetch onboarding status using application ID
           const statusResponse = await axios.get(
             `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/vendor-onboarding/status/${appId}`,
             { withCredentials: true }
           );
-          
+
           if (statusResponse.data.success) {
             setOnboardingData(statusResponse.data.data);
           }
@@ -171,10 +171,10 @@ export default function FinalReviewPage() {
             `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/vendor-onboarding/onboarding-data`,
             { withCredentials: true }
           );
-          
+
           if (detailedResponse.data.success) {
             const data = detailedResponse.data.data;
-            
+
             // Set verification details
             setVerificationDetails({
               businessName: data.businessName || '',
@@ -234,13 +234,13 @@ export default function FinalReviewPage() {
             });
           }
         }
-        
+
         // Fetch business details
         const businessResponse = await axios.get(
           `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/business/my`,
           { withCredentials: true }
         );
-        
+
         if (businessResponse.data.businesses?.length > 0) {
           const currentBusiness =
             businessResponse.data.businesses.find((item: Business) => item.isActive) ??
@@ -248,7 +248,7 @@ export default function FinalReviewPage() {
 
           setBusiness(currentBusiness);
         }
-        
+
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -268,21 +268,21 @@ export default function FinalReviewPage() {
     }
 
     if (!onboardingData) return "pending";
-    
-    switch(stepNumber) {
+
+    switch (stepNumber) {
       case 1: // Business Verification
-        return onboardingData.details.stage1.status === "submitted" || 
-               onboardingData.details.stage1.status === "verified" 
-               ? "completed" : "pending";
+        return onboardingData.details.stage1.status === "submitted" ||
+          onboardingData.details.stage1.status === "verified"
+          ? "completed" : "pending";
       case 2: // Tier / Subscription Selection
-        return onboardingData.details.stage2.status === "active" 
-               ? "completed" : "pending";
+        return onboardingData.details.stage2.status === "active"
+          ? "completed" : "pending";
       case 3: // Subscription Payment
-        return onboardingData.details.stage1.paymentStatus === "paid" 
-               ? "completed" : "pending";
+        return onboardingData.details.stage1.paymentStatus === "paid"
+          ? "completed" : "pending";
       case 4: // Business Profile Setup
-        return onboardingData.details.stage3.isComplete 
-               ? "completed" : "pending";
+        return onboardingData.details.stage3.isComplete
+          ? "completed" : "pending";
       case 5: // Product / Service Creation
         return onboardingData.currentStage && onboardingData.currentStage >= 4 ? "completed" : "pending";
       default:
@@ -294,68 +294,68 @@ export default function FinalReviewPage() {
     setExpandedStep(expandedStep === stepNumber ? null : stepNumber);
   };
 
-const steps = useMemo(() => {
-  const baseSteps = [
-    { 
-      number: "01", 
-      title: "Business Verification", 
-      status: getStepStatus(1), 
-      link: "/partners/business/new",
-      details: onboardingData ? {
-        points: onboardingData.details.stage1.points,
-        paymentStatus: onboardingData.details.stage1.paymentStatus
-      } : null
-    },
-    { 
-      number: "02", 
-      title: "Tier / Subscription Selection", 
-      status: getStepStatus(2), 
-      link: "/partners/tier-selection",
-      details: onboardingData ? {
-        plan: onboardingData.details.stage2.plan,
-        amount: onboardingData.details.stage2.amount
-      } : null
-    },
-    { 
-      number: "03", 
-      title: "Subscription Payment", 
-      status: getStepStatus(3), 
-      link: "/partners/tier-selection/success",
-      details: onboardingData ? {
-        status: onboardingData.details.stage1.paymentStatus,
-        date: onboardingData.details.stage2.subscribedAt
-      } : null
-    },
-    { 
-      number: "04", 
-      title: "Business Profile Setup", 
-      status: getStepStatus(4), 
-      link: "/partners/business-profile",
-      details: onboardingData ? {
-        hasLogo: onboardingData.details.stage3.hasLogo,
-        hasBio: onboardingData.details.stage3.hasBio
-      } : null
-    },
-    { 
-      number: "05", 
-      title: "Product / Service Creation", 
-      status: getStepStatus(5), 
-      link: "/partners/products"
+  const steps = useMemo(() => {
+    const baseSteps = [
+      {
+        number: "01",
+        title: "Business Verification",
+        status: getStepStatus(1),
+        link: "/partners/business/new",
+        details: onboardingData ? {
+          points: onboardingData.details.stage1.points,
+          paymentStatus: onboardingData.details.stage1.paymentStatus
+        } : null
+      },
+      {
+        number: "02",
+        title: "Tier / Subscription Selection",
+        status: getStepStatus(2),
+        link: "/partners/tier-selection",
+        details: onboardingData ? {
+          plan: onboardingData.details.stage2.plan,
+          amount: onboardingData.details.stage2.amount
+        } : null
+      },
+      {
+        number: "03",
+        title: "Subscription Payment",
+        status: getStepStatus(3),
+        link: "/partners/tier-selection/success",
+        details: onboardingData ? {
+          status: onboardingData.details.stage1.paymentStatus,
+          date: onboardingData.details.stage2.subscribedAt
+        } : null
+      },
+      {
+        number: "04",
+        title: "Business Profile Setup",
+        status: getStepStatus(4),
+        link: "/partners/business-profile",
+        details: onboardingData ? {
+          hasLogo: onboardingData.details.stage3.hasLogo,
+          hasBio: onboardingData.details.stage3.hasBio
+        } : null
+      },
+      {
+        number: "05",
+        title: "Product / Service Creation",
+        status: getStepStatus(5),
+        link: "/partners/products"
+      }
+    ];
+
+    // ✅ Only add Payout step if listingType is "product"
+    if (business?.listingType === "product") {
+      baseSteps.push({
+        number: "06",
+        title: "Payout & Bank Setup",
+        status: getStepStatus(6),
+        link: "/partners/payout-setup"
+      });
     }
-  ];
 
-  // ✅ Only add Payout step if listingType is "product"
-  if (business?.listingType === "product") {
-    baseSteps.push({
-      number: "06",
-      title: "Payout & Bank Setup",
-      status: getStepStatus(6),
-      link: "/partners/payout-setup"
-    });
-  }
-
-  return baseSteps;
-}, [business, onboardingData]);
+    return baseSteps;
+  }, [business, onboardingData]);
 
   // const steps = [
   //   { 
@@ -438,7 +438,7 @@ const steps = useMemo(() => {
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-3xl mx-auto px-4">
-        
+
         {/* Header */}
         <div className="text-center mb-10">
           <h1 className="text-2xl font-bold text-gray-900 tracking-wide">FINAL REVIEW</h1>
@@ -455,19 +455,19 @@ const steps = useMemo(() => {
         {/* Steps List with Accordion */}
         <div className="space-y-3 mb-8">
           {steps.map((step, index) => (
-            <div 
-              key={index} 
+            <div
+              key={index}
               className="bg-[#f5f5f0] rounded-lg overflow-hidden"
             >
               {/* Step Header - Always Visible */}
               <div className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-100 transition-colors"
-                   onClick={() => step.number === "06" ? router.push(step.link) : toggleStep(index + 1)}>
+                onClick={() => step.number === "06" ? router.push(step.link) : toggleStep(index + 1)}>
                 <div className="flex items-center gap-4 flex-1">
                   {/* Number Badge */}
                   <span className="w-8 h-8 rounded-md bg-[#c9a227] flex items-center justify-center text-sm font-bold text-white">
                     {step.number}
                   </span>
-                  
+
                   {/* Title */}
                   <span className="font-semibold text-gray-800 text-sm">
                     {step.title}
@@ -476,17 +476,16 @@ const steps = useMemo(() => {
 
                 <div className="flex items-center gap-3">
                   {/* Status Badge */}
-                  <span className={`text-xs px-3 py-1 rounded-full border ${
-                    step.status === 'completed' 
-                      ? 'border-green-500 text-green-600 bg-green-50' 
-                      : step.status === 'incompleted'
+                  <span className={`text-xs px-3 py-1 rounded-full border ${step.status === 'completed'
+                    ? 'border-green-500 text-green-600 bg-green-50'
+                    : step.status === 'incompleted'
                       ? 'border-red-400 text-red-500 bg-red-50'
                       : 'border-yellow-400 text-yellow-600 bg-yellow-50'
-                  }`}>
-                    {step.status === 'completed' ? 'Completed' : 
-                     step.status === 'incompleted' ? 'Incompleted' : 'Pending'}
+                    }`}>
+                    {step.status === 'completed' ? 'Completed' :
+                      step.status === 'incompleted' ? 'Incompleted' : 'Pending'}
                   </span>
-                  
+
                   {/* Expand/Collapse Arrow */}
                   {expandedStep === index + 1 ? (
                     <ChevronUp className="w-5 h-5 text-gray-400" />
@@ -734,9 +733,8 @@ const steps = useMemo(() => {
                           <div className="flex items-center gap-2">
                             <DollarSign className="w-4 h-4 text-green-600" />
                             <span className="text-xs text-gray-600">Payment:</span>
-                            <span className={`text-xs font-medium capitalize ${
-                              verificationDetails.paymentStatus === 'paid' ? 'text-green-600' : 'text-yellow-600'
-                            }`}>
+                            <span className={`text-xs font-medium capitalize ${verificationDetails.paymentStatus === 'paid' ? 'text-green-600' : 'text-yellow-600'
+                              }`}>
                               {verificationDetails.paymentStatus}
                             </span>
                           </div>
@@ -755,9 +753,9 @@ const steps = useMemo(() => {
                             <ImageIcon className="w-3 h-3" /> Business Logo
                           </h4>
                           {profileDetails.logo ? (
-                            <img 
-                              src={profileDetails.logo} 
-                              alt="Business Logo" 
+                            <img
+                              src={profileDetails.logo}
+                              alt="Business Logo"
                               className="w-24 h-24 object-cover rounded-lg border cursor-pointer hover:opacity-90 transition-opacity"
                               onClick={() => setSelectedDoc(profileDetails.logo)}
                             />
@@ -772,9 +770,9 @@ const steps = useMemo(() => {
                             <ImageIcon className="w-3 h-3" /> Feature Banner
                           </h4>
                           {profileDetails.featureBanner ? (
-                            <img 
-                              src={profileDetails.featureBanner} 
-                              alt="Feature Banner" 
+                            <img
+                              src={profileDetails.featureBanner}
+                              alt="Feature Banner"
                               className="w-24 h-24 object-cover rounded-lg border cursor-pointer hover:opacity-90 transition-opacity"
                               onClick={() => setSelectedDoc(profileDetails.featureBanner)}
                             />
@@ -886,7 +884,7 @@ const steps = useMemo(() => {
                   {step.number === "05" && (
                     <div className="space-y-3">
                       <p className="text-sm text-gray-600">
-                       Manage Your  Products Or services
+                        Manage Your  Products Or services
                       </p>
                       <div className="flex justify-end">
                         <Link href={step.link}>
@@ -976,13 +974,12 @@ const steps = useMemo(() => {
           <button
             onClick={handleSubmit}
             disabled={!confirmChecked || !agreeChecked}
-            className={`px-8 py-2.5 rounded text-sm font-medium transition-colors ${
-              confirmChecked && agreeChecked
-                ? 'bg-[#1e3a5f] text-white hover:bg-[#152a45] cursor-pointer'
-                : 'bg-[#1e3a5f] text-white opacity-50 cursor-not-allowed'
-            }`}
+            className={`px-8 py-2.5 rounded text-sm font-medium transition-colors ${confirmChecked && agreeChecked
+              ? 'bg-[#1e3a5f] text-white hover:bg-[#152a45] cursor-pointer'
+              : 'bg-[#1e3a5f] text-white opacity-50 cursor-not-allowed'
+              }`}
           >
-            Submit Response
+            Publish Profile and Products
           </button>
           {/* <button
             onClick={() => {

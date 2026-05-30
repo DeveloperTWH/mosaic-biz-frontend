@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import React, { Suspense, useCallback, useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import {
   AlertCircle,
   ArrowRight,
@@ -27,8 +27,14 @@ type Business = {
   isActive?: boolean;
 };
 
-const PayoutSetupPage = () => {
+interface PayoutSetupPageProps {
+  embedded?: boolean;
+  onNextTab?: () => void;
+}
+
+const PayoutSetupPage = ({ embedded = false, onNextTab }: PayoutSetupPageProps) => {
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   const [business, setBusiness] = useState<Business | null>(null);
   const [status, setStatus] = useState<StripeConnectStatus | null>(null);
@@ -180,6 +186,114 @@ const PayoutSetupPage = () => {
     );
   }
 
+  if (embedded) {
+    return (
+      <div className="space-y-6">
+        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          <div className="space-y-3">
+            <div className="inline-flex items-center gap-2 rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-slate-700">
+              <Building2 className="h-4 w-4" />
+              {business?.businessName || "Business"}
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold text-slate-900">
+                {isConnected ? "Stripe account is ready" : "Finish your Stripe onboarding"}
+              </h2>
+              <p className="mt-1 text-sm text-slate-600">
+                {isConnected
+                  ? "Your business can now receive payouts."
+                  : "Complete the setup once and Stripe will handle the rest."}
+              </p>
+            </div>
+          </div>
+
+          <div
+            className={`inline-flex items-center rounded-full px-3 py-1.5 text-sm font-medium ${
+              isConnected
+                ? "bg-green-100 text-green-700"
+                : hasIssues
+                  ? "bg-red-100 text-red-700"
+                  : "bg-amber-100 text-amber-700"
+            }`}
+          >
+            {isConnected ? (
+              <CheckCircle2 className="mr-2 h-4 w-4" />
+            ) : hasIssues ? (
+              <AlertCircle className="mr-2 h-4 w-4" />
+            ) : (
+              <CreditCard className="mr-2 h-4 w-4" />
+            )}
+            {isConnected ? "Connected" : hasIssues ? "Action needed" : "In progress"}
+          </div>
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {statusItems.map((item) => (
+            <div key={item.label} className="rounded-2xl bg-[#F8F5EE] p-4">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-medium text-slate-900">{item.label}</p>
+                {item.value ? (
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                ) : (
+                  <div className="h-2.5 w-2.5 rounded-full bg-amber-400" />
+                )}
+              </div>
+              <p className="mt-2 text-xs capitalize text-slate-500">{item.detail}</p>
+            </div>
+          ))}
+        </div>
+
+        {error ? (
+          <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {error}
+          </div>
+        ) : null}
+
+        {status?.disabledReason ? (
+          <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {status.disabledReason}
+          </div>
+        ) : null}
+
+        <div className="flex flex-wrap gap-3 pt-4 border-t border-dashed border-[#e6dccd]">
+          <button
+            type="button"
+            onClick={handleStartOrContinue}
+            disabled={launching || !business?._id}
+            className="inline-flex items-center gap-2 rounded-lg bg-blue-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {launching ? <RefreshCcw className="h-4 w-4 animate-spin" /> : <ExternalLink className="h-4 w-4" />}
+            {isConnected ? "Open Stripe" : "Connect Stripe"}
+          </button>
+
+          <button
+            type="button"
+            onClick={handleRefresh}
+            disabled={refreshing || !business?._id}
+            className="inline-flex items-center gap-2 rounded-lg border border-stone-300 bg-white px-5 py-3 text-sm font-medium text-slate-700 transition hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <RefreshCcw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
+            Refresh
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              if (onNextTab) {
+                onNextTab();
+              } else {
+                router.push("/partners/final-review");
+              }
+            }}
+            className="inline-flex items-center gap-2 rounded-lg bg-[#c9a227] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#b8921f]"
+          >
+            Next
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#f5f1e8] px-4 py-10 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-4xl space-y-6">
@@ -297,10 +411,16 @@ const PayoutSetupPage = () => {
   );
 };
 
-export default function Page() {
+export default function Page({
+  embedded = false,
+  onNextTab,
+}: {
+  embedded?: boolean;
+  onNextTab?: () => void;
+} = {}) {
   return (
     <Suspense>
-      <PayoutSetupPage />
+      <PayoutSetupPage embedded={embedded} onNextTab={onNextTab} />
     </Suspense>
   );
 }

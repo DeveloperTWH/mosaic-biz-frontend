@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import axios from "axios";
 import Navbar from "@/app/(home)/Components/Navbar";
 import BusinessProfilePage from "@/app/(home)/partners/business-profile/page";
@@ -12,12 +13,14 @@ import OrdersTab from "./components/OrdersTab";
 import BookingsTab from "./components/BookingsTab";
 import ShippingSettingsTab from "./components/ShippingSettingsTab";
 import TaxSettingsTab from "./components/TaxSettingsTab";
+import PayoutSetupTab from "@/app/(home)/partners/payout-setup/page";
 
 type ListingType = "product" | "service" | "food";
 type DashboardTab =
   | "edit-profile"
   | "manage-listings"
   | "shipping-settings"
+  | "payout-setup"
   | "tax-settings"
   | "location-timings"
   | "inquiries"
@@ -59,6 +62,7 @@ const baseDashboardTabs = [
 ] as const;
 
 export default function PartnerDashboardPage() {
+  const router = useRouter();
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<DashboardTab>("edit-profile");
@@ -191,21 +195,34 @@ export default function PartnerDashboardPage() {
   }, [activeBusiness]);
 
   const dashboardTabs = useMemo(() => {
+    const manageListingsLabel = `Add/Edit ${listingLabel}`;
+
     if (listingType === "product") {
       return [
-        ...baseDashboardTabs,
-        { key: "shipping-settings", label: "Shipping Settings" },
+        { key: "edit-profile", label: "Edit Profile" },
         { key: "tax-settings", label: "Tax Settings" },
+        { key: "manage-listings", label: manageListingsLabel },
+        { key: "shipping-settings", label: "Shipping Settings" },
+        { key: "payout-setup", label: "Payout Setup" },
         { key: "orders", label: "Orders" },
+        { key: "inquiries", label: "Inquiries" },
+        { key: "analytics", label: "Analytics" },
       ] as const;
     }
 
+    const baseTabs = [
+      { key: "edit-profile", label: "Edit Profile" },
+      { key: "manage-listings", label: manageListingsLabel },
+      { key: "inquiries", label: "Inquiries" },
+      { key: "analytics", label: "Analytics" },
+    ] as const;
+
     if (hasBookingLink) {
-      return [...baseDashboardTabs, { key: "bookings", label: "Bookings" }] as const;
+      return [...baseTabs, { key: "bookings", label: "Bookings" }] as const;
     }
 
-    return baseDashboardTabs;
-  }, [hasBookingLink, listingType]);
+    return baseTabs;
+  }, [hasBookingLink, listingType, listingLabel]);
 
   useEffect(() => {
     const isActiveTabVisible = dashboardTabs.some((tab) => tab.key === activeTab);
@@ -232,7 +249,7 @@ export default function PartnerDashboardPage() {
         return <FoodsPage />;
       }
 
-      return <ProductsPage />;
+      return <ProductsPage onNextTab={() => setActiveTab("shipping-settings")} />;
     }
 
     if (activeTab === "location-timings") {
@@ -293,8 +310,13 @@ export default function PartnerDashboardPage() {
         <ShippingSettingsTab
           businessId={activeBusiness?._id}
           isActive={activeTab === "shipping-settings"}
+          onNextTab={() => setActiveTab("payout-setup")}
         />
       );
+    }
+
+    if (activeTab === "payout-setup") {
+      return <PayoutSetupTab embedded onNextTab={() => router.push("/partners/final-review")} />;
     }
 
     if (activeTab === "tax-settings") {
@@ -337,7 +359,9 @@ export default function PartnerDashboardPage() {
             <div className="min-w-[760px] px-2">
               <div
                 className={`grid gap-3 ${
-                  dashboardTabCount === 7
+                  dashboardTabCount === 8
+                    ? "grid-cols-8"
+                    : dashboardTabCount === 7
                     ? "grid-cols-7"
                     : dashboardTabCount === 6
                     ? "grid-cols-6"
@@ -352,14 +376,14 @@ export default function PartnerDashboardPage() {
                       key={tab.key}
                       type="button"
                       onClick={() => setActiveTab(tab.key)}
-                      className={`min-h-[76px] rounded-xl border px-4 py-4 text-left transition-all ${
+                      className={`min-h-[76px] rounded-xl border px-2.5 py-3.5 text-left transition-all ${
                         activeTab === tab.key
                           ? "border-[#c9a44a] bg-[#f7f2df] text-[#8b6a15] shadow-sm"
                           : "border-gray-200 bg-white text-gray-500 hover:border-[#d7c17d] hover:text-gray-700"
                       }`}
                     >
                       <span
-                        className={`block text-sm font-semibold leading-5 ${
+                        className={`block text-xs md:text-sm font-semibold leading-tight break-words ${
                           activeTab === tab.key ? "text-[#8b6a15]" : "text-inherit"
                         }`}
                       >
