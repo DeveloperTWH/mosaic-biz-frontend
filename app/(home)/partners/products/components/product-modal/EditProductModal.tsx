@@ -13,7 +13,6 @@ import ImageGallerySection from './sections/ImageGallerySection';
 import BasicInfoSection from './sections/BasicInfoSection';
 import AttributesSection from './sections/AttributesSection';
 import VariantsSection from './sections/VariantsSection';
-import ShippingSection from './sections/ShippingSection';
 import MetaFieldsSection from './sections/MetaFieldsSection';
 import DiscountSection from './sections/DiscountSection';
 

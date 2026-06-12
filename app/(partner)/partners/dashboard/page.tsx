@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
 import Navbar from "@/app/(home)/Components/Navbar";
 import BusinessProfilePage from "@/app/(home)/partners/business-profile/page";
@@ -63,6 +63,7 @@ const baseDashboardTabs = [
 
 export default function PartnerDashboardPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<DashboardTab>("edit-profile");
@@ -70,6 +71,31 @@ export default function PartnerDashboardPage() {
   const [inquiriesLoading, setInquiriesLoading] = useState(false);
   const [inquiriesError, setInquiriesError] = useState<string | null>(null);
   const [hasBookingLink, setHasBookingLink] = useState(false);
+
+  useEffect(() => {
+    const requestedTab = searchParams.get("tab");
+
+    if (!requestedTab) {
+      return;
+    }
+
+    const allowedTabs: DashboardTab[] = [
+      "edit-profile",
+      "manage-listings",
+      "shipping-settings",
+      "payout-setup",
+      "tax-settings",
+      "location-timings",
+      "inquiries",
+      "analytics",
+      "bookings",
+      "orders",
+    ];
+
+    if (allowedTabs.includes(requestedTab as DashboardTab)) {
+      setActiveTab(requestedTab as DashboardTab);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const fetchBusinesses = async () => {

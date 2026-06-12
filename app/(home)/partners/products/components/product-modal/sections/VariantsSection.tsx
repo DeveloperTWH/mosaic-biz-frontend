@@ -100,9 +100,6 @@ export default function VariantsSection({
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">New Price</th>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Availability</th>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Standard Ship</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Overnight Ship</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Local Ship</th>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Images</th>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
             </tr>
@@ -237,61 +234,6 @@ export default function VariantsSection({
                     <option value="published">Published</option>
                     <option value="draft">Draft</option>
                   </select>
-                </td>
-
-                <td className="px-4 py-3 text-gray-600">
-                  <input
-                    type="number"
-                    value={variant.shipping?.standard ?? 0}
-                    onChange={(e) =>
-                      onUpdateVariant(variant._id, {
-                        shipping: {
-                          standard: parseFloat(e.target.value) || 0,
-                          overnight: variant.shipping?.overnight ?? 0,
-                          local: variant.shipping?.local ?? 0
-                        }
-                      })
-                    }
-                    className="w-20 px-2 py-1 text-xs border border-gray-300 rounded"
-                    step="0.01"
-                    min="0"
-                  />
-                </td>
-                <td className="px-4 py-3 text-gray-600">
-                  <input
-                    type="number"
-                    value={variant.shipping?.overnight ?? 0}
-                    onChange={(e) =>
-                      onUpdateVariant(variant._id, {
-                        shipping: {
-                          standard: variant.shipping?.standard ?? 0,
-                          overnight: parseFloat(e.target.value) || 0,
-                          local: variant.shipping?.local ?? 0
-                        }
-                      })
-                    }
-                    className="w-20 px-2 py-1 text-xs border border-gray-300 rounded"
-                    step="0.01"
-                    min="0"
-                  />
-                </td>
-                <td className="px-4 py-3 text-gray-600">
-                  <input
-                    type="number"
-                    value={variant.shipping?.local ?? 0}
-                    onChange={(e) =>
-                      onUpdateVariant(variant._id, {
-                        shipping: {
-                          standard: variant.shipping?.standard ?? 0,
-                          overnight: variant.shipping?.overnight ?? 0,
-                          local: parseFloat(e.target.value) || 0
-                        }
-                      })
-                    }
-                    className="w-20 px-2 py-1 text-xs border border-gray-300 rounded"
-                    step="0.01"
-                    min="0"
-                  />
                 </td>
 
                 <td className="px-4 py-3">
