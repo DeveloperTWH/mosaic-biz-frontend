@@ -288,6 +288,7 @@ export const useServiceForm = () => {
       );
 
       if (!response.ok) {
+        clearInterval(interval);
         throw new Error('Failed to get upload URL');
       }
 
@@ -325,13 +326,14 @@ export const useServiceForm = () => {
     setFormData(prev => ({ ...prev, businessHours: updated }));
   };
 
-  // File Upload
+  // File Upload — with gallery limit enforcement
   const handleFileUpload = async (type: 'cover' | 'gallery', file: File): Promise<void> => {
+    let interval: ReturnType<typeof setInterval> | null = null;
     try {
       setUploading(prev => ({ ...prev, [type]: true }));
       setUploadProgress(prev => ({ ...prev, [type]: 0 }));
 
-      const interval = setInterval(() => {
+      interval = setInterval(() => {
         setUploadProgress(prev => ({
           ...prev,
           [type]: Math.min((prev[type] || 0) + 10, 90)
@@ -339,9 +341,13 @@ export const useServiceForm = () => {
       }, 200);
 
       const documentType = type === 'cover' ? 'service-cover' : 'service-gallery';
-      
+
+      // Pass currentImageCount for gallery so backend can enforce plan limits
+      const currentImageCount = type === 'gallery' ? formData.images.length : undefined;
+      const countParam = currentImageCount !== undefined ? `&currentImageCount=${currentImageCount}` : '';
+
       const response = await fetch(
-        `${API_BASE_URL}/api/service/upload-url?fileName=${encodeURIComponent(file.name)}&fileType=${encodeURIComponent(file.type)}&documentType=${documentType}`,
+        `${API_BASE_URL}/api/service/upload-url?fileName=${encodeURIComponent(file.name)}&fileType=${encodeURIComponent(file.type)}&documentType=${documentType}${countParam}`,
         {
           method: 'GET',
           credentials: 'include',
@@ -349,7 +355,19 @@ export const useServiceForm = () => {
       );
 
       if (!response.ok) {
-        throw new Error('Failed to get upload URL');
+        // Read the backend error body to show the exact plan-limit message
+        let errMsg = 'Failed to get upload URL';
+        try {
+          const text = await response.text();
+          if (text) {
+            const errBody = JSON.parse(text);
+            if (errBody?.error) errMsg = errBody.error;
+            else if (errBody?.message) errMsg = errBody.message;
+          }
+        } catch (_) {}
+        // Show toast directly — don't throw, just return early
+        toast.error(errMsg);
+        return;
       }
 
       const { uploadUrl, fileUrl } = await response.json();
@@ -360,7 +378,6 @@ export const useServiceForm = () => {
         body: file,
       });
 
-      clearInterval(interval);
       setUploadProgress(prev => ({ ...prev, [type]: 100 }));
 
       if (type === 'cover') {
@@ -383,8 +400,9 @@ export const useServiceForm = () => {
 
     } catch (error: any) {
       console.error('Upload error:', error);
-      toast.error(`Upload failed: ${error.message}`);
+      toast.error(error.message || 'Upload failed');
     } finally {
+      if (interval) clearInterval(interval);
       setUploading(prev => ({ ...prev, [type]: false }));
       setTimeout(() => {
         setUploadProgress(prev => ({ ...prev, [type]: 0 }));
