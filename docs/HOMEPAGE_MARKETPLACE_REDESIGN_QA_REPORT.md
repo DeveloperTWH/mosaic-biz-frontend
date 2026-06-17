@@ -76,7 +76,7 @@
 
 | ID | Fix | Commit |
 |----|-----|--------|
-| QA-1 | Removed `bg-white text-black` from `ServicePageFallback` in `services/page.tsx` | See commit on `feat/homepage-redesign` |
+| QA-1 | Removed `bg-white text-black` from `ServicePageFallback` in `services/page.tsx` | `6fc1360a` |
 
 ---
 
