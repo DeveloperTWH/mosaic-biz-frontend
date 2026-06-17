@@ -377,9 +377,29 @@ function PartnerDashboardContent() {
 
       <main className="min-h-screen bg-[#f7f2eb] pt-[110px]">
         <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
-          <h1 className="mb-8 text-center text-2xl font-bold uppercase tracking-wide text-gray-800">
+          <h1 className="mb-4 text-center text-2xl font-bold uppercase tracking-wide text-gray-800">
             Vendor Dashboard
           </h1>
+          {!loading && activeBusiness && (
+            <div className="mb-8 rounded-xl border border-[#e8dfc8] bg-[#fcfaf6] px-5 py-4 text-sm text-gray-700">
+              <p className="font-semibold text-gray-900">Your next steps</p>
+              <p className="mt-1">
+                Keep your profile current, manage listings, and monitor orders from this dashboard.
+                {activeTab !== "manage-listings" ? (
+                  <>
+                    {" "}
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab("manage-listings")}
+                      className="font-semibold text-[#8b6a15] underline"
+                    >
+                      Go to listings
+                    </button>
+                  </>
+                ) : null}
+              </p>
+            </div>
+          )}
 
           <div className="mb-8 overflow-x-auto">
             <div className="min-w-[760px] px-2">

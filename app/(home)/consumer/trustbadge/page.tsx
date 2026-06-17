@@ -41,9 +41,13 @@ const ConsumerTrustBadges = () => {
         Trust Badges - Consumer
       </h1>
 
-      <p className="text-gray-500 mb-8 text-sm">
+      <p className="text-gray-500 mb-4 text-sm">
         Last updated: January 2026
       </p>
+
+      <div className="mb-8 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+        Badges indicate verified onboarding progress reviewed by Mosaic Biz Hub — not customer ratings or automated scores.
+      </div>
 
       {/* Introduction */}
       <section className="mb-6">

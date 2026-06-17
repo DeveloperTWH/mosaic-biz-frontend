@@ -231,9 +231,11 @@ export default function OrdersTab({ businessId, isActive }: OrdersTabProps) {
       )}
 
       {!error && orders.length === 0 && (
-        <div className="rounded-2xl border border-dashed border-[#d9d0c2] bg-white p-8 text-center">
-          <h2 className="text-xl font-semibold text-[#1c1c1c]">Orders</h2>
-          <p className="mt-3 text-sm text-gray-600">No orders found.</p>
+        <div className="rounded-2xl border border-dashed border-[#d9d0c2] bg-[#fcfaf6] p-8 text-center">
+          <h2 className="text-xl font-semibold text-[#1c1c1c]">No orders yet</h2>
+          <p className="mt-3 text-sm text-gray-600">
+            When customers purchase from your store, orders will appear here for fulfillment and tracking updates.
+          </p>
         </div>
       )}
 
