@@ -9,12 +9,10 @@ import {
   CreditCard,
   ListTree,
   MessageSquareQuote,
-  Newspaper,
-  HelpCircle,
+  Settings,
   LogOut,
   X,
   FileText,
-  Settings
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useParams } from "next/navigation";
@@ -41,10 +39,8 @@ const AdminSidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
     { label: "Users", icon: <Users className="w-5 h-5" /> },
     { label: "Subscription", icon: <CreditCard className="w-5 h-5" /> },
     { label: "Categories Management", icon: <ListTree className="w-5 h-5" /> },
-    { label: "CMS", icon: <Settings className="w-5 h-5" /> },
     { label: "Testimonials", icon: <MessageSquareQuote className="w-5 h-5" /> },
-    { label: "Blog", icon: <Newspaper className="w-5 h-5" /> },
-    { label: "FAQ", icon: <HelpCircle className="w-5 h-5" /> },
+    { label: "CMS", icon: <Settings className="w-5 h-5" /> },
   ];
 
   const getLink = (label: string) => {

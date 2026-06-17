@@ -1,4 +1,4 @@
-import HeroSection from "./components/HeroSection";
+import PublicPageHero from "../Components/PublicPageHero";
 import AboutContent from "./components/AboutContent";
 import CommunityDevelopment from "./components/CommunityDevelopment";
 import EconomicImpact from "./components/EconomicImpact";
@@ -11,7 +11,14 @@ import HowItWorks from "./components/HowitWorks";
 export default function AboutPage() {
   return (
     <main className="flex flex-col items-center w-full">
-      <HeroSection heading={"About"} imageUrl='/about.png'/>
+      <PublicPageHero
+        title="About"
+        breadcrumbs={[
+          { label: "Home", href: "/" },
+          { label: "About" },
+        ]}
+        imageUrl="/about.png"
+      />
       <AboutContent/>
       <EconomicImpact/>
       <CommunityDevelopment/>

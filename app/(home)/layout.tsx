@@ -1,35 +1,13 @@
 import type { Metadata } from "next";
-import { Josefin_Sans, Anton, Montserrat,Mulish } from "next/font/google";
 import "../globals.css";
+import AnnouncementBar from "./Components/AnnouncementBar";
 import Navbar from "./Components/Navbar";
 import Footer from "./Components/Footer";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "swiper/css";
 import "swiper/css/pagination";
-
-const josefin = Josefin_Sans({
-  subsets: ["latin"],
-  variable: "--font-josefin",
-});
-
-const anton = Anton({
-  weight: "400",
-  subsets: ["latin"],
-  variable: "--font-anton",
-});
-
-const montserrat = Montserrat({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"], // include 500 for medium!
-  variable: "--font-montserrat",
-});
-
-const mulish = Mulish({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"], // include 600 for SemiBold
-  variable: "--font-mulish",
-});
+import { fontVariables } from "@/lib/fonts";
 
 export const metadata: Metadata = {
   title: "Mosaic Biz Hub",
@@ -43,13 +21,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="with-fixed-header">
-<body
-  className={`${josefin.variable} ${anton.variable} ${montserrat.variable} ${mulish.variable}  antialiased min-h-screen w-screen`}
->
-        <Navbar/>
+      <body className={`${fontVariables} market-page antialiased min-h-screen w-screen`}>
+        <AnnouncementBar />
+        <Navbar />
         {children}
         <ToastContainer position="top-right" autoClose={3000} />
-        <Footer/>
+        <Footer />
       </body>
     </html>
   );

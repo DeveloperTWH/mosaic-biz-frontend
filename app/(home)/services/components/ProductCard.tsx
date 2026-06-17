@@ -14,42 +14,40 @@ type ProductCardProps = {
   logo?: string;
 };
 
-const HorizontalLine = () => {
-  return <p style={{ borderTop: '1px solid', color : "#D9D9D9",  margin: '10px 0' }}></p> ;
-};
-
 const ProductCard: React.FC<ProductCardProps> = ({
   serviceId,
   image,
   title,
   description,
-  rating,
-  totalRatings,
-  reviews,
   badge,
-  price,
   logo,
 }) => {
   const cardContent = (
-    <div className="product-card h-[420px] flex flex-col overflow-hidden border-2 border-[#D9D9D9] shadow-lg">
-      <div className="relative h-[180px] w-full flex-shrink-0">
+    <div className="market-card flex h-[420px] flex-col overflow-hidden transition-all duration-300 hover:shadow-market-glow">
+      <div className="relative h-[180px] w-full flex-shrink-0 bg-market-elevated">
         {image ? (
-          <img src={image} alt={title} className="product-image h-full w-full object-cover" />
+          <img src={image} alt={title} className="h-full w-full object-cover" />
         ) : (
-          <div className="h-full w-full bg-gray-100" />
+          <div className="flex h-full w-full items-center justify-center text-xs font-semibold text-market-muted">
+            No image
+          </div>
         )}
         {logo && (
-          <img src={logo} alt="Business Logo" className="absolute bottom-2 right-2 h-12 w-12 object-contain bg-white rounded-full p-1 shadow-md" />
+          <img
+            src={logo}
+            alt="Business Logo"
+            className="absolute bottom-2 right-2 h-12 w-12 rounded-full border border-white/10 bg-market-surface object-contain p-1 shadow-md"
+          />
         )}
       </div>
 
-      <div className="product-content p-4 flex flex-col flex-1">
-        {/* Title */}
-        <h3 className="product-title text-base font-bold mb-2 line-clamp-1 h-6">{title}</h3>
+      <div className="flex flex-1 flex-col p-4">
+        <h3 className="product-title mb-2 line-clamp-1 text-base font-semibold text-market-text">
+          {title || "Untitled listing"}
+        </h3>
 
-        {/* Description */}
         <p
-          className="product-description text-sm text-[#5F5F5F] overflow-hidden font-montserrat mb-3"
+          className="product-description mb-3 overflow-hidden font-montserrat text-sm text-market-muted"
           style={{
             display: "-webkit-box",
             WebkitLineClamp: 2,
@@ -61,32 +59,26 @@ const ProductCard: React.FC<ProductCardProps> = ({
           {description || "\u00a0"}
         </p>
 
-
-
-        <div className="flex justify-center mt-auto">
-          <div className="w-[65%] mr-5">
-            <HorizontalLine />
-          </div>
-          <span className="view-details text-[#C7A040] text-xs text-montserrat">
-            View Details
-          </span>
+        <div className="mt-auto flex items-center justify-center gap-3">
+          <div className="h-px flex-1 bg-white/10" />
+          <span className="view-details text-xs text-market-gold">View Details</span>
         </div>
 
-        {/* Grey background full width, fixed height to keep space even if no badge */}
-        <div className="mt-3 bg-gray-100 rounded px-4 py-2 flex justify-between items-center min-h-[64px]">
-          {/* Label always visible on left */}
-          <span className="text-gray-600 text-sm font-semibold">Earned Badge:</span>
-
-          {/* Badge image or empty placeholder on right */}
+        <div className="mt-3 flex min-h-[64px] items-center justify-between rounded bg-market-elevated px-4 py-2">
+          <span className="text-sm font-semibold text-market-muted">Earned Badge:</span>
           {badge ? (
             <img
-              src={`/badge/${badge.charAt(0).toUpperCase() + badge.slice(1).toLowerCase()}.png`}
+              src={`/badge/${badge.charAt(0).toUpperCase() + badge.slice(1)}.png`}
               alt={`${badge} badge`}
-              className="h-16 object-contain"
+              className="h-14 object-contain"
+              onError={(e) => {
+                const img = e.currentTarget;
+                if (img.src.endsWith("/badge.png")) return;
+                img.src = "/badge.png";
+              }}
             />
           ) : (
-            // empty placeholder keeps spacing
-            <div className="h-16 w-[96px]" />
+            <div className="h-14 w-[90px]" />
           )}
         </div>
       </div>
@@ -95,10 +87,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
   if (serviceId) {
     return (
-      <Link
-        href={`/vendor-profile/service-vendor/${serviceId}`}
-        className="block cursor-pointer transition-transform hover:-translate-y-0.5"
-      >
+      <Link href={`/vendor-profile/service-vendor/${serviceId}`} className="block">
         {cardContent}
       </Link>
     );

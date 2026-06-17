@@ -4,24 +4,11 @@ import Link from "next/link";
 type FoodCardProps = {
   foodId?: string;
   image?: string;
-  businessName: string; // updated
-  businessDescription?: string; // updated
+  businessName: string;
+  businessDescription?: string;
   badge?: string;
   logo?: string;
 };
-
-const HorizontalLine = () => {
-  return (
-    <p
-      style={{
-        borderTop: "1px solid",
-        color: "#D9D9D9",
-        margin: "10px 0",
-      }}
-    ></p>
-  );
-};
-
 
 const getBadgeUrl = (badge?: string) => {
   if (!badge) return "";
@@ -44,19 +31,13 @@ const FoodCard: React.FC<FoodCardProps> = ({
   logo,
 }) => {
   const cardContent = (
-    <div className="product-card h-[420px] flex flex-col overflow-hidden border-2 border-[#D9D9D9] shadow-lg">
-      
-      {/* Image with logo overlay */}
-      <div className="relative h-[180px] w-full flex-shrink-0">
+    <div className="market-card flex h-[420px] flex-col overflow-hidden transition-all duration-300 hover:shadow-market-glow">
+      <div className="relative h-[180px] w-full flex-shrink-0 bg-market-elevated">
         {image ? (
-          <img
-            src={image}
-            alt={businessName}
-            className="h-full w-full object-cover"
-          />
+          <img src={image} alt={businessName} className="h-full w-full object-cover" />
         ) : (
-          <div className="h-full w-full bg-gray-100 flex items-center justify-center text-xs font-semibold text-gray-500">
-            NO IMAGE
+          <div className="flex h-full w-full items-center justify-center text-xs font-semibold text-market-muted">
+            No image
           </div>
         )}
 
@@ -64,21 +45,18 @@ const FoodCard: React.FC<FoodCardProps> = ({
           <img
             src={logo}
             alt="Business Logo"
-            className="absolute bottom-2 right-2 h-12 w-12 object-contain bg-white rounded-full p-1 shadow-md"
+            className="absolute bottom-2 right-2 h-12 w-12 rounded-full border border-white/10 bg-market-surface object-contain p-1 shadow-md"
           />
         )}
       </div>
 
-      <div className="p-4 flex flex-col flex-1">
-        
-        {/* Business Name */}
-        <h3 className="text-base font-bold mb-2 line-clamp-1">
+      <div className="flex flex-1 flex-col p-4">
+        <h3 className="mb-2 line-clamp-1 text-base font-semibold text-market-text">
           {businessName}
         </h3>
 
-        {/* Business Description */}
         <p
-          className="text-sm text-[#5F5F5F] font-montserrat mb-3 overflow-hidden"
+          className="mb-3 overflow-hidden font-montserrat text-sm text-market-muted"
           style={{
             display: "-webkit-box",
             WebkitLineClamp: 2,
@@ -89,44 +67,31 @@ const FoodCard: React.FC<FoodCardProps> = ({
           {businessDescription || "\u00a0"}
         </p>
 
-        {/* Divider + View details */}
-        <div className="flex justify-center mt-auto">
-          <div className="w-[65%] mr-5">
-            <HorizontalLine />
-          </div>
-
-          <span className="text-[#C7A040] text-xs font-montserrat">
-            View Details
-          </span>
+        <div className="mt-auto flex items-center justify-center gap-3">
+          <div className="h-px flex-1 bg-white/10" />
+          <span className="text-xs font-montserrat text-market-gold">View Details</span>
         </div>
 
-        {/* Badge Section */}
-        <div className="mt-3 bg-gray-100 rounded px-4 py-2 flex justify-between items-center min-h-[64px]">
-          
-          <span className="text-gray-600 text-sm font-semibold">
-            Earned Badge:
-          </span>
-
-{badge ? (
-  <img
-    src={getBadgeUrl(badge)}
-    alt={`${badge} badge`}
-    className="h-16 object-contain"
-    onError={(e) => {
-      const img = e.currentTarget;
-      if (img.src.endsWith("/badge.png")) {
-        img.style.display = "none";
-        return;
-      }
-      img.src = "/badge.png";
-    }}
-  />
-) : (
-  <div className="h-16 w-[96px]" />
-)}
-
+        <div className="mt-3 flex min-h-[64px] items-center justify-between rounded bg-market-elevated px-4 py-2">
+          <span className="text-sm font-semibold text-market-muted">Earned Badge:</span>
+          {badge ? (
+            <img
+              src={getBadgeUrl(badge)}
+              alt={`${badge} badge`}
+              className="h-16 object-contain"
+              onError={(e) => {
+                const img = e.currentTarget;
+                if (img.src.endsWith("/badge.png")) {
+                  img.style.display = "none";
+                  return;
+                }
+                img.src = "/badge.png";
+              }}
+            />
+          ) : (
+            <div className="h-16 w-[96px]" />
+          )}
         </div>
-
       </div>
     </div>
   );

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { useRouter } from "next/navigation";
-import HeroSection from './components/HeroSection';
+import PublicPageHero from '../Components/PublicPageHero';
 import FilterBar from '../services/components/FilterBar';
 import TabsHeadingSection from './components/TabsHeadingSection';
 import FoodsAndRestaurantsPage from './components/FoodsAndRestaurantsPage';
@@ -106,7 +106,14 @@ const FoodSection = () => {
 
   return (
     <div>
-      <HeroSection heading={"Foods"} imageUrl="/bgdetailpage.png"  />
+      <PublicPageHero
+        title="Food & Grocery"
+        breadcrumbs={[
+          { label: "Home", href: "/" },
+          { label: "Food & Grocery" },
+        ]}
+        imageUrl="/bgdetailpage.png"
+      />
 
       <FilterSection onSearch={(filters) => {
         router.push(buildSearchPageUrl(filters));

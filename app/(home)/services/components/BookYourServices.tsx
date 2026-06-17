@@ -67,13 +67,13 @@ const BookServices: React.FC<BookServicesProps> = ({
 
         <div className="lg:w-3/4">
           <div className="flex mb-4 flex-row justify-between">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-market-muted">
               (Showing {startItem} - {endItem} Service Of {totalProducts} Services)
             </p>
 
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-700">Sort By:</span>
-              <select className="px-3 py-1 text-sm border rounded cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+              <span className="text-sm text-market-muted">Sort By:</span>
+              <select className="market-input w-auto cursor-pointer px-3 py-1 text-sm">
                 <option>Default</option>
                 <option>Price: Low to High</option>
                 <option>Price: High to Low</option>
@@ -84,11 +84,13 @@ const BookServices: React.FC<BookServicesProps> = ({
           </div>
 
           {loading ? (
-            <div className="flex justify-center items-center h-64">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1A1F71]"></div>
+            <div className="flex h-64 items-center justify-center">
+              <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-market-gold"></div>
             </div>
           ) : services.length === 0 ? (
-            <p className="text-center text-gray-600">No services found.</p>
+            <div className="market-card p-8 text-center">
+              <p className="text-market-muted">No services found.</p>
+            </div>
           ) : (
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
               {services.map((service) => (
