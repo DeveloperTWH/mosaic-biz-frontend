@@ -547,6 +547,9 @@ const Page: React.FC = () => {
           <div className="bg-gray-100 rounded-lg p-4 mb-6 flex justify-between items-center">
             <div>
               <h2 className="text-lg font-semibold text-gray-800">Onboarding Status</h2>
+              <p className="text-sm text-gray-600">
+                Step {onboardingStatus.data.currentStage} of {onboardingSteps.length}: complete each stage to launch your storefront.
+              </p>
               <p className="text-sm text-gray-600">{onboardingStatus.data.businessName}</p>
               <p className="text-xs text-gray-500">Application ID: {onboardingStatus.data.applicationId}</p>
             </div>

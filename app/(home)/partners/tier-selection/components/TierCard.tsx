@@ -148,7 +148,9 @@ const TierCard: React.FC<TierCardProps> = ({
             </p>
 
             <div className="flex items-baseline gap-1">
-              <span className="text-3xl sm:text-4xl font-bold text-[#1E3A8A]">${config.price}</span>
+              <span className="text-3xl sm:text-4xl font-bold text-[#1E3A8A]">
+                ${typeof plan.price === "number" ? plan.price.toFixed(2) : config.price}
+              </span>
               <span className="text-gray-600 text-sm">
                 /Month (Billed Annually)
               </span>
@@ -203,6 +205,9 @@ const TierCard: React.FC<TierCardProps> = ({
           <div className="mt-6 pt-4 border-t border-gray-100">
             <p className="text-sm text-gray-500 italic leading-relaxed">
               {config.footerText}
+            </p>
+            <p className="mt-3 text-xs leading-5 text-gray-500">
+              Listing limits reflect your selected plan. Some advanced marketing tools may roll out after launch.
             </p>
           </div>
         </div>
