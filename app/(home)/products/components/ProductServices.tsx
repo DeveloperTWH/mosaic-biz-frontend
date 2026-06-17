@@ -161,19 +161,26 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
           {/* Products Count - Compact */}
           <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
    
-            <p className="text-sm text-market-muted">
+            <p className="market-result-count">
               (Showing {startItem} – {endItem} Products Of {safeTotalProducts} Products)
             </p>
 
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-market-muted">Sort By:</span>
-                  <select className="market-input w-auto cursor-pointer px-3 py-1 text-sm">
-                    <option>Default</option>
-                    <option>Price: Low to High</option>
-                    <option>Price: High to Low</option>
-                    <option>Most Popular</option>
-                    <option>Newest</option>
-                  </select>
+                  <span className="market-result-count">Sort By:</span>
+                  <div className="market-select-wrap">
+                    <select className="market-select w-auto min-w-[140px] px-3 py-1 text-sm">
+                      <option>Default</option>
+                      <option>Price: Low to High</option>
+                      <option>Price: High to Low</option>
+                      <option>Most Popular</option>
+                      <option>Newest</option>
+                    </select>
+                    <div className="market-select-chevron">
+                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </div>
                 </div>
               
           </div>
@@ -184,8 +191,9 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
               <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-market-gold"></div>
             </div>
           ) : services.length === 0 ? (
-            <div className="market-card p-8 text-center">
-              <p className="text-market-muted">No products found.</p>
+            <div className="market-empty-state">
+              <p className="market-empty-state-title">No products found</p>
+              <p className="mt-2 text-sm text-market-muted">Try adjusting your filters or search terms.</p>
             </div>
           ) : (
             <>
@@ -390,9 +398,9 @@ function ProductCard({ item }: { item: RankedItem }) {
 
   return (
 
-    <Link href={href} className="block">
-    <div className="market-card flex h-[480px] w-full max-w-[300px] cursor-pointer flex-col overflow-hidden p-2 transition-all duration-300 hover:shadow-market-glow">
-      <div className="relative aspect-square w-full flex-shrink-0 overflow-hidden bg-market-elevated">
+    <Link href={href} className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-market-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-market-bg rounded-2xl">
+    <div className="market-card flex h-[480px] w-full max-w-[300px] cursor-pointer flex-col overflow-hidden p-2">
+      <div className="market-card-media relative aspect-square w-full flex-shrink-0">
         {images[0] ? (
           <img
             src={images[0]}
@@ -401,14 +409,12 @@ function ProductCard({ item }: { item: RankedItem }) {
             className="h-full w-full object-contain transition-transform duration-500 hover:scale-105"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-xs font-semibold tracking-wide text-market-muted">
-            No image
-          </div>
+          <div className="market-card-placeholder">No image</div>
         )}
 
         {onSale && (
           <div className="absolute top-3 left-3">
-            <span className="px-3 py-1 text-xs font-bold text-white bg-red-600 rounded-full">
+            <span className="rounded-full bg-red-600 px-3 py-1 text-xs font-bold text-white">
               SALE
             </span>
           </div>
@@ -416,11 +422,11 @@ function ProductCard({ item }: { item: RankedItem }) {
       </div>
 
       <div className="flex flex-1 flex-col p-3">
-        <h3 className="font-poppins line-clamp-2 h-[42px] text-base font-semibold leading-snug text-market-text">
+        <h3 className="market-card-title line-clamp-2 h-[42px]">
           {title}
         </h3>
 
-        <p className="mb-2 h-[40px] overflow-hidden font-montserrat text-xs leading-5 text-market-muted">
+        <p className="market-card-desc mb-2 h-[40px] overflow-hidden">
           {trimmedDescription || "\u00a0"}
         </p>
 
@@ -452,7 +458,7 @@ function ProductCard({ item }: { item: RankedItem }) {
         Starting from
       </span>
       <div className="flex items-center gap-2">
-        <span className="text-lg font-semibold text-red-400">
+        <span className="market-card-price-sale">
           ${effective.toFixed(2)}
         </span>
         <span className="text-sm text-market-muted line-through">
@@ -465,14 +471,14 @@ function ProductCard({ item }: { item: RankedItem }) {
       <span className="text-xs text-market-muted">
         Starting from
       </span>
-      <span className="text-lg font-semibold text-market-gold">
+      <span className="market-card-price">
         ${displayPrice.toFixed(2)}
       </span>
     </div>
   )}
 </div>
 
-        <div className="mt-3 flex min-h-[52px] items-center justify-between rounded bg-market-elevated px-4 py-2">
+        <div className="market-card-footer mt-3">
   <span className="text-sm font-semibold text-market-muted">
     Earned Badge:
   </span>

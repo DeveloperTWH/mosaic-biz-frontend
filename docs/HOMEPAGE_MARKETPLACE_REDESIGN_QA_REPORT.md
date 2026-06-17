@@ -203,3 +203,102 @@ Remaining **2-minute human step** (Vercel SSO required):
 Do **not** block promotion on empty homepage featured products until backend flags featured inventory via `/api/featured-products`.
 
 **Production was not deployed.**
+
+---
+
+## Visual polish pass — Batch 1 readability (`polish/public-readability-marketplace-forms`)
+
+**Branch:** `polish/public-readability-marketplace-forms`  
+**Date:** 2026-06-18  
+**Issues:** #41 readability, #42 cards/grids, #44 forms/filters  
+**Scope:** Visual-only on public marketplace routes — no API, auth, checkout, Stripe, middleware, or dashboard changes
+
+### Changes
+
+| Area | Update |
+|------|--------|
+| `app/globals.css` | Stronger `market-card` borders; `market-select`/`market-label`/`market-card-*` utilities; button/filter focus rings |
+| Shared filters | `PublicSearchFilterBar` — `market-label`, `market-select-wrap`, muted chevrons |
+| Listing cards | Products, services, foods, vendors, homepage featured — shared title/price/placeholder/footer hierarchy |
+| `/vendors` | `CustomSelect` dusk dropdown; vendor cards with logo placeholder; `SimilarProduct` strip migrated to `market-*` |
+| Empty states | Clear titles + helper copy on products/services/foods listings |
+
+### Guardrails verified
+
+| Check | Result |
+|-------|--------|
+| `/api/featured-products` canonical | Pass — unchanged (`ShopProducts` → `getFeaturedProducts`) |
+| `/api/products/featured` used | Pass — not referenced in app code |
+| API / auth / checkout / Stripe / middleware logic | Pass — no changes |
+| `npm run build` | Pass (pre-merge + QA re-run 2026-06-18) |
+
+### Manual visual QA checklist
+
+- [x] Desktop `/` — hero, search card, featured products carousel, category sections readable (local prod build)
+- [x] Desktop `/products` — filter sidebar, sort control, accordion filters present (local prod build; live data blocked by CORS on localhost)
+- [x] Desktop `/foods` — filters, sort control, listing shell (local prod build)
+- [x] Desktop `/services` — filters, sort control, listing shell (local prod build)
+- [x] Desktop `/vendors` — `CustomSelect` dusk dropdown opens; `SimilarProduct` uses `market-*` (local prod build)
+- [x] Mobile (~390px) — `/`, `/products`, `/foods`, `/services`, `/vendors`: no horizontal scroll (automated check)
+- [x] Keyboard — `CustomSelect` and search inputs show focus/expanded states (spot check)
+- [x] Network — client wiring unchanged: `ProductsClient` → `/api/products/list`; `ShopProducts` → `/api/featured-products`; backend direct API **200** for both
+
+---
+
+## Preview QA follow-up — Batch 1 (PR #48, pre-merge)
+
+**PR:** https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/48  
+**Branch:** `polish/public-readability-marketplace-forms`  
+**Commit:** `616b2b799c86e8e8903df1f8044611fe659f6c27`  
+**QA date:** 2026-06-18  
+**Vercel deployment:** Ready (commit status success)
+
+### Preview URL
+
+| Surface | URL | Access |
+|---------|-----|--------|
+| **Vercel preview (authoritative)** | https://mosaic-biz-frontend-launch-git-polish-p-138a0f-digital-builders.vercel.app | **Blocked** — redirects to Vercel SSO login (HTTP 401 / login page) |
+| Vercel inspector | https://vercel.com/digital-builders/mosaic-biz-frontend-launch/DJBR5H4jpVnxgVmWT4Jsnq1GgUBD | Team access only |
+| Local production build (QA fallback) | http://localhost:3010 | Used for automated + manual route checks |
+
+### Build
+
+| Command | Result |
+|---------|--------|
+| `npm run build` | **Pass** (re-run during QA follow-up) |
+
+### Route results (local prod @ `616b2b79`, mobile 390px unless noted)
+
+| Route | Visual readability | Cards/surfaces | Filters/dropdowns | Mobile scroll | Notes |
+|-------|-------------------|----------------|-------------------|---------------|-------|
+| `/` | Pass | Pass — search card `border-white/15`, dusk sections | Pass — `market-label`, state/minority selects | Pass (390px) | Featured section loads; API empty/CORS expected on localhost |
+| `/products` | Pass | Pass — filter panel + sort `market-select` | Pass — accordion + comboboxes | Pass (390px) | Minor desktop-only ~15px horizontal overflow (carousel offsets) — **deferred** |
+| `/foods` | Pass | Pass — listing shell + sort control | Pass | Pass (390px) | Empty listing state styled |
+| `/services` | Pass | Pass — listing shell + sort control | Pass | Pass (390px) | Empty listing state styled |
+| `/vendors` | Pass | Pass — `SimilarProduct` dusk cards | Pass — `CustomSelect` listbox `rgb(33,23,71)` (`market-elevated`) | Pass (390px) | Dropdown options: Fashion, Electronics, Beauty, Home, Footwear |
+
+### API / guardrails
+
+| Check | Result | Evidence |
+|-------|--------|----------|
+| `/api/products/list` wiring | Pass | `ProductsClient.tsx` unchanged endpoint |
+| `/api/featured-products` canonical | Pass | `ShopProducts.tsx` → `getFeaturedProducts()` |
+| `/api/products/featured` | Pass | Not referenced in app code |
+| Backend direct API | Pass | `GET /api/products/list` → **200**; `GET /api/featured-products` → **200** |
+| Auth / checkout / Stripe / middleware | Pass | No files touched in those areas |
+| Visual bugs requiring fix | **None** | No code changes in this QA pass |
+
+### QA status
+
+**Conditional pass — ready for merge** after optional human Vercel SSO spot-check on preview URL (confirm live product grid + featured section with production API origin).
+
+**Production was not manually deployed.**
+
+### Remaining visual gaps (deferred)
+
+1. Product / service / vendor **detail** pages — legacy light UI (Phase 2)
+2. Native `<select>` OS option menus — cannot fully theme (closed state uses `market-select`)
+3. Desktop `/products` ~15px horizontal overflow from carousel nav offsets (low priority)
+4. Legal / FAQ pages — legacy styling
+5. Duplicated listing components (`FilterAccordion`, `BookYourServices`, `ProductCard` copies)
+6. Human preview sign-off on Vercel SSO — pending ~2 min with team credentials

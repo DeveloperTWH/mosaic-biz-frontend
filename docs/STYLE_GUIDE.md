@@ -144,6 +144,31 @@ Shared UI lives in `components/ui/`. Prefer these over hand-rolled buttons:
 - `.btn-outline-white` — ghost on dark backgrounds
 - `.dropdown-link` — nav dropdown item on dark panels
 
+### Public marketplace utility classes (`app/globals.css`)
+
+Use on `/`, `/products`, `/foods`, `/services`, `/vendors` only.
+
+| Class | Use |
+|-------|-----|
+| `.market-btn-primary` / `.market-btn-secondary` / `.market-btn-outline` | Marketplace CTAs with `focus-visible` rings |
+| `.market-input` | Text fields; border `white/15`, gold focus ring |
+| `.market-label` | Form field labels (`text-market-muted`) |
+| `.market-select` | Native `<select>` — extends `.market-input` with `appearance-none pr-10` |
+| `.market-select-wrap` + `.market-select-chevron` | Wrapper + chevron for native selects |
+| `.market-card` | Listing card shell — border `white/15`, gold hover border |
+| `.market-card-media` | Card image area (`bg-market-elevated`) |
+| `.market-card-placeholder` | Missing image/logo placeholder |
+| `.market-card-title` / `.market-card-desc` | Title and body hierarchy |
+| `.market-card-price` / `.market-card-price-sale` | Price display (gold / sale red) |
+| `.market-card-footer` | Badge/footer row inside cards |
+| `.market-empty-state` / `.market-empty-state-title` | Empty listing panels |
+| `.market-result-count` | “Showing X–Y of Z” result counts |
+| `.market-carousel-btn` | Carousel prev/next with focus ring |
+| `.market-dropdown-link` | Custom dropdown list items (e.g. `CustomSelect`) |
+| `.filter-panel` + `.accordion-*` | Sidebar filter accordion (shared across listings) |
+
+**Native `<select>` note:** OS option menus cannot be fully themed; closed state uses `market-select`. Prefer `CustomSelect` for fully themed dropdowns where needed.
+
 ## Patterns
 
 ### Section block
@@ -190,7 +215,7 @@ Header uses `.glass-header` on `#site-header` with brand-navy frosted background
 | Area | Status |
 |------|--------|
 | Homepage + public chrome (`app/(home)/Components/*`) | **v3** — `market-*` dusk shell (PR #30) |
-| Public listings (`/products`, `/foods`, `/services`, `/vendors`) | **v3** — `market-*` listing bodies |
+| Public listings (`/products`, `/foods`, `/services`, `/vendors`) | **v3.1** — readability polish (#41/#42/#44); shared `market-card-*` + form classes |
 | Public heroes (`PublicPageHero`) | **v3** — shared dark hero |
 | Auth (`app/(auth)/*`) | v2 — `brand-*` navy/gold buttons |
 | Checkout (`app/(home)/checkout/*`) | v2 — `brand-*` (out of PR #30 scope) |

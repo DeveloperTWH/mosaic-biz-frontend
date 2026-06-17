@@ -42,7 +42,7 @@ export default function CustomSelect({ category, setCategory }: CustomSelectProp
                   setOpen(false);
                 }
               }}
-              className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20 text-xs text-market-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-market-gold/50"
+              className="flex h-6 w-6 items-center justify-center rounded-full bg-market-pill text-xs text-market-muted hover:bg-white/10 hover:text-market-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-market-gold/50"
               aria-label="Clear selection"
             >
               ×
@@ -50,7 +50,7 @@ export default function CustomSelect({ category, setCategory }: CustomSelectProp
           )}
 
           <svg
-            className="h-4 w-4 text-market-muted"
+            className={`h-4 w-4 text-market-muted transition-transform ${open ? 'rotate-180' : ''}`}
             fill="none"
             stroke="currentColor"
             strokeWidth={2}
@@ -64,7 +64,7 @@ export default function CustomSelect({ category, setCategory }: CustomSelectProp
 
       {open && (
         <ul
-          className="absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-white/15 bg-market-elevated shadow-market-card"
+          className="absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-white/15 bg-market-elevated py-1 shadow-market-card"
           role="listbox"
         >
           {options.map((option) => (
@@ -74,7 +74,9 @@ export default function CustomSelect({ category, setCategory }: CustomSelectProp
                 setCategory(option);
                 setOpen(false);
               }}
-              className="cursor-pointer px-4 py-3 text-sm text-market-text transition-colors hover:bg-white/5 focus-visible:bg-white/5"
+              className={`market-dropdown-link cursor-pointer ${
+                category === option ? 'bg-white/5 text-market-gold' : ''
+              }`}
               role="option"
               aria-selected={category === option}
             >

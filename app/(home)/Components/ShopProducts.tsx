@@ -212,18 +212,20 @@ export default function ShopProducts() {
             <div className="absolute top-1/2 left-0 -translate-y-1/2 -translate-x-4 z-10">
               <button
                 ref={prevButton}
-                className="flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-market-elevated text-market-text shadow-market-card transition hover:bg-market-surface"
+                className="market-carousel-btn h-12 w-12"
+                aria-label="Previous products"
               >
-                <ChevronLeft className="w-6 h-6 text-gray-700" />
+                <ChevronLeft className="h-6 w-6 text-market-text" />
               </button>
             </div>
             
             <div className="absolute top-1/2 right-0 -translate-y-1/2 translate-x-4 z-10">
               <button
                 ref={nextButton}
-                className="flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-market-elevated text-market-text shadow-market-card transition hover:bg-market-surface"
+                className="market-carousel-btn h-12 w-12"
+                aria-label="Next products"
               >
-                <ChevronRight className="w-6 h-6 text-gray-700" />
+                <ChevronRight className="h-6 w-6 text-market-text" />
               </button>
             </div>
 
@@ -298,33 +300,24 @@ function FeaturedProductCard({ item }: { item: FeaturedProduct }) {
   return (
     <Link
       href={`/product/${item._id}`}
-      className="market-card block h-[460px] w-full max-w-[300px] overflow-hidden hover:-translate-y-1"
+      className="market-card block h-[460px] w-full max-w-[300px] overflow-hidden hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-market-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-market-bg"
     >
       <div className="flex h-full flex-col">
-        {/* Product Image - Square (1:1 like 1080x1080) */}
-        <div className="relative aspect-square w-full flex-shrink-0 overflow-hidden bg-market-elevated">
+        <div className="market-card-media relative aspect-square w-full flex-shrink-0">
           <img
             src={coverImage}
             alt={title}
             loading="lazy"
-            className="w-full h-full object-contain transition-transform duration-500 hover:scale-105"
+            className="h-full w-full object-contain transition-transform duration-500 hover:scale-105"
           />
-          
-          {/* <div className="absolute top-3 left-3">
-            <span className="px-3 py-1 text-xs font-bold text-white bg-yellow-600 rounded-full">
-              FEATURED
-            </span>
-          </div> */}
         </div>
 
-        {/* Product Info - Flex grow to fill space */}
-        <div className="p-3 flex flex-col flex-1">
-          {/* Title */}
-          <h3 className="line-clamp-2 h-[42px] font-poppins text-base font-bold uppercase leading-snug tracking-tight text-market-text">
+        <div className="flex flex-1 flex-col p-3">
+          <h3 className="market-card-title line-clamp-2 h-[42px] uppercase tracking-tight">
             {title}
           </h3>
 
-          <p className="mb-2 h-[40px] overflow-hidden font-montserrat text-xs leading-5 text-market-muted">
+          <p className="market-card-desc mb-2 h-[40px] overflow-hidden">
             {trimmedDescription || "\u00a0"}
           </p>
 
@@ -333,7 +326,7 @@ function FeaturedProductCard({ item }: { item: FeaturedProduct }) {
           </p>
 
           <div className="mt-auto flex-shrink-0">
-            <span className="text-base font-bold text-market-gold">
+            <span className="market-card-price text-base">
               {price !== null ? `$${price.toFixed(2)}` : "Price on request"}
             </span>
           </div>
