@@ -70,13 +70,13 @@ export default function PublicSearchFilterBar({
   };
 
   return (
-    <div className="w-full bg-[#1A1F71] py-6 pb-10 text-white">
+    <div className="w-full py-2 text-market-text">
       <form
         onSubmit={handleSubmit}
-        className="mx-auto flex max-w-[1500px] flex-col gap-4 px-4 sm:px-6 md:flex-row md:items-end md:gap-6 lg:px-12"
+        className="flex flex-col gap-4 md:flex-row md:items-end md:gap-6"
       >
         <div className="min-w-0 flex-[3]">
-          <label className="block text-left text-[14px] font-medium text-white font-poppins">
+          <label className="mb-1.5 block text-left font-poppins text-sm font-medium text-market-muted">
             {keywordLabel}
           </label>
           <input
@@ -84,19 +84,19 @@ export default function PublicSearchFilterBar({
             placeholder={keywordPlaceholder}
             value={filters.keyword}
             onChange={(event) => onChange({ ...filters, keyword: event.target.value })}
-            className="h-10 w-full bg-white px-4 text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-custom-orange"
+            className="market-input"
           />
         </div>
 
         <div className="min-w-0 flex-1">
-          <label className="block text-left text-[14px] font-medium text-white font-poppins">
+          <label className="mb-1.5 block text-left font-poppins text-sm font-medium text-market-muted">
             {locationLabel}
           </label>
           <div className="relative">
             <select
               value={filters.location}
               onChange={(event) => onChange({ ...filters, location: event.target.value })}
-              className="h-10 w-full appearance-none bg-white px-4 text-xs text-[#5F5F5F] focus:outline-none focus:ring-2 focus:ring-custom-orange"
+              className="market-input appearance-none"
             >
               <option value="">Choose State</option>
               {US_STATE_OPTIONS.map((state) => (
@@ -114,7 +114,7 @@ export default function PublicSearchFilterBar({
         </div>
 
         <div className="min-w-0 flex-1">
-          <label className="block text-left text-[14px] font-medium text-white font-poppins">
+          <label className="mb-1.5 block text-left font-poppins text-sm font-medium text-market-muted">
             {minorityLabel}
           </label>
           <div className="relative">
@@ -122,7 +122,7 @@ export default function PublicSearchFilterBar({
               value={filters.minorityType}
               onChange={(event) => onChange({ ...filters, minorityType: event.target.value })}
               disabled={loadingMinorityTypes}
-              className="h-10 w-full appearance-none bg-white px-4 text-xs text-[#5F5F5F] focus:outline-none focus:ring-2 focus:ring-custom-orange"
+              className="market-input appearance-none disabled:opacity-50"
             >
               <option value="">
                 {loadingMinorityTypes ? "Loading minority types..." : "Choose Minority"}
@@ -144,7 +144,7 @@ export default function PublicSearchFilterBar({
         <div className="min-w-0 flex-1">
           <button
             type="submit"
-            className="flex h-10 w-full items-center justify-center bg-[#C7A040] text-sm font-semibold text-white transition-colors hover:bg-[#a88432]"
+            className="market-btn-primary flex h-10 w-full items-center justify-center text-sm normal-case"
           >
             {submitLabel}
           </button>

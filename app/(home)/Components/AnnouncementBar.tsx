@@ -1,0 +1,50 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
+
+const STORAGE_KEY = "mosaic_announcement_dismissed";
+
+export default function AnnouncementBar() {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    setVisible(sessionStorage.getItem(STORAGE_KEY) !== "true");
+  }, []);
+
+  const dismiss = () => {
+    sessionStorage.setItem(STORAGE_KEY, "true");
+    setVisible(false);
+    document.documentElement.style.setProperty("--announcement-h", "0px");
+  };
+
+  useEffect(() => {
+    document.documentElement.style.setProperty(
+      "--announcement-h",
+      visible ? "2.25rem" : "0px"
+    );
+  }, [visible]);
+
+  if (!visible) {
+    return null;
+  }
+
+  return (
+    <div className="fixed top-0 left-0 z-[60] flex h-9 w-full items-center justify-center bg-market-header px-4 text-center text-xs text-market-text sm:text-sm">
+      <p className="font-poppins">
+        Shop minority-owned businesses and support the culture.{" "}
+        <Link href="/products" className="font-semibold text-market-gold underline hover:text-market-gold-hover">
+          Explore the marketplace
+        </Link>
+      </p>
+      <button
+        type="button"
+        onClick={dismiss}
+        className="absolute right-3 top-1/2 -translate-y-1/2 rounded p-1 text-white/80 hover:text-white"
+        aria-label="Dismiss announcement"
+      >
+        ×
+      </button>
+    </div>
+  );
+}

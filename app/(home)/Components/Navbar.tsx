@@ -10,13 +10,6 @@ import { ShoppingCart, ChevronDown } from "lucide-react";
 import { useCartCount } from "@/hooks/useCartCount";
 import CartSyncPrompt from "./CartSyncPrompt";
 import { getLoggedInCustomer } from "@/utils/authUtils";
-import { Poppins } from "next/font/google";
-
-const popinFont = Poppins({
- weight : "600",
- style : 'normal'
- 
-})
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -88,7 +81,7 @@ const Navbar = () => {
   return (
     <header
       id="site-header"
-      className="fixed top-0 left-0 z-50 w-full px-6 py-4 bg-white shadow md:px-10 lg:px-20 font-sans"
+      className="market-glass-header fixed left-0 z-50 w-full px-6 py-4 font-poppins top-[var(--announcement-h,0px)] md:px-10 lg:px-20"
     >
       <CartSyncPrompt />
       
@@ -110,7 +103,7 @@ const Navbar = () => {
         <nav className="items-center hidden space-x-4 text-[12px] font-medium tracking-wide lg:flex">
           <Link 
             href="/" 
-            className={`text-[#A2A2A2] hover:text-sky-600 transition-colors font-medium uppercase ${popinFont.className}`}
+            className="font-medium uppercase text-market-muted transition-colors hover:text-market-gold"
           >
             HOME
           </Link>
@@ -120,22 +113,22 @@ const Navbar = () => {
             <button
               onClick={() => setShopDropdown(!shopDropdown)}
               onMouseEnter={() => setShopDropdown(true)}
-              className={`flex items-center text-[#A2A2A2] hover:text-sky-600 transition-colors focus:outline-none font-medium uppercase ${popinFont.className}`}
+              className={`flex items-center text-market-muted hover:text-market-gold transition-colors focus:outline-none font-medium uppercase`}
             >
               SHOP <ChevronDown className={`ml-1 w-3.5 h-3.5 transition-transform ${shopDropdown ? "rotate-180" : ""}`} />
             </button>
             {shopDropdown && (
               <div 
-                className="absolute left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg w-48 py-2 z-50"
+                className="absolute left-0 mt-2 z-50 w-48 rounded-lg border border-white/10 bg-market-elevated py-2 shadow-market-card"
                 onMouseLeave={() => setShopDropdown(false)}
               >
-                <Link href="/products" className={`block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-medium font-poppins ${popinFont.className}`}>
+                <Link href="/products" className="market-dropdown-link">
                   Products
                 </Link>
-                <Link href="/foods" className={`block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-medium font-poppins ${popinFont.className}`}>
+                <Link href="/foods" className={`market-dropdown-link`}>
                   Foods
                 </Link>
-                <Link href="/services" className={`block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-medium font-poppins ${popinFont.className}`}>
+                <Link href="/services" className={`market-dropdown-link`}>
                   Services
                 </Link>
               </div>
@@ -144,21 +137,21 @@ const Navbar = () => {
           
           <Link 
             href="/become-a-vendor" 
-            className={`text-[#A2A2A2] hover:text-sky-600 transition-colors font-medium uppercase  ${popinFont.className}`}
+            className={`text-market-muted hover:text-market-gold transition-colors font-medium uppercase `}
           >
             BECOME A VENDOR
           </Link>
           
           <Link 
             href="/about" 
-            className={`text-[#A2A2A2] hover:text-sky-600 transition-colors font-medium uppercase  ${popinFont.className}`}
+            className={`text-market-muted hover:text-market-gold transition-colors font-medium uppercase `}
           >
             ABOUT
           </Link>
           
           <Link 
             href="/contact" 
-            className={`text-[#A2A2A2] hover:text-sky-600 transition-colors font-small uppercase  ${popinFont.className}`}
+            className={`text-market-muted hover:text-market-gold transition-colors font-medium uppercase `}
           >
             CONTACT
           </Link>
@@ -168,48 +161,48 @@ const Navbar = () => {
             <button
               onClick={() => setMoreDropdown(!moreDropdown)}
               onMouseEnter={() => setMoreDropdown(true)}
-              className={`flex items-center text-[#A2A2A2] hover:text-sky-600 transition-colors focus:outline-none font-small uppercase  ${popinFont.className}`}
+              className={`flex items-center text-market-muted hover:text-market-gold transition-colors focus:outline-none font-medium uppercase `}
             >
               MORE <ChevronDown className={`ml-1 w-3.5 h-3.5 transition-transform ${moreDropdown ? "rotate-180" : ""}`} />
             </button>
             {moreDropdown && (
               <div 
-                className="absolute left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg w-56 py-2 z-50"
+                className="absolute left-0 mt-2 z-50 w-56 rounded-lg border border-white/10 bg-market-elevated py-2 shadow-market-card"
                 onMouseLeave={() => setMoreDropdown(false)}
               >
 
-                <Link href="/faq" className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-medium font-poppins">
+                <Link href="/faq" className="market-dropdown-link">
                   FAQ
                 </Link>
-                <Link href="/terms" className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-medium font-poppins">
+                <Link href="/terms" className="market-dropdown-link">
                   Terms & Conditions
                 </Link>
-                <Link href="/privacy" className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-medium font-poppins">
+                <Link href="/privacy" className="market-dropdown-link">
                   Privacy Policy
                 </Link>
-                 <Link href="/dispute" className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-medium font-poppins">
+                 <Link href="/dispute" className="market-dropdown-link">
                   Dispute Resolution Process 
                 </Link>
-                 <Link href="/refund-return" className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-medium font-poppins">
+                 <Link href="/refund-return" className="market-dropdown-link">
                   Refunds and Returns 
                 </Link>
-                <Link href="/consumer/terms" className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-medium font-poppins">
+                <Link href="/consumer/terms" className="market-dropdown-link">
                   Terms and Conditions – Consumer 
                 </Link>
-                <Link href="/vendor/terms" className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-medium font-poppins">
+                <Link href="/vendor/terms" className="market-dropdown-link">
                   Terms and Conditions – Vendor 
                 </Link>
-                <Link href="/consumer/trustbadge" className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-medium font-poppins">
+                <Link href="/consumer/trustbadge" className="market-dropdown-link">
                   Trust Badges – Consumer 
                 </Link>
-                <Link href="/vendor/trustbadge" className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 font-medium font-poppins">
+                <Link href="/vendor/trustbadge" className="market-dropdown-link">
                   Trust Badges – Vendor 
                 </Link>
               </div>
             )}
 
           </div>
-              <Link href="/how-to-use-this-app"   className="text-[#A2A2A2] hover:text-sky-600 transition-colors font-small uppercase font-poppins" >
+              <Link href="/how-to-use-this-app"   className="text-market-muted hover:text-market-gold transition-colors font-medium uppercase font-poppins" >
                   HOW TO USE THIS APP
               </Link>
         </nav>
@@ -226,7 +219,7 @@ const Navbar = () => {
               {/* Cart Icon */}
               <Link
                 href="/cart"
-                className={`relative inline-flex items-center justify-center w-10 h-10 rounded-full text-gray-700 hover:bg-gray-100 transition ${mounted && bump ? "ring-2 ring-sky-300" : ""}`}
+                className={`relative inline-flex h-10 w-10 items-center justify-center rounded-full text-market-text transition hover:bg-white/10 ${mounted && bump ? "ring-2 ring-market-teal/40" : ""}`}
                 aria-label={`Cart${mounted && cartCount > 0 ? `, ${cartCount} item${cartCount > 1 ? "s" : ""}` : ""}`}
                 title="Cart"
               >
@@ -253,19 +246,19 @@ const Navbar = () => {
                   />
                 </button>
                 {showDropdown && (
-                  <div className="absolute right-0 z-50 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl w-48">
+                  <div className="absolute right-0 z-50 mt-2 w-48 rounded-lg border border-white/10 bg-market-elevated shadow-market-card">
                     {isCustomer ? (
                       <>
                         <Link
                           href="/customer/order"
-                          className="block px-4 py-3 text-sm text-gray-700 rounded-t-lg hover:bg-gray-100 font-medium"
+                          className="market-dropdown-link rounded-t-lg px-4 py-3"
                           onClick={() => setShowDropdown(false)}
                         >
                           My Orders
                         </Link>
                         <Link
                           href="/customer/bookings"
-                          className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 font-medium"
+                          className="market-dropdown-link px-4 py-3"
                           onClick={() => setShowDropdown(false)}
                         >
                           My Bookings
@@ -274,7 +267,7 @@ const Navbar = () => {
                     ) : (
                       <Link
                         href="/partners/dashboard"
-                        className="block px-4 py-3 text-sm text-gray-700 rounded-t-lg hover:bg-gray-100 font-medium"
+                        className="market-dropdown-link rounded-t-lg px-4 py-3"
                         onClick={() => setShowDropdown(false)}
                       >
                         Dashboard
@@ -297,25 +290,25 @@ const Navbar = () => {
                 <button
                   onClick={() => setOpenLogin(!openLogin)}
                   onMouseEnter={() => setOpenLogin(true)}
-                  className="px-6 py-2.5 text-sm font-semibold text-white bg-[#1A1F71]  hover:bg-blue-700 transition-colors flex items-center uppercase tracking-wide"
+                  className="market-btn-primary flex items-center px-6 py-2.5 text-sm uppercase tracking-wide"
                 >
                   Login
                   <ChevronDown className={`ml-1.5 w-3.5 h-3.5 transition-transform ${openLogin ? "rotate-180" : ""}`} />
                 </button>
                 {openLogin && (
                   <div
-                    className="absolute right-0 z-20 mt-2 bg-white border border-gray-200 rounded-md shadow-lg w-48"
+                    className="absolute right-0 z-20 mt-2 w-48 rounded-md border border-white/10 bg-market-elevated shadow-market-card"
                     onMouseLeave={() => setOpenLogin(false)}
                   >
                     <Link
                       href="/login?type=customer"
-                      className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 font-medium font-poppins"
+                      className="market-dropdown-link px-4 py-3"
                     >
                       Login as Customer
                     </Link>
                     <Link
                       href="/login?type=vendor"
-                      className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 font-medium font-poppins"
+                      className="market-dropdown-link px-4 py-3"
                     >
                       Login as Vendor
                     </Link>
@@ -326,7 +319,7 @@ const Navbar = () => {
               {/* Cart for non-logged in users */}
               <Link
                 href="/cart"
-                className={`relative inline-flex items-center justify-center w-10 h-10 rounded-full text-gray-700 hover:bg-gray-100 transition ${mounted && bump ? "ring-2 ring-sky-300" : ""}`}
+                className={`relative inline-flex h-10 w-10 items-center justify-center rounded-full text-market-text transition hover:bg-white/10 ${mounted && bump ? "ring-2 ring-market-teal/40" : ""}`}
               >
                 <ShoppingCart size={22} />
                 {mounted && cartCount > 0 && (
@@ -341,7 +334,7 @@ const Navbar = () => {
 
         {/* Mobile Hamburger */}
         <button
-          className="text-gray-800 lg:hidden focus:outline-none"
+          className="text-market-text focus:outline-none lg:hidden"
           onClick={() => setIsOpen(!isOpen)}
         >
           <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
@@ -356,59 +349,59 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="mt-4 space-y-4 lg:hidden bg-white border-t border-gray-200 pt-4">
+        <div className="mt-4 space-y-4 border-t border-white/10 bg-market-surface pt-4 lg:hidden">
           <nav className="flex flex-col space-y-1">
-            <Link href="/" onClick={() => setIsOpen(false)} className="px-4 py-3 text-gray-800 hover:bg-gray-100 font-medium uppercase">
+            <Link href="/" onClick={() => setIsOpen(false)} className="px-4 py-3 font-medium uppercase text-market-text hover:bg-white/5">
               HOME
             </Link>
             
             <div className="px-4 py-3">
-              <div className="font-medium text-gray-800 mb-3 uppercase">SHOP</div>
+              <div className="mb-3 font-medium uppercase text-market-muted">SHOP</div>
               <div className="ml-4 space-y-3">
-                <Link href="/products" onClick={() => setIsOpen(false)} className="block py-2 text-gray-700 hover:text-blue-600 font-medium">
+                <Link href="/products" onClick={() => setIsOpen(false)} className="block py-2 font-medium text-market-muted hover:text-market-teal">
                   Products
                 </Link>
-                <Link href="/foods" onClick={() => setIsOpen(false)} className="block py-2 text-gray-700 hover:text-blue-600 font-medium">
+                <Link href="/foods" onClick={() => setIsOpen(false)} className="block py-2 font-medium text-market-muted hover:text-market-teal">
                   Foods
                 </Link>
-                <Link href="/services" onClick={() => setIsOpen(false)} className="block py-2 text-gray-700 hover:text-blue-600 font-medium">
+                <Link href="/services" onClick={() => setIsOpen(false)} className="block py-2 font-medium text-market-muted hover:text-market-teal">
                   Services
                 </Link>
               </div>
             </div>
             
-            <Link href="/become-a-vendor" onClick={() => setIsOpen(false)} className="px-4 py-3 text-gray-800 hover:bg-gray-100 font-medium uppercase">
+            <Link href="/become-a-vendor" onClick={() => setIsOpen(false)} className="px-4 py-3 font-medium uppercase text-market-text hover:bg-white/5">
               BECOME A VENDOR
             </Link>
             
-            <Link href="/about" onClick={() => setIsOpen(false)} className="px-4 py-3 text-gray-800 hover:bg-gray-100 font-medium uppercase">
+            <Link href="/about" onClick={() => setIsOpen(false)} className="px-4 py-3 font-medium uppercase text-market-text hover:bg-white/5">
               ABOUT
             </Link>
             
-            <Link href="/contact" onClick={() => setIsOpen(false)} className="px-4 py-3 text-gray-800 hover:bg-gray-100 font-medium uppercase">
+            <Link href="/contact" onClick={() => setIsOpen(false)} className="px-4 py-3 font-medium uppercase text-market-text hover:bg-white/5">
               CONTACT
             </Link>
             
             <div className="px-4 py-3">
-              <div className="font-medium text-gray-800 mb-3 uppercase">MORE</div>
+              <div className="mb-3 font-medium uppercase text-market-muted">MORE</div>
               <div className="ml-4 space-y-3">
-                {/* <Link href="/how-to-use-this-app" onClick={() => setIsOpen(false)} className="block py-2 text-gray-700 hover:text-blue-600 font-medium">
+                {/* <Link href="/how-to-use-this-app" onClick={() => setIsOpen(false)} className="block py-2 text-gray-700 hover:text-brand-teal font-medium">
                   HOW TO USE THIS APP
                 </Link> */}
-                <Link href="/faq" onClick={() => setIsOpen(false)} className="block py-2 text-gray-700 hover:text-blue-600 font-medium">
+                <Link href="/faq" onClick={() => setIsOpen(false)} className="block py-2 font-medium text-market-muted hover:text-market-teal">
                   FAQ
                 </Link>
-                <Link href="/terms" onClick={() => setIsOpen(false)} className="block py-2 text-gray-700 hover:text-blue-600 font-medium">
+                <Link href="/terms" onClick={() => setIsOpen(false)} className="block py-2 font-medium text-market-muted hover:text-market-teal">
                   Terms & Conditions
                 </Link>
-                <Link href="/privacy" onClick={() => setIsOpen(false)} className="block py-2 text-gray-700 hover:text-blue-600 font-medium">
+                <Link href="/privacy" onClick={() => setIsOpen(false)} className="block py-2 font-medium text-market-muted hover:text-market-teal">
                   Privacy Policy
                 </Link>
               </div>
             </div>
           </nav>
           
-          <div className="px-4 pt-4 border-t border-gray-200">
+          <div className="border-t border-white/10 px-4 pt-4">
             {isLoggedIn === null ? (
               <div className="w-full h-10 bg-gray-200 rounded animate-pulse" />
             ) : isLoggedIn ? (
@@ -421,12 +414,12 @@ const Navbar = () => {
                     alt="Profile"
                     className="border border-gray-300 rounded-full"
                   />
-                  <span className="text-gray-800 font-medium">My Account</span>
+                  <span className="font-medium text-market-text">My Account</span>
                 </div>
                 <Link
                   href="/cart"
                   onClick={() => setIsOpen(false)}
-                  className="flex items-center px-4 py-3 text-gray-800 hover:bg-gray-100 rounded font-medium"
+                  className="flex items-center rounded px-4 py-3 font-medium text-market-text hover:bg-white/5"
                 >
                   <ShoppingCart size={20} className="mr-3" />
                   Cart
@@ -441,14 +434,14 @@ const Navbar = () => {
                     <Link
                       href="/customer/order"
                       onClick={() => setIsOpen(false)}
-                      className="block px-4 py-3 text-gray-800 hover:bg-gray-100 rounded font-medium"
+                      className="block rounded px-4 py-3 font-medium text-market-text hover:bg-white/5"
                     >
                       My Orders
                     </Link>
                     <Link
                       href="/customer/bookings"
                       onClick={() => setIsOpen(false)}
-                      className="block px-4 py-3 text-gray-800 hover:bg-gray-100 rounded font-medium"
+                      className="block rounded px-4 py-3 font-medium text-market-text hover:bg-white/5"
                     >
                       My Bookings
                     </Link>
@@ -457,7 +450,7 @@ const Navbar = () => {
                   <Link
                     href="/partners/dashboard"
                     onClick={() => setIsOpen(false)}
-                    className="block px-4 py-3 text-gray-800 hover:bg-gray-100 rounded font-medium"
+                    className="block rounded px-4 py-3 font-medium text-market-text hover:bg-white/5"
                   >
                     Dashboard
                   </Link>
@@ -474,18 +467,18 @@ const Navbar = () => {
               </div>
             ) : (
               <div className="space-y-4">
-                <div className="text-gray-800 font-medium mb-3 uppercase">Login As:</div>
+                <div className="mb-3 font-medium uppercase text-market-muted">Login As:</div>
                 <Link href="/login?type=customer">
-                  <button className="w-full bg-blue-600 text-white px-4 py-3.5 rounded text-sm font-semibold hover:bg-blue-700 uppercase tracking-wide">
+                  <button className="market-btn-primary w-full px-4 py-3.5 text-sm uppercase tracking-wide">
                     Customer
                   </button>
                 </Link>
                 <Link href="/login?type=vendor">
-                  <button className="w-full border border-blue-600 text-blue-600 px-4 py-3.5 rounded text-sm font-semibold hover:bg-blue-50 uppercase tracking-wide">
+                  <button className="market-btn-outline w-full px-4 py-3.5 text-sm uppercase tracking-wide">
                     Vendor
                   </button>
                 </Link>
-                <Link href="/cart" onClick={() => setIsOpen(false)} className="flex items-center justify-center px-4 py-3 text-gray-800 hover:bg-gray-100 rounded font-medium">
+                <Link href="/cart" onClick={() => setIsOpen(false)} className="flex items-center justify-center rounded px-4 py-3 font-medium text-market-text hover:bg-white/5">
                   <ShoppingCart size={20} className="mr-3" />
                   Cart
                   {mounted && cartCount > 0 && (

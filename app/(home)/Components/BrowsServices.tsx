@@ -62,10 +62,10 @@ export default function BrowseServices({
 
   if (loading) {
     return (
-      <section className="bg-[#fbf4e6] py-10">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#d1aa45]"></div>
+      <section className="bg-market-bg py-10">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="flex h-64 items-center justify-center">
+            <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-market-gold"></div>
           </div>
         </div>
       </section>
@@ -73,18 +73,15 @@ export default function BrowseServices({
   }
 
   return (
-    <section className="bg-[#fbf4e6] py-10">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="flex items-center justify-between mb-16">
-          <h2 className="text-4xl font-bold tracking-wide text-gray-900 font-poppins">
-            BROWSE SERVICES
+    <section className="bg-market-bg py-10 sm:py-12">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        <div className="mb-10 flex flex-col items-start justify-between gap-4 sm:mb-12 sm:flex-row sm:items-center">
+          <h2 className="font-poppins text-2xl font-bold uppercase tracking-wide text-market-text sm:text-3xl">
+            Browse Services
           </h2>
 
           {showAllService && (
-            <Link
-              href="/services"
-              className="px-8 py-3 text-lg font-semibold text-white bg-[#d1aa45] hover:bg-[#c19a38] transition font-montserrat"
-            >
+            <Link href="/services" className="market-btn-secondary text-sm normal-case">
               Show All Services
             </Link>
           )}
@@ -93,7 +90,7 @@ export default function BrowseServices({
         <div className="relative flex items-center">
           <button
             ref={prevButtonRef}
-            className="absolute -left-12 z-10 flex items-center justify-center w-12 h-12 rounded-full bg-white border border-gray-300 text-gray-700 hover:bg-gray-100 shadow-lg"
+            className="absolute -left-2 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-market-elevated text-market-text shadow-market-card transition hover:bg-market-surface sm:-left-12 sm:h-12 sm:w-12"
             onClick={() => swiperInstance?.slidePrev()}
           >
             <ChevronLeft size={24} />
@@ -138,38 +135,40 @@ breakpoints={{
                     onMouseLeave={() => setHoveredIndex(null)}
                     onClick={() => handleCategoryClick(category)}
                   >
-                    <div className="relative w-44 h-44 mx-auto rounded-full overflow-hidden border-8 border-white shadow-xl transition-all duration-300">
-                      <div className={`relative w-full h-full ${
-                        isActive
-                          ? "ring-4 ring-[#d1aa45] border-[#d1aa45]" 
-                          : ""
-                      }`}>
+                    <div className="relative mx-auto h-40 w-40 overflow-hidden rounded-full border-4 border-white/10 shadow-market-card transition-all duration-300 sm:h-44 sm:w-44">
+                      <div
+                        className={`relative h-full w-full ${
+                          isActive ? "ring-2 ring-market-gold ring-offset-2 ring-offset-market-bg" : ""
+                        }`}
+                      >
                         <Image
                           src={category.img || "/browsservice/electronics 1.png"}
                           alt={category.name}
                           fill
                           className="object-cover"
                         />
-                        
-                        <div className={`absolute inset-0 flex items-center justify-center transition-all duration-300 ${
-                          isActive
-                            ? "bg-[#d1aa45]/90" 
-                            : "bg-[#d1aa45]/0"
-                        }`}>
-                          <span className={`text-white font-bold text-lg px-4 text-center transition-opacity duration-300 font-poppins ${
-                            isActive ? "opacity-100" : "opacity-0"
-                          }`}>
+
+                        <div
+                          className={`absolute inset-0 flex items-center justify-center transition-all duration-300 ${
+                            isActive ? "bg-market-gold/85" : "bg-transparent"
+                          }`}
+                        >
+                          <span
+                            className={`px-4 text-center font-poppins text-base font-bold text-market-header transition-opacity duration-300 sm:text-lg ${
+                              isActive ? "opacity-100" : "opacity-0"
+                            }`}
+                          >
                             {category.name}
                           </span>
                         </div>
                       </div>
                     </div>
 
-                    <p className={`mt-6 text-sm font-medium transition-all duration-300 font-poppins ${
-                      isActive
-                        ? "text-[#d1aa45] font-semibold" 
-                        : "text-gray-800"
-                    }`}>
+                    <p
+                      className={`mt-4 font-poppins text-sm font-medium transition-all duration-300 sm:mt-6 ${
+                        isActive ? "font-semibold text-market-gold" : "text-market-muted"
+                      }`}
+                    >
                       {category.name}
                     </p>
                   </div>
@@ -182,7 +181,7 @@ breakpoints={{
 
           <button
             ref={nextButtonRef}
-            className="absolute -right-12 z-10 flex items-center justify-center w-12 h-12 rounded-full bg-white border border-gray-300 text-gray-700 hover:bg-gray-100 shadow-lg"
+            className="absolute -right-2 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-market-elevated text-market-text shadow-market-card transition hover:bg-market-surface sm:-right-12 sm:h-12 sm:w-12"
             onClick={() => swiperInstance?.slideNext()}
           >
             <ChevronRight size={24} />
