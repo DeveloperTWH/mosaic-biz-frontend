@@ -18,7 +18,7 @@ For phased next work see [ROADMAP.md](ROADMAP.md). For architecture and env setu
 | Deploy model | Vercel preview per branch/merge; manual promote to production |
 | Preview access | Vercel deployment protection / SSO (HTTP 401 for unauthenticated automation) |
 | Build gate | `npm run build` passes on `main` |
-| Visual polish (in flight) | `polish/public-readability-marketplace-forms` — issues #41, #42, #44 |
+| Visual polish (in flight) | `polish/public-readability-marketplace-forms` — PR [#48](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/48); **conditional QA pass** (2026-06-18) |
 
 ### Latest significant merge
 
