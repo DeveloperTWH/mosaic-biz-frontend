@@ -104,9 +104,10 @@ npm run build — PASS (2026-06-17)
 
 | Item | Value |
 |------|-------|
-| Target branch | `main` |
-| Vercel | Auto-deploy on merge to `main`; manual promote if production alias not tied to `main` |
+| Branch | `main` |
+| Commit | `95369503` |
+| PR | [#49](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/49) — merged 2026-06-17, **no merge conflicts** |
+| Vercel production | **Ready** — https://mosaic-biz-frontend-launch.vercel.app |
+| GitHub deployment SHA | `9536950` (Production) |
 | API gate | `GET https://api.mosaicbizhub.com/api/products/list` → 200 |
 | Featured endpoint | `/api/featured-products` (canonical) |
-
-Update this section after merge with commit SHA and Vercel production URL.
