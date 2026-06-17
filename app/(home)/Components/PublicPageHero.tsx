@@ -53,7 +53,7 @@ const PublicPageHero = ({
                   {item.href ? (
                     <Link
                       href={item.href}
-                      className="transition-colors hover:text-market-gold"
+                      className="market-nav-link rounded-sm transition-colors hover:text-market-gold"
                     >
                       {item.label}
                     </Link>

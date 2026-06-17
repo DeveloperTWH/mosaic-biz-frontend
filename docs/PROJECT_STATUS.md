@@ -1,7 +1,7 @@
 # Project Status
 
 **Type:** Living document  
-**Last updated:** 2026-06-17  
+**Last updated:** 2026-06-18  
 **Audience:** Internal team
 
 For phased next work see [ROADMAP.md](ROADMAP.md). For architecture and env setup see [ARCHITECTURE.md](ARCHITECTURE.md).
@@ -17,7 +17,8 @@ For phased next work see [ROADMAP.md](ROADMAP.md). For architecture and env setu
 | Production deployed | **No** |
 | Deploy model | Vercel preview per branch/merge; manual promote to production |
 | Preview access | Vercel deployment protection / SSO (HTTP 401 for unauthenticated automation) |
-| Build gate | `npm run build` passes on release-candidate (incl. post PR #30) |
+| Build gate | `npm run build` passes on `main` |
+| Visual polish (in flight) | `polish/public-readability-marketplace-forms` — PR [#48](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/48); **conditional QA pass** (2026-06-18) |
 
 ### Latest significant merge
 
@@ -83,7 +84,7 @@ Details: [HOMEPAGE_MARKETPLACE_REDESIGN_QA_REPORT.md](HOMEPAGE_MARKETPLACE_REDES
 | Sprint PRs [#1](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/1), [#19](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/19)–[#21](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/21) | P1 | Awaiting merge/review into RC |
 | Product / food / service **detail** pages | P2 | Legacy light UI — deferred from PR #30 |
 | Mock detail routes vs live routes | P2 | `/products/[productid]/[id]`, `/services/[id]/[serviceId]` coexist with `/product/[id]`, `/service/[slug]` |
-| `CustomSelect` white dropdown on `/vendors` | P3 | Pre-existing; documented in QA report |
+| `CustomSelect` white dropdown on `/vendors` | P3 | **Fixed** in readability polish — `market-*` dropdown |
 | Customer `/dashboard` placeholder | P3 | Future phase |
 | `/foods/shop/[id]` stub | P3 | Document in smoke checklist known gaps |
 | `npm run lint` on Next 16 | P3 | DX — build used as gate |

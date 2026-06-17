@@ -66,20 +66,27 @@ const BookServices: React.FC<BookServicesProps> = ({
         </div>
 
         <div className="lg:w-3/4">
-          <div className="flex mb-4 flex-row justify-between">
-            <p className="text-sm text-market-muted">
+          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="market-result-count">
               (Showing {startItem} - {endItem} Service Of {totalProducts} Services)
             </p>
 
             <div className="flex items-center gap-2">
-              <span className="text-sm text-market-muted">Sort By:</span>
-              <select className="market-input w-auto cursor-pointer px-3 py-1 text-sm">
-                <option>Default</option>
-                <option>Price: Low to High</option>
-                <option>Price: High to Low</option>
-                <option>Most Popular</option>
-                <option>Newest</option>
-              </select>
+              <span className="market-result-count">Sort By:</span>
+              <div className="market-select-wrap">
+                <select className="market-select w-auto min-w-[140px] px-3 py-1 text-sm">
+                  <option>Default</option>
+                  <option>Price: Low to High</option>
+                  <option>Price: High to Low</option>
+                  <option>Most Popular</option>
+                  <option>Newest</option>
+                </select>
+                <div className="market-select-chevron">
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -88,8 +95,9 @@ const BookServices: React.FC<BookServicesProps> = ({
               <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-market-gold"></div>
             </div>
           ) : services.length === 0 ? (
-            <div className="market-card p-8 text-center">
-              <p className="text-market-muted">No services found.</p>
+            <div className="market-empty-state">
+              <p className="market-empty-state-title">No services found</p>
+              <p className="mt-2 text-sm text-market-muted">Try adjusting your filters or search terms.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">

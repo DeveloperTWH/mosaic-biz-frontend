@@ -66,7 +66,7 @@ export default function BrowseCategories({ onCategorySelect }: BrowseCategoriesP
           <button
             ref={prevButtonRef}
             type="button"
-            className="absolute -left-2 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-market-elevated text-market-text shadow-market-card transition hover:bg-market-surface sm:-left-12 sm:h-12 sm:w-12"
+            className="market-carousel-btn absolute -left-2 z-10 h-11 w-11 sm:-left-12 sm:h-12 sm:w-12"
             onClick={() => swiperInstance?.slidePrev()}
           >
             <ChevronLeft size={24} />
@@ -109,7 +109,7 @@ export default function BrowseCategories({ onCategorySelect }: BrowseCategoriesP
                       onMouseLeave={() => setHoveredIndex(null)}
                       onClick={() => onCategorySelect?.(category)}
                     >
-                      <div className="relative mx-auto h-40 w-40 overflow-hidden rounded-full border-4 border-white/10 shadow-market-card transition-all duration-300 sm:h-44 sm:w-44">
+                      <div className="relative mx-auto h-40 w-40 overflow-hidden rounded-full border-4 border-white/15 shadow-market-card transition-all duration-300 sm:h-44 sm:w-44">
                         <div
                           className={`relative h-full w-full ${
                             isHovered ? "ring-2 ring-market-gold ring-offset-2 ring-offset-market-bg" : ""
@@ -153,7 +153,7 @@ export default function BrowseCategories({ onCategorySelect }: BrowseCategoriesP
           <button
             ref={nextButtonRef}
             type="button"
-            className="absolute -right-2 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-market-elevated text-market-text shadow-market-card transition hover:bg-market-surface sm:-right-12 sm:h-12 sm:w-12"
+            className="market-carousel-btn absolute -right-2 z-10 h-11 w-11 sm:-right-12 sm:h-12 sm:w-12"
             onClick={() => swiperInstance?.slideNext()}
           >
             <ChevronRight size={24} />

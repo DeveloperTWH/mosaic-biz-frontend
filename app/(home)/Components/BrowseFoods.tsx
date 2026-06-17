@@ -72,7 +72,7 @@ export default function BrowseFoods({ onCategorySelect }: BrowseFoodsProps) {
                 onMouseLeave={() => setHoveredIndex(null)}
                 onClick={() => onCategorySelect?.(category)}
               >
-                <div className="relative mx-auto h-40 w-40 overflow-hidden rounded-full border-4 border-white/10 shadow-market-card transition-all duration-300 sm:h-44 sm:w-44">
+                <div className="relative mx-auto h-40 w-40 overflow-hidden rounded-full border-4 border-white/15 shadow-market-card transition-all duration-300 sm:h-44 sm:w-44">
                   <div
                     className={`relative h-full w-full ${
                       isHovered ? "ring-2 ring-market-gold ring-offset-2 ring-offset-market-bg" : ""

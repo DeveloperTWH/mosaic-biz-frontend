@@ -89,7 +89,7 @@ if (!token) {
                                 value={formData.firstName}
                                 onChange={handleChange}
                                 required
-                                className="input border-[1px] text-sm p-2 text-[#5F5F5F] font-montserrat" 
+                                className="input min-h-11 border-[1px] p-3 text-sm text-[#5F5F5F] font-montserrat focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C7A040]/60" 
                             />
                         </div>
 
@@ -103,7 +103,7 @@ if (!token) {
                                 value={formData.lastName}
                                 onChange={handleChange}
                                 required
-                                className="input border-[1px] text-sm p-2 text-[#5F5F5F] font-montserrat" 
+                                className="input min-h-11 border-[1px] p-3 text-sm text-[#5F5F5F] font-montserrat focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C7A040]/60" 
                             />
                         </div>
 
@@ -117,7 +117,7 @@ if (!token) {
                                 value={formData.email}
                                 onChange={handleChange}
                                 required
-                                className="input border-[1px] text-sm p-2 text-[#5F5F5F] font-montserrat" 
+                                className="input min-h-11 border-[1px] p-3 text-sm text-[#5F5F5F] font-montserrat focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C7A040]/60" 
                             />
                         </div>
 
@@ -131,7 +131,7 @@ if (!token) {
                                 value={formData.phoneNo}
                                 onChange={handleChange}
                                 required
-                                className="input border-[1px] text-sm p-2 text-[#5F5F5F] font-montserrat" 
+                                className="input min-h-11 border-[1px] p-3 text-sm text-[#5F5F5F] font-montserrat focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C7A040]/60" 
                             />
                         </div>
 
@@ -145,7 +145,7 @@ if (!token) {
                                 value={formData.subject}
                                 onChange={handleChange}
                                 required
-                                className="input border-[1px] text-sm p-2 text-[#5F5F5F] font-montserrat" 
+                                className="input min-h-11 border-[1px] p-3 text-sm text-[#5F5F5F] font-montserrat focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C7A040]/60" 
                             />
                         </div>
 
@@ -158,7 +158,7 @@ if (!token) {
                                 value={formData.howCanWeHelp}
                                 onChange={handleChange}
                                 required
-                                className="input h-28 border-[1px] text-sm p-2 text-[#5F5F5F] font-montserrat" 
+                                className="input min-h-[7rem] border-[1px] p-3 text-sm text-[#5F5F5F] font-montserrat focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C7A040]/60" 
                             />
                         </div>
                         <div className="md:col-span-2">
@@ -172,7 +172,7 @@ if (!token) {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full px-20 py-2 text-white bg-[#C7A040] md:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="market-btn-primary min-h-11 w-full px-8 py-3 md:w-auto disabled:cursor-not-allowed disabled:opacity-50"
                             >
                                 {loading ? 'Submitting...' : 'Submit'}
                             </button>
@@ -182,18 +182,13 @@ if (!token) {
 
 
                 {/* Newsletter */}
-                <div className="relative mt-10 min-h-[500px] w-[600px]">
-                    {/* <div
-                        className="absolute inset-0 z-0 bg-center bg-cover"
-                        style={{ backgroundImage: "url('/contact/contactRight.png')" }}
-                    > */}
-                        {/* <div className="absolute inset-0 bg-gray-700 opacity-90" /> */}
-                    {/* </div> */}
+                <div className="relative mt-10 w-full min-w-0 overflow-hidden">
                     <Image
                     src={"/contact/contactRight.png"}
-                    alt={"contact"}
+                    alt="Contact Mosaic Biz Hub"
                     height={800}
                     width={700}
+                    className="h-auto w-full max-w-full object-cover"
                     />
                     
 
@@ -259,14 +254,14 @@ if (!token) {
                     <h3 className="mb-2 text-lg font-bold">SOCIALIZE WITH US:</h3>
                     <hr className="h-[2px] w-[50px] bg-white" />
                     <hr className="h-[2px] w-[50px] bg-white mt-[1px] mb-5" />
-                    <div className="flex gap-4">
-                        <a href="#" className="hover:opacity-80 transition-opacity">
+                    <div className="flex gap-3">
+                        <a href="#" aria-label="Facebook" className="flex min-h-11 min-w-11 items-center justify-center rounded hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60">
                             <Facebook size={24} />
                         </a>
-                        <a href="#" className="hover:opacity-80 transition-opacity">
+                        <a href="#" aria-label="Instagram" className="flex min-h-11 min-w-11 items-center justify-center rounded hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60">
                             <Instagram size={24} />
                         </a>
-                        <a href="#" className="hover:opacity-80 transition-opacity">
+                        <a href="#" aria-label="LinkedIn" className="flex min-h-11 min-w-11 items-center justify-center rounded hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60">
                             <Linkedin size={24} />
                         </a>
                     </div>
@@ -291,7 +286,7 @@ if (!token) {
                             Take your business to new heights by listing it on Mosaic Biz Hub. Connect with customers who value minority-owned brands, showcase your unique products and services, and grow your presence in the digital marketplace. Join a community dedicated to supporting your success every step of the way.
                         </p>
 
-                        <Link href={"/become-a-vendor"} className="px-5 py-2 mt-5 mb-5 font-semibold text-white transition bg-transparent border border-white hover:bg-white hover:text-black">
+                        <Link href={"/become-a-vendor"} className="market-btn-outline min-h-11 px-6 py-3 mt-5 mb-5">
                             Become A Vendor
                         </Link>
                     </div>

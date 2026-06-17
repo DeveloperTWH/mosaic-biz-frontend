@@ -9,6 +9,7 @@ import { logoutUser } from "@/utils/logoutUser";
 import { ShoppingCart, ChevronDown } from "lucide-react";
 import { useCartCount } from "@/hooks/useCartCount";
 import CartSyncPrompt from "./CartSyncPrompt";
+import BrandLogo from "./BrandLogo";
 import { getLoggedInCustomer } from "@/utils/authUtils";
 
 const Navbar = () => {
@@ -88,14 +89,8 @@ const Navbar = () => {
       <div className="flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center">
-          <Link href="/">
-            <Image
-              src="/logo.png"
-              alt="OSAIC BIZ HUB Logo"
-              width={280}
-              height={60}
-              className="h-auto"
-            />
+          <Link href="/" className="inline-flex shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-market-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-market-header rounded-sm">
+            <BrandLogo variant="header" priority />
           </Link>
         </div>
 
@@ -334,8 +329,11 @@ const Navbar = () => {
 
         {/* Mobile Hamburger */}
         <button
-          className="text-market-text focus:outline-none lg:hidden"
+          type="button"
+          className="market-nav-link flex min-h-11 min-w-11 items-center justify-center rounded text-market-text lg:hidden"
           onClick={() => setIsOpen(!isOpen)}
+          aria-label={isOpen ? "Close menu" : "Open menu"}
+          aria-expanded={isOpen}
         >
           <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
             {isOpen ? (
@@ -351,51 +349,58 @@ const Navbar = () => {
       {isOpen && (
         <div className="mt-4 space-y-4 border-t border-white/10 bg-market-surface pt-4 lg:hidden">
           <nav className="flex flex-col space-y-1">
-            <Link href="/" onClick={() => setIsOpen(false)} className="px-4 py-3 font-medium uppercase text-market-text hover:bg-white/5">
+            <Link href="/" onClick={() => setIsOpen(false)} className="market-nav-link flex min-h-11 items-center px-4 py-3 font-medium uppercase text-market-text hover:bg-white/5">
               HOME
             </Link>
             
-            <div className="px-4 py-3">
-              <div className="mb-3 font-medium uppercase text-market-muted">SHOP</div>
-              <div className="ml-4 space-y-3">
-                <Link href="/products" onClick={() => setIsOpen(false)} className="block py-2 font-medium text-market-muted hover:text-market-teal">
+            <div className="px-4 py-2">
+              <div className="mb-2 flex min-h-11 items-center font-medium uppercase text-market-muted">SHOP</div>
+              <div className="ml-2 space-y-1">
+                <Link href="/products" onClick={() => setIsOpen(false)} className="market-nav-link flex min-h-11 items-center py-2 pl-2 font-medium text-market-muted hover:text-market-teal">
                   Products
                 </Link>
-                <Link href="/foods" onClick={() => setIsOpen(false)} className="block py-2 font-medium text-market-muted hover:text-market-teal">
+                <Link href="/foods" onClick={() => setIsOpen(false)} className="market-nav-link flex min-h-11 items-center py-2 pl-2 font-medium text-market-muted hover:text-market-teal">
                   Foods
                 </Link>
-                <Link href="/services" onClick={() => setIsOpen(false)} className="block py-2 font-medium text-market-muted hover:text-market-teal">
+                <Link href="/services" onClick={() => setIsOpen(false)} className="market-nav-link flex min-h-11 items-center py-2 pl-2 font-medium text-market-muted hover:text-market-teal">
                   Services
                 </Link>
               </div>
             </div>
             
-            <Link href="/become-a-vendor" onClick={() => setIsOpen(false)} className="px-4 py-3 font-medium uppercase text-market-text hover:bg-white/5">
+            <Link href="/become-a-vendor" onClick={() => setIsOpen(false)} className="market-nav-link flex min-h-11 items-center px-4 py-3 font-medium uppercase text-market-text hover:bg-white/5">
               BECOME A VENDOR
             </Link>
             
-            <Link href="/about" onClick={() => setIsOpen(false)} className="px-4 py-3 font-medium uppercase text-market-text hover:bg-white/5">
+            <Link href="/about" onClick={() => setIsOpen(false)} className="market-nav-link flex min-h-11 items-center px-4 py-3 font-medium uppercase text-market-text hover:bg-white/5">
               ABOUT
             </Link>
             
-            <Link href="/contact" onClick={() => setIsOpen(false)} className="px-4 py-3 font-medium uppercase text-market-text hover:bg-white/5">
+            <Link href="/contact" onClick={() => setIsOpen(false)} className="market-nav-link flex min-h-11 items-center px-4 py-3 font-medium uppercase text-market-text hover:bg-white/5">
               CONTACT
             </Link>
+
+            <Link href="/how-to-use-this-app" onClick={() => setIsOpen(false)} className="market-nav-link flex min-h-11 items-center px-4 py-3 font-medium uppercase text-market-text hover:bg-white/5">
+              HOW TO USE THIS APP
+            </Link>
             
-            <div className="px-4 py-3">
-              <div className="mb-3 font-medium uppercase text-market-muted">MORE</div>
-              <div className="ml-4 space-y-3">
-                {/* <Link href="/how-to-use-this-app" onClick={() => setIsOpen(false)} className="block py-2 text-gray-700 hover:text-brand-teal font-medium">
-                  HOW TO USE THIS APP
-                </Link> */}
-                <Link href="/faq" onClick={() => setIsOpen(false)} className="block py-2 font-medium text-market-muted hover:text-market-teal">
+            <div className="px-4 py-2">
+              <div className="mb-2 flex min-h-11 items-center font-medium uppercase text-market-muted">MORE</div>
+              <div className="ml-2 space-y-1">
+                <Link href="/faq" onClick={() => setIsOpen(false)} className="market-nav-link flex min-h-11 items-center py-2 pl-2 font-medium text-market-muted hover:text-market-teal">
                   FAQ
                 </Link>
-                <Link href="/terms" onClick={() => setIsOpen(false)} className="block py-2 font-medium text-market-muted hover:text-market-teal">
+                <Link href="/terms" onClick={() => setIsOpen(false)} className="market-nav-link flex min-h-11 items-center py-2 pl-2 font-medium text-market-muted hover:text-market-teal">
                   Terms & Conditions
                 </Link>
-                <Link href="/privacy" onClick={() => setIsOpen(false)} className="block py-2 font-medium text-market-muted hover:text-market-teal">
+                <Link href="/privacy" onClick={() => setIsOpen(false)} className="market-nav-link flex min-h-11 items-center py-2 pl-2 font-medium text-market-muted hover:text-market-teal">
                   Privacy Policy
+                </Link>
+                <Link href="/refund-return" onClick={() => setIsOpen(false)} className="market-nav-link flex min-h-11 items-center py-2 pl-2 font-medium text-market-muted hover:text-market-teal">
+                  Refunds & Returns
+                </Link>
+                <Link href="/dispute" onClick={() => setIsOpen(false)} className="market-nav-link flex min-h-11 items-center py-2 pl-2 font-medium text-market-muted hover:text-market-teal">
+                  Dispute Resolution
                 </Link>
               </div>
             </div>

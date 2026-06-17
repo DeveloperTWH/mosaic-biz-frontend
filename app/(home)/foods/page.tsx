@@ -15,6 +15,7 @@ import Image from 'next/image';
 import JoinVendorBanner from './components/JoinVendorBanner';
 import BrowseFoods from '../Components/BrowseFoods';
 import PublicSearchFilterBar from '../Components/PublicSearchFilterBar';
+import PublicFilterSection from '../Components/PublicFilterSection';
 import { buildSearchPageUrl, DEFAULT_PUBLIC_SEARCH_FILTERS, PublicSearchFilters } from '../Components/publicSearch';
 
 type FoodsListResponse = {
@@ -155,7 +156,9 @@ function FilterSection({ onSearch, selectedCategory, onCategorySelect }: {
 
   return (
     <>
-      <PublicSearchFilterBar filters={filters} onChange={setFilters} onSubmit={() => onSearch?.(filters)} />
+      <PublicFilterSection>
+        <PublicSearchFilterBar filters={filters} onChange={setFilters} onSubmit={() => onSearch?.(filters)} />
+      </PublicFilterSection>
 
       <BrowseFoods onCategorySelect={onCategorySelect} />
     </>
