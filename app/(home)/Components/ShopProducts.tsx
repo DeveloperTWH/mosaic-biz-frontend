@@ -234,7 +234,18 @@ export default function ShopProducts() {
         ) : error ? (
           <ErrorBlock error={error} onRetry={reload} />
         ) : items.length === 0 ? (
-          <div className="text-center text-gray-600 py-8">No products to display.</div>
+          <div className="rounded border border-[#E5DEC9] bg-white px-6 py-10 text-center text-gray-600">
+            <p className="font-semibold text-gray-900">Featured products coming soon</p>
+            <p className="mt-2 text-sm">
+              Check back shortly or browse the full marketplace.
+            </p>
+            <Link
+              href="/products"
+              className="mt-4 inline-block bg-[#1A1F71] px-6 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+            >
+              Browse all products
+            </Link>
+          </div>
         ) : (
           <div className="relative">
             {/* Navigation Buttons */}
@@ -318,6 +329,12 @@ export default function ShopProducts() {
 
 /* ---------- Featured Product Card ---------- */
 function FeaturedProductCard({ item }: { item: FeaturedProduct }) {
+  const title = item.title?.trim() || "Untitled product";
+  const coverImage = item.coverImage?.trim() || "/ShopProduct/Aria-SK6-Helmet 1.png";
+  const price =
+    typeof item.price === "number" && Number.isFinite(item.price)
+      ? item.price
+      : null;
   const description = item.description ?? "";
   const strippedDescription = stripHtml(description);
   const trimmedDescription =
@@ -334,8 +351,8 @@ function FeaturedProductCard({ item }: { item: FeaturedProduct }) {
         {/* Product Image - Square (1:1 like 1080x1080) */}
         <div className="relative w-full aspect-square overflow-hidden bg-gray-100 flex-shrink-0">
           <img
-            src={item.coverImage}
-            alt={item.title}
+            src={coverImage}
+            alt={title}
             loading="lazy"
             className="w-full h-full object-contain transition-transform duration-500 hover:scale-105"
           />
@@ -351,7 +368,7 @@ function FeaturedProductCard({ item }: { item: FeaturedProduct }) {
         <div className="p-3 flex flex-col flex-1">
           {/* Title */}
           <h3 className="text-base font-bold text-gray-900 uppercase tracking-tight leading-snug font-poppins line-clamp-2 h-[42px]">
-            {item.title}
+            {title}
           </h3>
 
           {/* Description */}
@@ -382,7 +399,7 @@ function FeaturedProductCard({ item }: { item: FeaturedProduct }) {
           {/* Price */}
           <div className="flex-shrink-0 mt-auto">
             <span className="text-base font-bold text-gray-900">
-              ${item.price.toFixed(2)}
+              {price !== null ? `$${price.toFixed(2)}` : "Price on request"}
             </span>
           </div>
         </div>

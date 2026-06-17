@@ -23,11 +23,11 @@ export default function PublicSearchFilterBar({
   filters = DEFAULT_PUBLIC_SEARCH_FILTERS,
   onChange,
   onSubmit,
-  keywordLabel = "Filter By Business Type",
-  keywordPlaceholder = "Type Here",
-  locationLabel = "Filter By Location",
-  minorityLabel = "Filter By Minority",
-  submitLabel = "Search Here",
+  keywordLabel = "Search by keyword",
+  keywordPlaceholder = "Product, service, or business name",
+  locationLabel = "Filter by state",
+  minorityLabel = "Filter by minority type",
+  submitLabel = "Search marketplace",
 }: PublicSearchFilterBarProps) {
   const [minorityTypes, setMinorityTypes] = useState<MinorityType[]>([]);
   const [loadingMinorityTypes, setLoadingMinorityTypes] = useState(true);
