@@ -168,7 +168,7 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({
                       getAriaValueText={valuetext}
                       min={0}
                       max={1000}
-                      style={{ color: "#C7A040" }}
+                      sx={{ color: "#E2B84B" }}
                     />
                   </Box>
 
@@ -213,6 +213,7 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({
                     return (
                       <li
                         key={i}
+                        className={isSelected ? "filter-item-selected" : undefined}
                         onClick={() => {
 
                           if (section.title === "Categories") {
@@ -247,9 +248,6 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({
                             section.title === "Sub Categories"
                               ? "pointer"
                               : "default",
-                          backgroundColor: isSelected ? "#C7A040" : "transparent",
-                          color: isSelected ? "white" : "inherit",
-                          fontWeight: isSelected ? "bold" : "normal",
                           fontFamily:
                             section.title === "Categories" ||
                             section.title === "Sub Categories" ||
@@ -269,8 +267,7 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({
                           section.title === "Select Badge"
                             ? { fontWeight: 500 }
                             : {}),
-                          padding: "10px 16px",
-                          listStyle: "none"
+                          listStyle: "none",
                         }}
                       >
                         {item}

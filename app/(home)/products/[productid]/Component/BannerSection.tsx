@@ -1,35 +1,25 @@
 import Image from "next/image";
 
-interface HeroSectionProps {
+interface BannerSectionProps {
   heading: string;
   imageUrl: string;
 }
 
-const BannerSection = ({ heading, imageUrl }: HeroSectionProps) => {
+const BannerSection = ({ heading, imageUrl }: BannerSectionProps) => {
   return (
-    <section className="relative w-full h-[300px] md:h-[500px]">
+    <section className="relative h-[300px] w-full overflow-hidden border-b border-white/10 bg-market-bg md:h-[500px]">
       <Image
         src={imageUrl}
         alt={heading}
         fill
-        priority  
-        className="object-cover w-full h-full"
+        priority
+        className="h-full w-full object-cover opacity-40"
       />
-      {/* <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-        <h1
-          className="text-3xl font-bold leading-loose text-white md:text-5xl font-heading"
-          style={{
-            textShadow: `
-      1px 1px 2px rgba(0,0,0,0.8),
-      -1px -1px 2px rgba(0,0,0,0.8),
-      1px -1px 2px rgba(0,0,0,0.8),
-      -1px 1px 2px rgba(0,0,0,0.8)
-    `,
-          }}
-        >
-          {heading}
-        </h1>
-      </div> */}
+      <div className="absolute inset-0 bg-market-hero" aria-hidden />
+      <div
+        className="pointer-events-none absolute inset-0 bg-market-glow-radial"
+        aria-hidden
+      />
     </section>
   );
 };
