@@ -2,7 +2,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Eye, ShoppingBag, Users, Briefcase, BookOpen } from 'lucide-react';
+import PublicPageHero from '../Components/PublicPageHero';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Autoplay } from 'swiper/modules';
 
@@ -50,22 +50,14 @@ const testimonials = [
 export default function HowToUseApp() {
     return (
         <div className="flex flex-col min-h-screen bg-white">
-            {/* Hero Section */}
-            <div className="relative w-full h-[300px] bg-[#1a1a1a]">
-                <div 
-                    className="absolute inset-0 bg-cover bg-center opacity-40"
-                    style={{ backgroundImage: "url('/how-to-use/banner.png')" }}
-                />
-                <div className="absolute inset-0 bg-black/30" />
-           <div className="relative z-10 flex flex-col items-center justify-center h-full text-center text-white px-4">
-  <h1 className="font-poppins font-semibold text-[42px] leading-[42px] tracking-[0%] text-center uppercase mb-2">
-    HOW TO USE THIS APP
-  </h1>
-  <p className="font-poppins font-semibold text-[18px] leading-[32px] tracking-[0%] text-center capitalize text-white">
-    Home // How To Use This App
-  </p>
-</div>
-            </div>
+            <PublicPageHero
+                title="How to Use This App"
+                breadcrumbs={[
+                    { label: "Home", href: "/" },
+                    { label: "How to Use This App" },
+                ]}
+                imageUrl="/how-to-use/banner.png"
+            />
 
             {/* Main Content */}
             <div className="max-w-6xl mx-auto w-full px-6 py-12 lg:px-12">

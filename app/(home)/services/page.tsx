@@ -4,7 +4,7 @@ import React, { Suspense, useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
 import CategoryGrid from "./components/CategoryGrid";
-import HeroSection from "./components/HeroSection";
+import PublicPageHero from "../Components/PublicPageHero";
 import BookServices from "./components/BookYourServices";
 import FeatureBlogs from "../Components/FeatureBlogs";
 import { Service } from "@/types/service";
@@ -190,8 +190,15 @@ const ServicePageContent = () => {
   };
 
   return (
-    <main className="text-black bg-white">
-      <HeroSection heading="Services" imageUrl="/bgdetailpage.png"  />
+    <main>
+      <PublicPageHero
+        title="Services"
+        breadcrumbs={[
+          { label: "Home", href: "/" },
+          { label: "Services" },
+        ]}
+        imageUrl="/bgdetailpage.png"
+      />
 
       <FilterSection
         filters={{
@@ -235,11 +242,18 @@ const ServicePageContent = () => {
 function ServicePageFallback() {
   return (
     <main className="bg-white text-black">
-      <HeroSection heading="Services" imageUrl="/bgdetailpage.png" />
+      <PublicPageHero
+        title="Services"
+        breadcrumbs={[
+          { label: "Home", href: "/" },
+          { label: "Services" },
+        ]}
+        imageUrl="/bgdetailpage.png"
+      />
       <section className="flex min-h-[320px] items-center justify-center px-4 py-10">
         <div className="flex flex-col items-center gap-4">
-          <div className="h-12 w-12 animate-spin rounded-full border-4 border-[#C7A040] border-t-transparent" />
-          <p className="text-sm font-medium text-gray-600">Loading services...</p>
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-market-gold border-t-transparent" />
+          <p className="text-sm font-medium text-market-muted">Loading services...</p>
         </div>
       </section>
     </main>
