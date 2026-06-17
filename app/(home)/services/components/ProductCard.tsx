@@ -45,7 +45,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
       <div className="product-content p-4 flex flex-col flex-1">
         {/* Title */}
-        <h3 className="product-title text-base font-bold mb-2 line-clamp-1 h-6">{title}</h3>
+        <h3 className="product-title text-base font-bold mb-2 line-clamp-1 h-6">{title || "Untitled listing"}</h3>
 
         {/* Description */}
         <p

@@ -42,7 +42,7 @@ export default function Footer() {
               <li><Link href="/how-to-use-this-app" className="text-custom-yellow font-montserrat">How to Use this App </Link></li>
               <li><Link href="/consumer/trustbadge" className="text-custom-yellow font-montserrat">Trust Badges – Consumer </Link></li>
               <li><Link href="/consumer/terms" className="text-custom-yellow font-montserrat">Terms and Conditions – Consumer </Link></li>
-              <li><Link href="#" className="text-custom-yellow font-montserrat">Consumer Login </Link></li>
+              <li><Link href="/login?type=customer" className="text-custom-yellow font-montserrat">Consumer Login </Link></li>
             </ul>
           </div>
 

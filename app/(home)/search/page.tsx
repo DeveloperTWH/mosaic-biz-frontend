@@ -450,10 +450,16 @@ const tabItems = [
           <div className="rounded border border-red-200 bg-red-50 p-4 text-red-700">{error}</div>
         ) : totalResults === 0 ? (
           <div className="rounded border border-[#E5DEC9] bg-white p-10 text-center">
-            {/* <h2 className="text-xl font-semibold text-gray-900">No results found</h2>
+            <h2 className="text-xl font-semibold text-gray-900">No matches yet</h2>
             <p className="mt-2 text-sm text-gray-600">
-              Try another business keyword, location, or minority type.
-            </p> */}
+              Try another keyword, state, or minority type to explore the marketplace.
+            </p>
+            <Link
+              href="/products"
+              className="mt-4 inline-block bg-[#1A1F71] px-6 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+            >
+              Browse all products
+            </Link>
           </div>
         ) : (
           <>
