@@ -1,36 +1,81 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Mosaic Biz Hub — Frontend
 
-## Getting Started
+Next.js marketplace frontend for **Mosaic Biz Hub** — a platform connecting consumers to verified minority-owned businesses (products, services, and food).
 
-First, run the development server:
+| Item | Value |
+|------|--------|
+| Launch repo | [Digital-Builders-757/mosaic-biz-frontend-launch](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch) |
+| Integration branch | `sprint/frontend-release-candidate` |
+| API | `https://api.mosaicbizhub.com` (backend: `Techware-Hut/mosaic-backend`) |
+| Docs hub | **[docs/README.md](docs/README.md)** |
+| Current status | [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md) |
+
+**Production is not auto-deployed.** Work merges to the release-candidate branch and is validated on Vercel preview before any manual production promote.
+
+---
+
+## Prerequisites
+
+- Node.js 18+ (LTS recommended)
+- npm
+
+---
+
+## Local development
+
+1. Clone the repo and install dependencies:
+
+```bash
+npm install
+```
+
+2. Create `.env.local` (not committed) with at least:
+
+```bash
+NEXT_PUBLIC_API_BASE_URL=http://localhost:3001   # local backend, or https://api.mosaicbizhub.com for API-only checks
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+3. Start the dev server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open the app at the URL specified in the `NEXT_PUBLIC_APP_URL` environment variable with your browser to see the result.
+4. Open `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**Note:** Calling the production API from `localhost` often fails in the browser due to CORS. Run the backend locally on `:3001` for full UI dev, or use a Vercel preview for integration QA.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## Scripts
 
-To learn more about Next.js, take a look at the following resources:
+| Command | Purpose |
+|---------|---------|
+| `npm run dev` | Development server (Turbopack) |
+| `npm run build` | Production build — **release gate** |
+| `npm run start` | Serve production build |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Documentation
 
-## Deploy on Vercel
+All internal docs live under [`docs/`](docs/README.md):
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **[Project status](docs/PROJECT_STATUS.md)** — where we are today (living)
+- **[Roadmap](docs/ROADMAP.md)** — phased next steps
+- **[Architecture](docs/ARCHITECTURE.md)** — routes, env, deployment, auth
+- **[API contracts](docs/API_CONTRACTS.md)** — canonical endpoints
+- **[Style guide](docs/STYLE_GUIDE.md)** — design tokens
+- **[Smoke checklist](docs/FRONTEND_SMOKE_CHECKLIST.md)** — preview QA
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## Release workflow (summary)
+
+1. Feature/sprint work → PR into `sprint/frontend-release-candidate` on the **launch repo**
+2. Vercel builds a **Preview** (may require team SSO)
+3. QA runs [smoke checklist](docs/FRONTEND_SMOKE_CHECKLIST.md) on preview
+4. Manual promote to production when approved — not on every merge to `main`
+
+See [docs/ROADMAP.md](docs/ROADMAP.md) for current phase and non-goals.

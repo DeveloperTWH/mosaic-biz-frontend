@@ -1,5 +1,7 @@
 # Sentry Vercel Setup
 
+> **Status (2026-06-17):** Sentry PR [#1](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/1) not merged to release-candidate. See [PROJECT_STATUS.md](PROJECT_STATUS.md).
+
 Branch: `feat/sentry-monitoring`  
 PR: https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/1
 

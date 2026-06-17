@@ -1,5 +1,9 @@
 # Homepage Marketplace Redesign — QA Report
 
+> **Type:** QA evidence  
+> **Living section:** [Post-merge sign-off](#post-merge-sign-off-pr-30-merged) (2026-06-17)  
+> **Status hub:** [PROJECT_STATUS.md](PROJECT_STATUS.md)
+
 **Branch:** `feat/homepage-redesign`  
 **PR:** https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/30  
 **Preview:** https://mosaic-biz-frontend-launch-git-feat-hom-4afb18-digital-builders.vercel.app  
@@ -125,5 +129,77 @@ Local partial capture: homepage desktop structure verified via Playwright snapsh
 2. Confirm featured products load with live backend on preview
 3. Merge PR #30 only (not `main`, not production)
 4. Smoke test release-candidate preview after merge
+
+**Production was not deployed.**
+
+---
+
+## Post-merge sign-off (PR #30 merged)
+
+**Merge commit:** `3b168f397510b7861784906335ef2ac30ca29628` (2026-06-17T21:56:22Z)  
+**Target branch:** `sprint/frontend-release-candidate`  
+**Post-merge preview URL:** https://mosaic-biz-frontend-launch-n9lklmen7-digital-builders.vercel.app  
+**Sign-off date:** 2026-06-17  
+**Production deployed:** No
+
+### Preview access
+
+| Check | Result |
+|-------|--------|
+| Post-merge deployment resolved (GitHub deployment `5101311004`) | **Pass** |
+| Automated browser access to Vercel preview | **Blocked** — HTTP 401; redirects to Vercel SSO login (same as QA-2) |
+| Stale feature-branch preview | Not used for sign-off |
+
+### Primary gate: `/products` API wiring
+
+| Check | Result | Evidence |
+|-------|--------|----------|
+| Frontend calls canonical products list endpoint | **Pass** | Production build (`NEXT_PUBLIC_API_BASE_URL=https://api.mosaicbizhub.com`) issues `GET https://api.mosaicbizhub.com/api/products/list?search=&city=&minorityType=&page=1&limit=10` on `/products` load (Playwright network log) |
+| Backend returns 200 with live product data | **Pass** | Direct API: `total=1`, first title **`TEST PRODUCT 17 jun`** |
+| `/api/products/featured` not used | **Pass** | Unchanged from pre-merge grep |
+| **`TEST PRODUCT 17 jun` visible in preview UI** | **Pending human** | Blocked by Vercel SSO; backend data confirmed; wiring confirmed in build |
+
+**Network evidence (automated, production build on localhost:3005):**
+
+```text
+GET https://api.mosaicbizhub.com/api/products/list?search=&city=&minorityType=&page=1&limit=10
+```
+
+**Backend evidence (direct API, no browser):**
+
+```text
+GET https://api.mosaicbizhub.com/api/products/list?page=1&limit=10&search= → 200
+total=1, title=TEST PRODUCT 17 jun
+```
+
+Note: Local production-build smoke against `api.mosaicbizhub.com` from `localhost:3005` shows CORS-blocked responses in the browser (expected for non-allowlisted origins). Vercel preview origins are the authoritative UI test surface.
+
+### Homepage featured products
+
+| Check | Result | Evidence |
+|-------|--------|----------|
+| Frontend calls canonical featured endpoint | **Pass** | `GET https://api.mosaicbizhub.com/api/featured-products?page=1&limit=12` on `/` load |
+| Backend response | **200, empty array** | `pagination.totalProducts=0` — **backend/data issue, not a redesign or env blocker** |
+| Homepage handles empty featured state | **Pass** (local build) | Styled error/empty panel with Retry; no crash or hydration error |
+
+### Secondary visual smoke (local production build)
+
+| Route | Result |
+|-------|--------|
+| `/` | Pass — dusk hero, announcement bar, trust bar, featured section empty/error state styled |
+| `/products` | Pass — dark marketplace shell, filters, hero; listing empty only due to local CORS |
+
+### Recommendation
+
+**Conditional pass for release-candidate promotion** at the code + API-contract level.
+
+Remaining **2-minute human step** (Vercel SSO required):
+
+1. Open https://mosaic-biz-frontend-launch-n9lklmen7-digital-builders.vercel.app/products
+2. Hard refresh (Ctrl+Shift+R)
+3. Confirm Network → `api.mosaicbizhub.com/api/products/list` → **200**
+4. Confirm **`TEST PRODUCT 17 jun`** appears in the product grid
+
+Do **not** block promotion on empty homepage featured products until backend flags featured inventory via `/api/featured-products`.
 
 **Production was not deployed.**

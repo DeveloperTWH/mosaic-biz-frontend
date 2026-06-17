@@ -22,6 +22,35 @@ Use Tailwind tokens — never hardcode hex in components.
 | `brand-yellow` | `#F9AE53` | Category accents (alias: `custom-yellow`) |
 | `brand-sky` | `#16A1C0` | Category accents (alias: `custom-blue`) |
 
+### Public marketplace (`market-*`) — PR #30 dusk shell
+
+Use on homepage and public listing routes (`/products`, `/foods`, `/services`, `/vendors`, `/about`). **Do not** apply `market-*` to auth, checkout, or partner dashboard — those keep `brand-*` / `surface-*`.
+
+| Token | Hex | Use |
+|-------|-----|-----|
+| `market-bg` | `#120B2F` | Page background |
+| `market-surface` | `#18123A` | Cards, panels |
+| `market-elevated` | `#211747` | Raised surfaces, filter panels |
+| `market-header` | `#0A0618` | Header-adjacent dark bands |
+| `market-pill` | `#2D2652` | Pills, chips, inactive controls |
+| `market-text` | `#EDE7FF` | Primary text on dark |
+| `market-muted` | `#A9A2D8` | Secondary text on dark |
+| `market-gold` | `#E2B84B` | Primary CTA on marketplace |
+| `market-gold-hover` | `#F5D76E` | CTA hover |
+| `market-teal` | `#2DD4BF` | Links, accents on dark |
+| `market-glow` | `#7E22CE` | Glow accents |
+
+**Backgrounds & shadows:** `bg-market-hero`, `bg-market-glow-radial`, `bg-market-cta-band`, `shadow-market-card`, `shadow-market-glow`.
+
+**When to use which family:**
+
+| Surface | Tokens |
+|---------|--------|
+| Public marketplace (browse) | `market-*` |
+| Auth, checkout, payment success | `brand-*` |
+| Partner dashboard, onboarding forms | `surface-*`, `dashboard-*` |
+| Legal / legacy pages | Migrate toward `brand-*`; many still legacy |
+
 ### Dashboard / partner surfaces
 
 | Token | Hex | Use |
@@ -160,11 +189,14 @@ Header uses `.glass-header` on `#site-header` with brand-navy frosted background
 
 | Area | Status |
 |------|--------|
-| Homepage (`app/(home)/Components/*`) | v2 — brand tokens, section utilities |
-| Auth (`app/(auth)/*`) | v2 — brand navy/gold buttons |
-| Checkout (`app/(home)/checkout/*`) | v2 — brand tokens |
-| Payment success (`app/(home)/payment-success`) | v2 — brand tokens |
-| Partner dashboard | v2 — surface/dashboard tokens (forms partially migrated) |
-| Vendor onboarding hub (`app/(home)/partners/page.tsx`) | v2 — brand tokens on CTAs and progress |
+| Homepage + public chrome (`app/(home)/Components/*`) | **v3** — `market-*` dusk shell (PR #30) |
+| Public listings (`/products`, `/foods`, `/services`, `/vendors`) | **v3** — `market-*` listing bodies |
+| Public heroes (`PublicPageHero`) | **v3** — shared dark hero |
+| Auth (`app/(auth)/*`) | v2 — `brand-*` navy/gold buttons |
+| Checkout (`app/(home)/checkout/*`) | v2 — `brand-*` (out of PR #30 scope) |
+| Payment success (`app/(home)/payment-success`) | v2 — `brand-*` |
+| Partner dashboard | v2 — `surface-*` / `dashboard-*` (forms partially migrated) |
+| Vendor onboarding hub (`app/(home)/partners/page.tsx`) | v2 — `brand-*` on CTAs and progress |
+| Product / service / vendor detail pages | Legacy — light UI; Phase 2 roadmap |
 | Vendor profiles / payment inline styles | Legacy — not yet migrated |
 | Legal pages (FAQ, privacy, terms) | Legacy — Arial CSS files |

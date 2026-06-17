@@ -1,5 +1,8 @@
 # Homepage Redesign — Scope Audit
 
+> **Type:** PR #30 scope record (historical)  
+> **Merged:** 2026-06-17 into `sprint/frontend-release-candidate` — see [PROJECT_STATUS.md](PROJECT_STATUS.md)
+
 **Branch:** `feat/homepage-redesign`  
 **Audit date:** 2026-06-17  
 **Purpose:** Separate in-scope public marketplace redesign from out-of-scope area changes before PR.

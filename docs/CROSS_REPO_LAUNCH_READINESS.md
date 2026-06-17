@@ -1,5 +1,7 @@
 # Cross-Repo Launch Readiness Report
 
+> **Historical snapshot — 2026-06-16.** For current status see [PROJECT_STATUS.md](PROJECT_STATUS.md) and [ROADMAP.md](ROADMAP.md). PR #30 (homepage redesign) merged 2026-06-17 — not reflected below.
+
 Date: 2026-06-16  
 Scope: Mosaic Biz Hub frontend sprint (launch repo). Backend sprint branches not executed in this session.
 
@@ -56,6 +58,8 @@ Scope: Mosaic Biz Hub frontend sprint (launch repo). Backend sprint branches not
 
 ## 6. Frontend PRs to review
 
+> **Archive — superseded.** See [ROADMAP.md](ROADMAP.md) Phase 1 and [PROJECT_STATUS.md](PROJECT_STATUS.md) for current PR state.
+
 | PR | Branch | Focus |
 |----|--------|-------|
 | [#1](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/1) | `feat/sentry-monitoring` | Sentry + source maps |
@@ -80,6 +84,8 @@ None created in this session. Run backend prompt pack on `Techware-Hut/mosaic-ba
 - Sentry error + trace capture after env setup
 
 ## 10. Suggested Bryan update message
+
+> **Archive — superseded by [PROJECT_STATUS.md](PROJECT_STATUS.md) (2026-06-17).**
 
 > Frontend sprint pass 1 is on four review branches (Sentry, launch polish, vendor UX, flow QA). Builds pass locally. Canonical `/api/featured-products` preserved. No merges to main and no production deploy. Next: review PRs #1/#19/#20/#21, set Vercel Sentry env vars, run preview smoke checklist, then start backend sprint branches on mosaic-backend.
 
