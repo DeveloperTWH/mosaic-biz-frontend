@@ -76,9 +76,7 @@ export default function PublicSearchFilterBar({
         className="flex flex-col gap-4 md:flex-row md:items-end md:gap-6"
       >
         <div className="min-w-0 flex-[3]">
-          <label className="mb-1.5 block text-left font-poppins text-sm font-medium text-market-muted">
-            {keywordLabel}
-          </label>
+          <label className="market-label">{keywordLabel}</label>
           <input
             type="text"
             placeholder={keywordPlaceholder}
@@ -89,14 +87,12 @@ export default function PublicSearchFilterBar({
         </div>
 
         <div className="min-w-0 flex-1">
-          <label className="mb-1.5 block text-left font-poppins text-sm font-medium text-market-muted">
-            {locationLabel}
-          </label>
-          <div className="relative">
+          <label className="market-label">{locationLabel}</label>
+          <div className="market-select-wrap">
             <select
               value={filters.location}
               onChange={(event) => onChange({ ...filters, location: event.target.value })}
-              className="market-input appearance-none"
+              className="market-select"
             >
               <option value="">Choose State</option>
               {US_STATE_OPTIONS.map((state) => (
@@ -105,8 +101,8 @@ export default function PublicSearchFilterBar({
                 </option>
               ))}
             </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3">
-              <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="market-select-chevron">
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
               </svg>
             </div>
@@ -114,15 +110,13 @@ export default function PublicSearchFilterBar({
         </div>
 
         <div className="min-w-0 flex-1">
-          <label className="mb-1.5 block text-left font-poppins text-sm font-medium text-market-muted">
-            {minorityLabel}
-          </label>
-          <div className="relative">
+          <label className="market-label">{minorityLabel}</label>
+          <div className="market-select-wrap">
             <select
               value={filters.minorityType}
               onChange={(event) => onChange({ ...filters, minorityType: event.target.value })}
               disabled={loadingMinorityTypes}
-              className="market-input appearance-none disabled:opacity-50"
+              className="market-select"
             >
               <option value="">
                 {loadingMinorityTypes ? "Loading minority types..." : "Choose Minority"}
@@ -133,8 +127,8 @@ export default function PublicSearchFilterBar({
                 </option>
               ))}
             </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3">
-              <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="market-select-chevron">
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
               </svg>
             </div>

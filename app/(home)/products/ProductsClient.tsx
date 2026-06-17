@@ -233,7 +233,7 @@ const Page = () => {
                     <button
                         ref={prevButton}
                         type="button"
-                        className="market-card flex h-11 w-11 items-center justify-center rounded-full text-market-text transition hover:border-market-gold/40 sm:h-12 sm:w-12"
+                        className="market-carousel-btn h-11 w-11 sm:h-12 sm:w-12"
                     >
                         <ChevronLeft className="h-6 w-6" />
                     </button>
@@ -243,7 +243,7 @@ const Page = () => {
                     <button
                         ref={nextButton}
                         type="button"
-                        className="market-card flex h-11 w-11 items-center justify-center rounded-full text-market-text transition hover:border-market-gold/40 sm:h-12 sm:w-12"
+                        className="market-carousel-btn h-11 w-11 sm:h-12 sm:w-12"
                     >
                         <ChevronRight className="h-6 w-6" />
                     </button>
@@ -508,9 +508,12 @@ function ProductCard({ item }: { item: RankedItem }) {
     return (
         <div 
             onClick={handleCardClick}
-            className="market-card flex h-[460px] w-full max-w-[300px] cursor-pointer flex-col overflow-hidden p-2 transition-all duration-300 hover:shadow-market-glow"
+            onKeyDown={(e) => e.key === 'Enter' && handleCardClick()}
+            role="button"
+            tabIndex={0}
+            className="market-card flex h-[460px] w-full max-w-[300px] cursor-pointer flex-col overflow-hidden p-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-market-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-market-bg"
         >
-            <div className="relative aspect-square w-full flex-shrink-0 overflow-hidden bg-market-elevated">
+            <div className="market-card-media relative aspect-square w-full flex-shrink-0">
                 {images[0] ? (
                 <img
                     src={images[0]}
@@ -519,14 +522,12 @@ function ProductCard({ item }: { item: RankedItem }) {
                     className="h-full w-full object-contain transition-transform duration-500 hover:scale-105"
                 />
                 ) : (
-                <div className="flex h-full w-full items-center justify-center text-xs font-semibold tracking-wide text-market-muted">
-                    No image
-                </div>
+                <div className="market-card-placeholder">No image</div>
                 )}
                 
                 {onSale && (
                     <div className="absolute top-3 left-3">
-                        <span className="px-3 py-1 text-xs font-bold text-white bg-red-600 rounded-full">
+                        <span className="rounded-full bg-red-600 px-3 py-1 text-xs font-bold text-white">
                             SALE
                         </span>
                     </div>
@@ -534,11 +535,11 @@ function ProductCard({ item }: { item: RankedItem }) {
             </div>
 
             <div className="flex flex-1 flex-col p-3">
-                <h3 className="font-poppins line-clamp-2 h-[42px] text-base font-semibold leading-snug text-market-text">
+                <h3 className="market-card-title line-clamp-2 h-[42px]">
                     {title}
                 </h3>
 
-                <p className="mb-2 h-[40px] overflow-hidden font-montserrat text-xs leading-5 text-market-muted">
+                <p className="market-card-desc mb-2 h-[40px] overflow-hidden">
                     {trimmedDescription || "\u00a0"}
                 </p>
 
@@ -570,7 +571,7 @@ function ProductCard({ item }: { item: RankedItem }) {
         Starting from
       </span>
       <div className="flex items-center gap-3">
-        <span className="text-base font-semibold text-red-400">
+        <span className="market-card-price-sale text-base">
           ${effective.toFixed(2)}
         </span>
         <span className="text-sm text-market-muted line-through">
@@ -583,7 +584,7 @@ function ProductCard({ item }: { item: RankedItem }) {
       <span className="text-xs text-market-muted">
         Starting from
       </span>
-      <span className="text-base font-semibold text-market-gold">
+      <span className="market-card-price text-base">
         ${price.toFixed(2)}
       </span>
     </div>

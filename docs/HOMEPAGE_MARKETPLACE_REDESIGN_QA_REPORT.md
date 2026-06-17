@@ -203,3 +203,42 @@ Remaining **2-minute human step** (Vercel SSO required):
 Do **not** block promotion on empty homepage featured products until backend flags featured inventory via `/api/featured-products`.
 
 **Production was not deployed.**
+
+---
+
+## Visual polish pass — Batch 1 readability (`polish/public-readability-marketplace-forms`)
+
+**Branch:** `polish/public-readability-marketplace-forms`  
+**Date:** 2026-06-18  
+**Issues:** #41 readability, #42 cards/grids, #44 forms/filters  
+**Scope:** Visual-only on public marketplace routes — no API, auth, checkout, Stripe, middleware, or dashboard changes
+
+### Changes
+
+| Area | Update |
+|------|--------|
+| `app/globals.css` | Stronger `market-card` borders; `market-select`/`market-label`/`market-card-*` utilities; button/filter focus rings |
+| Shared filters | `PublicSearchFilterBar` — `market-label`, `market-select-wrap`, muted chevrons |
+| Listing cards | Products, services, foods, vendors, homepage featured — shared title/price/placeholder/footer hierarchy |
+| `/vendors` | `CustomSelect` dusk dropdown; vendor cards with logo placeholder; `SimilarProduct` strip migrated to `market-*` |
+| Empty states | Clear titles + helper copy on products/services/foods listings |
+
+### Guardrails verified
+
+| Check | Result |
+|-------|--------|
+| `/api/featured-products` canonical | Pass — unchanged (`ShopProducts` → `getFeaturedProducts`) |
+| `/api/products/featured` used | Pass — not referenced in app code |
+| API / auth / checkout / Stripe / middleware logic | Pass — no changes |
+| `npm run build` | Run at commit time |
+
+### Manual visual QA checklist
+
+- [ ] Desktop `/` — hero, search card, featured products carousel, category sections readable
+- [ ] Desktop `/products` — filter sidebar, product grid cards, sort control, carousel chevrons
+- [ ] Desktop `/foods` — food category tiles, listing cards, sort control
+- [ ] Desktop `/services` — service cards, filters, sort control
+- [ ] Desktop `/vendors` — `CustomSelect` dropdown, vendor grid, similar-products strip
+- [ ] Mobile (~390px) — all five routes: no horizontal scroll; filters usable; card text readable
+- [ ] Keyboard — Tab through search filters, sort selects, carousel buttons, category pills; visible focus rings
+- [ ] Network — `/products` still calls `api.mosaicbizhub.com/api/products/list`; `/` still calls `/api/featured-products`

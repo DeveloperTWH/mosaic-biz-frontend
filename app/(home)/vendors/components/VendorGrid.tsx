@@ -126,10 +126,16 @@ export default function VendorGrid() {
             ) : (
                 <div className="mb-6 grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5">
                     {vendors.map((vendor) => (
-                        <Link key={vendor._id} href={`/vendors/${vendor.slug}`}>
-                            <div className="market-card p-4 text-center transition hover:shadow-market-glow">
-                                <img src={vendor.logo} alt={vendor.businessName} className="mx-auto h-16 object-contain" />
-                                <p className="mt-2 text-sm font-medium text-market-text">{vendor.businessName}</p>
+                        <Link key={vendor._id} href={`/vendors/${vendor.slug}`} className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-market-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-market-bg rounded-2xl">
+                            <div className="market-card p-4 text-center">
+                                <div className="market-card-media mx-auto mb-3 flex h-20 w-full items-center justify-center rounded-lg">
+                                    {vendor.logo ? (
+                                        <img src={vendor.logo} alt={vendor.businessName} className="mx-auto h-16 max-w-full object-contain" />
+                                    ) : (
+                                        <div className="market-card-placeholder h-16">No logo</div>
+                                    )}
+                                </div>
+                                <p className="market-card-title line-clamp-2 text-sm">{vendor.businessName}</p>
                             </div>
                         </Link>
                     ))}
@@ -170,7 +176,7 @@ export default function VendorGrid() {
                         </div>
                     </>
                 ) : (
-                    <h2 className="heading text-center text-2xl text-market-muted">No Vendor Found</h2>
+                    <h2 className="market-empty-state-title text-center text-2xl">No vendors found</h2>
                 )}
             </div>
         </>
