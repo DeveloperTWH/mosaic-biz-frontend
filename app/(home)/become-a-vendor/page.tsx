@@ -1,5 +1,4 @@
 import React from 'react';
-import HeroSection from '../services/components/HeroSection';
 import { Mail, MapPinned, PhoneCall, CheckCircle, FileText, Video, HeadphonesIcon } from 'lucide-react';
 import Link from 'next/link';
 

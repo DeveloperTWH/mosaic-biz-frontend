@@ -161,15 +161,13 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
           {/* Products Count - Compact */}
           <div className="flex mb-4 flex-row justify-between">
    
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-market-muted">
               (Showing {startItem} – {endItem} Products Of {safeTotalProducts} Products)
             </p>
 
-                          {/* Sort By Section - Compact */}
- 
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-700">Sort By:</span>
-                  <select className="px-3 py-1 text-sm border rounded cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                  <span className="text-sm text-market-muted">Sort By:</span>
+                  <select className="market-input w-auto cursor-pointer px-3 py-1 text-sm">
                     <option>Default</option>
                     <option>Price: Low to High</option>
                     <option>Price: High to Low</option>
@@ -182,11 +180,13 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
 
           {/* Services Grid - Compact Cards */}
           {loading ? (
-            <div className="flex justify-center items-center h-64">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1A1F71]"></div>
+            <div className="flex h-64 items-center justify-center">
+              <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-market-gold"></div>
             </div>
           ) : services.length === 0 ? (
-            <p className="text-center text-gray-600">No Product found.</p>
+            <div className="market-card p-8 text-center">
+              <p className="text-market-muted">No products found.</p>
+            </div>
           ) : (
             <>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -391,19 +391,18 @@ function ProductCard({ item }: { item: RankedItem }) {
   return (
 
     <Link href={href} className="block">
-    <div className="bg-green p-2 border-2 border-[#D9D9D9] w-full max-w-[300px] h-[480px] shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col cursor-pointer">
-      {/* Product Image - Square (1:1 like Best Sellers) */}
-      <div className="relative w-full aspect-square overflow-hidden bg-gray-100 flex-shrink-0">
+    <div className="market-card flex h-[480px] w-full max-w-[300px] cursor-pointer flex-col overflow-hidden p-2 transition-all duration-300 hover:shadow-market-glow">
+      <div className="relative aspect-square w-full flex-shrink-0 overflow-hidden bg-market-elevated">
         {images[0] ? (
           <img
             src={images[0]}
             alt={title}
             loading="lazy"
-            className="w-full h-full object-contain transition-transform duration-500 hover:scale-105"
+            className="h-full w-full object-contain transition-transform duration-500 hover:scale-105"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-xs font-semibold text-gray-500 tracking-wide">
-            NO IMAGE
+          <div className="flex h-full w-full items-center justify-center text-xs font-semibold tracking-wide text-market-muted">
+            No image
           </div>
         )}
 
@@ -416,69 +415,65 @@ function ProductCard({ item }: { item: RankedItem }) {
         )}
       </div>
 
-      {/* Product Info */}
-      <div className="p-3 flex flex-col flex-1">
-        {/* Title */}
-        <h3 className="text-base font-bold text-gray-900 uppercase tracking-tight leading-snug font-poppins line-clamp-2 h-[42px]">
+      <div className="flex flex-1 flex-col p-3">
+        <h3 className="font-poppins line-clamp-2 h-[42px] text-base font-semibold leading-snug text-market-text">
           {title}
         </h3>
 
-        {/* Description */}
-        <p className="mb-2 text-xs text-gray-600 leading-5 font-montserrat h-[40px] overflow-hidden">
+        <p className="mb-2 h-[40px] overflow-hidden font-montserrat text-xs leading-5 text-market-muted">
           {trimmedDescription || "\u00a0"}
         </p>
 
-        {/* Rating and Reviews */}
-        <div className="flex-shrink-0 min-h-[20px]">
-          <div className="flex items-center mb-1">
+        {(rating > 0 || reviewCount > 0) && (
+        <div className="min-h-[20px] flex-shrink-0">
+          <div className="mb-1 flex items-center">
             <div className="flex">
               {[...Array(5)].map((_, i) => (
                 <Star
                   key={i}
                   size={14}
-                  fill={i < fullStars ? "#FBBF24" : i === fullStars && hasHalfStar ? "#FBBF24" : "#E5E7EB"}
-                  stroke={i < fullStars ? "#FBBF24" : i === fullStars && hasHalfStar ? "#FBBF24" : "#D1D5DB"}
-                  className={i < fullStars || (i === fullStars && hasHalfStar) ? "text-yellow-400" : "text-gray-300"}
+                  fill={i < fullStars ? "#E2B84B" : i === fullStars && hasHalfStar ? "#E2B84B" : "transparent"}
+                  stroke={i < fullStars || (i === fullStars && hasHalfStar) ? "#E2B84B" : "#A9A2D8"}
+                  className={i < fullStars || (i === fullStars && hasHalfStar) ? "text-market-gold" : "text-market-muted/40"}
                 />
               ))}
             </div>
-            <p className="text-[10px] ml-2 text-gray-500 font-poppins leading-tight">
+            <p className="ml-2 font-poppins text-[10px] leading-tight text-market-muted">
               {ratingCount} Ratings And {reviewCount} Reviews
             </p>
           </div>
         </div>
+        )}
 
-        {/* Price */}
-<div className="flex-shrink-0 mt-auto">
+        <div className="mt-auto flex-shrink-0">
   {onSale ? (
     <div className="flex flex-col leading-tight">
-      <span className="text-xs text-gray-500">
+      <span className="text-xs text-market-muted">
         Starting from
       </span>
       <div className="flex items-center gap-2">
-        <span className="text-lg font-semibold text-[#B12704]">
+        <span className="text-lg font-semibold text-red-400">
           ${effective.toFixed(2)}
         </span>
-        <span className="text-sm text-gray-500 line-through">
+        <span className="text-sm text-market-muted line-through">
           ${displayPrice.toFixed(2)}
         </span>
       </div>
     </div>
   ) : (
     <div className="flex flex-col leading-tight">
-      <span className="text-xs text-gray-500">
+      <span className="text-xs text-market-muted">
         Starting from
       </span>
-      <span className="text-lg font-semibold text-gray-900">
+      <span className="text-lg font-semibold text-market-gold">
         ${displayPrice.toFixed(2)}
       </span>
     </div>
   )}
 </div>
 
-        {/* Earned Badge Section (Bottom Like First Card) */}
-<div className="mt-3 bg-gray-100 rounded px-4 py-2 flex justify-between items-center min-h-[52px]">
-  <span className="text-gray-600 text-sm font-semibold">
+        <div className="mt-3 flex min-h-[52px] items-center justify-between rounded bg-market-elevated px-4 py-2">
+  <span className="text-sm font-semibold text-market-muted">
     Earned Badge:
   </span>
 

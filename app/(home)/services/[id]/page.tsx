@@ -12,7 +12,7 @@ import ServiceCard from "./components/ServiceCard";
 import { Service } from '@/types/service';
 import AllServicesMap from "./components/AllServicesMap";
 import AffixSidebar from "./components/AffixSidebar"; // adjust path as needed
-import HeroSection from "../components/HeroSection";
+import PublicPageHero from "../../Components/PublicPageHero";
 import { buildSearchPageUrl } from "../../Components/publicSearch";
 
 
@@ -22,6 +22,9 @@ interface PageProps {
 }
 
 type MinorityType = { _id: string; name: string };
+
+const slugToTitle = (slug: string) =>
+    slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
 export default function ServiceCategoryPage({ params }: PageProps) {
     const unwrappedParams = use(params);
@@ -133,9 +136,9 @@ export default function ServiceCategoryPage({ params }: PageProps) {
 
 
     if (loading) return (
-        <div className="flex items-center justify-center p-5 text-custom-blue">
-            <Loader2 className="w-6 h-6 mr-2 animate-spin" />
-            <span>Loading...</span>
+        <div className="flex items-center justify-center p-5 text-market-teal">
+            <Loader2 className="mr-2 h-6 w-6 animate-spin" />
+            <span className="text-market-muted">Loading...</span>
         </div>
     );
 
@@ -143,9 +146,17 @@ export default function ServiceCategoryPage({ params }: PageProps) {
 
     return (
         <>
-            <main className="text-black bg-white">
+            <main>
                 {/* Banner */}
-                <HeroSection heading={`${id} Services`} imageUrl="/Service/service.png"  />
+                <PublicPageHero
+                    title={`${slugToTitle(id)} Services`}
+                    breadcrumbs={[
+                        { label: "Home", href: "/" },
+                        { label: "Services", href: "/services" },
+                        { label: slugToTitle(id) },
+                    ]}
+                    imageUrl="/Service/service.png"
+                />
                 <FilterBar
                     searchText={searchText}
                     setSearchText={setSearchText}
@@ -156,39 +167,37 @@ export default function ServiceCategoryPage({ params }: PageProps) {
                     onSearch={handleSearch}
                 />
                 {services.length === 1 ? (
-                    <div className="flex flex-col items-center justify-center p-5 text-red-600">
-                        <AlertTriangle className="w-10 h-10 mb-2" />
-                        <span>Service not found</span>
+                    <div className="market-card mx-auto flex max-w-md flex-col items-center justify-center p-8 text-center">
+                        <AlertTriangle className="mb-2 h-10 w-10 text-red-400" />
+                        <span className="text-market-text">Service not found</span>
                     </div>
                 ) :
                     (
                         <>
-                            <div className="mx-auto max-w-7xl">
-                                <p className="text-xs uppercase text-custom-blue">{id}</p>
-                                <h2 className="mb-4 text-xl font-bold md:text-2xl heading custom-blue">
-                                    Top {id} Service's Near you 
+                            <div className="mx-auto max-w-7xl px-4 sm:px-6">
+                                <p className="text-xs uppercase tracking-wide text-market-teal">{id}</p>
+                                <h2 className="heading mb-4 text-xl font-semibold text-market-text md:text-2xl">
+                                    Top {slugToTitle(id)} Services Near You
                                 </h2>
-                                <div className="flex flex-wrap gap-2 text-[12px]">
-                                    <div className="flex items-center justify-center gap-1 px-3 py-1 capitalize border border-black rounded-full cursor-pointer">
+                                <div className="flex flex-wrap gap-2 text-xs">
+                                    <div className="flex cursor-pointer items-center justify-center gap-1 rounded-full border border-white/10 bg-market-elevated px-3 py-1.5 capitalize text-market-text">
                                         <SlidersHorizontal size={"15px"} /> all
                                     </div>
 
-                                    {/* Price Dropdown */}
                                     <div className="relative">
-                                        <select className="px-3 py-1 capitalize bg-white border border-black rounded-full appearance-none cursor-pointer">
+                                        <select className="cursor-pointer appearance-none rounded-full border border-white/10 bg-market-elevated px-3 py-1.5 capitalize text-market-text">
                                             <option value="">price</option>
                                             <option value="low">Low to High</option>
                                             <option value="high">High to Low</option>
                                         </select>
                                         <ChevronDown
                                             size={16}
-                                            className="absolute text-black transform -translate-y-1/2 pointer-events-none right-2 top-1/2"
+                                            className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 transform text-market-muted"
                                         />
                                     </div>
 
-                                    {/* Sort By Dropdown */}
                                     <div className="relative">
-                                        <select className="px-3 py-1 capitalize bg-white border border-black rounded-full appearance-none cursor-pointer">
+                                        <select className="cursor-pointer appearance-none rounded-full border border-white/10 bg-market-elevated px-3 py-1.5 capitalize text-market-text">
                                             <option value="">sort by</option>
                                             <option value="rating">Rating</option>
                                             <option value="reviews">Most Reviewed</option>
@@ -196,17 +205,17 @@ export default function ServiceCategoryPage({ params }: PageProps) {
                                         </select>
                                         <ChevronDown
                                             size={16}
-                                            className="absolute text-black transform -translate-y-1/2 pointer-events-none right-2 top-1/2"
+                                            className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 transform text-market-muted"
                                         />
                                     </div>
 
-                                    <div className="px-3 py-1 capitalize border border-black rounded-full cursor-pointer">
+                                    <div className="cursor-pointer rounded-full border border-white/10 bg-market-elevated px-3 py-1.5 capitalize text-market-text">
                                         open now
                                     </div>
-                                    <div className="px-3 py-1 capitalize border border-black rounded-full cursor-pointer">
+                                    <div className="cursor-pointer rounded-full border border-white/10 bg-market-elevated px-3 py-1.5 capitalize text-market-text">
                                         online booking
                                     </div>
-                                    <div className="px-3 py-1 capitalize border border-black rounded-full cursor-pointer">
+                                    <div className="cursor-pointer rounded-full border border-white/10 bg-market-elevated px-3 py-1.5 capitalize text-market-text">
                                         offers available
                                     </div>
                                 </div>
@@ -237,9 +246,8 @@ export default function ServiceCategoryPage({ params }: PageProps) {
                                 {/* Desktop Map Sidebar */}
                                 {!isMobile && services.length > 0 && (
                                     <aside ref={asideRef} className="lg:col-span-1">
-                                        <div className="sticky top-[calc(var(--header-h)+1rem)] z-40 rounded shadow">
-                                            {/* Use max-h so it fits the viewport but doesn't fight the column height */}
-                                            <div className="h-[60vh] rounded bg-white overflow-visible">
+                                        <div className="sticky top-[calc(var(--header-h)+1rem)] z-40">
+                                            <div className="market-card h-[60vh] overflow-visible rounded-2xl">
                                                 <AllServicesMap
                                                     services={services}
                                                     selectedServiceId={activeService as string | null}
@@ -256,7 +264,7 @@ export default function ServiceCategoryPage({ params }: PageProps) {
                 {/* Filters and Listings */}
 
             </main >
-            <div className="bbg-custom-soil">
+            <div className="bg-market-bg">
                 <FAQSection />
             </div>
             <ClientTestimonials />

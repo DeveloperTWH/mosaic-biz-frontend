@@ -1,0 +1,170 @@
+# Mosaic Biz Hub — Style Guide
+
+This document is the source of truth for visual design in `mosaic-biz-frontend`. Tokens live in [`tailwind.config.js`](../tailwind.config.js); shared utilities live in [`app/globals.css`](../app/globals.css); reusable components live in [`components/ui/`](../components/ui/).
+
+## Brand colors
+
+Use Tailwind tokens — never hardcode hex in components.
+
+| Token | Hex | Use |
+|-------|-----|-----|
+| `brand-navy` | `#0B1426` | Primary dark background, footer, hero base |
+| `brand-navy-light` | `#1A1F71` | Buttons, nav accents, secondary dark surfaces |
+| `brand-purple` | `#2E1A47` | Gradient mid-tone |
+| `brand-purple-light` | `#4C2A6A` | Hover states on purple surfaces |
+| `brand-teal` | `#14B8A6` | Links, success accents |
+| `brand-teal-dark` | `#0D9488` | Teal hover |
+| `brand-gold` | `#C7A040` | Primary CTA, accents, dividers |
+| `brand-gold-light` | `#E5C76B` | Gold hover |
+| `brand-cream` | `#FFF6E0` | Warm backgrounds, badges (alias: `custom-soil`) |
+| `brand-muted` | `#5F5F5F` | Secondary body text |
+| `brand-orange` | `#CE5F44` | Category accents (alias: `custom-orange`) |
+| `brand-yellow` | `#F9AE53` | Category accents (alias: `custom-yellow`) |
+| `brand-sky` | `#16A1C0` | Category accents (alias: `custom-blue`) |
+
+### Dashboard / partner surfaces
+
+| Token | Hex | Use |
+|-------|-----|-----|
+| `surface-cream` | `#f7f2eb` | Partner dashboard page background |
+| `surface-panel` | `#fcfaf6` | Cards, panels |
+| `border-warm` | `#ebe2d3` | Panel borders |
+| `dashboard-gold` | `#c9a44a` | Dashboard CTAs (maps to brand gold family) |
+| `dashboard-text` | `#1c1c1c` | Dashboard primary text |
+| `dashboard-muted` | `#8e816d` | Dashboard labels and eyebrows |
+| `dashboard-input-border` | `#ddd3c4` | Form field borders |
+| `dashboard-border-light` | `#e6dccd` | Table and section dividers |
+| `dashboard-warn-border` | `#e4b2a8` | Error/warning panel borders |
+| `dashboard-warn-bg` | `#fff3f0` | Error/warning panel backgrounds |
+| `dashboard-warn-text` | `#9f4332` | Error/warning text |
+
+### Gradients & shadows
+
+- `bg-brand-gradient` — hero, CTA bands
+- `bg-hero-gradient` — hero overlay
+- `shadow-glass` — elevated cards, dropdowns
+
+## Legacy hex deprecation map
+
+When migrating old code, replace:
+
+| Replace | With |
+|---------|------|
+| `#1A1F71`, `#1a1f71` | `brand-navy-light` |
+| `#0B1426` | `brand-navy` |
+| `#d1aa45`, `#c19a38`, `#c9a44a` | `brand-gold` or `dashboard-gold` |
+| `#FFF6E0`, `#fbf4e6`, `#fff6df` | `brand-cream` |
+| `#5F5F5F` | `brand-muted` |
+| `#03989e` | `brand-teal` |
+| `#f7f2eb`, `#fcfaf6`, `#ebe2d3` | `surface-cream`, `surface-panel`, `border-warm` |
+| `hover:bg-blue-700` | `hover:bg-brand-navy` or `hover:bg-brand-teal-dark` |
+| `bg-blue-600`, `bg-blue-900` | `bg-brand-navy-light`, `bg-brand-navy` |
+
+Legacy `custom-*` tokens remain as aliases for backward compatibility but should not be used in new code.
+
+## Typography
+
+| Role | Font | Tailwind class |
+|------|------|----------------|
+| Body & headings | Poppins | `font-poppins` |
+| Labels & subcopy | Montserrat | `font-montserrat` |
+| Optional accent | Mulish | `font-mulish` |
+
+Fonts load via `next/font` in [`app/(home)/layout.tsx`](../app/(home)/layout.tsx). Do not use Google CDN `@import` for fonts.
+
+**Root scale:** `html { font-size: 14.4px }` — all rem-based Tailwind sizes are ~90% of default. Keep this until a deliberate redesign.
+
+### Heading patterns
+
+```html
+<h2 class="section-heading">Section Title</h2>
+<div class="section-divider"></div>
+```
+
+For headings on dark backgrounds:
+
+```html
+<h2 class="section-heading-inverse">Ready to grow?</h2>
+```
+
+Legacy `.heading` (42px zinc) is deprecated — use `.section-heading`.
+
+## Layout
+
+| Pattern | Class / value |
+|---------|---------------|
+| Page container | `.container-page` → `max-w-7xl px-4 sm:px-6 lg:px-8` |
+| Wide content | `max-w-[1400px]` for product grids only |
+| Section spacing | `py-12` to `py-16` |
+| Fixed header offset | `with-fixed-header` on `<html>`; `--header-h`, `--announcement-h` CSS vars |
+
+## Components
+
+Shared UI lives in `components/ui/`. Prefer these over hand-rolled buttons:
+
+| Component | Variants |
+|-----------|----------|
+| `Button` | `default` (gold), `secondary` (navy), `outline`, `ghost`, `destructive` |
+| `Input` | Standard form input with brand focus ring |
+| `Card` | Panel with warm border for dashboard/marketing |
+
+### Button utility classes (globals.css)
+
+- `.btn-primary` — gold CTA
+- `.btn-secondary` — navy filled
+- `.btn-outline-white` — ghost on dark backgrounds
+- `.dropdown-link` — nav dropdown item on dark panels
+
+## Patterns
+
+### Section block
+
+```tsx
+<section className="py-16">
+  <div className="container-page text-center">
+    <h2 className="section-heading">Browse by Category</h2>
+    <div className="section-divider" />
+    <p className="mt-4 font-montserrat text-sm text-gray-600">Subcopy here</p>
+  </div>
+</section>
+```
+
+### Hero CTA
+
+```tsx
+<button className="btn-primary min-w-[220px]">Explore the Marketplace</button>
+<button className="btn-outline-white min-w-[220px]">Apply to Become a Vendor</button>
+```
+
+### Glass navbar
+
+Header uses `.glass-header` on `#site-header` with brand-navy frosted background.
+
+## Do / Don't
+
+**Do**
+
+- Use `brand-*` and `surface-*` tokens
+- Use `components/ui` for buttons and inputs
+- Use `.section-heading` + `.section-divider` for marketing sections
+- Use `hover:bg-brand-navy` instead of generic blue hovers
+
+**Don't**
+
+- Hardcode `#hex` in `className` or inline `style`
+- Load fonts from Google CDN in CSS
+- Use `custom-*` in new code (use `brand-*` equivalents)
+- Mix `max-w-6xl` and `max-w-7xl` on adjacent sections without reason
+
+## Migration status
+
+| Area | Status |
+|------|--------|
+| Homepage (`app/(home)/Components/*`) | v2 — brand tokens, section utilities |
+| Auth (`app/(auth)/*`) | v2 — brand navy/gold buttons |
+| Checkout (`app/(home)/checkout/*`) | v2 — brand tokens |
+| Payment success (`app/(home)/payment-success`) | v2 — brand tokens |
+| Partner dashboard | v2 — surface/dashboard tokens (forms partially migrated) |
+| Vendor onboarding hub (`app/(home)/partners/page.tsx`) | v2 — brand tokens on CTAs and progress |
+| Vendor profiles / payment inline styles | Legacy — not yet migrated |
+| Legal pages (FAQ, privacy, terms) | Legacy — Arial CSS files |

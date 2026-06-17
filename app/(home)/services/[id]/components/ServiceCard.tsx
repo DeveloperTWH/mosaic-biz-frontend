@@ -22,50 +22,45 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
   return (
     <div
       onClick={() => onClick(service._id)}
-      className={`cursor-pointer border rounded-md overflow-hidden shadow-sm transition-all duration-300 relative ${
-        isActive ? "text-white" : "text-black"
-      }`}
-      style={
+      className={`market-card relative cursor-pointer overflow-hidden transition-all duration-300 ${
         isActive
-          ? {
-              backgroundImage:
-                "linear-gradient(216.65deg, rgba(0, 0, 0, 0.36) -10.96%, rgba(0, 0, 0, 0.87) 29.64%, #000000 70.76%), url('/Footer/footer-bg.png')",
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              backgroundRepeat: "no-repeat",
-            }
-          : {}
-      }
+          ? "border-market-gold/40 bg-market-elevated ring-1 ring-market-gold/30"
+          : "hover:border-white/20"
+      }`}
     >
-      <div className="grid grid-cols-3">
+      {isActive ? (
+        <div className="pointer-events-none absolute inset-0 bg-market-glow-radial opacity-60" aria-hidden />
+      ) : null}
+      <div className="relative grid grid-cols-3">
         <Image
           src={service.coverImage}
           alt={service.title}
           width={150}
           height={150}
-          className="object-cover w-full h-full col-span-1"
+          className="col-span-1 h-full w-full object-cover"
         />
         <div className="col-span-2 p-4">
-          <h3 className="mb-1 text-lg font-semibold">{service.title}</h3>
-          <div className="my-1 text-sm">
-            ⭐ {service.averageRating} ({service.totalReviews} Reviews)
-          </div>
-          <div className="flex flex-wrap gap-2 my-2 text-xs">
+          <h3 className="mb-1 text-lg font-semibold text-market-text">{service.title}</h3>
+          {(service.averageRating > 0 || service.totalReviews > 0) && (
+            <div className="my-1 text-sm text-market-muted">
+              {service.averageRating} ({service.totalReviews} Reviews)
+            </div>
+          )}
+          <div className="my-2 flex flex-wrap gap-2 text-xs">
             {service.services.map((tag) => (
               <span
                 key={tag._id}
-                className="px-2 py-1 text-gray-800 bg-gray-200 rounded-full"
+                className="rounded-full bg-market-elevated px-2 py-1 text-market-muted"
               >
                 {tag.name}
               </span>
             ))}
           </div>
-          <p className="text-sm">{service.description}</p>
+          <p className="text-sm text-market-muted line-clamp-3">{service.description}</p>
           <Link
             href={`/service/${service.slug}`}
-            className={`inline-flex items-center gap-1 mt-4 hover:underline text-[14px] ${
-              isActive ? "text-custom-orange" : "text-black"
-            }`}
+            className="mt-4 inline-flex items-center gap-1 text-sm text-market-gold hover:text-market-gold-hover hover:underline"
+            onClick={(e) => e.stopPropagation()}
           >
             Read More <MoveRight className="ml-1" size={14} />
           </Link>
@@ -73,7 +68,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
       </div>
 
       {isMobile && isActive && (
-        <div className="w-full h-64 px-4 mt-4 mb-5">
+        <div className="relative mb-5 mt-4 h-64 w-full px-4">
           <iframe
             src={`https://www.google.com/maps?q=${service.contact.address}&output=embed`}
             width="100%"
@@ -81,7 +76,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
             style={{ border: 0 }}
             allowFullScreen
             loading="lazy"
-            className="rounded"
+            className="rounded border border-white/10"
           />
         </div>
       )}

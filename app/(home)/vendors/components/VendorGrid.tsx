@@ -99,7 +99,7 @@ export default function VendorGrid() {
 
                 <input
                     type="text"
-                    className="w-full p-2 border sm:col-span-1 md:col-span-3"
+                    className="market-input sm:col-span-1 md:col-span-3"
                     placeholder="Enter City"
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
@@ -107,13 +107,13 @@ export default function VendorGrid() {
 
                 <input
                     type="text"
-                    className="w-full p-2 border sm:col-span-1 md:col-span-4"
+                    className="market-input sm:col-span-1 md:col-span-4"
                     placeholder="Search Business Name"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                 />
 
-                <button onClick={clearFilters} className="w-full px-4 py-2 text-white bg-red-500 sm:col-span-2 md:col-span-2">
+                <button onClick={clearFilters} className="market-btn-outline w-full sm:col-span-2 md:col-span-2">
                     Clear
                 </button>
             </div>
@@ -121,15 +121,15 @@ export default function VendorGrid() {
             {/* Vendor Grid */}
             {loading ? (
                 <div className="flex justify-center py-10">
-                    <div className="w-8 h-8 border-4 border-gray-300 rounded-full border-t-black animate-spin"></div>
+                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-market-muted border-t-market-gold"></div>
                 </div>
             ) : (
-                <div className="grid grid-cols-2 gap-6 mb-6 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5">
+                <div className="mb-6 grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5">
                     {vendors.map((vendor) => (
                         <Link key={vendor._id} href={`/vendors/${vendor.slug}`}>
-                            <div className="p-4 text-center border">
-                                <img src={vendor.logo} alt={vendor.businessName} className="object-contain h-16 mx-auto" />
-                                <p className="mt-2 text-sm font-medium">{vendor.businessName}</p>
+                            <div className="market-card p-4 text-center transition hover:shadow-market-glow">
+                                <img src={vendor.logo} alt={vendor.businessName} className="mx-auto h-16 object-contain" />
+                                <p className="mt-2 text-sm font-medium text-market-text">{vendor.businessName}</p>
                             </div>
                         </Link>
                     ))}
@@ -141,12 +141,12 @@ export default function VendorGrid() {
             <div className="flex flex-col items-center justify-center gap-4 mt-4 sm:flex-row">
                 {totalPages > 0 ? (
                     <>
-                        <span className="text-lg font-semibold whitespace-nowrap">
+                        <span className="whitespace-nowrap text-lg font-semibold text-market-text">
                             Page {page} of {totalPages}
                         </span>
 
                         <div className="flex flex-wrap items-center justify-center gap-2">
-                            <button onClick={() => page > 1 && setPage(page - 1)} disabled={page === 1} className="px-3 py-1 rounded heading">
+                            <button onClick={() => page > 1 && setPage(page - 1)} disabled={page === 1} className="market-btn-outline px-3 py-1 text-sm disabled:opacity-50">
                                 Prev
                             </button>
 
@@ -154,19 +154,23 @@ export default function VendorGrid() {
                                 <button
                                     key={i + 1}
                                     onClick={() => setPage(i + 1)}
-                                    className={`px-4 py-1 rounded ${page === i + 1 ? 'bg-black text-white rounded-full' : 'bg-gray-100'}`}
+                                    className={`rounded-full px-4 py-1 text-sm ${
+                                      page === i + 1
+                                        ? "bg-market-gold font-semibold text-market-header"
+                                        : "border border-white/10 bg-market-elevated text-market-text hover:border-market-gold/40"
+                                    }`}
                                 >
                                     {i + 1}
                                 </button>
                             ))}
 
-                            <button onClick={() => page < totalPages && setPage(page + 1)} disabled={page === totalPages} className="px-3 py-1 rounded heading">
+                            <button onClick={() => page < totalPages && setPage(page + 1)} disabled={page === totalPages} className="market-btn-outline px-3 py-1 text-sm disabled:opacity-50">
                                 Next
                             </button>
                         </div>
                     </>
                 ) : (
-                    <h2 className="text-2xl text-center heading">No Vendor Found</h2>
+                    <h2 className="heading text-center text-2xl text-market-muted">No Vendor Found</h2>
                 )}
             </div>
         </>

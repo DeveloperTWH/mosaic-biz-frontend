@@ -12,60 +12,69 @@ const Hero = () => {
   }, []);
 
   return (
-    <div className="bg-white">
+    <div className="relative bg-market-bg">
       <section
-        className="relative h-[520px] bg-cover bg-center sm:h-[600px] lg:h-[650px]"
-        style={{ backgroundImage: "url(/herobanner.png)" }}
+        className="relative flex min-h-[520px] items-center overflow-hidden bg-market-hero bg-cover bg-center sm:min-h-[580px] lg:min-h-[640px]"
+        style={{
+          backgroundImage:
+            "linear-gradient(180deg, rgba(18,11,47,0.75) 0%, rgba(33,23,71,0.82) 100%), url(/herobanner.png)",
+        }}
       >
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-stone-800/60 px-4 text-center">
-          <div className="mx-auto w-full max-w-4xl">
-            <h1 className="mb-4 font-poppins text-3xl font-bold uppercase tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl">
-              Your Marketplace for Minority-Owned Excellence
-            </h1>
-            <p className="mx-auto mb-8 max-w-2xl font-poppins text-sm text-white sm:text-base">
-              From food to fashion to services, Mosaic Biz Hub connects you to
-              verified businesses and gives entrepreneurs the tools to grow.
+        <div
+          className="pointer-events-none absolute inset-0 bg-market-glow-radial"
+          aria-hidden
+        />
+        <div className="relative mx-auto w-full max-w-5xl px-4 py-16 text-center sm:px-6 sm:py-20">
+          <p className="mb-4 font-montserrat text-xs font-semibold uppercase tracking-[0.2em] text-market-gold sm:text-sm">
+            Mosaic Biz Hub
+          </p>
+          <h1 className="mb-4 font-poppins text-3xl font-bold leading-tight text-market-text sm:text-4xl md:text-5xl lg:text-6xl">
+            Shop the Movement.
+            <span className="mt-2 block text-market-gold">Support the Culture.</span>
+          </h1>
+          <p className="mx-auto mb-10 max-w-2xl font-montserrat text-sm text-market-muted sm:text-base">
+            From food to fashion to services, Mosaic Biz Hub connects you to verified
+            minority-owned businesses and gives entrepreneurs the tools to grow.
+          </p>
+
+          {isLoggedIn === null ? (
+            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <div className="h-11 w-48 rounded bg-white/10" />
+              <div className="h-11 w-48 rounded bg-white/10" />
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <Link href="/products">
+                <button type="button" className="market-btn-primary min-w-[220px]">
+                  Explore the Marketplace
+                </button>
+              </Link>
+              <Link href="/become-a-vendor">
+                <button type="button" className="market-btn-outline min-w-[220px]">
+                  Apply to Become a Vendor
+                </button>
+              </Link>
+            </div>
+          )}
+
+          {isLoggedIn === false ? (
+            <p className="mt-6 text-xs text-market-muted">
+              Already have an account?{" "}
+              <Link
+                href="/login?type=customer"
+                className="text-market-gold underline hover:text-market-gold-hover"
+              >
+                Customer login
+              </Link>
+              {" · "}
+              <Link
+                href="/login?type=vendor"
+                className="text-market-gold underline hover:text-market-gold-hover"
+              >
+                Vendor login
+              </Link>
             </p>
-
-            {isLoggedIn === null ? (
-              <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-                <div className="h-11 w-44 rounded bg-gray-100/70" />
-                <div className="h-11 w-44 rounded bg-gray-100/70" />
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-                <Link href="/products">
-                  <button
-                    type="button"
-                    className="min-w-[200px] bg-[#C7A040] px-8 py-3 font-poppins text-xs font-semibold uppercase tracking-wide text-white transition-colors hover:bg-[#b08f35]"
-                  >
-                    Explore Marketplace
-                  </button>
-                </Link>
-                <Link href="/become-a-vendor">
-                  <button
-                    type="button"
-                    className="min-w-[200px] border-2 border-white px-8 py-3 font-poppins text-xs font-semibold uppercase tracking-wide text-white transition-colors hover:bg-white/10"
-                  >
-                    Become a Vendor
-                  </button>
-                </Link>
-              </div>
-            )}
-
-            {isLoggedIn === false ? (
-              <p className="mt-6 text-xs text-white/80">
-                Already have an account?{" "}
-                <Link href="/login?type=customer" className="underline hover:text-white">
-                  Customer login
-                </Link>
-                {" · "}
-                <Link href="/login?type=vendor" className="underline hover:text-white">
-                  Vendor login
-                </Link>
-              </p>
-            ) : null}
-          </div>
+          ) : null}
         </div>
       </section>
     </div>

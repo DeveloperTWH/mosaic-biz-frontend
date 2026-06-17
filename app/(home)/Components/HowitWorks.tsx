@@ -43,22 +43,15 @@ export default function HowItWorks() {
   const [tabClick, setTabClick] = useState(0);
 
   return (
-    <section className="bg-white">
-      <div className="py-4 lg:py-6 max-w-7xl mx-auto px-6">
-        {/* Heading - Compact */}
-        <div className="text-center mb-4">
-<h2 className="text-4xl font-bold text-gray-900 tracking-wide font-poppins uppercase">
-  HOW IT WORKS
-</h2>
-
-<p className="mt-2 text-gray-600 text-[12px] leading-5 max-w-6xl mx-auto font-mulish font-normal">
-  Mosaic Biz Hub isn’t just a marketplace, it’s a movement. Our Mosaic creates a multicultural tapestry of unstoppable success, a marketplace of diverse business excellence.
-  We connect conscious consumers with verified, minority-owned businesses through a platform built for visibility, trust, and growth. Mosaic Biz Hub is dedicated to empowering all minority-owned businesses at least 51% owned that are Hispanic or Latino, Asian, African American, Women, or disabled veterans, by providing a dynamic, inclusive, and accessible online/mobile marketplace that fosters economic growth, amplifies diverse voices, and connects entrepreneurs with eager consumers. Whether you're here to shop with purpose or scale your brand, here’s how to make the most of your experience
-</p>
-
-          <div className="flex justify-center mt-3">
-            <div className="w-16 h-[2px] bg-gray-300" />
-          </div>
+    <section className="bg-market-bg py-12 sm:py-16">
+      <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:py-6">
+        <div className="mb-8 text-center">
+          <h2 className="market-section-heading">How Mosaic Biz Hub Works</h2>
+          <div className="market-section-divider" />
+          <p className="mx-auto mt-4 max-w-4xl font-mulish text-xs leading-5 text-market-muted sm:text-sm">
+            Mosaic Biz Hub connects conscious consumers with verified minority-owned businesses
+            through a platform built for visibility, trust, and growth.
+          </p>
         </div>
 
         {/* Content - Compact Grid */}
@@ -103,7 +96,7 @@ export default function HowItWorks() {
           </div>
 
           {/* Right Content */}
-          <div className="lg:col-span-7 bg-gray-50 p-3 flex items-center gap-2 min-h-[250px] md:min-h-[270px]">
+          <div className="market-card flex min-h-[250px] items-center gap-2 p-4 md:min-h-[270px] lg:col-span-7">
             <div className="flex-shrink-0">
               <Image
                 src={icons[tabClick]}
@@ -114,7 +107,7 @@ export default function HowItWorks() {
               />
             </div>
 
-<div className="flex flex-col gap-1.5 text-[#5F5F5F] text-[13px] leading-5 font-montserrat font-[500] capitalize flex-1">
+<div className="flex flex-1 flex-col gap-1.5 font-montserrat text-[13px] font-medium capitalize leading-5 text-market-muted">
   <p>{tabContent[tabClick].description}</p>
 </div>
           </div>
@@ -124,7 +117,7 @@ export default function HowItWorks() {
         <div className="flex justify-center mt-3">
           <Link 
             href="/how-to-use-this-app"
-            className="px-6 py-2 bg-[#1e3a5f] text-white text-xs font-medium hover:bg-[#2a4a6f] transition-colors"
+            className="market-btn-secondary px-6 py-2 text-xs normal-case"
           >
             Learn More
           </Link>
@@ -145,7 +138,7 @@ function FeaturedVendors() {
   ];
 
   return (
-    <section className="w-full py-7 overflow-hidden bg-gray-50">
+    <section className="w-full overflow-hidden bg-market-surface py-7">
       <Swiper
         modules={[Autoplay, Pagination]}
         slidesPerView={"auto"}

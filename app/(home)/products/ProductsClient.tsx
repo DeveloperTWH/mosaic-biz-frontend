@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react'
 import axios from "axios"
 import { useRouter } from "next/navigation";
-import HeroSection from "./components/HeroSection";
+import PublicPageHero from "../Components/PublicPageHero";
 import CategoryGrid from './components/CategoryGrid';
 import FeaturedProducts from './components/FeaturedProducts';
 import { ChevronRight, ChevronLeft, Star } from 'lucide-react';
@@ -189,7 +189,14 @@ const Page = () => {
 
     return (
         <div>
-            <HeroSection heading="Services" imageUrl="/bgdetailpage.png" />
+            <PublicPageHero
+                title="Shop"
+                breadcrumbs={[
+                    { label: "Home", href: "/" },
+                    { label: "Shop" },
+                ]}
+                imageUrl="/bgdetailpage.png"
+            />
             
             <FilterSection 
                 filters={{
@@ -215,41 +222,41 @@ const Page = () => {
             />
             
             {loadingn && (
-                <div className="text-center py-8">
-                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-                    <p className="mt-2 text-gray-600">Searching products...</p>
+                <div className="py-8 text-center">
+                    <div className="inline-block h-8 w-8 animate-spin rounded-full border-b-2 border-market-gold"></div>
+                    <p className="mt-2 text-market-muted">Searching products...</p>
                 </div>
             )}
             
-            <div className="relative p-10">
-                {/* Navigation Buttons */}
-                <div className="absolute top-1/2 left-10 -translate-y-1/2 -translate-x-4 z-10">
+            <div className="relative px-4 py-10 sm:px-6">
+                <div className="absolute top-1/2 left-2 z-10 -translate-y-1/2 sm:left-4">
                     <button
                         ref={prevButton}
-                        className="w-12 h-12 flex items-center justify-center bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors"
+                        type="button"
+                        className="market-card flex h-11 w-11 items-center justify-center rounded-full text-market-text transition hover:border-market-gold/40 sm:h-12 sm:w-12"
                     >
-                        <ChevronLeft className="w-6 h-6 text-gray-700" />
+                        <ChevronLeft className="h-6 w-6" />
                     </button>
                 </div>
                 
-                <div className="absolute top-1/2 right-10 -translate-y-1/2 translate-x-4 z-10">
+                <div className="absolute top-1/2 right-2 z-10 -translate-y-1/2 sm:right-4">
                     <button
                         ref={nextButton}
-                        className="w-12 h-12 flex items-center justify-center bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors"
+                        type="button"
+                        className="market-card flex h-11 w-11 items-center justify-center rounded-full text-market-text transition hover:border-market-gold/40 sm:h-12 sm:w-12"
                     >
-                        <ChevronRight className="w-6 h-6 text-gray-700" />
+                        <ChevronRight className="h-6 w-6" />
                     </button>
                 </div>
 
-                <div className='flex flex-col items-center'>
-                    <p className='text-3xl'>What’s Hot. What’s Trusted. What’s Moving</p>
-                    <div className="flex flex-col items-center justify-center">
-                        <hr className="h-[2px] w-[100px] bg-gray-700" />
-                        <hr className="h-[2px] w-[100px] mt-[2px] mb-4 bg-gray-700" />
-                    </div>
-<p className='w-[50%] text-[14px] text-[#2E2E2E] text-center font-normal font-montserrat'>
-   Discover top-rated products and services that customers love—updated in real time
-</p>
+                <div className="flex flex-col items-center text-center">
+                    <h2 className="font-poppins text-2xl font-semibold text-market-text sm:text-3xl">
+                        What&apos;s Hot. What&apos;s Trusted. What&apos;s Moving
+                    </h2>
+                    <div className="market-section-divider mt-4" />
+                    <p className="mt-4 max-w-2xl font-montserrat text-sm text-market-muted sm:text-base">
+                        Discover top-rated products and services that customers love—updated in real time
+                    </p>
                 </div>
 
                 {/* Products Carousel */}
@@ -501,16 +508,21 @@ function ProductCard({ item }: { item: RankedItem }) {
     return (
         <div 
             onClick={handleCardClick}
-            className="bg-green p-2 border-2 border-[#D9D9D9] w-full max-w-[300px] h-[460px] shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col cursor-pointer"
+            className="market-card flex h-[460px] w-full max-w-[300px] cursor-pointer flex-col overflow-hidden p-2 transition-all duration-300 hover:shadow-market-glow"
         >
-            {/* Product Image - Square (1:1 like 1080x1080) */}
-            <div className="relative w-full aspect-square overflow-hidden bg-gray-100 flex-shrink-0">
+            <div className="relative aspect-square w-full flex-shrink-0 overflow-hidden bg-market-elevated">
+                {images[0] ? (
                 <img
                     src={images[0]}
                     alt={title}
                     loading="lazy"
-                    className="w-full h-full object-contain transition-transform duration-500 hover:scale-105"
+                    className="h-full w-full object-contain transition-transform duration-500 hover:scale-105"
                 />
+                ) : (
+                <div className="flex h-full w-full items-center justify-center text-xs font-semibold tracking-wide text-market-muted">
+                    No image
+                </div>
+                )}
                 
                 {onSale && (
                     <div className="absolute top-3 left-3">
@@ -521,60 +533,57 @@ function ProductCard({ item }: { item: RankedItem }) {
                 )}
             </div>
 
-            {/* Product Info - Flex grow to fill space */}
-            <div className="p-3 flex flex-col flex-1">
-                {/* Title */}
-                <h3 className="text-base font-bold text-gray-900 uppercase tracking-tight leading-snug font-poppins line-clamp-2 h-[42px]">
+            <div className="flex flex-1 flex-col p-3">
+                <h3 className="font-poppins line-clamp-2 h-[42px] text-base font-semibold leading-snug text-market-text">
                     {title}
                 </h3>
 
-                {/* Description */}
-                <p className="mb-2 text-xs text-gray-600 leading-5 font-montserrat h-[40px] overflow-hidden">
+                <p className="mb-2 h-[40px] overflow-hidden font-montserrat text-xs leading-5 text-market-muted">
                     {trimmedDescription || "\u00a0"}
                 </p>
 
-                {/* Rating and Reviews */}
-                <div className="flex-shrink-0 min-h-[20px]">
-                    <div className="flex items-center mb-1">
+                {(rating > 0 || (reviewCount ?? 0) > 0) && (
+                <div className="min-h-[20px] flex-shrink-0">
+                    <div className="mb-1 flex items-center">
                         <div className="flex">
                             {[...Array(5)].map((_, i) => (
                                 <Star
                                     key={i}
                                     size={14}
-                                    fill={i < fullStars ? "#FBBF24" : i === fullStars && hasHalfStar ? "#FBBF24" : "#E5E7EB"}
-                                    stroke={i < fullStars ? "#FBBF24" : i === fullStars && hasHalfStar ? "#FBBF24" : "#D1D5DB"}
-                                    className={i < fullStars || (i === fullStars && hasHalfStar) ? "text-yellow-400" : "text-gray-300"}
+                                    fill={i < fullStars ? "#E2B84B" : i === fullStars && hasHalfStar ? "#E2B84B" : "transparent"}
+                                    stroke={i < fullStars || (i === fullStars && hasHalfStar) ? "#E2B84B" : "#A9A2D8"}
+                                    className={i < fullStars || (i === fullStars && hasHalfStar) ? "text-market-gold" : "text-market-muted/40"}
                                 />
                             ))}
                         </div>
-                        <p className="text-[10px] ml-2 text-gray-500 font-poppins leading-tight">
+                        <p className="ml-2 font-poppins text-[10px] leading-tight text-market-muted">
                             {ratingCount} Ratings And {reviewCount} Reviews
                         </p>
                     </div>
                 </div>
+                )}
 
-                {/* Price */}
-<div className="flex-shrink-0 mt-auto">
+                <div className="mt-auto flex-shrink-0">
   {onSale ? (
     <div className="flex flex-col leading-tight">
-      <span className="text-xs text-gray-500">
+      <span className="text-xs text-market-muted">
         Starting from
       </span>
       <div className="flex items-center gap-3">
-        <span className="text-base font-semibold text-[#B12704]">
+        <span className="text-base font-semibold text-red-400">
           ${effective.toFixed(2)}
         </span>
-        <span className="text-sm text-gray-500 line-through">
+        <span className="text-sm text-market-muted line-through">
           ${price.toFixed(2)}
         </span>
       </div>
     </div>
   ) : (
     <div className="flex flex-col leading-tight">
-      <span className="text-xs text-gray-500">
+      <span className="text-xs text-market-muted">
         Starting from
       </span>
-      <span className="text-base font-semibold text-gray-900">
+      <span className="text-base font-semibold text-market-gold">
         ${price.toFixed(2)}
       </span>
     </div>
