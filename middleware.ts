@@ -33,6 +33,10 @@ function redirectUnauthorized(req: NextRequest, path: string) {
 export async function middleware(req: NextRequest) {
     const path = req.nextUrl.pathname;
 
+    if (path === "/monitoring") {
+        return NextResponse.next();
+    }
+
     if (path.startsWith('/verify-otp')) {
         const otpFlag = req.cookies.get('otpPending')?.value;
 

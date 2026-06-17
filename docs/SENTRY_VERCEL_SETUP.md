@@ -1,14 +1,14 @@
 # Sentry Vercel Setup
 
-> **Status (2026-06-17):** Sentry PR [#1](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/1) not merged to release-candidate. See [PROJECT_STATUS.md](PROJECT_STATUS.md).
+> **Status (2026-06-17):** Sentry PR [#1](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/1) — merging into `main`. See [PROJECT_STATUS.md](PROJECT_STATUS.md).
 
 Branch: `feat/sentry-monitoring`  
 PR: https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/1
 
 ## Status
 
-- Code complete on feature branch; **not merged to `main`** per launch sprint rules
-- Review PR #1 before merge; do not enable push-to-main deployment
+- Code complete on feature branch; merge conflicts with `main` resolved on `feat/sentry-monitoring`
+- Set Vercel env vars (below) before relying on production monitoring
 
 ## Vercel environment variables
 
