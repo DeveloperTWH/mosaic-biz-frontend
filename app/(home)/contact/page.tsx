@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import HeroSection from './components/HeroSection';
+import PublicPageHero from '../Components/PublicPageHero';
 import { Mail, MapPinned, PhoneCall, Facebook, Instagram, Linkedin } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -58,7 +58,14 @@ if (!token) {
     return (
         <div className="flex flex-col">
             {/* Hero Section */}
-            <HeroSection heading="Connect With Us" imageUrl="/contact/contact_banner.png" />
+            <PublicPageHero
+                title="Contact"
+                breadcrumbs={[
+                    { label: "Home", href: "/" },
+                    { label: "Contact" },
+                ]}
+                imageUrl="/contact/banner.png"
+            />
 
             {/* Contact Form & Newsletter */}
             <div className="grid w-full grid-cols-1 gap-8 p-6 mx-auto lg:grid-cols-2 lg:p-12 max-w-7xl">

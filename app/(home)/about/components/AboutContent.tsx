@@ -14,19 +14,18 @@ export default function AboutContent() {
       </div>
       {/* Text content */}
       <div className="py-10 md:pl-10 md:order-1">
-        <h2 className="mb-2 text-3xl font-bold heading">ABOUT US</h2>
-        <hr className="h-[2px] w-[120px] bg-green-900" />
-        <hr className="h-[2px] w-[120px] bg-green-900 mt-[1px] mb-5" />
-        <p className="text-sm leading-relaxed text-gray-700">
+        <h2 className="heading mb-2 text-3xl font-bold text-market-text">About Us</h2>
+        <div className="market-section-divider !mx-0 !mt-2 !w-28" />
+        <p className="text-sm leading-relaxed text-market-muted">
           Mosaic Biz Hub was found with a single vision: to empower minority-owned businesses and provide them with success in the digital age. We think every business has a story—and every story should be heard.
         </p>
-        <p className="mt-5 text-sm leading-relaxed text-gray-700">
+        <p className="mt-5 text-sm leading-relaxed text-market-muted">
           Started by Bryan Harris, Mosaic Biz Hub aims to bridge the gap. Minority entrepreneurs fought to get noticed, had fewer opportunities, and were hindered by obstacles that prevented them from achieving their full potential. We wanted to make that happen. 
         </p>
-        <p className="mt-5 text-sm leading-relaxed text-gray-700">
+        <p className="mt-5 text-sm leading-relaxed text-market-muted">
           Now, Mosaic Biz Hub is more than a platform—it's an ecosystem. A place where businesses can reach out to customers, express their culture, and develop with the support they should have. 
         </p>
-        <p className="mt-5 text-sm leading-relaxed text-gray-700">
+        <p className="mt-5 text-sm leading-relaxed text-market-muted">
           So, what sets us apart? We don't merely list businesses. We highlight their voices, their traditions, and the impact they make in their communities. Our platform brings together restaurants, services, products, and more—all under one digital roof that is proud to celebrate diversity. 
 
         </p>

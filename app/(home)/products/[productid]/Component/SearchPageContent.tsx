@@ -5,14 +5,12 @@ import { useParams } from "next/navigation";
 import FilterSidebar from "./FilterSidebar";
 import { Star, StarHalf, RotateCcw } from "lucide-react";
 import BannerSection from "./BannerSection";
-import SimilarProduct from "../[id]/Component/SimilarProduct";
 import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Keyboard, A11y, Autoplay } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-import HeroSection from "../../components/HeroSection";
 
 /* ---------- types ---------- */
 type RankedItem = {

@@ -38,9 +38,14 @@ const TrustBadges = () => {
     <div className="max-w-[900px] mx-auto p-8 font-sans leading-relaxed">
       <h1 className="mb-2 text-3xl font-bold">Trust Badges - Vendor</h1>
 
-      <p className="text-gray-500 mb-8 text-sm">
+      <p className="text-gray-500 mb-4 text-sm">
         Last updated: January 2026
       </p>
+
+      <div className="mb-8 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+        Trust badges reflect verified onboarding and profile completion steps reviewed by our team.
+        They are not automated reputation scores.
+      </div>
 
       {/* Introduction */}
       <section className="mb-6">

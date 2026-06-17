@@ -23,34 +23,29 @@ export default function BrowseFoodAndGrocery() {
   ];
 
   return (
-    <section className="py-24 bg-white">
-      <div className="max-w-7xl mx-auto px-6">
-        {/* Heading */}
-        <div className="text-center mb-20">
-          <h1 className="text-4xl font-bold text-gray-900 tracking-wide font-poppins">
-            BROWSE FROM DELICIOUS FOOD AND GROCERY
-          </h1>
-
-          {/* Divider (exact style) */}
-          <div className="flex justify-center mt-4">
-            <div className="w-28 h-[2px] bg-gray-400"></div>
-          </div>
+    <section className="bg-market-bg py-16 sm:py-20">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        <div className="mb-12 text-center sm:mb-16">
+          <h2 className="font-poppins text-2xl font-bold uppercase tracking-wide text-market-text sm:text-3xl">
+            Browse Food & Grocery
+          </h2>
+          <div className="market-section-divider" />
         </div>
 
-        {/* Image Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-10">
           {categories.map((category, index) => (
-            <Link key={index} href={"/foods"} className="text-center">
-              <div className="relative w-full h-64 rounded-xl overflow-hidden font-poppins">
+            <Link key={index} href={"/foods"} className="group text-center">
+              <div className="market-card relative h-56 w-full overflow-hidden rounded-xl sm:h-64">
                 <Image
                   src={category.image}
                   alt={category.name}
                   fill
-                  className="object-cover"
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-market-header/80 via-transparent to-transparent" />
               </div>
 
-              <p className="mt-4 text-lg font-semibold text-gray-800 font-poppins">
+              <p className="mt-4 font-poppins text-base font-semibold text-market-text sm:text-lg">
                 {category.name}
               </p>
             </Link>

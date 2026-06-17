@@ -1,17 +1,13 @@
 "use client";
 
 import React from "react";
-import { Star, StarHalf, RotateCcw, Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { RotateCcw, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination, Keyboard, A11y, Autoplay } from "swiper/modules";
+import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
-import "swiper/css/pagination";
 import { getFeaturedProducts, FeaturedProduct } from "@/lib/api/featured-products";
-import PublicSearchFilterBar from "./PublicSearchFilterBar";
-import { buildSearchPageUrl, DEFAULT_PUBLIC_SEARCH_FILTERS, PublicSearchFilters } from "./publicSearch";
 
 /* ---------- types ---------- */
 type RankedItem = {
@@ -168,65 +164,29 @@ function useFeaturedProducts(searchFilters?: { businessType: string; location: s
   return { items, error, loading, reload: load };
 }
 
-/* ---------- Filter Component ---------- */
-
-function FilterSection({ onSearch }: { onSearch: (filters: PublicSearchFilters) => void }) {
-  const [filters, setFilters] = React.useState(DEFAULT_PUBLIC_SEARCH_FILTERS);
-
-  return (
-    <PublicSearchFilterBar filters={filters} onChange={setFilters} onSubmit={() => onSearch(filters)} />
-  );
-}
-
-
-
 /* ---------- main component ---------- */
 export default function ShopProducts() {
-  const router = useRouter();
   const { items, error, loading, reload } = useFeaturedProducts();
   const [swiperRef, setSwiperRef] = React.useState<any>(null);
 
   const prevButton = React.useRef(null);
   const nextButton = React.useRef(null);
 
-  const handleSearch = (filters: PublicSearchFilters) => {
-    router.push(buildSearchPageUrl(filters));
-  };
-
   return (
-    <>
-      <FilterSection onSearch={handleSearch} />
-      
-      <section className="pt-12 pb-16 px-4 sm:px-6 lg:px-12 max-w-[1400px] mx-auto w-full">
-        <div className="max-w-3xl mx-auto text-center mb-12">
-          <h2 className="mb-3 text-2xl uppercase sm:text-3xl md:text-4xl font-bold text-gray-900 font-poppins">
-            Featured Products
-          </h2>
-          <div className="flex flex-col items-center justify-center mb-4">
-            <hr className="w-20 h-1 bg-green-900" />
-            <hr className="w-20 h-1 bg-green-900" />
-          </div>
-<p
-  className="px-2 mb-8 text-gray-600 sm:px-0 sm:text-base"
-  style={{
-    fontFamily: 'Montserrat',
-    fontWeight: 400,
-    fontStyle: 'normal',
-    fontSize: '14px',
-    lineHeight: '24px',
-    letterSpacing: '0%',
-    textAlign: 'center'
-  }}
->
-  See what’s trending, what’s new, and what our community is loving right now. Highlighted featured products from verified vendors you can trust
-</p>
+    <section className="mx-auto w-full max-w-[1400px] bg-market-bg px-4 py-12 sm:px-6 lg:px-12">
+        <div className="mx-auto mb-12 max-w-3xl text-center">
+          <h2 className="market-section-heading">Featured Products</h2>
+          <div className="market-section-divider" />
+          <p className="mx-auto mt-4 max-w-2xl font-montserrat text-sm text-market-muted sm:text-base">
+            See what is trending from verified vendors. Live listings powered by our marketplace API.
+          </p>
         </div>
 
         {/* Products Carousel Section */}
         {loading && (
           <div className="text-center py-8">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-            <p className="mt-2 text-gray-600">Searching products...</p>
+            <div className="inline-block h-8 w-8 animate-spin rounded-full border-b-2 border-market-gold"></div>
+            <p className="mt-2 text-market-muted">Searching products...</p>
           </div>
         )}
         {items === null || (loading && items === null) ? (
@@ -234,14 +194,25 @@ export default function ShopProducts() {
         ) : error ? (
           <ErrorBlock error={error} onRetry={reload} />
         ) : items.length === 0 ? (
-          <div className="text-center text-gray-600 py-8">No products to display.</div>
+          <div className="market-card rounded-xl px-6 py-10 text-center">
+            <p className="font-semibold text-market-text">Featured products coming soon</p>
+            <p className="mt-2 text-sm text-market-muted">
+              Check back shortly or browse the full marketplace.
+            </p>
+            <Link
+              href="/products"
+              className="market-btn-secondary mt-4 inline-block px-6 py-2 text-sm normal-case"
+            >
+              Browse all products
+            </Link>
+          </div>
         ) : (
           <div className="relative">
             {/* Navigation Buttons */}
             <div className="absolute top-1/2 left-0 -translate-y-1/2 -translate-x-4 z-10">
               <button
                 ref={prevButton}
-                className="w-12 h-12 flex items-center justify-center bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors"
+                className="flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-market-elevated text-market-text shadow-market-card transition hover:bg-market-surface"
               >
                 <ChevronLeft className="w-6 h-6 text-gray-700" />
               </button>
@@ -250,7 +221,7 @@ export default function ShopProducts() {
             <div className="absolute top-1/2 right-0 -translate-y-1/2 translate-x-4 z-10">
               <button
                 ref={nextButton}
-                className="w-12 h-12 flex items-center justify-center bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors"
+                className="flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-market-elevated text-market-text shadow-market-card transition hover:bg-market-surface"
               >
                 <ChevronRight className="w-6 h-6 text-gray-700" />
               </button>
@@ -297,27 +268,26 @@ export default function ShopProducts() {
           </div>
         )}
 
-        {/* Show All Products Button */}
-        <div className="flex justify-start mt-12">
+        <div className="mt-12 flex justify-center">
           <Link
             href="/products"
-            className="inline-block px-12 py-3 text-sm font-semibold text-white  bg-[#1A1F71] hover:bg-blue-600 transition-colors font-montserrat"
+            className="market-btn-secondary inline-block px-12 py-3 font-montserrat text-sm normal-case"
           >
-            Show All Products
+            Show all products
           </Link>
         </div>
-
-        {/* Bottom Decorative Line */}
-        <div className="flex justify-center mt-12">
-          <hr className="h-[2px] w-1/2 bg-custom-blue" />
-        </div>
       </section>
-    </>
   );
 }
 
 /* ---------- Featured Product Card ---------- */
 function FeaturedProductCard({ item }: { item: FeaturedProduct }) {
+  const title = item.title?.trim() || "Untitled product";
+  const coverImage = item.coverImage?.trim() || "/ShopProduct/Aria-SK6-Helmet 1.png";
+  const price =
+    typeof item.price === "number" && Number.isFinite(item.price)
+      ? item.price
+      : null;
   const description = item.description ?? "";
   const strippedDescription = stripHtml(description);
   const trimmedDescription =
@@ -328,14 +298,14 @@ function FeaturedProductCard({ item }: { item: FeaturedProduct }) {
   return (
     <Link
       href={`/product/${item._id}`}
-      className="block bg-green p-2 border-2 border-[#D9D9D9] w-full max-w-[300px] h-[460px] shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden"
+      className="market-card block h-[460px] w-full max-w-[300px] overflow-hidden hover:-translate-y-1"
     >
       <div className="flex h-full flex-col">
         {/* Product Image - Square (1:1 like 1080x1080) */}
-        <div className="relative w-full aspect-square overflow-hidden bg-gray-100 flex-shrink-0">
+        <div className="relative aspect-square w-full flex-shrink-0 overflow-hidden bg-market-elevated">
           <img
-            src={item.coverImage}
-            alt={item.title}
+            src={coverImage}
+            alt={title}
             loading="lazy"
             className="w-full h-full object-contain transition-transform duration-500 hover:scale-105"
           />
@@ -350,39 +320,21 @@ function FeaturedProductCard({ item }: { item: FeaturedProduct }) {
         {/* Product Info - Flex grow to fill space */}
         <div className="p-3 flex flex-col flex-1">
           {/* Title */}
-          <h3 className="text-base font-bold text-gray-900 uppercase tracking-tight leading-snug font-poppins line-clamp-2 h-[42px]">
-            {item.title}
+          <h3 className="line-clamp-2 h-[42px] font-poppins text-base font-bold uppercase leading-snug tracking-tight text-market-text">
+            {title}
           </h3>
 
-          {/* Description */}
-          <p className="mb-2 text-xs text-gray-600 leading-5 font-montserrat h-[40px] overflow-hidden">
+          <p className="mb-2 h-[40px] overflow-hidden font-montserrat text-xs leading-5 text-market-muted">
             {trimmedDescription || "\u00a0"}
           </p>
 
-          {/* Rating */}
-          <div className="flex-shrink-0 min-h-[20px]">
-            <div className="flex items-center mb-1">
-              <div className="flex">
-                {[...Array(5)].map((_, i) => (
-                  <Star
-                    key={i}
-                    size={14}
-                    fill="#FBBF24"
-                    stroke="#FBBF24"
-                    className="text-yellow-400"
-                  />
-                ))}
-              </div>
-              <p className="text-[10px] ml-2 text-gray-500 font-poppins leading-tight">
-                Featured Product
-              </p>
-            </div>
-          </div>
+          <p className="mb-2 font-poppins text-[10px] uppercase tracking-wide text-market-teal">
+            Featured Product
+          </p>
 
-          {/* Price */}
-          <div className="flex-shrink-0 mt-auto">
-            <span className="text-base font-bold text-gray-900">
-              ${item.price.toFixed(2)}
+          <div className="mt-auto flex-shrink-0">
+            <span className="text-base font-bold text-market-gold">
+              {price !== null ? `$${price.toFixed(2)}` : "Price on request"}
             </span>
           </div>
         </div>
@@ -396,23 +348,23 @@ function SkeletonCarousel() {
   return (
     <div className="relative">
       <div className="absolute top-1/2 left-0 -translate-y-1/2 -translate-x-4 z-10">
-        <button className="w-12 h-12 bg-gray-200 rounded-full"></button>
+        <button className="h-12 w-12 rounded-full border border-white/10 bg-market-elevated"></button>
       </div>
       
       <div className="absolute top-1/2 right-0 -translate-y-1/2 translate-x-4 z-10">
-        <button className="w-12 h-12 bg-gray-200 rounded-full"></button>
+        <button className="h-12 w-12 rounded-full border border-white/10 bg-market-elevated"></button>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 py-4">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="bg-white rounded-xl shadow-sm overflow-hidden flex flex-col h-[480px] animate-pulse">
-            <div className="h-48 bg-gray-200 flex-shrink-0"></div>
-            <div className="p-5 flex flex-col flex-grow">
-              <div className="h-5 bg-gray-200 rounded mb-3"></div>
-              <div className="h-4 bg-gray-200 rounded mb-2"></div>
-              <div className="h-4 bg-gray-200 rounded mb-3"></div>
-              <div className="h-5 bg-gray-200 rounded mb-4 w-1/2"></div>
-              <div className="h-10 bg-gray-200 rounded mt-auto"></div>
+          <div key={i} className="market-card flex h-[480px] animate-pulse flex-col overflow-hidden">
+            <div className="h-48 flex-shrink-0 bg-market-elevated"></div>
+            <div className="flex flex-grow flex-col p-5">
+              <div className="mb-3 h-5 rounded bg-market-elevated"></div>
+              <div className="mb-2 h-4 rounded bg-market-elevated"></div>
+              <div className="mb-3 h-4 rounded bg-market-elevated"></div>
+              <div className="mb-4 h-5 w-1/2 rounded bg-market-elevated"></div>
+              <div className="mt-auto h-10 rounded bg-market-elevated"></div>
             </div>
           </div>
         ))}
@@ -424,13 +376,13 @@ function SkeletonCarousel() {
 /* ---------- Error Block ---------- */
 function ErrorBlock({ error, onRetry }: { error: string; onRetry: () => void }) {
   return (
-    <div className="flex flex-col items-center gap-3 py-8 text-center">
-      <div className="text-red-600">
-        We're having trouble loading products: {error}
+    <div className="market-card flex flex-col items-center gap-3 rounded-xl py-8 text-center">
+      <div className="text-market-teal">
+        We&apos;re having trouble loading products: {error}
       </div>
       <button
         onClick={onRetry}
-        className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white rounded-lg bg-custom-orange hover:bg-orange-600"
+        className="market-btn-primary inline-flex items-center gap-2 px-4 py-2 text-sm normal-case"
       >
         <RotateCcw size={16} /> Retry
       </button>

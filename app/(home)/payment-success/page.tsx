@@ -136,15 +136,40 @@ function PaymentSuccessPage() {
   }, [paymentIntentId, redirectStatus, source]);
 
   if (!paymentIntentId || redirectStatus !== 'succeeded') {
-    return <div className="p-8 text-center text-red-600">Payment failed or invalid session</div>;
+    return (
+      <div className="mx-auto max-w-lg p-8 text-center">
+        <h1 className="text-xl font-semibold text-red-700">Payment not completed</h1>
+        <p className="mt-3 text-sm text-gray-600">
+          Your payment was cancelled or could not be confirmed. No charge was finalized.
+        </p>
+        <a href="/cart" className="mt-6 inline-block bg-[#1A1F71] px-6 py-2 text-sm font-semibold text-white">
+          Return to cart
+        </a>
+      </div>
+    );
   }
 
   if (loading) {
-    return <div className="p-8 text-center">Fetching payment details...</div>;
+    return (
+      <div className="mx-auto max-w-lg p-8 text-center">
+        <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-[#C7A040] border-t-transparent" />
+        <p className="mt-4 text-sm text-gray-600">Confirming your payment...</p>
+      </div>
+    );
   }
 
   if (!paymentData) {
-    return <div className="p-8 text-center text-red-600">Unable to load payment information</div>;
+    return (
+      <div className="mx-auto max-w-lg p-8 text-center">
+        <h1 className="text-xl font-semibold text-red-700">Unable to load receipt</h1>
+        <p className="mt-3 text-sm text-gray-600">
+          Payment may have succeeded but receipt details are unavailable. Check your email or order history.
+        </p>
+        <a href="/customer/order" className="mt-6 inline-block bg-[#1A1F71] px-6 py-2 text-sm font-semibold text-white">
+          View my orders
+        </a>
+      </div>
+    );
   }
 
   const formattedAmount = (paymentData.amount / 100).toFixed(2);
