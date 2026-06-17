@@ -2,9 +2,7 @@ export default function AboutContent() {
   return (
     <section className="grid w-full gap-5 px-6 py-10 md:px-16 md:py-20 md:grid-cols-2 ">
 
-      <div className="relative flex items-center justify-center w-full md:order-2">
-
-        <div className="absolute top-[-18%] left-[30%] w-[110%] h-[95%]  -z-10" />
+      <div className="relative flex w-full items-center justify-center overflow-hidden md:order-2">
 
         <img
           src="/about/aboutUsSection.png"

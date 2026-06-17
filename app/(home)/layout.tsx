@@ -21,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="with-fixed-header">
-      <body className={`${fontVariables} market-page antialiased min-h-screen w-screen`}>
+      <body className={`${fontVariables} market-page antialiased min-h-screen w-full overflow-x-hidden`}>
         <AnnouncementBar />
         <Navbar />
         {children}

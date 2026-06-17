@@ -131,15 +131,15 @@ body {
 }
 
 .market-btn-primary {
-  @apply rounded bg-market-gold px-8 py-3 font-poppins text-xs font-semibold uppercase tracking-wide text-market-header transition-colors hover:bg-market-gold-hover;
+  @apply min-h-11 rounded bg-market-gold px-8 py-3 font-poppins text-xs font-semibold uppercase tracking-wide text-market-header transition-colors hover:bg-market-gold-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-market-gold/60 focus-visible:ring-offset-2 focus-visible:ring-offset-market-bg;
 }
 
 .market-btn-secondary {
-  @apply rounded border border-market-gold/40 bg-market-elevated px-8 py-3 font-poppins text-xs font-semibold uppercase tracking-wide text-market-gold transition-colors hover:border-market-gold hover:bg-market-surface;
+  @apply min-h-11 rounded border border-market-gold/40 bg-market-elevated px-8 py-3 font-poppins text-xs font-semibold uppercase tracking-wide text-market-gold transition-colors hover:border-market-gold hover:bg-market-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-market-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-market-bg;
 }
 
 .market-btn-outline {
-  @apply rounded border border-white/20 px-8 py-3 font-poppins text-xs font-semibold uppercase tracking-wide text-market-text transition-colors hover:border-white/30 hover:bg-white/5;
+  @apply min-h-11 rounded border border-white/20 px-8 py-3 font-poppins text-xs font-semibold uppercase tracking-wide text-market-text transition-colors hover:border-white/30 hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-market-gold/40 focus-visible:ring-offset-2 focus-visible:ring-offset-market-bg;
 }
 
 .market-card {
@@ -154,7 +154,15 @@ body {
 }
 
 .market-input {
-  @apply h-10 w-full rounded-lg border border-white/10 bg-market-elevated px-4 text-sm text-market-text placeholder:text-market-muted focus:outline-none focus:ring-2 focus:ring-market-gold/50;
+  @apply min-h-11 h-11 w-full rounded-lg border border-white/15 bg-market-elevated px-4 text-sm text-market-text placeholder:text-market-muted focus:border-market-gold/30 focus:outline-none focus:ring-2 focus:ring-market-gold/50 disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+.market-footer-link {
+  @apply flex min-h-11 items-center rounded-sm py-1 text-market-muted transition-colors hover:text-market-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-market-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-market-header;
+}
+
+.market-nav-link {
+  @apply rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-market-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-market-header;
 }
 
 .market-teal-soft {
@@ -331,6 +339,12 @@ body {
 }
 
 .accordion-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.accordion-btn:focus-visible {
+  outline: 2px solid rgba(226, 184, 75, 0.5);
+  outline-offset: -2px;
   background: rgba(255, 255, 255, 0.05);
 }
 

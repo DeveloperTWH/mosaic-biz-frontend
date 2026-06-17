@@ -33,14 +33,14 @@ export default function AnnouncementBar() {
     <div className="fixed top-0 left-0 z-[60] flex h-9 w-full items-center justify-center bg-market-header px-4 text-center text-xs text-market-text sm:text-sm">
       <p className="font-poppins">
         Shop minority-owned businesses and support the culture.{" "}
-        <Link href="/products" className="font-semibold text-market-gold underline hover:text-market-gold-hover">
+        <Link href="/products" className="market-nav-link font-semibold text-market-gold underline hover:text-market-gold-hover">
           Explore the marketplace
         </Link>
       </p>
       <button
         type="button"
         onClick={dismiss}
-        className="absolute right-3 top-1/2 -translate-y-1/2 rounded p-1 text-white/80 hover:text-white"
+        className="market-nav-link absolute right-2 top-1/2 flex min-h-11 min-w-11 -translate-y-1/2 items-center justify-center rounded text-lg text-white/80 hover:text-white"
         aria-label="Dismiss announcement"
       >
         ×

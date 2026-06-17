@@ -14,48 +14,59 @@ export default function CustomSelect({ category, setCategory }: CustomSelectProp
   return (
     <div className="relative w-full">
       <button
-  type="button"
-  onClick={() => setOpen(!open)}
-  className="border p-2 w-full flex justify-between items-center rounded cursor-pointer relative"
-  aria-haspopup="listbox"
-  aria-expanded={open}
->
-  <span>{category || 'Select Category'}</span>
-
-  <div className="flex items-center gap-2">
-    {category && (
-      <span
-        role="button"
-        tabIndex={0}
-        onClick={(e) => {
-          e.stopPropagation(); // prevent dropdown toggle
-          setCategory('');
-          setOpen(false);
-        }}
-        onKeyDown={(e) => e.key === 'Enter' && setCategory('')}
-        className="bg-gray-500 text-white w-4 h-4 flex items-center justify-center rounded-full text-xs cursor-pointer"
-        aria-label="Clear selection"
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="market-input flex w-full cursor-pointer items-center justify-between gap-2 text-left"
+        aria-haspopup="listbox"
+        aria-expanded={open}
       >
-        ×
-      </span>
-    )}
-    
-    {/* ▼ Dropdown Icon */}
-    <svg
-      className="w-4 h-4 text-gray-600"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      viewBox="0 0 24 24"
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-    </svg>
-  </div>
-</button>
+        <span className={category ? 'text-market-text' : 'text-market-muted'}>
+          {category || 'Select Category'}
+        </span>
 
+        <div className="flex shrink-0 items-center gap-2">
+          {category && (
+            <span
+              role="button"
+              tabIndex={0}
+              onClick={(e) => {
+                e.stopPropagation();
+                setCategory('');
+                setOpen(false);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setCategory('');
+                  setOpen(false);
+                }
+              }}
+              className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20 text-xs text-market-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-market-gold/50"
+              aria-label="Clear selection"
+            >
+              ×
+            </span>
+          )}
+
+          <svg
+            className="h-4 w-4 text-market-muted"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            viewBox="0 0 24 24"
+            aria-hidden
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+      </button>
 
       {open && (
-        <ul className="absolute z-10 w-full bg-white border mt-1 rounded shadow-md max-h-48 overflow-y-auto">
+        <ul
+          className="absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-white/15 bg-market-elevated shadow-market-card"
+          role="listbox"
+        >
           {options.map((option) => (
             <li
               key={option}
@@ -63,7 +74,7 @@ export default function CustomSelect({ category, setCategory }: CustomSelectProp
                 setCategory(option);
                 setOpen(false);
               }}
-              className="p-2 hover:bg-gray-100 cursor-pointer"
+              className="cursor-pointer px-4 py-3 text-sm text-market-text transition-colors hover:bg-white/5 focus-visible:bg-white/5"
               role="option"
               aria-selected={category === option}
             >

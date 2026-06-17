@@ -13,6 +13,7 @@ import JoinVendorBanner from "./components/JoinVendorBanner";
 import BrowseServices from "../Components/BrowsServices";
 import { Category, SubCategory, SubCategoryResponse, ServiceCategoryResponse } from "@/types/Category";
 import PublicSearchFilterBar from "../Components/PublicSearchFilterBar";
+import PublicFilterSection from "../Components/PublicFilterSection";
 import { buildSearchPageUrl, PublicSearchFilters } from "../Components/publicSearch";
 
 type MinorityType = { _id: string; name: string };
@@ -269,7 +270,9 @@ function FilterSection({ filters, onFiltersChange, onSearch, selectedCategory, o
 }) {
   return (
     <>
-      <PublicSearchFilterBar filters={filters} onChange={onFiltersChange} onSubmit={() => onSearch?.()} />
+      <PublicFilterSection>
+        <PublicSearchFilterBar filters={filters} onChange={onFiltersChange} onSubmit={() => onSearch?.()} />
+      </PublicFilterSection>
 
       <BrowseServices
         showAllService={false}

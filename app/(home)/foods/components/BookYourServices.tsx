@@ -66,7 +66,7 @@ const BookServices: React.FC<BookServicesProps> = ({
         </div>
 
         <div className="lg:w-3/4">
-          <div className="flex mb-4 flex-row justify-between">
+          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-market-muted">
               (Showing {startItem} - {endItem} foods Of {totalProducts} foods)
             </p>

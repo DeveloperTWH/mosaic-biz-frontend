@@ -16,6 +16,7 @@ import FilterAccordion from './components/FilterAccordion';
 import { Category, SubCategory, SubCategoryResponse, CategoryResponse } from '@/types/Category';
 import Link from 'next/link';
 import PublicSearchFilterBar from "../Components/PublicSearchFilterBar";
+import PublicFilterSection from "../Components/PublicFilterSection";
 import { buildSearchPageUrl, PublicSearchFilters } from "../Components/publicSearch";
 
 type MinorityType = { _id: string; name: string };
@@ -339,7 +340,9 @@ function FilterSection({ filters, onFiltersChange, onSearch, selectedCategory, o
 }) {
     return (
         <>
-            <PublicSearchFilterBar filters={filters} onChange={onFiltersChange} onSubmit={() => onSearch?.()} />
+            <PublicFilterSection>
+                <PublicSearchFilterBar filters={filters} onChange={onFiltersChange} onSubmit={() => onSearch?.()} />
+            </PublicFilterSection>
 
             <BrowseCategories onCategorySelect={onCategorySelect} />
         </>

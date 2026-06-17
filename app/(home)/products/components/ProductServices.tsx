@@ -159,7 +159,7 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
         <div className="w-full min-w-0 flex-1">
     
           {/* Products Count - Compact */}
-          <div className="flex mb-4 flex-row justify-between">
+          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
    
             <p className="text-sm text-market-muted">
               (Showing {startItem} – {endItem} Products Of {safeTotalProducts} Products)
