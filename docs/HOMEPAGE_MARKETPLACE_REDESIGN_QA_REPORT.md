@@ -1,102 +1,129 @@
 # Homepage Marketplace Redesign — QA Report
 
 **Branch:** `feat/homepage-redesign`  
+**PR:** https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/30  
+**Preview:** https://mosaic-biz-frontend-launch-git-feat-hom-4afb18-digital-builders.vercel.app  
 **Base (PR target):** `sprint/frontend-release-candidate`  
 **Report date:** 2026-06-17  
-**Production deployed:** No — local verification only
+**Production deployed:** No
+
+---
+
+## QA method
+
+| Method | Result |
+|--------|--------|
+| Vercel preview (automated) | **Blocked** — deployment protection / SSO (401). Manual browser QA required on preview URL. |
+| Local `localhost:3000` (automated) | **Partial** — layout/chrome verified; API calls fail without backend on `:3001`. |
+| Code verification | **Complete** — in-scope files checked for API paths, legacy tokens, and out-of-scope diffs. |
+| `npm run build` | **Passed** (pre-QA and post-fix) |
+
+---
+
+## Routes checked
+
+| Route | Desktop | Mobile | Visual (styling) | Functional (API) |
+|-------|---------|--------|------------------|------------------|
+| `/` | Yes (local) | Yes (local) | Pass — dusk hero, announcement bar, trust bar, market sections | Blocked locally (backend down); verify on Vercel preview |
+| `/products` | Yes (local) | Yes (local) | Pass — dark shell, filter panel, category strip, cards | Blocked locally |
+| `/foods` | Yes (local) | — | Pass — dark listing body, JoinVendorBanner | Blocked locally |
+| `/services` | Yes (local) | — | Pass — main content dark; **fallback loader had white main (fixed)** | Blocked locally |
+| `/services/[id]` | Not reached (no API data locally) | — | Verify on preview with live category slug | Blocked locally |
+| `/vendors` | Yes (local) | — | Pass grid cards; **CustomSelect dropdown still white (deferred)** | Blocked locally |
+| `/about` | Yes (local) | — | Pass — PublicPageHero + readable AboutContent | N/A |
+| `/cart` | Yes (local) | — | Pass — navbar/footer chrome only (page out of redesign scope) | N/A |
+| Product detail | Documented gap only | — | **Out of scope** — legacy light surfaces remain | N/A |
+
+---
+
+## Checklist results
+
+| Check | Result |
+|-------|--------|
+| Homepage hero — premium dusk style | **Pass** (local visual) |
+| Navbar does not overlap content | **Pass** |
+| Announcement bar spacing | **Pass** |
+| Mobile menu usable | **Pass** (hamburger + nav present; full tap test on Vercel preview) |
+| No white/cream legacy blocks on primary marketplace routes | **Pass** (main content); Suspense fallback on `/services` was white — **fixed** |
+| No legacy orange accents in redesigned areas | **Pass** (grep + visual) |
+| Cards, filters, inputs, buttons use `market-*` palette | **Pass** on in-scope listing components |
+| Featured products via `/api/featured-products` | **Pass** (code) — `ShopProducts.tsx` → `getFeaturedProducts()` → `lib/api/featured-products.ts` |
+| `/api/products/featured` not used | **Pass** (grep — no references in app code) |
+| No fake stats/ratings/reviews | **Pass** — ratings only when API provides data |
+| Cart icon/link works | **Pass** — `/cart` link present with badge |
+| Login/account links work | **Pass** — links to `/login?type=customer` and `/login?type=vendor` |
+| Vendor CTA routes correctly | **Pass** — `/become-a-vendor` links verified |
+| Search/filter behavior unchanged | **Pass** (code — no handler/logic changes in PR) |
+| No horizontal scroll on mobile | **Pass** (local 390px viewport audit) |
+| No hydration errors on homepage | **Pass** — no hydration errors observed; fetch errors only from missing backend |
+| Missing images/content do not break layout | **Pass** — error/empty states use market dusk panels |
+| Footer links usable | **Pass** |
+
+---
+
+## Bugs found
+
+| ID | Severity | Route | Description |
+|----|----------|-------|-------------|
+| QA-1 | Low | `/services` | `ServicePageFallback` Suspense fallback used `bg-white text-black` — brief white flash while loading |
+| QA-2 | Info | Preview QA | Vercel preview SSO blocks headless/automated access |
+| QA-3 | Info | Local QA | Backend not running — cannot confirm live featured products / listings on localhost |
+| QA-4 | Deferred | `/vendors` | `CustomSelect` dropdown panel still `bg-white` (pre-existing, documented gap) |
+
+---
+
+## Bugs fixed
+
+| ID | Fix | Commit |
+|----|-----|--------|
+| QA-1 | Removed `bg-white text-black` from `ServicePageFallback` in `services/page.tsx` | See commit on `feat/homepage-redesign` |
+
+---
+
+## Screenshots
+
+Automated screenshot capture to `docs/qa-screenshots/` was attempted but Playwright MCP wrote outside the workspace in some runs. **Manual capture recommended on Vercel preview:**
+
+- [ ] Homepage desktop
+- [ ] Homepage mobile
+- [ ] Products desktop
+- [ ] Foods desktop
+- [ ] Services desktop
+- [ ] Vendors desktop
+- [ ] One mobile listing route (e.g. `/products` at 390px)
+
+Local partial capture: homepage desktop structure verified via Playwright snapshot (dusk hero, announcement bar, featured products error state with market styling when API unavailable).
 
 ---
 
 ## Build result
 
-| Check | Result |
-|-------|--------|
-| `npm run build` | **Passed** (Next.js 16.1.2, Turbopack) |
-| TypeScript | Passed |
-| Static generation | 66 routes generated |
-
-**Post-revert fix:** Removed stale `HeroSection` import from `app/(home)/become-a-vendor/page.tsx` after legacy hero files were deleted (build collateral, not redesign scope).
+| When | Result |
+|------|--------|
+| Pre-PR push | Passed |
+| Post QA-1 fix | Passed (`npm run build`) |
 
 ---
 
-## Commits on branch (5)
+## Remaining deferred gaps (not in this PR)
 
-| # | SHA | Message |
-|---|-----|---------|
-| 1 | `ec022827` | `style: add Mosaic marketplace theme tokens` |
-| 2 | `6e93f4cf` | `feat: redesign homepage and public chrome` |
-| 3 | `619bccd7` | `feat: add shared public page hero styling` |
-| 4 | `915ea0e8` | `style: align public marketplace listings with dusk palette` |
-| 5 | *(this commit)* | `docs: add redesign QA and scope notes` |
-
----
-
-## Scope summary
-
-| Metric | Count |
-|--------|-------|
-| Files reverted (out of scope) | **43** |
-| Files kept in scope | **65** (across 4 feature commits) |
-| Out-of-scope areas excluded | Auth, checkout, partner onboarding, partner dashboard, admin |
-
-See [`HOMEPAGE_REDESIGN_SCOPE_AUDIT.md`](./HOMEPAGE_REDESIGN_SCOPE_AUDIT.md) for the full file-by-file breakdown.
+1. Product / food / vendor detail pages — legacy light UI
+2. Legal / FAQ pages
+3. `CustomSelect` white dropdown on `/vendors`
+4. Duplicated listing components (`BookYourServices`, `FilterAccordion`, `ProductCard`)
+5. Partner onboarding / dashboards / auth / checkout styling (reverted from branch)
+6. `services/components/CategoryGrid.tsx` — white carousel controls (unused on main services page path; low priority)
 
 ---
 
-## Visual QA checklist (manual — not run on Vercel preview)
+## Final recommendation
 
-### Homepage and chrome
+**Ready to review** — with one minor fix (QA-1) pushed.
 
-- [ ] `/` — Hero, announcement bar, trust bar, category browse, featured products, vendor CTA
-- [ ] Navbar — logo, search, cart, auth links, mobile menu
-- [ ] Footer — links, social, newsletter
-- [ ] Responsive — mobile / tablet / desktop breakpoints
+**Before merge into `sprint/frontend-release-candidate`:**
+1. Human spot-check on Vercel preview (SSO access) for `/`, `/products`, `/foods`, `/services`, `/vendors`, `/about`
+2. Confirm featured products load with live backend on preview
+3. Merge PR #30 only (not `main`, not production)
+4. Smoke test release-candidate preview after merge
 
-### Public page heroes (`PublicPageHero`)
-
-- [ ] `/about`
-- [ ] `/contact`
-- [ ] `/foods`
-- [ ] `/products`
-- [ ] `/services`
-- [ ] `/services/[id]` (category listing)
-- [ ] `/vendors`
-- [ ] `/how-to-use-this-app`
-
-### Marketplace listing bodies
-
-- [ ] `/products` — filters, category strip, product cards, join-vendor banner
-- [ ] `/foods` — filters, food cards, book-services section
-- [ ] `/services` — filters, service cards
-- [ ] `/services/[id]` — service detail cards
-- [ ] `/vendors` — vendor grid
-- [ ] `/about` — AboutContent secondary styling
-
-### Regression checks
-
-- [ ] `/api/featured-products` still loads featured products on homepage (`ShopProducts`)
-- [ ] No fake ratings or stats introduced
-- [ ] Auth, checkout, `/partners/*`, partner dashboard unchanged from base (reverted)
-- [ ] `middleware.ts` unchanged
-
----
-
-## Deferred gaps (not in this PR)
-
-1. **Product / food / vendor detail pages** — `/products/[productid]`, `/foods/resturant/[id]`, `/vendor-profile/*` (BannerSection overlay only touched)
-2. **Legal / FAQ** — `/faq`, `/privacy`, `/terms`, consumer/vendor terms
-3. **Partner onboarding** — `/partners/*` styling (reverted)
-4. **Partner / admin / customer dashboards** — reverted
-5. **Auth & checkout token migration** — reverted
-6. **`CustomSelect` white dropdown** on `/vendors` filter
-7. **Component consolidation** — duplicate `BookYourServices`, `FilterAccordion`, `ProductCard` across routes
-8. **`JoinVendorBanner` layout refactor**
-
----
-
-## Next steps (when requested)
-
-1. Push branch to `launch` remote (`Digital-Builders-757/mosaic-biz-frontend-launch`)
-2. Open PR into `sprint/frontend-release-candidate`
-3. Run visual QA on Vercel preview for routes above
-4. Fix only bugs caused by this branch — no new redesign scope
+**Production was not deployed.**

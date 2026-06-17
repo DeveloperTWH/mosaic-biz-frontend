@@ -241,7 +241,7 @@ const ServicePageContent = () => {
 
 function ServicePageFallback() {
   return (
-    <main className="bg-white text-black">
+    <main>
       <PublicPageHero
         title="Services"
         breadcrumbs={[
