@@ -4,18 +4,26 @@
 **Last updated:** 2026-06-18  
 **Repo:** `Digital-Builders-757/mosaic-biz-frontend-launch`
 
+Full Epic #54 closeout: [EPIC_54_SPRINT_CLOSEOUT.md](EPIC_54_SPRINT_CLOSEOUT.md)
+
 ---
 
-## Epic #54 sprint batches
+## Epic #54 sprint summary (2026-06-18)
 
-| Batch | Branch | Issues | Status |
-|-------|--------|--------|--------|
-| Epic #54 Batch 1 | `polish/vendor-readability-global-cta` | #51, #55, #58, #62 | PR #64 |
-| Epic #54 Batch 2 | `polish/mobile-nav-responsive-pass` | #52, #53 | In progress |
-| Epic #54 Batch 3 | `polish/homepage-marketplace-experience` | #59, #60 | In progress |
-| Epic #54 Batch 4 | `polish/trust-howto-content-cleanup` | #56, #57, #61 | In progress |
+| Batch | PR | Issues | Status |
+|-------|-----|--------|--------|
+| 1 | [#64](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/64) | #51, #55, #58, #62 | Merged |
+| 2 | [#65](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/65) | #52, #53 | Merged |
+| 3 | [#66](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/66) | #59, #60 | Merged |
+| 4 | [#67](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/67) | #56, #57, #61 | Merged |
+| 5 | [#68](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/68) | Docs closeout | Merged |
 
-### Prior release batches (merged)
+**Build:** `npm run build` PASS on all batch branches  
+**Production:** Vercel auto-deploy on merge to `main`
+
+---
+
+## Prior release batch summary
 
 | Batch | Branch | Issues | Status |
 |-------|--------|--------|--------|

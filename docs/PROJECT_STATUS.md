@@ -6,6 +6,8 @@
 
 For phased next work see [ROADMAP.md](ROADMAP.md). For architecture and env setup see [ARCHITECTURE.md](ARCHITECTURE.md).
 
+Epic #54 sprint closeout: [EPIC_54_SPRINT_CLOSEOUT.md](EPIC_54_SPRINT_CLOSEOUT.md)
+
 ---
 
 ## Release posture
@@ -13,24 +15,30 @@ For phased next work see [ROADMAP.md](ROADMAP.md). For architecture and env setu
 | Item | Status |
 |------|--------|
 | Launch repo | `Digital-Builders-757/mosaic-biz-frontend-launch` |
-| Production branch | `main` @ `95369503` |
-| Production deployed | **Yes** — Vercel auto-deploy on PR [#49](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/49) merge (2026-06-17) |
+| Production branch | `main` @ `f15cf314` |
+| Production deployed | **Yes** — prior polish PRs [#48](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/48) + [#49](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/49) |
 | Production URL | https://mosaic-biz-frontend-launch.vercel.app |
 | Deploy model | Vercel auto-deploy on merge to `main` |
 | Preview access | Vercel deployment protection / SSO (HTTP 401 for unauthenticated automation) |
-| Build gate | `npm run build` passes on `main` |
-| Visual polish | **Merged** — PRs [#48](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/48) + [#49](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/49) |
+| Build gate | `npm run build` passes |
+| Epic #54 visual polish | **PRs open** — [#64](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/64)–[#67](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/67) awaiting merge |
 
-### Latest significant merge
+### Epic #54 sprint PRs (2026-06-18)
+
+| PR | Title | Issues |
+|----|-------|--------|
+| [#64](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/64) | Vendor readability and CTA system | #51, #55, #58, #62 |
+| [#65](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/65) | Mobile navigation and responsive layout | #52, #53 |
+| [#66](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/66) | Homepage and marketplace visual hierarchy | #59, #60 |
+| [#67](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/67) | Trust, how-to, and public content pages | #56, #57, #61 |
+
+### Prior significant merges
 
 | PR | Title | Merged into | Merge commit |
 |----|-------|-------------|--------------|
-| [#49](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/49) | Public marketplace readability, mobile QA, logo fix | `main` | `95369503` (2026-06-17) |
-| [#48](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/48) | Marketplace readability and controls | `main` | (included in #49 history) |
-| [#30](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/30) | Homepage + public marketplace redesign | `main` (via RC) | `3b168f39` (2026-06-17) |
-| [#1](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/1) | Sentry error monitoring | `main` | `0bd3b2a7` (2026-06-17) |
-
-**Production deployment:** https://mosaic-biz-frontend-launch-jzdmc3r1w-digital-builders.vercel.app (alias: https://mosaic-biz-frontend-launch.vercel.app)
+| [#50](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/50) | Docs production main status | `main` | `f15cf314` |
+| [#49](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/49) | Public marketplace readability, mobile QA | `main` | `95369503` |
+| [#30](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/30) | Homepage + public marketplace redesign | `main` | `3b168f39` |
 
 ---
 
@@ -81,13 +89,13 @@ Details: [HOMEPAGE_MARKETPLACE_REDESIGN_QA_REPORT.md](HOMEPAGE_MARKETPLACE_REDES
 
 | Item | Priority | Notes |
 |------|----------|-------|
+| Merge Epic #54 PRs #64–#67 | P0 | Then rebase docs closeout PR |
 | Human preview sign-off on `/products` | P0 | ~2 min with Vercel SSO |
-| Sprint PRs [#1](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/1), [#19](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/19)–[#21](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/21) | P1 | Awaiting merge/review into RC |
-| Product / food / service **detail** pages | P2 | Legacy light UI — deferred from PR #30 |
-| Mock detail routes vs live routes | P2 | `/products/[productid]/[id]`, `/services/[id]/[serviceId]` coexist with `/product/[id]`, `/service/[slug]` |
-| `CustomSelect` white dropdown on `/vendors` | P3 | **Fixed** in readability polish — `market-*` dropdown |
+| Product / food / service **detail** pages | P2 | Deferred from Epic #54 — legacy light UI |
+| Legal pages full copy pass | P2 | Needs legal approval; overflow fixed in #65 |
+| Mock detail routes vs live routes | P2 | Documented; no reroute without approval |
+| `/foods/shop/[id]` stub | P3 | Known gap |
 | Customer `/dashboard` placeholder | P3 | Future phase |
-| `/foods/shop/[id]` stub | P3 | Document in smoke checklist known gaps |
 | `npm run lint` on Next 16 | P3 | DX — build used as gate |
 
 ---
@@ -113,4 +121,4 @@ Before promoting beyond RC:
 2. Run [FRONTEND_SMOKE_CHECKLIST.md](FRONTEND_SMOKE_CHECKLIST.md) on RC preview with evidence.
 3. Do **not** block RC on empty homepage featured section until backend populates featured inventory.
 
-**Production was not manually deployed from this workstation.** Vercel auto-deployed `main` @ `95369503` on PR #49 merge.
+**Production was not manually deployed from this workstation.** Epic #54 code awaits merge; production remains at `main` @ `f15cf314` until PRs #64–#67 land.
