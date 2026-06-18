@@ -52,19 +52,31 @@ const Hero = () => {
               </div>
             )}
             {isLoggedIn === false && (
-              <div className="flex flex-col gap-8 md:flex-row justify-center">
-                <Link href="/login?type=customer">
-                  <button className="py-3 text-xs font-semibold text-white uppercase transition-colors border-2 border-white  px-9 font-poppins tracking-wide hover:bg-white/10">
-                    Login As Customer
+              <div className="flex flex-col items-center gap-4 md:flex-row md:justify-center">
+                <Link href="/products">
+                  <button className="w-full min-w-[220px] px-9 py-3 font-poppins text-xs font-semibold uppercase tracking-wide text-white transition-colors border-2 border-[#C7A040] bg-[#C7A040] hover:bg-[#a88432] sm:w-auto">
+                    Explore Marketplace
                   </button>
                 </Link>
-                <Link href="/login?type=vendor">
-                  <button className="py-3 text-xs  text-white uppercase transition-colors border-2 border-white  px-9 font-poppins  tracking-wide hover:bg-white/10">
-                    Login As Vendor
+                <Link href="/become-a-vendor">
+                  <button className="w-full min-w-[220px] px-9 py-3 font-poppins text-xs font-semibold uppercase tracking-wide text-white transition-colors border-2 border-white hover:bg-white/10 sm:w-auto">
+                    Become a Vendor
                   </button>
                 </Link>
               </div>
             )}
+            {isLoggedIn === false ? (
+              <p className="mt-6 text-xs text-white/80">
+                Already have an account?{" "}
+                <Link href="/login?type=customer" className="underline hover:text-white">
+                  Sign in as customer
+                </Link>
+                {" · "}
+                <Link href="/login?type=vendor" className="underline hover:text-white">
+                  Sign in as vendor
+                </Link>
+              </p>
+            ) : null}
           </div>
         </div>
       </section>

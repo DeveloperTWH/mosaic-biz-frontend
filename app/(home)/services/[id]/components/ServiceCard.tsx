@@ -62,7 +62,8 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
           </div>
           <p className="text-sm">{service.description}</p>
           <Link
-            href={`/service/${service.slug}`}
+            href={`/vendor-profile/service-vendor/${service._id}`}
+            onClick={(e) => e.stopPropagation()}
             className={`inline-flex items-center gap-1 mt-4 hover:underline text-[14px] ${
               isActive ? "text-custom-orange" : "text-black"
             }`}

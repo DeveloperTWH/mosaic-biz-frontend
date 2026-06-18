@@ -168,14 +168,8 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
                           {/* Sort By Section - Compact */}
  
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-700">Sort By:</span>
-                  <select className="px-3 py-1 text-sm border rounded cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
-                    <option>Default</option>
-                    <option>Price: Low to High</option>
-                    <option>Price: High to Low</option>
-                    <option>Most Popular</option>
-                    <option>Newest</option>
-                  </select>
+                  <span className="text-sm text-gray-700">Sort:</span>
+                  <span className="text-sm text-gray-500">Featured</span>
                 </div>
               
           </div>

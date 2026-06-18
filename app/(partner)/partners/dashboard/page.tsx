@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
 import Navbar from "@/app/(home)/Components/Navbar";
@@ -61,7 +61,7 @@ const baseDashboardTabs = [
   { key: "analytics", label: "Analytics" },
 ] as const;
 
-export default function PartnerDashboardPage() {
+function PartnerDashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [businesses, setBusinesses] = useState<Business[]>([]);
@@ -451,5 +451,13 @@ export default function PartnerDashboardPage() {
         </div>
       </main>
     </>
+  );
+}
+
+export default function PartnerDashboardPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center text-gray-600">Loading dashboard…</div>}>
+      <PartnerDashboardContent />
+    </Suspense>
   );
 }

@@ -81,6 +81,7 @@ const Page = () => {
     const [totalProducts, setTotalProducts] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
+    const [listFetchError, setListFetchError] = useState<string | null>(null);
 
     const prevButton = React.useRef(null);
     const nextButton = React.useRef(null);
@@ -117,6 +118,7 @@ const Page = () => {
 
     const fetchProducts = async (q?: string, m?: string, c?: string, categoryId?: string, subcategoryId?: string, badge?: string, priceMin?: number, priceMax?: number) => {
         setLoading(true);
+        setListFetchError(null);
         try {
             const defaultLimit = 10;
             const params: any = {
@@ -146,6 +148,7 @@ const Page = () => {
             setItemsPerPage(Number(responseData.pageSize ?? responseData.limit ?? params.limit ?? defaultLimit));
         } catch (err) {
             console.error("Error fetching products", err);
+            setListFetchError("Unable to load products right now. Please try again.");
             setProducts([]);
             setTotalProducts(0);
             setCurrentPage(1);
@@ -252,7 +255,17 @@ const Page = () => {
 </p>
                 </div>
 
+                {error ? (
+                  <div className="mb-6 rounded border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                    Unable to load featured picks: {error}{" "}
+                    <button type="button" onClick={reload} className="font-semibold underline">
+                      Retry
+                    </button>
+                  </div>
+                ) : null}
+
                 {/* Products Carousel */}
+                {!error ? (
                 <Swiper
                     onSwiper={setSwiperRef}
                     modules={[Navigation]}
@@ -285,9 +298,19 @@ const Page = () => {
                         </SwiperSlide>
                     ))}
                 </Swiper>
+                ) : null}
             </div>
 
-            <ProductSevices 
+            {listFetchError ? (
+              <div className="mx-4 mb-6 rounded border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                {listFetchError}{" "}
+                <button type="button" onClick={() => fetchProducts()} className="font-semibold underline">
+                  Retry
+                </button>
+              </div>
+            ) : null}
+
+            <ProductSevices
                 services={products}
                 totalProducts={totalProducts}
                 currentPage={currentPage}

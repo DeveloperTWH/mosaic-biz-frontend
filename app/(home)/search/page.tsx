@@ -6,6 +6,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Star } from "lucide-react";
 import PublicSearchFilterBar from "../Components/PublicSearchFilterBar";
 import { PublicSearchFilters } from "../Components/publicSearch";
+import MarketEmptyState from "../Components/MarketEmptyState";
+import MarketLoadingBlock from "../Components/MarketLoadingBlock";
 
 type ApiBusiness = {
   _id?: string;
@@ -392,14 +394,19 @@ function SearchPageContent() {
   // ];
 
 const tabItems = [
-  { key: "products", label: "Search For Products", count: response?.totals?.products ?? 0 },
-  { key: "services", label: "Search For Services", count: response?.totals?.services ?? 0 },
-  { key: "foods", label: "Search For Food Item", count: response?.totals?.foods ?? 0 },
+  { key: "products", label: "Products", count: response?.totals?.products ?? 0 },
+  { key: "services", label: "Services", count: response?.totals?.services ?? 0 },
+  { key: "foods", label: "Foods", count: response?.totals?.foods ?? 0 },
 ].filter((tab) => tab.count > 0) as Array<{
   key: SearchTab;
   label: string;
   count: number;
 }>;
+
+  const hasAnyFilter =
+    Boolean(queryFilters.keyword.trim()) ||
+    Boolean(queryFilters.location.trim()) ||
+    Boolean(queryFilters.minorityType.trim());
 
   return (
     <div className="min-h-screen bg-[#FAF8F2]">
@@ -440,21 +447,23 @@ const tabItems = [
         </div>
 
         {loading ? (
-          <div className="flex min-h-[320px] items-center justify-center">
-            <div className="flex flex-col items-center gap-4">
-              <div className="h-12 w-12 animate-spin rounded-full border-4 border-[#C7A040] border-t-transparent" />
-              <p className="text-sm font-medium text-gray-600">Searching results...</p>
-            </div>
-          </div>
+          <MarketLoadingBlock label="Searching results…" minHeight="min-h-[320px]" />
         ) : error ? (
           <div className="rounded border border-red-200 bg-red-50 p-4 text-red-700">{error}</div>
+        ) : totalResults === 0 && !hasAnyFilter ? (
+          <MarketEmptyState
+            title="Search the marketplace"
+            description="Enter a keyword, state, or minority-owned business type above to find products, services, and food vendors."
+            ctaLabel="Browse products"
+            ctaHref="/products"
+          />
         ) : totalResults === 0 ? (
-          <div className="rounded border border-[#E5DEC9] bg-white p-10 text-center">
-            {/* <h2 className="text-xl font-semibold text-gray-900">No results found</h2>
-            <p className="mt-2 text-sm text-gray-600">
-              Try another business keyword, location, or minority type.
-            </p> */}
-          </div>
+          <MarketEmptyState
+            title="No matches yet"
+            description="Try another keyword, state, or minority type to explore the marketplace."
+            ctaLabel="Browse all products"
+            ctaHref="/products"
+          />
         ) : (
           <>
             {activeTab === "products" ? (

@@ -155,7 +155,7 @@ export default function ServiceCategoryPage({ params }: PageProps) {
                     setSearchLocation={setSearchLocation}
                     onSearch={handleSearch}
                 />
-                {services.length === 1 ? (
+                {services.length === 0 ? (
                     <div className="flex flex-col items-center justify-center p-5 text-red-600">
                         <AlertTriangle className="w-10 h-10 mb-2" />
                         <span>Service not found</span>

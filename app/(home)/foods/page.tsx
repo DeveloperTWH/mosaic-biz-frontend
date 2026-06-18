@@ -36,6 +36,7 @@ const FoodSection = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [loading, setLoading] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [subcategories, setSubcategories] = useState<SubCategory[]>([]);
   const [selectedSubcategory, setSelectedSubcategory] = useState("");
@@ -53,6 +54,7 @@ const FoodSection = () => {
 
   const fetchFoods = async (categoryId?: string, subcategoryId?: string, badge?: string, priceMin?: number, priceMax?: number) => {
     setLoading(true);
+    setFetchError(null);
     try {
       const params: any = {
         search: searchText,
@@ -78,6 +80,9 @@ const FoodSection = () => {
       setItemsPerPage(typeof res.data.limit === "number" ? res.data.limit : Number(params.limit) || 10);
     } catch (err) {
       console.error(err);
+      setFetchError("Unable to load food listings right now. Please try again.");
+      setServices([]);
+      setTotalServices(0);
     } finally {
       setLoading(false);
     }
@@ -115,6 +120,21 @@ const FoodSection = () => {
         setSelectedSubcategory("");
         fetchFoods(category._id, undefined);
       }} />
+
+      {fetchError ? (
+        <div className="mx-auto max-w-[1400px] px-4 py-6">
+          <div className="rounded border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+            {fetchError}{" "}
+            <button
+              type="button"
+              onClick={() => fetchFoods(undefined, undefined)}
+              className="font-semibold underline"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      ) : null}
 
       <BookServices services={services} totalProducts={totalServices} currentPage={currentPage} itemsPerPage={itemsPerPage} selectedCategory={selectedCategory} loading={loading} onCategorySelect={(categoryId) => {
         const categories = services.map(s => ({ _id: categoryId, name: '' } as Category));
