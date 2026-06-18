@@ -12,7 +12,7 @@
 |-------|--------|--------|--------|
 | Epic #54 Batch 1 | `polish/vendor-readability-global-cta` | #51, #55, #58, #62 | PR #64 |
 | Epic #54 Batch 2 | `polish/mobile-nav-responsive-pass` | #52, #53 | In progress |
-| Epic #54 Batch 3 | `polish/homepage-marketplace-experience` | #59, #60 | Pending |
+| Epic #54 Batch 3 | `polish/homepage-marketplace-experience` | #59, #60 | In progress |
 | Epic #54 Batch 4 | `polish/trust-howto-content-cleanup` | #56, #57, #61 | Pending |
 
 ### Prior release batches (merged)

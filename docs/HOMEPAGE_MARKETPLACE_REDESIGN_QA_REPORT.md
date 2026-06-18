@@ -298,7 +298,31 @@ Do **not** block promotion on empty homepage featured products until backend fla
 
 1. Product / service / vendor **detail** pages — legacy light UI (Phase 2)
 2. Native `<select>` OS option menus — cannot fully theme (closed state uses `market-select`)
-3. Desktop `/products` ~15px horizontal overflow from carousel nav offsets (low priority)
-4. Legal / FAQ pages — legacy styling
+3. ~~Desktop `/products` ~15px horizontal overflow from carousel nav offsets~~ — addressed Epic #54 Batch 3 (carousel inset)
+4. Legal / FAQ pages — legacy styling (Batch 4)
 5. Duplicated listing components (`FilterAccordion`, `BookYourServices`, `ProductCard` copies)
 6. Human preview sign-off on Vercel SSO — pending ~2 min with team credentials
+
+---
+
+## Epic #54 Batch 3 — Homepage marketplace conversion (#59, #60)
+
+**Branch:** `polish/homepage-marketplace-experience`
+
+### Changes
+
+- Hero: clearer shopper/vendor CTAs, category path pills, trust badge education link
+- TrustBar: linked trust/onboarding/about items
+- BrowseByCategory: Shop/Book/Order CTAs + marketplace search CTA
+- ShopProducts: card View action, missing-image placeholder, carousel overflow fix
+- VendorGrid: View store label on cards
+- `market-card-action` utility added
+
+### API confirmation
+
+- `GET /api/featured-products` unchanged via `ShopProducts.tsx`
+- `/api/products/featured` not used
+
+### Build
+
+`npm run build` — PASS (Batch 3)

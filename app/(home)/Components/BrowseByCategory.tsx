@@ -19,8 +19,19 @@ export default function BrowseByCategory() {
       <BrowseServices showAllService={true} />
       <BrowseFoodAndGrocery />
       <div className="mx-auto max-w-7xl px-4 pb-12 pt-4 text-center sm:px-6 lg:px-8">
-        <Link href="/products" className="market-btn-secondary inline-block">
-          View all marketplace listings
+        <div className="mb-6 flex flex-wrap items-center justify-center gap-3">
+          <Link href="/products" className="market-btn-secondary min-w-[140px]">
+            Shop products
+          </Link>
+          <Link href="/services" className="market-btn-secondary min-w-[140px]">
+            Book services
+          </Link>
+          <Link href="/foods" className="market-btn-secondary min-w-[140px]">
+            Order food
+          </Link>
+        </div>
+        <Link href="/search" className="market-btn-primary inline-block">
+          Search the marketplace
         </Link>
       </div>
     </section>

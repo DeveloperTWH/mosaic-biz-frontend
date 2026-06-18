@@ -154,6 +154,7 @@ export default function VendorGrid() {
                                     )}
                                 </div>
                                 <p className="market-card-title line-clamp-2 text-sm">{vendor.businessName}</p>
+                                <span className="market-card-action mt-2 inline-block text-xs">View store</span>
                             </div>
                         </Link>
                     ))}
