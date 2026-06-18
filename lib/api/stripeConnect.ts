@@ -108,6 +108,32 @@ export const normalizeStripeConnectStatus = (payload: any): StripeConnectStatus 
   };
 };
 
+export async function loadActiveBusinessId(preferredId?: string | null): Promise<string> {
+  if (preferredId?.trim()) {
+    return preferredId.trim();
+  }
+
+  const response = await fetch(`${BASE_URL}/api/business/my`, {
+    method: "GET",
+    credentials: "include",
+  });
+
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data?.message || data?.error || "Failed to load your business");
+  }
+
+  const businesses = Array.isArray(data?.businesses) ? data.businesses : [];
+  const currentBusiness =
+    businesses.find((item: { isActive?: boolean }) => item.isActive) ?? businesses[0] ?? null;
+
+  if (!currentBusiness?._id) {
+    throw new Error("No business found for this account");
+  }
+
+  return currentBusiness._id as string;
+}
+
 export async function getBusinessConnectStatus(businessId: string) {
   const response = await fetch(`${BASE_URL}/api/connect/${businessId}/status`, {
     method: "GET",

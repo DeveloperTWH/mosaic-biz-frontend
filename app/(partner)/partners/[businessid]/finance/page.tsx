@@ -12,6 +12,7 @@ import NotFoundPage from '../components/NotFoundPage';
 import { loadConnectAndInitialize, type StripeConnectInstance } from '@stripe/connect-js';
 import { ConnectComponentsProvider, ConnectPayments, ConnectPayouts } from '@stripe/react-connect-js';
 import { ExternalLink } from 'lucide-react';
+import { STRIPE_CONNECT_DASHBOARD } from '@/lib/api/routeContract';
 
 
 const page = () => {
@@ -44,7 +45,7 @@ const page = () => {
                 setError('Stripe account not linked to this business.');
                 return;
             }
-            const res = await fetch(`${apiBase}/stripe/express-login-link`, {
+            const res = await fetch(`${apiBase}${STRIPE_CONNECT_DASHBOARD.expressLoginLink}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
@@ -104,7 +105,7 @@ const page = () => {
                             return undefined;
                         }
 
-                        const res = await fetch(`${apiBase}/stripe/account-session`, {
+                        const res = await fetch(`${apiBase}${STRIPE_CONNECT_DASHBOARD.accountSession}`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             credentials: 'include',
@@ -160,8 +161,8 @@ const page = () => {
                 if (!currentAccountId || !apiBase) return;
 
                 const [balRes, payoutRes] = await Promise.all([
-                    fetch(`${apiBase}/stripe/account-balance?account=${currentAccountId}`, { credentials: 'include' }),
-                    fetch(`${apiBase}/stripe/last-payout?account=${currentAccountId}`, { credentials: 'include' }),
+                    fetch(`${apiBase}${STRIPE_CONNECT_DASHBOARD.accountBalance}?account=${currentAccountId}`, { credentials: 'include' }),
+                    fetch(`${apiBase}${STRIPE_CONNECT_DASHBOARD.lastPayout}?account=${currentAccountId}`, { credentials: 'include' }),
                 ]);
 
                 const parse = async (res: Response) => {

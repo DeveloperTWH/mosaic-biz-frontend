@@ -131,21 +131,8 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
             </p>
 
                 <div className="flex items-center gap-2">
-                  <span className="market-result-count">Sort By:</span>
-                  <div className="market-select-wrap">
-                    <select className="market-select w-auto min-w-[140px] px-3 py-1 text-sm">
-                      <option>Default</option>
-                      <option>Price: Low to High</option>
-                      <option>Price: High to Low</option>
-                      <option>Most Popular</option>
-                      <option>Newest</option>
-                    </select>
-                    <div className="market-select-chevron">
-                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </div>
-                  </div>
+                  <span className="market-result-count">Sort:</span>
+                  <span className="market-result-count text-market-muted">Featured</span>
                 </div>
               
           </div>

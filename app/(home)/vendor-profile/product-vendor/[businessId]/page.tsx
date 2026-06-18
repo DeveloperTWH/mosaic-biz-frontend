@@ -7,6 +7,8 @@ import { Eye } from "lucide-react";
 import ClientTestimonials from "../../../Components/ClientTestimonials";
 import PublicSearchFilterBar from "../../../Components/PublicSearchFilterBar";
 import { buildSearchPageUrl, PublicSearchFilters } from "../../../Components/publicSearch";
+import MarketEmptyState from "../../../Components/MarketEmptyState";
+import MarketLoadingBlock from "../../../Components/MarketLoadingBlock";
 
 type VendorBusiness = {
   _id: string;
@@ -227,6 +229,7 @@ export default function ProductVendorProfilePage() {
   const [products, setProducts] = useState<VendorProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
   const [filters, setFilters] = useState<PublicSearchFilters>({
     keyword: "",
     location: "",
@@ -300,7 +303,7 @@ export default function ProductVendorProfilePage() {
     };
 
     load();
-  }, [businessId, sort]);
+  }, [businessId, sort, reloadKey]);
 
   const filteredProducts = useMemo(() => {
     return products.filter((item) => {
@@ -429,15 +432,16 @@ export default function ProductVendorProfilePage() {
       />
 
       {loading ? (
-        <div className="flex items-center justify-center min-h-[40vh]">
-          <div className="flex flex-col items-center gap-4">
-            <div className="w-12 h-12 border-4 border-[#c79b44] rounded-full border-t-transparent animate-spin" />
-            <p className="text-sm font-medium text-gray-600">Loading vendor profile...</p>
-          </div>
-        </div>
+        <MarketLoadingBlock label="Loading vendor profile…" minHeight="min-h-[40vh]" />
       ) : error ? (
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12 py-10">
-          <div className="p-4 text-red-700 bg-red-50 border border-red-200 rounded">{error}</div>
+          <MarketEmptyState
+            title="Vendor profile unavailable"
+            description={error}
+            ctaLabel="Browse vendors"
+            ctaHref="/vendors"
+            onRetry={() => setReloadKey((key) => key + 1)}
+          />
         </div>
       ) : (
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12 py-8">

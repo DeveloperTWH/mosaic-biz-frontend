@@ -382,7 +382,7 @@ function SignupContent() {
                   <button 
                     type="submit"
                     disabled={loading}
-                    className="bg-blue-900 text-white px-[120px] py-2 font-montserrat font-thin hover:bg-blue-800 transition disabled:opacity-60"
+                    className="w-full max-w-xs bg-blue-900 px-6 py-2 font-montserrat font-thin text-white transition hover:bg-blue-800 disabled:opacity-60"
                   >
                     {loading ? 'Registering...' : 'Register'}
                   </button>

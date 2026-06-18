@@ -54,10 +54,10 @@ const Hero = () => {
           ) : (
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link href="/products" className="market-btn-primary w-full text-center sm:min-w-[220px] sm:w-auto">
-                Shop the Marketplace
+                Explore Marketplace
               </Link>
-              <Link href="/signup?type=customer" className="market-btn-outline w-full text-center sm:min-w-[220px] sm:w-auto">
-                Create Account
+              <Link href="/become-a-vendor" className="market-btn-outline w-full text-center sm:min-w-[220px] sm:w-auto">
+                Become a Vendor
               </Link>
             </div>
           )}

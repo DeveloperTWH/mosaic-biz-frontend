@@ -7,6 +7,7 @@ import axios from "axios";
 import Sidebar from "../components/Sidebar";
 import Topbar from "../components/Topbar";
 import { Store, Users as UsersIcon, Shield, Ban } from "lucide-react";
+import { LEGACY_ADMIN_USERS } from "@/lib/api/routeContract";
 
 type User = {
   _id: string;
@@ -37,7 +38,7 @@ const UsersPage = () => {
     try {
       setLoading(true);
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/users`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}${LEGACY_ADMIN_USERS}`,
         { withCredentials: true }
       );
       const {

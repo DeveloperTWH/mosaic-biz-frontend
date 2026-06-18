@@ -76,7 +76,7 @@ flowchart TD
 | **Customer account** | `/customer/order`, `/customer/bookings` | No `/account` page |
 | **Auth** | `/login?type=customer`, `/login?type=vendor`, `/signup?type=customer`, `/signup?type=vendor`, `/forgot-password`, `/verify-otp` | `(auth)` group — no site Navbar |
 | **Vendor marketing** | `/become-a-vendor`, `/refer-a-vendor` | Onboarding entry points |
-| **Vendor registration** | `/partners`, `/partners/business/new`, `/partners/business/payment`, `/partners/tier-selection`, `/partners/tier-selection/checkout`, `/partners/tier-selection/success`, `/partners/business-profile`, `/partners/products`, `/partners/services`, `/partners/foods`, `/partners/add-product`, `/partners/add-service`, `/partners/add-food`, `/partners/payout-setup`, `/partners/connect/return`, `/partners/final-review`, `/partners/business/[businessid]/setup` | Under `(home)` — keeps Navbar |
+| **Vendor registration** | `/partners`, `/partners/business/new`, `/partners/business/payment`, `/partners/tier-selection`, `/partners/tier-selection/checkout`, `/partners/tier-selection/success`, `/partners/business-profile`, `/partners/products`, `/partners/services`, `/partners/foods`, `/partners/add-product`, `/partners/add-service`, `/partners/add-food`, `/partners/payout-setup`, `/partners/connect/return`, `/partners/connect/refresh`, `/partners/final-review`, `/partners/business/[businessid]/setup` | Under `(home)` — keeps Navbar |
 | **Vendor dashboard** | `/partners/dashboard`, `/partners/[businessid]`, `/partners/[businessid]/inventory/*`, `/partners/[businessid]/orders`, `/partners/[businessid]/bookings`, `/partners/[businessid]/finance`, `/partners/[businessid]/my-account` | `(partner)` group — separate layout |
 | **Static / legal** | `/about`, `/contact`, `/how-to-use-this-app`, `/faq`, `/terms`, `/privacy`, `/dispute`, `/refund-return`, `/consumer/terms`, `/consumer/trustbadge`, `/vendor/terms`, `/vendor/trustbadge` | Linked from LEARN / MORE in nav |
 
@@ -148,7 +148,7 @@ flowchart TD
 - `/partners/tier-selection`, `/partners/tier-selection/checkout`, `/partners/tier-selection/success`
 - `/partners/business-profile`, `/partners/products`, `/partners/services`, `/partners/foods`
 - `/partners/add-product`, `/partners/add-service`, `/partners/add-food`
-- `/partners/payout-setup`, `/partners/connect/return`, `/partners/final-review`
+- `/partners/payout-setup`, `/partners/connect/return`, `/partners/connect/refresh`, `/partners/final-review`
 - `/partners/business/[businessid]/setup`, `/partners/services/[serviceId]`
 
 ### `(auth)` — 4 routes

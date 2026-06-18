@@ -27,7 +27,7 @@ Base URL: `NEXT_PUBLIC_API_BASE_URL` (default `https://api.mosaicbizhub.com`).
 | GET | `/api/featured-products` | `ShopProducts.tsx`, `lib/api/featured-products.ts` | Homepage featured carousel; may return empty array (backend data) |
 | GET | `/api/products/list` | `ProductsClient.tsx` | Primary `/products` listing — **RC QA gate** |
 | GET | `/api/services/list` | `services/page.tsx`, product pages | Services listing |
-| GET | `/api/foods/list` | Foods listing pages | Food listing |
+| GET | `/api/food/list` | Foods listing pages | Food listing |
 | GET | `/api/ranked` | `ShopProducts.tsx` | Homepage ranked mix; optional `NEXT_PUBLIC_RANKED_PATH` |
 | GET | `/api/categories/products` | Product filters, browse | Category tree |
 | GET | `/api/categories/services` | Service filters | Category tree |
@@ -106,7 +106,7 @@ Webhook handling is **backend-only** — not in this repo.
 
 ## Admin
 
-Admin pages under `/admin/*` call admin-scoped APIs (e.g. featured product toggle on `/admin/products`). Details live in admin page modules and backend docs.
+Admin pages under `/admin/*` call admin-scoped APIs. Legacy mounts (`/admin/users`, `/admin/api/products`) and modern mounts (`/api/admin/...`) both exist — see [BACKEND_FRONTEND_ROUTE_CONTRACT.md](BACKEND_FRONTEND_ROUTE_CONTRACT.md).
 
 ---
 

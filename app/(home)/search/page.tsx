@@ -377,14 +377,19 @@ function SearchPageContent() {
   // ];
 
 const tabItems = [
-  { key: "products", label: "Search For Products", count: response?.totals?.products ?? 0 },
-  { key: "services", label: "Search For Services", count: response?.totals?.services ?? 0 },
-  { key: "foods", label: "Search For Food Item", count: response?.totals?.foods ?? 0 },
+  { key: "products", label: "Products", count: response?.totals?.products ?? 0 },
+  { key: "services", label: "Services", count: response?.totals?.services ?? 0 },
+  { key: "foods", label: "Foods", count: response?.totals?.foods ?? 0 },
 ].filter((tab) => tab.count > 0) as Array<{
   key: SearchTab;
   label: string;
   count: number;
 }>;
+
+  const hasAnyFilter =
+    Boolean(queryFilters.keyword.trim()) ||
+    Boolean(queryFilters.location.trim()) ||
+    Boolean(queryFilters.minorityType.trim());
 
   return (
     <div className="min-h-screen bg-market-bg">
@@ -440,9 +445,16 @@ const tabItems = [
         </div>
 
         {loading ? (
-          <MarketLoadingBlock label="Searching results…" />
+          <MarketLoadingBlock label="Searching results…" minHeight="min-h-[320px]" />
         ) : error ? (
           <div className="market-card border-red-400/30 p-4 text-red-300">{error}</div>
+        ) : totalResults === 0 && !hasAnyFilter ? (
+          <MarketEmptyState
+            title="Search the marketplace"
+            description="Enter a keyword, state, or minority-owned business type above to find products, services, and food vendors."
+            ctaLabel="Browse products"
+            ctaHref="/products"
+          />
         ) : totalResults === 0 ? (
           <MarketEmptyState
             title="No matches yet"

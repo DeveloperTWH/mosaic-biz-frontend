@@ -25,6 +25,7 @@ import MobileStickyActionBar from "../../Components/MobileStickyActionBar";
 import TrustBadge from "../../Components/TrustBadge";
 import { pickBadgeValue } from "@/lib/trustBadge";
 import { buildSearchPageUrl, PublicSearchFilters } from "../../Components/publicSearch";
+import MarketEmptyState from "../../Components/MarketEmptyState";
 
 const getAttributeGroups = (variants: Variant[]): Map<string, Set<string>> => {
   const attributeMap = new Map<string, Set<string>>();
@@ -121,6 +122,7 @@ export default function ProductDetailPage() {
   const router = useRouter();
   const id = typeof params.id === 'string' ? params.id : params.id?.[0];
   const [product, setProduct] = useState<ProductDetailItem | null>(null);
+  const [loadState, setLoadState] = useState<"loading" | "error" | "ready">("loading");
   const [liked, setLiked] = useState(false);
   const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>({});
   const [selectedVariant, setSelectedVariant] = useState<Variant | null>(null);
@@ -174,10 +176,12 @@ export default function ProductDetailPage() {
   useEffect(() => {
     if (!id) return;
     const loadProduct = async () => {
+      setLoadState("loading");
       try {
         const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/public/product/${id}`);
         const p: ProductDetailItem = res.data.data;
         setProduct(p);
+        setLoadState("ready");
         setReviewSummary({
           totalReviews: Number(p.totalReviews) || 0,
           averageRating: Number(p.averageRating) || 0,
@@ -211,6 +215,8 @@ export default function ProductDetailPage() {
           setLiked(false);
         }
       } catch (err) {
+        setProduct(null);
+        setLoadState("error");
         toast.error('Failed to load product details');
       }
     };
@@ -524,10 +530,10 @@ setMainImage(firstImage);
         toast.info('Please log in as a customer to submit a review.');
         // localStorage.setItem("product_id", id ?? "")
         // router.push('/login?type=customer');
-                const redirectPath =
+        const redirectPath =
           typeof window !== "undefined"
             ? `${window.location.pathname}${window.location.search}`
-            : `/vendor-profile/product/${id}`;
+            : `/product/${id}`;
         router.push(`/login?type=customer&redirect=${encodeURIComponent(redirectPath)}`);
         return;
       }
@@ -537,10 +543,24 @@ setMainImage(firstImage);
     }
   };
 
-  if (!product) {
+  if (loadState === "loading") {
     return (
       <div className="bg-market-bg">
         <MarketLoadingBlock label="Loading product details…" minHeight="min-h-[60vh]" />
+      </div>
+    );
+  }
+
+  if (loadState === "error" || !product) {
+    return (
+      <div className="min-h-[60vh] bg-market-bg px-4 py-16">
+        <MarketEmptyState
+          title="Product unavailable"
+          description="This product may have been removed or is temporarily unavailable."
+          ctaLabel="Browse all products"
+          ctaHref="/products"
+          onRetry={() => router.refresh()}
+        />
       </div>
     );
   }
