@@ -14,19 +14,23 @@
 
 ## Post-consolidation revalidation (2026-06-18)
 
-**Release branch:** `release/frontend-post-main-ux-smoke-consolidation` @ `204068b9`  
+**Release PR:** https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/131  
+**Release branch:** `release/frontend-post-main-ux-smoke-consolidation` @ `9a625575`  
+**Vercel preview:** https://mosaic-biz-frontend-launch-git-release-0b7777-digital-builders.vercel.app (SSO-protected — HTTP 401 without Vercel login)  
 **Includes:** PR #130 UX smoke (rebased), route reconciliation (#129), Stripe refresh (#128), this doc (#127).
 
 | Check | Result | Notes |
 |-------|--------|-------|
 | `npm run build` on release branch | **Pass** | **68** routes (adds `/partners/connect/refresh`) |
+| Vercel deployment (PR #131) | **Pass** | `FsuMoFkcjHp6zEQMde55nqmF85Nk` |
 | `GET /api/featured-products` (direct) | **200** | `https://api.mosaicbizhub.com/api/featured-products?page=1&limit=12` |
 | Production homepage | **200** | `https://mosaic-biz-frontend-launch.vercel.app/` (pre-merge deploy) |
-| Production `/partners/connect/refresh` | **404** | Expected until release branch merges + deploys |
+| Production `/partners/connect/refresh` | **404** | Expected until PR #131 merges + deploys |
+| Preview `/partners/connect/refresh` | **401** | SSO gate — route verified locally |
 | `NEXT_PUBLIC_API_URL` in app code | **0** | Unchanged |
 | `process.env.API_BASE_URL` env usage | **0** | Local aliases only |
 
-Production smoke below remains valid for **current production deploy** (`main` @ `76091ac1`). Re-run full browser matrix on Vercel preview after release branch deploy.
+Production smoke below remains valid for **current production deploy** (`main` @ `76091ac1`). Re-run full browser matrix on production after PR #131 merge.
 
 ---
 

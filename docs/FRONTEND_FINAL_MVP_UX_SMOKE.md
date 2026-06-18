@@ -184,7 +184,29 @@ New captures recommended on Vercel preview after merge: hero CTAs, `/search` dis
 
 ---
 
-## Manual test checklist (local dev @ consolidated branch)
+## Manual test checklist (PR #131 release)
+
+**Release PR:** https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/131  
+**Vercel preview URL:** https://mosaic-biz-frontend-launch-git-release-0b7777-digital-builders.vercel.app  
+**Preview access:** SSO-protected (HTTP 401 without Vercel login) — browser QA run on local consolidated branch @ `9a625575`  
+**Vercel build:** **Pass** (deployment `FsuMoFkcjHp6zEQMde55nqmF85Nk`)  
+**Tested:** 2026-06-18
+
+| Check | Preview (Vercel) | Local consolidated branch |
+|-------|------------------|---------------------------|
+| `/` hero CTAs (logged out) | Blocked (SSO) | **Pass** — Explore Marketplace + Become a Vendor |
+| `/search` discovery empty state | Blocked (SSO) | **Pass** |
+| `/product/[invalid-id]` unavailable UI | Blocked (SSO) | **Pass** — Product unavailable + retry |
+| `/partners/dashboard` | Blocked (SSO) | **Pass** — renders, no prerender crash |
+| `/partners/connect/refresh` | Blocked (SSO) | **Pass** — route exists, recovery UI loads |
+| `GET /api/featured-products` | N/A (SSO) | **Pass** — direct API probe 200 |
+| `/api/products/featured` usages | N/A | **Pass** — 0 in codebase |
+
+**Deferred (post-merge bug-fix pass):** `/search?keyword=test` zero-results, `/services/[category]` single-result live check, food Book Table toast, auth @ 390px mobile viewport on production.
+
+---
+
+## Manual test checklist (local dev @ consolidated branch — prior run)
 
 **Tested:** 2026-06-18 on `http://localhost:3000` (`release/frontend-post-main-ux-smoke-consolidation` @ `204068b9`)
 
