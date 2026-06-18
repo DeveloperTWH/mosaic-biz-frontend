@@ -103,6 +103,50 @@ npm run build
 |-------|-------|
 | #75 | Header / hamburger nav (stashed local nav work) |
 | #78–#79 | Detail page redesign, homepage Cultural Discovery |
-| #80 | About hero layout (stashed) |
 | #83 | Vendor storefront hierarchy redesign |
 | #84 | Full placeholder/demo content inventory |
+
+---
+
+## Issue #80 — About and public dark-surface readability
+
+**Issue:** [#80](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/issues/80)  
+**Branch:** `sprint/epic-73-about-readability`  
+**Last updated:** 2026-06-17
+
+### Root cause
+
+Dark `market-page` shell with light-surface tokens misapplied: `text-gray-700` and `.public-prose` (`text-brand-muted`) on purple backgrounds made body copy and breadcrumbs nearly invisible. About sections lacked consistent `container-page` width.
+
+### Files changed
+
+| File | Change |
+|------|--------|
+| `app/globals.css` | `.market-page-prose`, `.market-page-prose-muted`, `.public-prose` → `text-market-text/90` |
+| `app/(home)/Components/PublicPageHero.tsx` | Full-bleed `min-w-full`, breadcrumb contrast |
+| `app/(home)/about/components/*` | Container wrappers, dark-surface prose tokens, section dividers |
+| `app/(home)/contact/page.tsx` | Dark-surface labels + intro prose |
+| `app/(home)/Components/nav/MobileNavDrawer.tsx` | MORE links `text-market-text/90` |
+
+### Routes checked
+
+| Route | Notes |
+|-------|-------|
+| `/about` | Hero full width; Mission/About body readable on purple |
+| `/faq`, `/privacy`, `/terms`, `/dispute`, `/refund-return` | `PublicContentLayout` inherits fixed `.public-prose` |
+| `/contact` | Form labels + intro on dark shell |
+| Mobile nav MORE drawer | Link contrast improved |
+
+### Screenshot checklist (#80)
+
+- [ ] `/about` hero @ 375px and desktop — full viewport width
+- [ ] `/about` Mission + About Us body — readable without squinting
+- [ ] Breadcrumbs on `/about` and `/contact`
+- [ ] Mobile MORE menu links @ 375px
+- [ ] Community Development gray cards — no regression (light surface)
+
+### Build proof (#80)
+
+| Gate | Result | Date |
+|------|--------|------|
+| `npm run build` | **Pass** | 2026-06-17 |

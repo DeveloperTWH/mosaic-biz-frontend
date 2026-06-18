@@ -103,7 +103,19 @@ body {
 }
 
 .public-prose {
-  @apply font-montserrat text-sm leading-relaxed text-brand-muted sm:text-base;
+  @apply font-montserrat text-sm leading-relaxed text-market-text/90 sm:text-base;
+}
+
+.market-page-prose {
+  @apply font-montserrat text-sm leading-relaxed text-market-text/90 sm:text-base;
+}
+
+.market-page-prose-muted {
+  @apply font-montserrat text-sm leading-relaxed text-market-muted sm:text-base;
+}
+
+.market-section-body {
+  @apply font-montserrat text-sm leading-relaxed text-market-muted sm:text-base;
 }
 
 .public-grid-listing {

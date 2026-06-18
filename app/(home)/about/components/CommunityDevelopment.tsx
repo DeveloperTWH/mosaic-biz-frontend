@@ -2,14 +2,12 @@ import Image from "next/image";
 
 export default function CommunityDevelopment() {
   return (
-    <section className="w-full px-6 md:px-16 py-16 text-center">
-      {/* Heading */}
+    <section className="w-full py-16 text-center">
+      <div className="container-page mx-auto max-w-7xl">
       <h2 className="market-section-heading mb-4 text-3xl">COMMUNITY DEVELOPMENT:</h2>
-      <hr className="h-[2px] w-[120px] bg-green-900 mx-auto" />
-      <hr className="h-[2px] w-[120px] bg-green-900 mt-[1px] mb-10 mx-auto" />
+      <div className="market-section-divider mb-10" />
 
-      {/* Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
         {/* Card 1 */}
         <div className="p-8 bg-gray-100 rounded-2xl shadow-md flex flex-col items-center text-center">
           <Image
@@ -51,6 +49,7 @@ export default function CommunityDevelopment() {
             Working with women and minority-owned businesses demonstrates a commitment to social impact and corporate responsibility.
           </p>
         </div>
+      </div>
       </div>
     </section>
   );
