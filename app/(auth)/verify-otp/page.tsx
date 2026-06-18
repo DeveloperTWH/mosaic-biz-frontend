@@ -10,6 +10,11 @@ import Link from 'next/link';
 import { X } from 'lucide-react';
 import { logAuthRequest } from '@/utils/authDebug';
 import { parseAuthJsonResponse } from '@/utils/parseAuthErrorResponse';
+import {
+  getAuthenticatedUser,
+  isBusinessOwner,
+  persistClientSession,
+} from '@/utils/authUtils';
 
 function VerifyOtpPage() {
     const searchParams = useSearchParams();
@@ -93,11 +98,29 @@ function VerifyOtpPage() {
             });
 
             if (data?.success && data.user) {
-                localStorage.setItem('user_session', 'true');
-                localStorage.setItem('user_gender', data.user.gender || '');
-                localStorage.setItem('user_role', data.user.role || '');
-                window.dispatchEvent(new Event('auth:login'));
-                router.push(data.user.role === 'business_owner' ? '/partners' : (safeRedirect || '/'));
+                const sessionUser = await getAuthenticatedUser();
+
+                logAuthRequest({
+                    endpoint: `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/auth/check`,
+                    method: 'GET',
+                    status: sessionUser ? 200 : 401,
+                    credentialsIncluded: true,
+                    body: sessionUser
+                        ? { success: true, user: { role: sessionUser.role } }
+                        : undefined,
+                });
+
+                if (!sessionUser) {
+                    setError(
+                        'Verification succeeded but session was not established. Try again or contact support.'
+                    );
+                    return;
+                }
+
+                persistClientSession(sessionUser);
+                router.push(
+                    isBusinessOwner(sessionUser) ? '/partners' : (safeRedirect || '/')
+                );
             } else {
                 setError(errorMessage || data?.message || 'Invalid OTP');
             }
