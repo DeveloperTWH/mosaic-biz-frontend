@@ -42,6 +42,7 @@ function getLoggedInServerSnapshot() {
 }
 
 function subscribeClient(onStoreChange: () => void) {
+  onStoreChange();
   return () => {};
 }
 

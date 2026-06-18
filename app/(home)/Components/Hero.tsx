@@ -42,13 +42,22 @@ const Hero = () => {
               <div className="h-11 w-48 rounded bg-white/10" />
               <div className="h-11 w-48 rounded bg-white/10" />
             </div>
+          ) : isLoggedIn ? (
+            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <Link href="/products" className="market-btn-primary w-full text-center sm:min-w-[220px] sm:w-auto">
+                Shop the Marketplace
+              </Link>
+              <Link href="/customer/order" className="market-btn-outline w-full text-center sm:min-w-[220px] sm:w-auto">
+                My Orders
+              </Link>
+            </div>
           ) : (
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link href="/products" className="market-btn-primary w-full text-center sm:min-w-[220px] sm:w-auto">
                 Shop the Marketplace
               </Link>
-              <Link href="/become-a-vendor" className="market-btn-outline w-full text-center sm:min-w-[220px] sm:w-auto">
-                Become a vendor
+              <Link href="/signup?type=customer" className="market-btn-outline w-full text-center sm:min-w-[220px] sm:w-auto">
+                Create Account
               </Link>
             </div>
           )}
