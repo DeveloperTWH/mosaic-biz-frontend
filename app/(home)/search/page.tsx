@@ -9,7 +9,7 @@ import PublicFilterSection from "../Components/PublicFilterSection";
 import MarketLoadingBlock from "../Components/MarketLoadingBlock";
 import MarketEmptyState from "../Components/MarketEmptyState";
 import MarketImage from "../Components/MarketImage";
-import { PublicSearchFilters, parseListingFiltersFromSearchParams, buildSearchPageUrlWithTab } from "../Components/publicSearch";
+import { PublicSearchFilters, parseListingFiltersFromSearchParams, buildSearchPageUrlWithTab, searchParamsUsesLegacyNames } from "../Components/publicSearch";
 
 type ApiBusiness = {
   _id?: string;
@@ -272,6 +272,20 @@ function SearchPageContent() {
   }, [queryFilters]);
 
   useEffect(() => {
+    if (!searchParamsUsesLegacyNames(searchParams)) {
+      return;
+    }
+
+    const parsed = parseListingFiltersFromSearchParams(searchParams);
+    router.replace(
+      buildSearchPageUrlWithTab({
+        ...parsed,
+        tab: activeTab,
+      })
+    );
+  }, [searchParams, router, activeTab]);
+
+  useEffect(() => {
     const hasAnyFilter =
       Boolean(queryFilters.keyword.trim()) ||
       Boolean(queryFilters.location.trim()) ||
@@ -352,13 +366,12 @@ function SearchPageContent() {
   }, [activeTab, response]);
 
   const handleSearch = () => {
-    const params = new URLSearchParams();
-
-    if (filters.keyword.trim()) params.set("keyword", filters.keyword.trim());
-    if (filters.location.trim()) params.set("location", filters.location.trim());
-    if (filters.minorityType.trim()) params.set("minorityType", filters.minorityType.trim());
-
-    router.push(`/search${params.toString() ? `?${params.toString()}` : ""}`);
+    router.push(
+      buildSearchPageUrlWithTab({
+        ...filters,
+        tab: activeTab,
+      })
+    );
   };
 
   const products = response?.data?.products ?? [];
