@@ -1,9 +1,57 @@
 # Frontend Final MVP UX Smoke Pass
 
-**Branch:** `fix/frontend-final-mvp-ux-smoke-pass`  
+**Branch:** `release/frontend-post-main-ux-smoke-consolidation`  
 **Date:** 2026-06-18  
-**Base:** `origin/main` @ `f47ffe0c` (pre-fix baseline)  
+**Original PR #130 branch:** `fix/frontend-final-mvp-ux-smoke-pass` @ `e9a14dc0`  
+**Consolidated commit:** `89acd1b0` (on top of `main` @ `76091ac1`)  
 **Repo:** `Digital-Builders-757/mosaic-biz-frontend-launch`
+
+---
+
+## Consolidation onto current main (2026-06-18)
+
+| Item | Value |
+|------|-------|
+| Stale PR #130 base | `f47ffe0c` (~40 commits behind `main`) |
+| Target main | `76091ac1` |
+| Cherry-picked | `e9a14dc0` |
+| Consolidated commit | `89acd1b0` |
+| Release branch | `release/frontend-post-main-ux-smoke-consolidation` |
+| Full release stack HEAD | `204068b9` (includes route reconciliation, Stripe refresh, live-domain proof docs) |
+
+### Conflict resolution (10 files)
+
+Cherry-pick conflicted on files touched by both stale PR #130 and post-redesign `main`. Resolution rule: **keep main layout/styling; apply PR #130 behavioral fixes only.**
+
+| File | Resolution |
+|------|------------|
+| `Hero.tsx` | Main marketplace hero retained; logged-out CTAs → Explore Marketplace + Become a Vendor |
+| `MarketEmptyState.tsx` | Main `market-*` styling + PR #130 `onRetry` / retry button |
+| `MarketLoadingBlock.tsx` | Main version (a11y + market tokens) |
+| `search/page.tsx` | Main search shell + discovery / no-results empty states |
+| `product/[id]/page.tsx` | Main PDP shell + `loadState` error UI (Product unavailable) |
+| `ProductServices.tsx` | Static "Featured" sort label (non-interactive) |
+| `ServiceCard.tsx` | Main card styling + link → `/vendor-profile/service-vendor/[id]` |
+| `services/[id]/page.tsx` | Empty check `length === 0` with main styling |
+| `(auth)/layout.tsx` | Main `min-h-screen overflow-x-hidden` (already on main) |
+| `partners/dashboard/page.tsx` | Main Suspense fallback (already on main) |
+
+### Build / lint (consolidated branch)
+
+| Check | Result |
+|-------|--------|
+| `npm run build` | **Pass** — Next.js 16.1.2, **68** routes (includes `/partners/connect/refresh`) |
+| `npm run lint` | **Fail** — pre-existing repo-wide issues (661 problems); no new errors in consolidated UX files |
+| `npm test` | N/A — no test script |
+
+### Guardrails
+
+| Check | Result |
+|-------|--------|
+| `/api/products/featured` in app code | **0** usages |
+| `GET /api/featured-products` | **Unchanged** — `lib/api/featured-products.ts` |
+| `NEXT_PUBLIC_API_URL` | **0** usages |
+| `localhost:3001` / Elastic Beanstalk in app code | **0** |
 
 ---
 
@@ -116,9 +164,10 @@ New captures recommended on Vercel preview after merge: hero CTAs, `/search` dis
 
 | Check | Status |
 |-------|--------|
-| `GET /api/featured-products` preserved | **Pass** — `ShopProducts.tsx` unchanged |
-| No `lib/api/routeContract.ts` changes | **Pass** — file not touched |
-| No payment / checkout / Stripe changes | **Pass** |
+| `GET /api/featured-products` preserved | **Pass** — `ShopProducts.tsx` + `lib/api/featured-products.ts` unchanged path |
+| Route contract centralized | **Pass** — `lib/api/routeContract.ts` added on release branch (#129) |
+| Stripe Connect refresh route | **Pass** — `/partners/connect/refresh` added (#128); no checkout/webhook changes |
+| No payment / checkout / order logic changes | **Pass** |
 | No backend API path renames | **Pass** |
 | Food booking: UX honesty only (no new API) | **Pass** |
 
@@ -135,13 +184,26 @@ New captures recommended on Vercel preview after merge: hero CTAs, `/search` dis
 
 ---
 
-## Manual test checklist (preview)
+## Manual test checklist (local dev @ consolidated branch)
 
-- [ ] `/` — hero shows Explore Marketplace + Become a Vendor when logged out
-- [ ] `/search` — discovery empty state (no filters)
-- [ ] `/search?keyword=test` — no-results empty state when API returns zero
-- [ ] `/product/[invalid-id]` — unavailable state, not infinite spinner
-- [ ] `/services/[category]` — single result renders (not "not found")
-- [ ] `/vendor-profile/food-vendor/[id]` — Book Table shows honest toast
-- [ ] `/login?type=customer` @ 390px — no horizontal scroll
-- [ ] Network: homepage still calls `GET /api/featured-products`
+**Tested:** 2026-06-18 on `http://localhost:3000` (`release/frontend-post-main-ux-smoke-consolidation` @ `204068b9`)
+
+- [x] `/` — hero shows **Explore Marketplace** + **Become a Vendor** when logged out (after hydration)
+- [x] `/search` — discovery empty state ("Search the marketplace" + Browse products CTA)
+- [ ] `/search?keyword=test` — no-results empty state when API returns zero (not re-run; logic present in `search/page.tsx`)
+- [x] `/product/[invalid-id]` — **Product unavailable** state with retry + browse CTA (not infinite spinner)
+- [ ] `/services/[category]` — single result renders (code fix verified; live category not re-run)
+- [ ] `/vendor-profile/food-vendor/[id]` — Book Table toast (not re-run this pass)
+- [ ] `/login?type=customer` @ 390px — no horizontal scroll (layout fix inherited from main)
+- [x] `/partners/dashboard` — renders without prerender crash (Suspense wrapper)
+- [x] `/partners/connect/refresh` — route exists; recovery UI loads (logged-out shows safe error path)
+- [x] Network: `GET https://api.mosaicbizhub.com/api/featured-products` → **200** (direct probe)
+- [x] No `/api/products/featured` in codebase grep
+
+**Vercel preview:** pending deploy from `release/frontend-post-main-ux-smoke-consolidation` push — re-run mobile viewport checklist on preview URL when ready.
+
+### PR #130 merge recommendation
+
+**Recommend:** Force-update PR #130 branch (`fix/frontend-final-mvp-ux-smoke-pass`) with `--force-with-lease` from `release/frontend-post-main-ux-smoke-consolidation`, **or** close #130 and open one release PR from this branch (supersedes #127–#130).
+
+**Do not merge stale PR #130 as-is** — it is based on pre-redesign `main` @ `f47ffe0c`.

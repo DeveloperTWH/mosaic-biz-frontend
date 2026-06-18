@@ -12,6 +12,24 @@
 
 ---
 
+## Post-consolidation revalidation (2026-06-18)
+
+**Release branch:** `release/frontend-post-main-ux-smoke-consolidation` @ `204068b9`  
+**Includes:** PR #130 UX smoke (rebased), route reconciliation (#129), Stripe refresh (#128), this doc (#127).
+
+| Check | Result | Notes |
+|-------|--------|-------|
+| `npm run build` on release branch | **Pass** | **68** routes (adds `/partners/connect/refresh`) |
+| `GET /api/featured-products` (direct) | **200** | `https://api.mosaicbizhub.com/api/featured-products?page=1&limit=12` |
+| Production homepage | **200** | `https://mosaic-biz-frontend-launch.vercel.app/` (pre-merge deploy) |
+| Production `/partners/connect/refresh` | **404** | Expected until release branch merges + deploys |
+| `NEXT_PUBLIC_API_URL` in app code | **0** | Unchanged |
+| `process.env.API_BASE_URL` env usage | **0** | Local aliases only |
+
+Production smoke below remains valid for **current production deploy** (`main` @ `76091ac1`). Re-run full browser matrix on Vercel preview after release branch deploy.
+
+---
+
 ## Test surfaces
 
 | Surface | URL | Used in this proof |
