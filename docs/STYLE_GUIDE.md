@@ -154,6 +154,9 @@ Use on public marketplace routes and education pages inside the `market-page` sh
 | `.market-card-light` | White elevated card on dusk pages — step cards, resource cards |
 | `.market-card-light-title` | Headings on white cards — `text-brand-navy` |
 | `.market-card-light-body` | Body copy on white cards — `text-brand-muted` |
+| `.market-surface-light` | White page shell inside `market-page` — resets inherited `text-market-text` to `text-brand-navy` |
+| `.market-accordion-light` | `<details>` accordions on light backgrounds — readable summary + body |
+| `.market-card-light-list` | Bullet lists inside white cards — `text-brand-muted` with link contrast |
 | `.market-step-badge` | Numbered step badges (gold circle) |
 | `.market-support-callout` | Info callout on dusk background (not `bg-blue-50`) |
 | `.market-input` | Text fields; border `white/15`, gold focus ring |

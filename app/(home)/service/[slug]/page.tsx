@@ -467,9 +467,9 @@ const ServiceDetailPage = () => {
                         <div>
                             <h2 className="mb-2 text-xl font-semibold heading">FAQ</h2>
                             {service.faq.map((item, i) => (
-                                <details key={i} className="p-3 mb-2 border rounded">
-                                    <summary className="font-semibold cursor-pointer">{item.question}</summary>
-                                    <p className="mt-2 text-gray-700">{item.answer}</p>
+                                <details key={i} className="market-accordion-light mb-2">
+                                    <summary>{item.question}</summary>
+                                    <p className="market-accordion-light-body">{item.answer}</p>
                                 </details>
                             ))}
 

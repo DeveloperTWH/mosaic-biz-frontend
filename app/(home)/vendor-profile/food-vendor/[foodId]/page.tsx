@@ -743,7 +743,7 @@ export default function FoodVendorProfilePage() {
   };
 
   return (
-    <div className={`min-h-screen bg-white font-sans ${MOBILE_STICKY_BAR_PADDING}`}>
+    <div className={`market-surface-light min-h-screen font-sans ${MOBILE_STICKY_BAR_PADDING}`}>
       <div className="relative h-[180px] w-full overflow-hidden bg-gray-800">
         <img
           src="/products/19099 1.png"

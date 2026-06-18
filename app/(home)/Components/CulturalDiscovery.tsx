@@ -96,8 +96,8 @@ export function VendorStoriesSection() {
   return (
     <section className="container-page public-section py-12">
       <div className="market-card-light mx-auto max-w-3xl p-8 text-center">
-        <h2 className="font-poppins text-2xl font-semibold text-market-text">Vendor Stories</h2>
-        <p className="mt-4 font-montserrat text-sm text-market-muted">
+        <h2 className="market-card-light-title">Vendor Stories</h2>
+        <p className="mt-4 market-card-light-body">
           Real stories from entrepreneurs building on Mosaic Biz Hub — launching with our first vendor cohort.
         </p>
         <Link href="/about" className="market-btn-secondary mt-6 inline-flex min-h-11 items-center px-6">
