@@ -82,6 +82,7 @@ function VerifyOtpPage() {
             if (data.success) {
                 localStorage.setItem('user_session', 'true');
                 localStorage.setItem('user_gender', data.user.gender || '');
+                localStorage.setItem('user_role', data.user.role || '');
                 window.dispatchEvent(new Event('auth:login'));
                 router.push(data.user.role === 'business_owner' ? '/partners' : (safeRedirect || '/'));
             } else {

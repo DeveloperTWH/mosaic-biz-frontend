@@ -24,16 +24,26 @@ const Navbar = () => {
   const { count: cartCount } = useCartCount(isLoggedIn);
 
   useEffect(() => {
-    const session = localStorage.getItem("user_session");
-    setIsLoggedIn(session === "true");
-    setGender(localStorage.getItem("user_gender"));
+    const syncAuth = () => {
+      const session = localStorage.getItem("user_session");
+      setIsLoggedIn(session === "true");
+      setGender(localStorage.getItem("user_gender"));
 
-    (async () => {
-      const user = await getLoggedInCustomer();
-      setIsCustomer(!!user);
-    })();
+      (async () => {
+        const user = await getLoggedInCustomer();
+        setIsCustomer(!!user);
+      })();
+    };
 
+    syncAuth();
     setMounted(true);
+
+    window.addEventListener("auth:login", syncAuth);
+    window.addEventListener("auth:logout", syncAuth);
+    return () => {
+      window.removeEventListener("auth:login", syncAuth);
+      window.removeEventListener("auth:logout", syncAuth);
+    };
   }, []);
 
   useEffect(() => {

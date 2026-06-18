@@ -111,6 +111,12 @@ export const COMMERCE_STICKY_ROUTE_PREFIXES = [
 ] as const;
 
 /**
+ * Intentionally NOT hidden: `/vendor-profile/product-vendor/*`
+ * Vendor product storefront is a browsing/listing page (links to `/product/[id]` for purchase).
+ * No MobileStickyActionBar — bottom nav aids catalog navigation.
+ */
+
+/**
  * Commerce detail pages render MobileStickyActionBar instead of global bottom nav.
  * Hiding bottom nav avoids double-stacked fixed UI on mobile (Epic #95 / #101).
  */
@@ -146,8 +152,20 @@ export function getBottomNavActiveId(pathname: string): BottomNavItemId | null {
   return null;
 }
 
-export function getAccountNavHref(isLoggedIn: boolean, isCustomer: boolean): string {
+export function getAccountNavHref(
+  isLoggedIn: boolean,
+  isCustomer: boolean,
+  storedRole?: string | null
+): string {
   if (!isLoggedIn) return "/login?type=customer";
+  if (storedRole === "business_owner") return "/partners/dashboard";
+  if (storedRole === "customer") return "/customer/order";
   if (isCustomer) return "/customer/order";
   return "/partners/dashboard";
+}
+
+/** Sync role hint from localStorage (set on login/OTP). Client-only. */
+export function getStoredUserRole(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem("user_role");
 }

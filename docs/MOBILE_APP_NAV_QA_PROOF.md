@@ -143,11 +143,10 @@ Related prior assets: `docs/qa-screenshots/homepage-mobile.png`, `docs/qa-screen
 
 1. **Login horizontal overflow** — `/login?type=customer` reports `scrollWidth > clientWidth` at 390px. Auth layout is outside `(home)` chrome; fix deferred (not part of mobile nav stack).
 2. **Commerce sticky bar end-to-end** — Could not verify sticky purchase bar, `with-commerce-sticky` class, or body padding swap with live product data; local API (`localhost:3001`) was unreachable. Route-level bottom-nav suppression on `/product/*` **verified**.
-3. **`/vendor-profile/product-vendor/*`** — Still shows bottom nav (not in `COMMERCE_STICKY_ROUTE_PREFIXES`). Intentional gap vs product/service/food detail routes; track if vendor storefront should use sticky bar.
-4. **Duplicate FAQ in hamburger drawer** — FAQ appears under both Learn and More sections (`navConfig.ts` MORE_LINKS + LEARN_LINKS).
-5. **Navbar auth refresh** — Bottom nav Account href may not update until reload after login (`auth:login` listener exists but header/session sync is inconsistent).
-6. **ESLint debt** — 660 existing lint findings; mobile nav QA does not resolve repo-wide lint.
-7. **Empty marketplace locally** — Product grid empty when API offline; card polish and listing layout verified structurally only.
+3. **`/vendor-profile/product-vendor/*`** — Bottom nav **intentionally visible** (vendor storefront browsing; purchase on `/product/*`). Documented in `navConfig.ts`.
+4. **Duplicate FAQ in hamburger drawer** — Resolved in `sprint/hamburger-menu-simplification` (FAQ once in Explore section).
+5. **Navbar auth refresh** — Fixed in `sprint/mobile-bottom-nav-polish-state-fix` (`auth:login`/`auth:logout` listeners + `user_role` localStorage).
+6. **Login horizontal overflow** — Fixed in `sprint/mobile-bottom-nav-polish-state-fix` (auth header positioning + layout overflow containment).
 
 ## Manual re-test (when API available)
 

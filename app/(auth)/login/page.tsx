@@ -81,6 +81,7 @@ function LoginContent() {
       if (data.success) {
         localStorage.setItem('user_session', 'true');
         localStorage.setItem('user_gender', data.user.gender || '');
+        localStorage.setItem('user_role', data.user.role || '');
         window.dispatchEvent(new Event("auth:login"));
   
         router.push(data.user.role === 'business_owner' ? '/partners' : (safeRedirect || '/'));
@@ -103,8 +104,8 @@ function LoginContent() {
   };
 
   return (
-    <div className="min-h-screen grid grid-cols-1 md:grid-cols-2">
-      <header className="w-full px-0 py-4 flex items-center justify-between bg-white md:bg-transparent absolute top-0 left-20 z-20">
+    <div className="min-h-screen grid max-w-[100vw] grid-cols-1 overflow-x-hidden md:grid-cols-2">
+      <header className="absolute left-0 right-0 top-0 z-20 flex w-full items-center justify-between bg-white px-4 py-4 md:left-20 md:bg-transparent md:px-0">
         <span className="text-xl font-bold tracking-wide text-blue-900 md:text-white">
           <img
             src="/login/logo.png"
@@ -186,8 +187,8 @@ function LoginContent() {
       </div>
 
       {/* Right Section */}
-      <div className="flex items-center justify-center bg-white px-6 py-10">
-        <div className="w-full max-w-md">
+      <div className="flex min-w-0 items-center justify-center bg-white px-6 py-10">
+        <div className="w-full max-w-md min-w-0">
           <span className="inline-block mb-2 rounded-full bg-[#FFF6E0] px-2 text-[10px] font-thin font-montserrat text-[#C7A040]">
             {type?.charAt(0).toUpperCase() + type?.slice(1)}
           </span>
