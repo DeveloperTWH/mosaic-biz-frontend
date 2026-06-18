@@ -5,8 +5,11 @@ type BrandLogoProps = {
   priority?: boolean;
 };
 
+const LOGO_WIDTH = 1000;
+const LOGO_HEIGHT = 129;
+
 const SIZES = {
-  header: "h-10 w-auto max-w-[min(280px,60vw)] sm:h-11",
+  header: "h-9 w-auto max-w-[min(240px,55vw)] sm:h-10",
   footer: "h-12 w-auto max-w-[min(320px,70vw)] sm:h-14",
 } as const;
 
@@ -15,10 +18,10 @@ export default function BrandLogo({ variant = "header", priority = false }: Bran
     <Image
       src="/mosaic-biz-hub-logo-transparent.png"
       alt="Mosaic Biz Hub"
-      width={800}
-      height={200}
+      width={LOGO_WIDTH}
+      height={LOGO_HEIGHT}
       priority={priority}
-      className={`${SIZES[variant]} object-contain object-left drop-shadow-[0_0_12px_rgba(237,231,255,0.2)]`}
+      className={`${SIZES[variant]} object-contain object-left`}
     />
   );
 }
