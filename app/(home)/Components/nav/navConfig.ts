@@ -27,8 +27,8 @@ export const LEARN_LINKS: NavLink[] = [
   { label: "FAQ", href: "/faq" },
 ];
 
-export const MORE_LINKS: NavLink[] = [
-  { label: "FAQ", href: "/faq" },
+/** Legal and compliance links — footer + desktop MORE dropdown only (not hamburger). */
+export const LEGAL_POLICY_LINKS: NavLink[] = [
   { label: "Terms & Conditions", href: "/terms" },
   { label: "Privacy Policy", href: "/privacy" },
   { label: "Dispute Resolution Process", href: "/dispute" },
@@ -39,10 +39,26 @@ export const MORE_LINKS: NavLink[] = [
   { label: "Trust Badges – Vendor", href: "/vendor/trustbadge" },
 ];
 
-/** MORE dropdown excludes FAQ (shown under Learn in drawer). */
-export const MORE_DROPDOWN_LINKS: NavLink[] = MORE_LINKS.filter(
-  (link) => link.href !== "/faq"
-);
+/** Footer legal column — same routes as LEGAL_POLICY_LINKS with footer-friendly labels. */
+export const FOOTER_LEGAL_LINKS: NavLink[] = [
+  { label: "Privacy policy", href: "/privacy" },
+  { label: "Terms of service", href: "/terms" },
+  { label: "Refunds & returns", href: "/refund-return" },
+  { label: "Dispute resolution", href: "/dispute" },
+  { label: "Consumer terms", href: "/consumer/terms" },
+  { label: "Vendor terms", href: "/vendor/terms" },
+  { label: "Trust badges – consumer", href: "/consumer/trustbadge" },
+  { label: "Trust badges – vendor", href: "/vendor/trustbadge" },
+];
+
+/** @deprecated Use LEGAL_POLICY_LINKS — kept for any legacy imports. */
+export const MORE_LINKS: NavLink[] = [
+  { label: "FAQ", href: "/faq" },
+  ...LEGAL_POLICY_LINKS,
+];
+
+/** Desktop MORE dropdown — legal/policy only (FAQ lives under LEARN). */
+export const MORE_DROPDOWN_LINKS: NavLink[] = LEGAL_POLICY_LINKS;
 
 export const LOGIN_LINKS: NavLink[] = [
   { label: "Login as Customer", href: "/login?type=customer" },
@@ -54,10 +70,22 @@ export const SEARCH_CTA: NavLink = {
   href: "/search",
 };
 
-/** Shop sub-links kept in hamburger drawer (Products/Search handled by bottom nav). */
-export const DRAWER_SHOP_LINKS: NavLink[] = SHOP_LINKS.filter(
+/** Marketplace sub-links in hamburger (Products/Search handled by bottom nav). */
+export const DRAWER_MARKETPLACE_LINKS: NavLink[] = SHOP_LINKS.filter(
   (link) => link.href !== "/products" && link.href !== "/search"
 );
+
+/** @deprecated Alias for DRAWER_MARKETPLACE_LINKS */
+export const DRAWER_SHOP_LINKS: NavLink[] = DRAWER_MARKETPLACE_LINKS;
+
+/** Hamburger explore/help links — no legal or policy pages. */
+export const DRAWER_EXPLORE_LINKS: NavLink[] = [
+  { label: "About", href: "/about" },
+  { label: "Contact", href: "/contact" },
+  { label: "How It Works", href: "/how-to-use-this-app" },
+  { label: "FAQ", href: "/faq" },
+  { label: "Refer a Vendor", href: "/refer-a-vendor" },
+];
 
 export type BottomNavItemId = "home" | "shop" | "discover" | "cart" | "account";
 
