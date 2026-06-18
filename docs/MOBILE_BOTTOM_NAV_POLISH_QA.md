@@ -1,6 +1,7 @@
 # Mobile Bottom Nav Polish QA — State and UX Fix
 
 **Branch:** `sprint/mobile-bottom-nav-polish-state-fix`  
+**Commit:** `9a9d9ab1c3f3076748a45560e92b635a9c912f43`  
 **Date:** 2026-06-18  
 **Related issues:** #95, #97, #98, #101, #103
 
