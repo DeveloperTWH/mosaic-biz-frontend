@@ -72,40 +72,7 @@ export const US_STATE_OPTIONS = [
 ] as const;
 
 export function buildSearchPageUrl(filters: Partial<PublicSearchFilters>): string {
-  const params = new URLSearchParams();
-
-  if (filters.keyword?.trim()) {
-    params.set("keyword", filters.keyword.trim());
-  }
-
-  if (filters.location?.trim()) {
-    params.set("location", filters.location.trim());
-  }
-
-  if (filters.minorityType?.trim()) {
-    params.set("minorityType", filters.minorityType.trim());
-  }
-
-  const query = params.toString();
-  return query ? `/search?${query}` : "/search";
-}
-
-export function buildListingSearchParams(filters: Partial<PublicSearchFilters>): URLSearchParams {
-  const params = new URLSearchParams();
-
-  if (filters.keyword?.trim()) {
-    params.set("q", filters.keyword.trim());
-  }
-
-  if (filters.location?.trim()) {
-    params.set("city", filters.location.trim());
-  }
-
-  if (filters.minorityType?.trim()) {
-    params.set("minorityType", filters.minorityType.trim());
-  }
-
-  return params;
+  return buildSearchPageUrlWithTab(filters);
 }
 
 /** Extended filters for listing pages and unified search */
@@ -141,6 +108,18 @@ function readFirstParam(params: URLSearchParams, keys: readonly string[]): strin
     if (value) return value;
   }
   return "";
+}
+
+/** True when URL uses legacy search param names that should be replaced with canonical q/city */
+export function searchParamsUsesLegacyNames(
+  params: URLSearchParams | null | undefined
+): boolean {
+  if (!params) return false;
+  return (
+    params.has("keyword") ||
+    params.has("search") ||
+    params.has("location")
+  );
 }
 
 /** Parse URL search params into listing filters (backward-compat with legacy names) */
