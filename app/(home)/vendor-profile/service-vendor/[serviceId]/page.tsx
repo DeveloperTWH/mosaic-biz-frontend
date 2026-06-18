@@ -9,7 +9,7 @@ import { createServiceBooking } from "@/lib/api/serviceBookings";
 import { Review } from "@/types/review";
 import ClientTestimonials from "../../../Components/ClientTestimonials";
 import PublicSearchFilterBar from "../../../Components/PublicSearchFilterBar";
-import MobileStickyActionBar, { MOBILE_STICKY_BAR_PADDING } from "../../../Components/MobileStickyActionBar";
+import MobileStickyActionBar from "../../../Components/MobileStickyActionBar";
 import TrustBadge from "../../../Components/TrustBadge";
 import { buildSearchPageUrl, PublicSearchFilters } from "../../../Components/publicSearch";
 
@@ -942,7 +942,7 @@ export default function ServiceVendorProfilePage() {
 
 
   return (
-    <div className={`market-surface-light min-h-screen font-sans ${MOBILE_STICKY_BAR_PADDING}`}>
+    <div className="market-surface-light min-h-screen font-sans">
 
       {/* ── Hero Banner ── */}
 <div className="relative w-full h-[180px] bg-gray-800 overflow-hidden">

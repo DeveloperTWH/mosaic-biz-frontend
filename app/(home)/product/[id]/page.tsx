@@ -21,7 +21,7 @@ import { toggleWishlist, isProductWishlisted } from '@/utils/wishlistUtils';
 import PublicSearchFilterBar from "../../Components/PublicSearchFilterBar";
 import PublicPageHero from "../../Components/PublicPageHero";
 import MarketLoadingBlock from "../../Components/MarketLoadingBlock";
-import MobileStickyActionBar, { MOBILE_STICKY_BAR_PADDING } from "../../Components/MobileStickyActionBar";
+import MobileStickyActionBar from "../../Components/MobileStickyActionBar";
 import TrustBadge from "../../Components/TrustBadge";
 import { pickBadgeValue } from "@/lib/trustBadge";
 import { buildSearchPageUrl, PublicSearchFilters } from "../../Components/publicSearch";
@@ -546,7 +546,7 @@ setMainImage(firstImage);
   }
 
   return (
-    <div className={`min-h-screen bg-market-bg ${MOBILE_STICKY_BAR_PADDING}`}>
+    <div className="min-h-screen bg-market-bg">
       <PublicPageHero
         title="Product"
         breadcrumbs={[
@@ -1172,7 +1172,7 @@ setMainImage(firstImage);
       <MobileStickyActionBar
         leading={
           price.current > 0 ? (
-            <span className="font-poppins text-lg font-semibold text-market-gold">
+            <span className="font-poppins text-base font-semibold text-market-gold sm:text-lg">
               ${price.current.toFixed(2)}
             </span>
           ) : undefined

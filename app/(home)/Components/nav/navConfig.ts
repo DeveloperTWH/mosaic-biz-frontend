@@ -76,7 +76,21 @@ export const BOTTOM_NAV_ITEMS: BottomNavItem[] = [
 ];
 
 /** Routes where bottom nav should be hidden (checkout flow). */
-export const BOTTOM_NAV_HIDDEN_PREFIXES = ["/checkout"];
+export const COMMERCE_STICKY_ROUTE_PREFIXES = [
+  "/product/",
+  "/vendor-profile/service-vendor/",
+  "/vendor-profile/food-vendor/",
+] as const;
+
+/**
+ * Commerce detail pages render MobileStickyActionBar instead of global bottom nav.
+ * Hiding bottom nav avoids double-stacked fixed UI on mobile (Epic #95 / #101).
+ */
+export function isCommerceStickyRoute(pathname: string): boolean {
+  return COMMERCE_STICKY_ROUTE_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+}
+
+export const BOTTOM_NAV_HIDDEN_PREFIXES = ["/checkout", ...COMMERCE_STICKY_ROUTE_PREFIXES];
 
 export function getBottomNavActiveId(pathname: string): BottomNavItemId | null {
   if (pathname === "/") return "home";

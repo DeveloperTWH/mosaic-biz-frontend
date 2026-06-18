@@ -69,6 +69,7 @@ body {
   --header-h: 64px;
   --announcement-h: 0px;
   --bottom-nav-h: 0px;
+  --commerce-sticky-h: calc(4.25rem + env(safe-area-inset-bottom, 0px));
 }
 
 /* padding only in pages rendered by this layout */
@@ -84,6 +85,15 @@ body {
   :root.with-fixed-header body {
     padding-bottom: var(--bottom-nav-h);
   }
+
+  /* Commerce detail pages: sticky purchase bar replaces global bottom nav */
+  :root.with-fixed-header.with-commerce-sticky {
+    --bottom-nav-h: 0px;
+  }
+
+  :root.with-fixed-header.with-commerce-sticky body {
+    padding-bottom: var(--commerce-sticky-h);
+  }
 }
 
 .market-bottom-nav {
@@ -92,6 +102,11 @@ body {
   -webkit-backdrop-filter: blur(12px);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.market-commerce-sticky-bar {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.35);
 }
 
 .glass-header {
