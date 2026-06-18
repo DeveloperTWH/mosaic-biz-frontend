@@ -8,6 +8,7 @@ import { Star } from "lucide-react";
 import MarketImage from "../../Components/MarketImage";
 import MarketLoadingBlock from "../../Components/MarketLoadingBlock";
 import MarketEmptyState from "../../Components/MarketEmptyState";
+import MobileFilterDrawer from "../../Components/MobileFilterDrawer";
 
 
 interface BookServicesProps {
@@ -71,6 +72,7 @@ const ProductSevices: React.FC<BookServicesProps> = ({
     badge: ""
   });
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const safeTotalProducts = Number(totalProducts) || 0;
   const startItem = safeTotalProducts === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
@@ -84,90 +86,43 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
 };
 
 
-  const filterOptions = {
-    categories: ["Hair Salon", "Spa", "Nail Salon", "Barber", "Massage"],
-    subCategories: ["Haircut", "Coloring", "Facial", "Manicure", "Pedicure"],
-    badges: ["Premium", "Verified", "Top Rated", "Eco-Friendly", "Luxury"]
-  };
+  const filterPanel = (
+    <FilterAccordion
+      selectedCategory={selectedCategory}
+      onFilterChange={(category, subCategory) => {
+        onCategoryFilter?.(category, subCategory);
+      }}
+      onCategorySelect={onCategorySelect}
+      onSubcategorySelect={onSubcategorySelect}
+      onBadgeSelect={onBadgeSelect}
+      onPriceChange={onPriceChange}
+    />
+  );
 
   return (
     <section className="container-page py-8">
-       
       <div className="flex flex-col gap-6 lg:flex-row">
-
-        {/* Left Sidebar - Filters */}
-        <div className="w-full lg:w-[300px] lg:flex-none">
-          <button
-            type="button"
-            className="market-btn-secondary mb-4 w-full lg:hidden"
-            onClick={() => setFiltersOpen((prev) => !prev)}
-            aria-expanded={filtersOpen}
-          >
-            {filtersOpen ? "Hide filters" : "Filters"}
-          </button>
-          <div className={`${filtersOpen ? "block" : "hidden"} lg:block`}>
-            <div className="space-y-6">
-              <FilterAccordion 
-                selectedCategory={selectedCategory}
-                onFilterChange={(category, subCategory) => {
-                  console.log('Category filter clicked:', category, subCategory);
-                  onCategoryFilter?.(category, subCategory);
-                }}
-                onCategorySelect={onCategorySelect}
-                onSubcategorySelect={onSubcategorySelect}
-                onBadgeSelect={onBadgeSelect}
-                onPriceChange={onPriceChange}
-              />
-
-              {/* Sub-Category Filter */}
-              {/* <div>
-                <h3 className="mb-2 text-sm font-semibold text-gray-700 uppercase tracking-wider">Select Sub - Category</h3>
-                <div className="w-full h-0.5 bg-gray-300 mb-3"></div>
-                <div className="space-y-1">
-                  {filterOptions.subCategories.map((subCategory) => (
-                    <button
-                      key={subCategory}
-                      onClick={() => handleFilterChange('subCategory', subCategory)}
-                      className={`w-full px-3 py-2 text-sm text-left rounded transition-colors ${
-                        selectedFilters.subCategory === subCategory 
-                          ? 'bg-blue-600 text-white' 
-                          : 'bg-white text-gray-700 hover:bg-blue-50 hover:text-blue-600'
-                      }`}
-                    >
-                      {subCategory}
-                    </button>
-                  ))}
-                </div>
-              </div> */}
-
-              {/* Badge Filter */}
-              {/* <div>
-                <h3 className="mb-2 text-sm font-semibold text-gray-700 uppercase tracking-wider">Select Badge</h3>
-                <div className="w-full h-0.5 bg-gray-300 mb-3"></div>
-                <div className="space-y-1">
-                  {filterOptions.badges.map((badge) => (
-                    <button
-                      key={badge}
-                      onClick={() => handleFilterChange('badge', badge)}
-                      className={`w-full px-3 py-2 text-sm text-left rounded transition-colors ${
-                        selectedFilters.badge === badge 
-                          ? 'bg-blue-600 text-white' 
-                          : 'bg-white text-gray-700 hover:bg-blue-50 hover:text-blue-600'
-                      }`}
-                    >
-                      {badge}
-                    </button>
-                  ))}
-                </div>
-              </div> */}
-            {/* </div> */}
-            </div>
-          </div>
+        <div className="hidden w-full lg:block lg:w-[300px] lg:flex-none">
+          <div className="space-y-6">{filterPanel}</div>
         </div>
 
-        {/* Right Content - Services Grid */}
         <div className="w-full min-w-0 flex-1">
-    
+          <button
+            type="button"
+            className="market-btn-secondary mb-4 w-full min-h-11 lg:hidden"
+            onClick={() => setDrawerOpen(true)}
+            aria-expanded={drawerOpen}
+          >
+            Filters
+          </button>
+
+          <MobileFilterDrawer
+            open={drawerOpen}
+            onClose={() => setDrawerOpen(false)}
+            resultCount={safeTotalProducts}
+          >
+            {filterPanel}
+          </MobileFilterDrawer>
           {/* Products Count - Compact */}
           <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
    

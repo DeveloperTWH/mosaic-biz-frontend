@@ -9,6 +9,8 @@ import { createServiceBooking } from "@/lib/api/serviceBookings";
 import { Review } from "@/types/review";
 import ClientTestimonials from "../../../Components/ClientTestimonials";
 import PublicSearchFilterBar from "../../../Components/PublicSearchFilterBar";
+import MobileStickyActionBar, { MOBILE_STICKY_BAR_PADDING } from "../../../Components/MobileStickyActionBar";
+import TrustBadge from "../../../Components/TrustBadge";
 import { buildSearchPageUrl, PublicSearchFilters } from "../../../Components/publicSearch";
 
 /* ─────────────── Types based on actual API response ─────────────── */
@@ -940,7 +942,7 @@ export default function ServiceVendorProfilePage() {
 
 
   return (
-    <div className="min-h-screen bg-white font-sans">
+    <div className={`min-h-screen bg-white font-sans ${MOBILE_STICKY_BAR_PADDING}`}>
 
       {/* ── Hero Banner ── */}
 <div className="relative w-full h-[180px] bg-gray-800 overflow-hidden">
@@ -1379,7 +1381,7 @@ export default function ServiceVendorProfilePage() {
             </div>
 
             {/* Book Service Form */}
-<div className="overflow-hidden border border-[#e2c46a] bg-[#fff8e8]">
+<div id="booking-section" className="overflow-hidden border border-[#e2c46a] bg-[#fff8e8]">
   
   {/* Header */}
   <div className="border-b border-[#e6d3a3] px-5 py-4">
@@ -1733,6 +1735,35 @@ export default function ServiceVendorProfilePage() {
         error={revealError}
         onClose={closeRevealModal}
         onConfirm={handleRevealConfirm}
+      />
+
+      <MobileStickyActionBar
+        leading={
+          totalPrice > 0 && !hasDirectBookingLink ? (
+            <span className="font-poppins text-sm font-semibold text-market-gold">
+              ${totalPrice.toFixed(2)}
+            </span>
+          ) : undefined
+        }
+        primaryLabel={hasDirectBookingLink ? "Book now" : bookingSubmitting ? "Submitting…" : "Request appointment"}
+        onPrimaryClick={() => {
+          if (hasDirectBookingLink) {
+            window.open(bookingToolLink, "_blank", "noopener,noreferrer");
+            return;
+          }
+          if (bookingReady && !bookingSubmitting) {
+            void handleBookingSubmit();
+            return;
+          }
+          document.getElementById("booking-section")?.scrollIntoView({ behavior: "smooth" });
+        }}
+        primaryDisabled={!hasDirectBookingLink && bookingSubmitting}
+        secondaryLabel={hasDirectBookingLink ? undefined : "View form"}
+        onSecondaryClick={
+          hasDirectBookingLink
+            ? undefined
+            : () => document.getElementById("booking-section")?.scrollIntoView({ behavior: "smooth" })
+        }
       />
     </div>
   );

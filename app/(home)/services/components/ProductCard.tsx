@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import MarketImage from "../../Components/MarketImage";
+import TrustBadge from "../../Components/TrustBadge";
 
 type ProductCardProps = {
   serviceId?: string;
@@ -57,22 +58,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
           <span className="font-montserrat text-xs font-medium text-market-gold">View Details</span>
         </div>
 
-        <div className="market-card-footer mt-3 min-h-[64px]">
+        <div className="market-card-footer mt-3 flex min-h-[64px] flex-col items-center justify-center gap-1">
           <span className="text-sm font-semibold text-market-muted">Earned Badge:</span>
-          {badge ? (
-            <img
-              src={`/badge/${badge.charAt(0).toUpperCase() + badge.slice(1)}.png`}
-              alt={`${badge} badge`}
-              className="h-14 object-contain"
-              onError={(e) => {
-                const img = e.currentTarget;
-                if (img.src.endsWith("/badge.png")) return;
-                img.src = "/badge.png";
-              }}
-            />
-          ) : (
-            <div className="h-14 w-[90px]" />
-          )}
+          {badge ? <TrustBadge tier={badge} size="lg" linkToExplainer /> : <div className="h-14 w-[90px]" />}
         </div>
       </div>
     </div>

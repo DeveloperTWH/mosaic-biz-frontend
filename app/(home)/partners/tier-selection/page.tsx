@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { AlertCircle, Loader } from 'lucide-react';
 import Link from 'next/link';
 import TierCard from '../tier-selection/components/TierCard';
+import TierComparison from '../tier-selection/components/TierComparison';
 import { PaymentModal } from './components';
 import {
   fetchSubscriptionPlans,
@@ -200,6 +201,14 @@ const TierSelectionContent: React.FC = () => {
               badge={getBadge(plan.name)}
             />
           ))}
+        </div>
+
+        <div className="mb-12">
+          <TierComparison plans={plans} />
+          <p className="mt-4 text-center text-xs text-gray-500">
+            Feature availability follows your selected plan. Marketing descriptions may include upcoming capabilities —
+            confirm active features in your dashboard after subscribing.
+          </p>
         </div>
 
         {/* Back Link */}
