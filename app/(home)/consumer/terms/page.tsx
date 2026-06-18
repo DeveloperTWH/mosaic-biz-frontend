@@ -329,7 +329,7 @@ const CustomerTermsConditions = () => {
       </section>
 
       {/* CTA Section */}
-      <div className="relative left-1/2 right-1/2 w-screen ml-[-50vw] mr-[-50vw] mt-12 mb-8">
+      <div className="mt-12 w-full">
         <div
           className="w-full bg-cover bg-center"
           style={{ backgroundImage: "url('/contact/becomeVendor.png')" }}

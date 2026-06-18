@@ -256,7 +256,7 @@ body {
 }
 
 .market-dropdown-link {
-  @apply block px-4 py-2.5 text-sm font-medium font-poppins text-market-text/90 hover:bg-white/5;
+  @apply market-nav-link flex min-h-11 items-center px-4 py-2.5 text-sm font-medium font-poppins text-market-text/90 hover:bg-white/5 hover:text-market-gold;
 }
 
 .roboto {
