@@ -1,12 +1,27 @@
 # Mobile App Navigation QA Proof — Epic #95 / Issue #103
 
 **Repo:** Digital-Builders-757/mosaic-biz-frontend-launch  
-**Branch:** `sprint/mobile-nav-qa-103`  
-**Feature stack tip:** `589b0e2044152d4ebe551a2771335f7662a57f0e` (`fix: prevent mobile sticky commerce overlap`)  
-**QA commit (this doc):** `a539b6e39b720c532f35611e2903db9cc9502c5d` (`docs: add mobile app navigation QA proof`; branch tip `sprint/mobile-nav-qa-103`)  
+**Branch:** `release/mobile-app-nav-reconciliation-95-103`  
+**Reconciliation commit:** `f485fd3530e43e37995fac38d1e68d5dc0b87db3`  
+**Merge strategy:** merge `launch/main` into mobile nav stack (not rebase)  
+**Reconciliation date:** 2026-06-18  
+**Prior QA branch:** `sprint/mobile-nav-qa-103` (`fac1012f`)  
 **Test date:** 2026-06-18  
-**Tester:** Cursor agent (local dev server + browser automation)  
+**Tester:** Cursor agent (local build + prior browser automation)  
 **Environment:** `http://localhost:3000` (Next.js dev), API at `http://localhost:3001` **offline** during QA
+
+## Reconciliation summary
+
+| Item | Detail |
+|------|--------|
+| Base branch | `sprint/mobile-nav-qa-103` (4 mobile-nav commits + QA doc) |
+| Merged from | `launch/main` @ `0a3d5f82` (PR #104 opaque drawers + epic-73 readability) |
+| WIP commit | `a5be10ec` — Hero auth CTAs + bottom nav hydration fix |
+| Conflicts resolved | `app/(home)/Components/nav/MobileNavDrawer.tsx` (combined portal + bottom-offset + opaque panel), `app/globals.css` (auto-merged: bottom-nav vars + readability tokens) |
+| Cherry-picked | `668ba319` → `docs/MOBILE_APP_NAV_AUDIT.md` (Issue #96) |
+| Stashed (not in release) | `safety: pre-reconciliation local WIP (about/readability)` — unrelated about/readability edits |
+
+Post-merge drawer behavior: `createPortal` + `.market-mobile-drawer-panel` opaque panel from PR #104, with `bottomOffset: var(--bottom-nav-h)` so drawer sits above bottom nav.
 
 ## Scope
 
@@ -17,6 +32,9 @@ Proof pack for the mobile app-style navigation stack merged on this branch:
 | `e0180860` | feat: add mobile bottom app navigation       |
 | `5d1d61db` | style: polish mobile marketplace and homepage UX |
 | `589b0e20` | fix: prevent mobile sticky commerce overlap  |
+| `a5be10ec` | fix: sync hero CTAs and bottom nav auth hydration |
+| `55c3bbee` | merge: reconcile launch/main into mobile nav release |
+| `f485fd35` | docs: audit mobile app navigation IA         |
 
 **Key files under test:**
 
@@ -25,7 +43,9 @@ Proof pack for the mobile app-style navigation stack merged on this branch:
 - `app/(home)/Components/nav/navConfig.ts`
 - `app/(home)/Components/Navbar.tsx`
 - `app/(home)/Components/MobileStickyActionBar.tsx`
-- `app/globals.css` (`--bottom-nav-h`, `--commerce-sticky-h`, `.with-commerce-sticky`)
+- `app/(home)/Components/Hero.tsx`
+- `app/globals.css` (`--bottom-nav-h`, `--commerce-sticky-h`, `.with-commerce-sticky`, `.market-mobile-drawer-panel`)
+- `docs/MOBILE_APP_NAV_AUDIT.md`
 
 ## Viewports tested
 
@@ -91,13 +111,16 @@ _(Product sticky bar and login overflow re-validated on iPhone; Android spot-che
 
 ## Build / lint / typecheck
 
-Run on branch `sprint/mobile-nav-qa-103` at feature commit `589b0e20` (build re-run at QA time; QA doc at branch tip):
+Run on branch `release/mobile-app-nav-reconciliation-95-103` at commit `f485fd35` (post-reconciliation):
 
 | Command | Result | Notes |
 |---------|--------|-------|
-| `npm run build` | **Pass** (exit 0) | Next.js production build completed |
+| `npm install` | **Pass** (exit 0) | Dependencies installed |
+| `npm run build` | **Pass** (exit 0) | Next.js 16.1.2 production build completed |
 | `npx tsc --noEmit` | **Pass** (exit 0) | No TypeScript errors |
-| `npm run lint` | **Fail** (exit 1) | 658 problems (341 errors, 317 warnings) — **pre-existing repo-wide**; not introduced by mobile nav stack |
+| `npm run lint` | **Fail** (exit 1) | 660 problems (343 errors, 317 warnings) — **pre-existing repo-wide**; not introduced by mobile nav stack |
+| `npm run test` | **N/A** | Script not defined in `package.json` |
+| `npm run typecheck` | **N/A** | Script not defined; used `npx tsc --noEmit` instead |
 
 ## Screenshots
 
@@ -123,7 +146,7 @@ Related prior assets: `docs/qa-screenshots/homepage-mobile.png`, `docs/qa-screen
 3. **`/vendor-profile/product-vendor/*`** — Still shows bottom nav (not in `COMMERCE_STICKY_ROUTE_PREFIXES`). Intentional gap vs product/service/food detail routes; track if vendor storefront should use sticky bar.
 4. **Duplicate FAQ in hamburger drawer** — FAQ appears under both Learn and More sections (`navConfig.ts` MORE_LINKS + LEARN_LINKS).
 5. **Navbar auth refresh** — Bottom nav Account href may not update until reload after login (`auth:login` listener exists but header/session sync is inconsistent).
-6. **ESLint debt** — 658 existing lint findings; mobile nav QA does not resolve repo-wide lint.
+6. **ESLint debt** — 660 existing lint findings; mobile nav QA does not resolve repo-wide lint.
 7. **Empty marketplace locally** — Product grid empty when API offline; card polish and listing layout verified structurally only.
 
 ## Manual re-test (when API available)
@@ -138,7 +161,9 @@ Related prior assets: `docs/qa-screenshots/homepage-mobile.png`, `docs/qa-screen
 | Gate | Status |
 |------|--------|
 | QA doc present | Yes |
+| Audit doc present (`MOBILE_APP_NAV_AUDIT.md`) | Yes |
+| Merge conflicts resolved | Yes (`MobileNavDrawer.tsx`, `globals.css`) |
 | Build passes | Yes |
 | Known issues documented | Yes |
 | Production deploy | **Not triggered** |
-| Merge to main | **Out of scope** |
+| Recommendation | **Ready for PR to `launch/main`** — staging/preview QA with live API required before production (#101 sticky commerce E2E) |
