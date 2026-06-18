@@ -27,7 +27,7 @@ export const LEARN_LINKS: NavLink[] = [
   { label: "FAQ", href: "/faq" },
 ];
 
-/** Legal and compliance links — footer + desktop MORE dropdown only (not hamburger). */
+/** Legal and compliance links — footer only (not header or hamburger). */
 export const LEGAL_POLICY_LINKS: NavLink[] = [
   { label: "Terms & Conditions", href: "/terms" },
   { label: "Privacy Policy", href: "/privacy" },
@@ -50,15 +50,6 @@ export const FOOTER_LEGAL_LINKS: NavLink[] = [
   { label: "Trust badges – consumer", href: "/consumer/trustbadge" },
   { label: "Trust badges – vendor", href: "/vendor/trustbadge" },
 ];
-
-/** @deprecated Use LEGAL_POLICY_LINKS — kept for any legacy imports. */
-export const MORE_LINKS: NavLink[] = [
-  { label: "FAQ", href: "/faq" },
-  ...LEGAL_POLICY_LINKS,
-];
-
-/** Desktop MORE dropdown — legal/policy only (FAQ lives under LEARN). */
-export const MORE_DROPDOWN_LINKS: NavLink[] = LEGAL_POLICY_LINKS;
 
 export const LOGIN_LINKS: NavLink[] = [
   { label: "Login as Customer", href: "/login?type=customer" },

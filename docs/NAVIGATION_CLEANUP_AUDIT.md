@@ -188,3 +188,89 @@ Privacy policy, Terms of service, Refunds & returns, Dispute resolution, Consume
 1. Fix `FeatureBlogs.tsx` `/blogs` link (dead route) or add blog section.
 2. Add shipping policy page if business requires it, then add to `FOOTER_LEGAL_LINKS`.
 3. Remove duplicate FAQ note from `MOBILE_APP_NAV_QA_PROOF.md` on next QA pass.
+
+---
+
+## Header More Section Removal
+
+**Branch:** `sprint/remove-header-more-section`  
+**Completed:** 2026-06-18
+
+### Why "More" was removed
+
+The desktop header **MORE** dropdown duplicated footer legal/compliance content (Terms, Privacy, dispute, refunds, consumer/vendor terms, trust badges). That made the header feel like a legal document directory and distracted from core marketplace actions. Legal and policy links belong in the footer; the header should focus on shopping, vendor onboarding, trust-building learn content, login, and cart.
+
+### Links removed from desktop header
+
+These 8 links were removed from the desktop **MORE** dropdown (via `MORE_DROPDOWN_LINKS` / `LEGAL_POLICY_LINKS`):
+
+| Label | Route |
+|-------|-------|
+| Terms & Conditions | `/terms` |
+| Privacy Policy | `/privacy` |
+| Dispute Resolution Process | `/dispute` |
+| Refunds and Returns | `/refund-return` |
+| Terms and Conditions – Consumer | `/consumer/terms` |
+| Terms and Conditions – Vendor | `/vendor/terms` |
+| Trust Badges – Consumer | `/consumer/trustbadge` |
+| Trust Badges – Vendor | `/vendor/trustbadge` |
+
+Mobile hamburger **More** section was already removed in the prior hamburger simplification pass — no regression.
+
+### Where those links now live
+
+All removed links remain in the footer **Legal** column via `FOOTER_LEGAL_LINKS` in [`Footer.tsx`](../app/(home)/Components/Footer.tsx):
+
+- Privacy policy → `/privacy`
+- Terms of service → `/terms`
+- Refunds & returns → `/refund-return`
+- Dispute resolution → `/dispute`
+- Consumer terms → `/consumer/terms`
+- Vendor terms → `/vendor/terms`
+- Trust badges – consumer → `/consumer/trustbadge`
+- Trust badges – vendor → `/vendor/trustbadge`
+
+No new routes were added. Shipping policy still has no dedicated route.
+
+### Final desktop header structure
+
+| Item | Contents |
+|------|----------|
+| HOME | `/` |
+| SHOP | Products, Foods, Services, Vendors, Search |
+| BECOME A VENDOR | `/become-a-vendor` |
+| LEARN | About, Contact, How to Use This App, FAQ |
+| Header actions | Login dropdown (Customer/Vendor) + Cart |
+
+**Removed:** MORE dropdown.
+
+### Final mobile drawer structure (unchanged)
+
+1. **Marketplace** — Foods, Services, Vendors  
+2. **Become a Vendor** (CTA)  
+3. **Explore** — About, Contact, How It Works, FAQ, Refer a Vendor  
+4. **Account** — Customer/Vendor login or role-aware dashboard links  
+
+### Footer legal/policy structure (unchanged)
+
+Dedicated **Legal** column: Privacy policy, Terms of service, Refunds & returns, Dispute resolution, Consumer terms, Vendor terms, Trust badges – consumer, Trust badges – vendor.
+
+### Config cleanup
+
+- Removed `MORE_DROPDOWN_LINKS` and deprecated `MORE_LINKS` from [`navConfig.ts`](../app/(home)/Components/nav/navConfig.ts).
+- Kept `LEGAL_POLICY_LINKS` and `FOOTER_LEGAL_LINKS` for footer use.
+- Updated `LEGAL_POLICY_LINKS` comment to footer-only.
+
+### Files changed (this pass)
+
+| File | Summary |
+|------|---------|
+| `app/(home)/Components/nav/DesktopNav.tsx` | Removed MORE `NavDropdown` |
+| `app/(home)/Components/nav/navConfig.ts` | Removed MORE exports; footer-only legal comment |
+| `docs/NAVIGATION_CLEANUP_AUDIT.md` | This section |
+
+### Follow-up recommendations
+
+1. Update [`docs/HEADER_NAV_QA.md`](HEADER_NAV_QA.md) desktop IA table — still references MORE and old mobile More section.
+2. Add shipping policy page if business requires it, then add to `FOOTER_LEGAL_LINKS`.
+3. Fix `FeatureBlogs.tsx` `/blogs` dead link or add blog route.
