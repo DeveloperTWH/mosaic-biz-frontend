@@ -80,7 +80,7 @@ const VendorDetailPage = () => {
     const [tab, setTab] = useState<number>(1);
 
     return (
-        <div className="max-w-screen-xl mx-auto px-4 py-6">
+        <div className="market-surface-light max-w-screen-xl mx-auto px-4 py-6">
             <div className="flex flex-col md:flex-row gap-6">
                 <div className="w-full md:w-[38%] space-y-6">
                     <div className="bg-white shadow-md rounded-lg p-6 border-1 border-black">

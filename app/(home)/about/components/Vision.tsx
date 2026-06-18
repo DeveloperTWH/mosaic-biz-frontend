@@ -2,7 +2,7 @@ export default function Vision() {
     return (
         <section className="w-full px-6 py-20 pt-0 md:px-16">
             <div className="mx-auto md:w-3/4">
-                <h2 className="mb-2 text-3xl font-bold text-center heading">VISION:</h2>
+                <h2 className="market-section-heading mb-2 text-center text-3xl">VISION:</h2>
                 <hr className="h-[2px] w-[120px] bg-green-900 mx-auto" />
                 <hr className="h-[2px] w-[120px] bg-green-900 mt-[1px] mb-5 mx-auto" />
                 <p className="text-sm leading-relaxed text-gray-700">

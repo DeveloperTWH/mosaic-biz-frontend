@@ -923,7 +923,7 @@ setMainImage(firstImage);
     ? product.metaFields.map((field, i) => (
       <div key={i} className="flex py-1.5 border-b border-gray-100">
         <span
-          className="w-44 shrink-0"
+          className="w-44 shrink-0 text-brand-navy"
           style={{
             fontFamily: 'Montserrat, sans-serif',
             fontWeight: 700,
@@ -937,6 +937,7 @@ setMainImage(firstImage);
         </span>
 
         <span
+          className="market-card-light-body"
           style={{
             fontFamily: 'Montserrat, sans-serif',
             fontWeight: 500,
@@ -950,7 +951,7 @@ setMainImage(firstImage);
     : product.attributes?.map((attr, i) => (
       <div key={i} className="flex py-1.5 border-b border-gray-100">
         <span
-          className="w-44 shrink-0"
+          className="w-44 shrink-0 text-brand-navy"
           style={{
             fontFamily: 'Montserrat, sans-serif',
             fontWeight: 700,
@@ -964,6 +965,7 @@ setMainImage(firstImage);
         </span>
 
         <span
+          className="market-card-light-body"
           style={{
             fontFamily: 'Montserrat, sans-serif',
             fontWeight: 500,
@@ -996,7 +998,7 @@ setMainImage(firstImage);
   About Item
 </h3>
                 <div 
-                  className="prose prose-sm max-w-none text-gray-700"
+                  className="market-card-light-body prose prose-sm max-w-none"
                   style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '14px' }}
                   dangerouslySetInnerHTML={{ __html: product.description }}
                 />

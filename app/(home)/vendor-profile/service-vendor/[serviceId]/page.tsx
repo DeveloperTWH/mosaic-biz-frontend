@@ -942,7 +942,7 @@ export default function ServiceVendorProfilePage() {
 
 
   return (
-    <div className={`min-h-screen bg-white font-sans ${MOBILE_STICKY_BAR_PADDING}`}>
+    <div className={`market-surface-light min-h-screen font-sans ${MOBILE_STICKY_BAR_PADDING}`}>
 
       {/* ── Hero Banner ── */}
 <div className="relative w-full h-[180px] bg-gray-800 overflow-hidden">

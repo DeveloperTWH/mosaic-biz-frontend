@@ -16,10 +16,10 @@ export default function InnovationDiversity() {
             </div>
             {/* Text content */}
             <div className="py-10 md:px-10">
-                <h2 className="mb-2 text-3xl font-bold heading">INNOVATION AND DIVERSITY:</h2>
+                <h2 className="market-section-heading mb-2 text-3xl">INNOVATION AND DIVERSITY:</h2>
                 <hr className="h-[2px] w-[120px] bg-green-900" />
                 <hr className="h-[2px] w-[120px] bg-green-900 mt-[1px] mb-5" />
-                <div className="mt-8 space-y-4 text-gray-700">
+                <div className="mt-8 space-y-4 text-market-muted">
                     <div className="flex items-start gap-3">
                         <CheckCircle className="text-green-700 min-w-[20px]" size={20} />
                         <p className="text-base font-medium">
@@ -33,7 +33,7 @@ export default function InnovationDiversity() {
                         </p>
                     </div>
                 </div>
-                <p className="mt-5 text-sm leading-relaxed text-gray-700">
+                <p className="mt-5 text-sm leading-relaxed text-market-muted">
                     "The Road To America's Economic Prosperity Runs Through Our Minority Business Communities," "We Must Continue To Ensure That Minority-Owned Business And The Entrepreneurs Behind Them Have The Tools, Resources, And Support They Need To Not Just Take Part In But Drive The Economic Success Of This Country." Deputy Commerce Secretary Don Graves.
                 </p>
             </div>

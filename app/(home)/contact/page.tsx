@@ -71,10 +71,10 @@ if (!token) {
             <div className="grid w-full grid-cols-1 gap-8 p-6 mx-auto lg:grid-cols-2 lg:p-12 max-w-7xl">
                 {/* Contact Form */}
                 <div className='p-4 sm:p-6 md:p-8 lg:p-10'>
-                    <h2 className="mb-3 text-3xl font-poppins sm:text-4xl">CONNECT WITH US</h2>
+                    <h2 className="market-section-heading mb-3 sm:text-4xl">CONNECT WITH US</h2>
                     <hr className="h-[2px] w-[100px] bg-green-900" />
                     <hr className="h-[2px] w-[100px] bg-green-900 mt-[1px] mb-4" />
-                    <p className="mb-6 text-sm text-[#5F5F5F] font-montserrat">
+                    <p className="mb-6 text-sm text-market-muted font-montserrat">
                         Reach out to Mosaic Biz Hub anytime. We’re here to support your journey, answer your questions, and help your business thrive in the digital world.
                     </p>
 

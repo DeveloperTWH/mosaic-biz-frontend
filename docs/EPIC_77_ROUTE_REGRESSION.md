@@ -24,14 +24,15 @@
 # Expect 308/301 to canonical routes
 curl -I https://<preview>/products/foo/bar
 curl -I https://<preview>/services/cat/svc123
-curl -I https://<preview>/vendors/some-slug
+curl -I https://<preview>/vendors/some-slug-or-id
 ```
 
-## Footer link grep (local)
+## Vendor profile routing (Epic #102)
 
-```bash
-rg "href=\"/" app/(home)/Components/Footer.tsx
-```
+| Source | Destination |
+|--------|-------------|
+| `/vendors` grid card click | `/vendor-profile/product-vendor/:businessId` |
+| `/vendors/:vendor_id` (legacy bookmark) | `/vendor-profile/product-vendor/:vendor_id` (308) |
 
 ## Known non-canonical (intentionally redirected)
 

@@ -19,7 +19,7 @@ const nextConfig: NextConfig = {
       { source: "/services/:id/:serviceId", destination: "/vendor-profile/service-vendor/:serviceId", permanent: true },
       { source: "/foods/resturant/:id", destination: "/foods", permanent: true },
       { source: "/foods/shop/:id", destination: "/foods", permanent: true },
-      { source: "/vendors/:vendor_id", destination: "/vendors", permanent: true },
+      { source: "/vendors/:vendor_id", destination: "/vendor-profile/product-vendor/:vendor_id", permanent: true },
     ];
   },
 };

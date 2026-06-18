@@ -397,7 +397,7 @@ export default function ProductVendorProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="market-surface-light min-h-screen">
       <div className="relative w-full h-[180px] bg-gray-800 overflow-hidden">
         <img
           src="/products/19099 1.png"

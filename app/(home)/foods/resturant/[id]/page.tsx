@@ -446,9 +446,9 @@ const RestaurantDetailPage = () => {
             <div>
               <h2 className="text-xl font-semibold mb-2 heading">FAQ</h2>
               {restaurant.faq.map((item, i) => (
-                <details key={i} className="mb-2 border p-3">
-                  <summary className="font-semibold cursor-pointer">{item.question}</summary>
-                  <p className="mt-2 text-gray-700">{item.answer}</p>
+                <details key={i} className="market-accordion-light mb-2">
+                  <summary>{item.question}</summary>
+                  <p className="market-accordion-light-body">{item.answer}</p>
                 </details>
               ))}
 

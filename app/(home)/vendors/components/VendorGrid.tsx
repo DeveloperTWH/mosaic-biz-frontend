@@ -151,7 +151,7 @@ export default function VendorGrid() {
             ) : (
                 <div className="mb-6 grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5">
                     {vendors.map((vendor) => (
-                        <Link key={vendor._id} href={`/vendors/${vendor.slug}`} className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-market-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-market-bg rounded-2xl">
+                        <Link key={vendor._id} href={`/vendor-profile/product-vendor/${vendor._id}`} className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-market-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-market-bg rounded-2xl">
                             <div className="market-card p-4 text-center">
                                 <div className="market-card-media mx-auto mb-3 flex h-20 w-full items-center justify-center rounded-lg">
                                     {vendor.logo ? (
