@@ -7,7 +7,7 @@ import {
     ProductVariantSize,
 } from "@/types/product";
 import axios from "axios";
-import { uploadToS3 } from "@/utils/s3Uploader";
+import { uploadToS3, GalleryLimitError } from "@/utils/s3Uploader";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 
@@ -319,7 +319,12 @@ const AddProductPage: React.FC<AddProductPageProps> = ({ businessId, businessSlu
             // ✅ 2. Upload Variant Images & Videos (with proper MIME types)
             const updatedVariants = await Promise.all(
                 productData.variants.map(async (variant, vIndex) => {
-                    // --- Images ---
+                    // --- Images (gallery – tier-enforced) ---
+                    // Count already-uploaded (non-blob) images as the baseline for the limit check
+                    const alreadyUploadedCount = variant.images.filter(
+                        (url) => !url.startsWith("blob:")
+                    ).length;
+
                     const uploadedImages = await Promise.all(
                         variant.images.map(async (imgUrl, i) => {
                             if (imgUrl.startsWith("blob:")) {
@@ -329,13 +334,17 @@ const AddProductPage: React.FC<AddProductPageProps> = ({ businessId, businessSlu
                                     `variant-${vIndex}-img-${Date.now()}-${i}.jpg`,
                                     { type: blob.type || "image/jpeg" }
                                 );
-                                return await uploadToS3(fileObj);
+                                // Pass currentImageCount = number of images already committed
+                                return await uploadToS3(fileObj, {
+                                    galleryType: "product-gallery",
+                                    currentImageCount: alreadyUploadedCount,
+                                });
                             }
                             return imgUrl;
                         })
                     );
 
-                    // --- Videos ---
+                    // --- Videos (variant videos are NOT gallery-limited) ---
                     const uploadedVideos = await Promise.all(
                         (variant.videos || []).map(async (vidUrl, i) => {
                             if (vidUrl.startsWith("blob:")) {
@@ -386,7 +395,11 @@ const AddProductPage: React.FC<AddProductPageProps> = ({ businessId, businessSlu
             router.push(`/partners/${businessSlug}/inventory`);
         } catch (error: any) {
             console.error("Error submitting product:", error);
-            toast.error(error?.response.data.error || "An error occurred while submitting the product.");
+            if (error instanceof GalleryLimitError) {
+                toast.error(error.message);
+            } else {
+                toast.error(error?.response?.data?.error || "An error occurred while submitting the product.");
+            }
         } finally {
             setIsSubmitting(false);
         }

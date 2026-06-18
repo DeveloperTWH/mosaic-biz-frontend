@@ -50,88 +50,88 @@ export default function ServiceImages({
             </button>
           </div>
         ) : (
-<div className="w-full h-48 bg-gray-200 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
-  <input
-    type="file"
-    id="cover-upload"
-    className="hidden"
-    accept="image/*"
-    onChange={(e) => {
-      const file = e.target.files?.[0];
+          <div className="w-full h-48 bg-gray-200 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
+            <input
+              type="file"
+              id="cover-upload"
+              className="hidden"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
 
-      if (file) {
-        const maxSize = 5 * 1024 * 1024; // 5MB
+                if (file) {
+                  const maxSize = 5 * 1024 * 1024; // 5MB
 
-        if (file.size > maxSize) {
-          alert('Image must be less than 5MB');
-          e.currentTarget.value = '';
-          return;
-        }
+                  if (file.size > maxSize) {
+                    alert('Image must be less than 5MB');
+                    e.currentTarget.value = '';
+                    return;
+                  }
 
-        onCoverUpload(file);
-      }
+                  onCoverUpload(file);
+                }
 
-      e.currentTarget.value = '';
-    }}
-  />
+                e.currentTarget.value = '';
+              }}
+            />
 
-  <label
-    htmlFor="cover-upload"
-    className="cursor-pointer flex flex-col items-center"
-  >
-    <ImageIcon className="w-12 h-12 text-gray-400 mb-2" />
-    <p className="text-xs text-gray-400">
-      Max 5MB
-    </p>
-  </label>
-</div>
+            <label
+              htmlFor="cover-upload"
+              className="cursor-pointer flex flex-col items-center"
+            >
+              <ImageIcon className="w-12 h-12 text-gray-400 mb-2" />
+              <p className="text-xs text-gray-400">
+                Max 5MB
+              </p>
+            </label>
+          </div>
         )}
       </div>
 
       {/* Service Gallery */}
       <div>
         <h3 className="text-sm font-semibold text-gray-900 mb-1 border-l-4 border-[#c9a227] pl-3">Service Gallery</h3>
-        <p className="text-xs text-gray-500 mb-3 pl-4">Max 5 images allowed based on your subscription plan.</p>
+        <p className="text-xs text-gray-500 mb-3 pl-4">uploding gallary images allowed baced on your subsritpion plan</p>
         {error ? (
           <p className="mb-3 pl-4 text-xs text-red-600">{error}</p>
         ) : null}
-        
+
         {/* Add Photo Button */}
         <div className="mb-3">
-<input
-  type="file"
-  id="gallery-upload"
-  className="hidden"
-  accept="image/*"
-  multiple
-  onChange={(e) => {
-    const files = e.target.files ? Array.from(e.target.files) : [];
-    const maxSize = 5 * 1024 * 1024; // 5MB
+          <input
+            type="file"
+            id="gallery-upload"
+            className="hidden"
+            accept="image/*"
+            multiple
+            onChange={(e) => {
+              const files = e.target.files ? Array.from(e.target.files) : [];
+              const maxSize = 5 * 1024 * 1024; // 5MB
 
-    const validFiles = files.filter((file) => {
-      if (file.size > maxSize) {
-        alert(`${file.name} is larger than 5MB`);
-        return false;
-      }
-      return true;
-    });
+              const validFiles = files.filter((file) => {
+                if (file.size > maxSize) {
+                  alert(`${file.name} is larger than 5MB`);
+                  return false;
+                }
+                return true;
+              });
 
-    if (validFiles.length > 0) {
-      onGalleryUpload(validFiles);
-    }
+              if (validFiles.length > 0) {
+                onGalleryUpload(validFiles);
+              }
 
-    e.currentTarget.value = '';
-  }}
-/>
-          <label 
-            htmlFor="gallery-upload" 
+              e.currentTarget.value = '';
+            }}
+          />
+          <label
+            htmlFor="gallery-upload"
             className="inline-block px-6 py-2 bg-[#c9a227] text-white text-sm rounded cursor-pointer hover:bg-[#b8921f]"
           >
             Add Photo
           </label>
           <p className="text-xs text-gray-400 mb-3">
-  Preferred image size: 1080 × 1080 pixels
-</p>
+            Preferred image size: 1080 × 1080 pixels
+          </p>
         </div>
 
         {/* Gallery Grid */}

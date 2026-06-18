@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import { Service } from '@/types/service'
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
-import { uploadToS3 } from '@/utils/s3Uploader';
+import { uploadToS3, GalleryLimitError } from '@/utils/s3Uploader';
 
 interface UpdateServiceFormProps {
     businessId: string;
@@ -930,7 +930,12 @@ const UpdateServiceForm: React.FC<UpdateServiceFormProps> = ({ businessId, busin
                 coverImageUrl = await uploadToS3(fileObj);
             }
 
-            // ✅ 2. Upload Images
+            // ✅ 2. Upload Images (gallery – tier-enforced)
+            // Count already-saved images (non-blob URLs) as the baseline
+            const alreadyUploadedImageCount = (serviceData.images || []).filter(
+                (url) => !url.startsWith("blob:")
+            ).length;
+
             const uploadedImages = await Promise.all(
                 (serviceData.images || []).map(async (imgUrl, i) => {
                     if (imgUrl.startsWith("blob:")) {
@@ -938,7 +943,10 @@ const UpdateServiceForm: React.FC<UpdateServiceFormProps> = ({ businessId, busin
                         const fileObj = new File([blob], `service-img-${Date.now()}-${i}.jpg`, {
                             type: blob.type || "image/jpeg",
                         });
-                        return await uploadToS3(fileObj);
+                        return await uploadToS3(fileObj, {
+                            galleryType: "service-gallery",
+                            currentImageCount: alreadyUploadedImageCount,
+                        });
                     }
                     return imgUrl;
                 })
@@ -979,7 +987,11 @@ const UpdateServiceForm: React.FC<UpdateServiceFormProps> = ({ businessId, busin
             router.push(`/partners/${businessSlug}/inventory`);
         } catch (err) {
             console.error("Submission error:", err);
-            toast.error("Submission failed. Please try again.");
+            if (err instanceof GalleryLimitError) {
+                toast.error(err.message);
+            } else {
+                toast.error("Submission failed. Please try again.");
+            }
         } finally {
             setIsSubmitting(false);
         }

@@ -1,40 +1,63 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import axios from "axios";
 import Sidebar from "./components/Sidebar"; // Import Sidebar component
 import Topbar from "./components/Topbar"; // Import Topbar component
 import Link from "next/link";
+import BusinessStatusModal from "./components/BusinessStatusModal";
 
 const Dashboard = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [businesses, setBusinesses] = useState<any[]>([]);
-  const [businessCount, setbusinessCount] = useState<any[]>([]);
+  const [businessCount, setbusinessCount] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [noBusinesses, setNoBusinesses] = useState<boolean>(false); // State to check if there are no businesses
-  const [notApprovedCount, setNotApprovedCount] = useState<number>(0); // Track count of not approved businesses
-  const router = useRouter();
+  const [activeBusinessCount, setActiveBusinessCount] = useState<number>(0); // Track count of active businesses
+  const [inactiveBusinessCount, setInactiveBusinessCount] = useState<number>(0); // Track count of inactive businesses
+  const [statusModalOpen, setStatusModalOpen] = useState<boolean>(false);
+  const [selectedBusinessIndex, setSelectedBusinessIndex] = useState<number | null>(null);
+  const [deactivationRemark, setDeactivationRemark] = useState<string>("");
+  const [updatingStatus, setUpdatingStatus] = useState<boolean>(false);
+  const [businessFilter, setBusinessFilter] = useState<"all" | "active" | "inactive">("all");
 
   // Function to fetch all businesses from the backend
   const fetchBusinesses = async () => {
+    setLoading(true);
     try {
+      const filterQuery =
+        businessFilter === "all" ? "" : `&isActive=${businessFilter === "active"}`;
       const response = await axios.get(
-        // Example with limit and page:
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/api/business?limit=4&page=1`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/business?page=1&limit=4${filterQuery}`,
         {
-          withCredentials: true, // Ensures that credentials (cookies) are sent with the request
+          withCredentials: true,
         }
       );
+      const data = Array.isArray(response.data.data) ? response.data.data : [];
 
       // Check if businesses exist
-      if (response.data.data.length === 0) {
+      if (data.length === 0) {
         setNoBusinesses(true); // If no businesses are found
+        setBusinesses([]);
+        setbusinessCount(0);
+        setActiveBusinessCount(0);
+        setInactiveBusinessCount(0);
       } else {
-        setBusinesses(response.data.data); // Assuming the response structure has `data`
-        setbusinessCount(response.data.totalBusinesses)
-        setNotApprovedCount(response.data.notApprovedCount); // Set count of not approved businesses
+        setBusinesses(data); // Assuming the response structure has `data`
+        setbusinessCount(response.data.totalBusinesses ?? data.length)
+        const activeCount =
+          response.data.activeBusinessCount ??
+          response.data.activeBusinesses ??
+          response.data.activeCount ??
+          data.filter((business: any) => business.isActive ?? business.isApproved).length;
+        const inactiveCount =
+          response.data.inactiveBusinessCount ??
+          response.data.inactiveBusinesses ??
+          response.data.inactiveCount ??
+          data.filter((business: any) => !(business.isActive ?? business.isApproved)).length;
+        setActiveBusinessCount(activeCount);
+        setInactiveBusinessCount(inactiveCount);
         setNoBusinesses(false); // Businesses found, reset state
       }
 
@@ -44,6 +67,10 @@ const Dashboard = () => {
       if (error.response && error.response.status === 404) {
         // Handle the case where businesses are not found
         setNoBusinesses(true);
+        setBusinesses([]);
+        setbusinessCount(0);
+        setActiveBusinessCount(0);
+        setInactiveBusinessCount(0);
       } else {
         toast.error("Failed to fetch businesses. Please try again later.");
         console.error("Error fetching businesses:", error);
@@ -54,45 +81,67 @@ const Dashboard = () => {
   // Call fetchBusinesses on component mount
   useEffect(() => {
     fetchBusinesses();
-  }, []);
+  }, [businessFilter]);
 
-  // Function to toggle the approval status
-  const toggleApproval = async (index: number) => {
+  const updateBusinessStatus = async (index: number, nextStatus: boolean, remark?: string) => {
     const business = businesses[index];
-    const updatedBusinesses = [...businesses];
-    const status = business.isApproved ? "Disapproved" : "Approved";
+    const status = nextStatus ? "activated" : "deactivated";
 
     try {
-      // Send approval/disapproval request to the backend
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/api/business/approve/${business._id}`,
-        {},
+      setUpdatingStatus(true);
+      // Send activate/deactivate request to the backend
+      await axios.patch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/business/status/${business._id}`,
         {
-          withCredentials: true, // Ensure cookies are sent with the request
+          isActive: nextStatus,
+          remark:
+            remark ||
+            (nextStatus
+              ? "Activated by admin from the dashboard."
+              : "Deactivated by admin from the dashboard."),
+        },
+        {
+          withCredentials: true,
         }
       );
 
-      // Update the state after toggling
-      updatedBusinesses[index].isApproved =
-        !updatedBusinesses[index].isApproved;
-      setBusinesses(updatedBusinesses);
-
-      // Update the notApprovedCount
-      const updatedNotApprovedCount = updatedBusinesses.filter(
-        (business) => !business.isApproved
-      ).length;
-
-      // Set the new count of not approved businesses
-      setNotApprovedCount(updatedNotApprovedCount);
-
       // Show success message
       toast.success(`${business.businessName} has been ${status}.`);
+      setStatusModalOpen(false);
+      setSelectedBusinessIndex(null);
+      setDeactivationRemark("");
     } catch (error) {
       toast.error(
-        `Failed to ${status.toLowerCase()} ${business.businessName}.`
+        `Failed to ${nextStatus ? "activate" : "deactivate"} ${business.businessName}.`
       );
-      console.error("Error during approval/disapproval:", error);
+      console.error("Error during active status update:", error);
+    } finally {
+      setUpdatingStatus(false);
     }
+  };
+
+  const openDeactivateModal = (index: number) => {
+    setSelectedBusinessIndex(index);
+    setDeactivationRemark("");
+    setStatusModalOpen(true);
+  };
+
+  const confirmDeactivate = async () => {
+    if (selectedBusinessIndex === null) return;
+    if (!deactivationRemark.trim()) {
+      toast.error("Please add a remark before deactivating this business.");
+      return;
+    }
+
+    await updateBusinessStatus(selectedBusinessIndex, false, deactivationRemark.trim());
+  };
+
+  const activateBusiness = async (index: number) => {
+    await updateBusinessStatus(index, true);
+  };
+
+  const handleFilterChange = (filter: "all" | "active" | "inactive") => {
+    setBusinessFilter(filter);
   };
 
   if (loading) {
@@ -110,6 +159,29 @@ const Dashboard = () => {
         <Topbar setIsSidebarOpen={setSidebarOpen} />
 
         <main className="flex-1 px-8 py-6 overflow-y-auto">
+          <div className="flex flex-wrap items-center gap-3 mb-6">
+            <span className="text-sm font-semibold uppercase tracking-wide text-gray-500">
+              Filter
+            </span>
+            {(["all", "active", "inactive"] as const).map((filter) => (
+              <button
+                key={filter}
+                onClick={() => handleFilterChange(filter)}
+                className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+                  businessFilter === filter
+                    ? "bg-indigo-600 text-white shadow-md"
+                    : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
+                }`}
+              >
+                {filter === "all"
+                  ? "All Businesses"
+                  : filter === "active"
+                    ? "Active Only"
+                    : "Inactive Only"}
+              </button>
+            ))}
+          </div>
+
           {/* Stats Section */}
           <div className="grid grid-cols-1 gap-8 mb-8 sm:grid-cols-2 lg:grid-cols-3">
             {/* Stats Card 1 */}
@@ -125,24 +197,30 @@ const Dashboard = () => {
             {/* Stats Card 2 */}
             <div className="p-8 transition-all duration-300 transform bg-white rounded-lg shadow-lg hover:shadow-2xl hover:scale-105">
               <h3 className="text-lg font-semibold text-gray-800">
-                Pending Approvals
+                Active Businesses
               </h3>
-              <p className="text-3xl font-bold text-orange-600">
-                {noBusinesses ? "N/A" : notApprovedCount}
+              <p className="text-3xl font-bold text-green-600">
+                {noBusinesses ? "N/A" : activeBusinessCount}
               </p>
             </div>
 
             {/* Stats Card 3 */}
             <div className="p-8 transition-all duration-300 transform bg-white rounded-lg shadow-lg hover:shadow-2xl hover:scale-105">
-              <h3 className="text-lg font-semibold text-gray-800">Customers</h3>
-              <p className="text-3xl font-bold text-green-600">120</p>
+              <h3 className="text-lg font-semibold text-gray-800">
+                Inactive Businesses
+              </h3>
+              <p className="text-3xl font-bold text-orange-600">
+                {noBusinesses ? "N/A" : inactiveBusinessCount}
+              </p>
             </div>
 
             {/* Stats Card 4 (Revenue) */}
-            <div className="p-8 transition-all duration-300 transform bg-white rounded-lg shadow-lg hover:shadow-2xl hover:scale-105">
-              <h3 className="text-lg font-semibold text-gray-800">Revenue</h3>
-              <p className="text-3xl font-bold text-teal-600">$15000</p>
-            </div>
+            {/* <div className="p-8 transition-all duration-300 transform bg-white rounded-lg shadow-lg hover:shadow-2xl hover:scale-105">
+              <h3 className="text-lg font-semibold text-gray-800">Live View</h3>
+              <p className="text-base font-medium text-teal-600">
+                Business status management
+              </p>
+            </div> */}
           </div>
 
           {/* No Businesses Found Message */}
@@ -181,24 +259,32 @@ const Dashboard = () => {
                         <td className="px-6 py-4">
                           <span
                             className={
-                              business.isApproved
+                              Boolean(business.isActive ?? business.isApproved)
                                 ? "text-green-600"
                                 : "text-red-600"
                             }
                           >
-                            {business.isApproved ? "Approved" : "Not Approved"}
+                            {Boolean(business.isActive ?? business.isApproved)
+                              ? "Active"
+                              : "Inactive"}
                           </span>
                         </td>
 
                         <td className="px-6 py-4">
                           <button
-                            className={`${business.isApproved
+                            className={`${Boolean(business.isActive ?? business.isApproved)
                                 ? "bg-red-500 hover:bg-red-600"
                                 : "bg-green-500 hover:bg-green-600"
                               } text-white px-4 py-2 rounded-lg shadow-md transition-all duration-300`}
-                            onClick={() => toggleApproval(index)}
+                            onClick={() =>
+                              Boolean(business.isActive ?? business.isApproved)
+                                ? openDeactivateModal(index)
+                                : activateBusiness(index)
+                            }
                           >
-                            {business.isApproved ? "Disapprove" : "Approve"}
+                            {Boolean(business.isActive ?? business.isApproved)
+                              ? "Deactivate"
+                              : "Activate"}
                           </button>
                         </td>
                       </tr>
@@ -219,6 +305,19 @@ const Dashboard = () => {
           )}
         </main>
       </div>
+      <BusinessStatusModal
+        isOpen={statusModalOpen}
+        businessName={selectedBusinessIndex !== null ? businesses[selectedBusinessIndex]?.businessName || "this business" : "this business"}
+        remark={deactivationRemark}
+        setRemark={setDeactivationRemark}
+        loading={updatingStatus}
+        onClose={() => {
+          setStatusModalOpen(false);
+          setSelectedBusinessIndex(null);
+          setDeactivationRemark("");
+        }}
+        onConfirm={confirmDeactivate}
+      />
     </div>
   );
 };

@@ -457,11 +457,12 @@ const toggleHasVariants = (value: boolean) => {
 
   // File upload for feature and gallery images
   const handleFileUpload = async (type: 'feature' | 'gallery', file: File): Promise<void> => {
+    let interval: ReturnType<typeof setInterval> | null = null;
     try {
       setUploading(prev => ({ ...prev, [type]: true }));
       setUploadProgress(prev => ({ ...prev, [type]: 0 }));
 
-      const interval = setInterval(() => {
+      interval = setInterval(() => {
         setUploadProgress(prev => ({
           ...prev,
           [type]: Math.min((prev[type] || 0) + 10, 90)
@@ -470,8 +471,12 @@ const toggleHasVariants = (value: boolean) => {
 
       const documentType = type === 'feature' ? 'product-cover' : 'product-gallery';
       
+      // Pass currentImageCount for gallery uploads so backend can enforce plan limits
+      const currentImageCount = type === 'gallery' ? formData.galleryImages.length : undefined;
+      const countParam = currentImageCount !== undefined ? `&currentImageCount=${currentImageCount}` : '';
+
       const response = await fetch(
-        `${API_BASE_URL}/api/product/upload-url?fileName=${encodeURIComponent(file.name)}&fileType=${encodeURIComponent(file.type)}&documentType=${documentType}`,
+        `${API_BASE_URL}/api/product/upload-url?fileName=${encodeURIComponent(file.name)}&fileType=${encodeURIComponent(file.type)}&documentType=${documentType}${countParam}`,
         {
           method: 'GET',
           credentials: 'include',
@@ -479,7 +484,19 @@ const toggleHasVariants = (value: boolean) => {
       );
 
       if (!response.ok) {
-        throw new Error('Failed to get upload URL');
+        // Read the backend error body to show the exact plan-limit message
+        let errMsg = 'Failed to get upload URL';
+        try {
+          const text = await response.text();
+          if (text) {
+            const errBody = JSON.parse(text);
+            if (errBody?.error) errMsg = errBody.error;
+            else if (errBody?.message) errMsg = errBody.message;
+          }
+        } catch (_) {}
+        // Show toast directly — don't throw, just return early
+        toast.error(errMsg);
+        return;
       }
 
       const data: UploadResponse = await response.json();
@@ -495,7 +512,6 @@ const toggleHasVariants = (value: boolean) => {
         throw new Error('Failed to upload file to S3');
       }
 
-      clearInterval(interval);
       setUploadProgress(prev => ({ ...prev, [type]: 100 }));
 
       // Update form data with file URL
@@ -522,8 +538,9 @@ const toggleHasVariants = (value: boolean) => {
 
     } catch (error: any) {
       console.error('Upload error:', error);
-      toast.error(`Upload failed: ${error.message}`);
+      toast.error(error.message || 'Upload failed');
     } finally {
+      if (interval) clearInterval(interval);
       setUploading(prev => ({ ...prev, [type]: false }));
       setTimeout(() => {
         setUploadProgress(prev => ({ ...prev, [type]: 0 }));
@@ -697,10 +714,12 @@ const toggleHasVariants = (value: boolean) => {
 
   let errorMessage = 'Failed to create product';
 
-  if (backendError?.error?.message) {
-    errorMessage = backendError.error.message;
+  if (typeof backendError?.error === 'string') {
+    errorMessage = backendError.error;              // ← {"error": "...string..."} ✅
+  } else if (backendError?.error?.message) {
+    errorMessage = backendError.error.message;      // ← {"error": {"message": "..."}}
   } else if (backendError?.message) {
-    errorMessage = backendError.message;
+    errorMessage = backendError.message;            // ← {"message": "..."}
   }
 
   toast.error(errorMessage);
