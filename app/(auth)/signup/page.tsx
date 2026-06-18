@@ -9,6 +9,8 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { Eye, EyeOff, X } from "lucide-react";
 import TermsModal from "../../(home)/partners/final-review/components/TermsModal"; // Import the modal
+import { logAuthRequest } from "@/utils/authDebug";
+import { parseAuthJsonResponse } from "@/utils/parseAuthErrorResponse";
 
 type MinorityType = {
   _id: string;
@@ -149,36 +151,52 @@ function SignupContent() {
       return;
     }
 
-    const payload = {
+    const payload: Record<string, unknown> = {
       name: type === "vendor" ? `${firstName} ${lastName}`.trim() : name,
       email,
       password,
       role: type === "vendor" ? "business_owner" : "customer",
       mobile,
-      gender: formData.get("gender"),
-      minorityType: formData.get("minorityType"),
     };
-    
-    console.log("Registration payload:", payload);
+
+    const gender = formData.get("gender");
+    const minorityType = formData.get("minorityType");
+    if (typeof gender === "string" && gender.trim()) {
+      payload.gender = gender.trim();
+    }
+    if (typeof minorityType === "string" && minorityType.trim()) {
+      payload.minorityType = minorityType.trim();
+    }
+
+    const registerUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/register`;
 
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/register`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-          credentials: "include",
-        }
-      );
+      const res = await fetch(registerUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        credentials: "include",
+      });
 
-      const data = await res.json();
-      console.log("Registration response:", data);
-      
-      if (data.success) {
-        router.push(`/verify-otp?email=${payload.email}&type=${type}`);
+      const { data, errorMessage } = await parseAuthJsonResponse<{
+        success?: boolean;
+        message?: string;
+      }>(res);
+
+      logAuthRequest({
+        endpoint: registerUrl,
+        method: "POST",
+        status: res.status,
+        credentialsIncluded: true,
+        body: data ?? undefined,
+      });
+
+      if (data?.success) {
+        router.push(
+          `/verify-otp?email=${encodeURIComponent(payload.email as string)}&type=${type}`
+        );
       } else {
-        setError(data.message || "Registration failed");
+        setError(errorMessage || data?.message || "Registration failed");
       }
     } catch (err) {
       console.error("Registration error:", err);

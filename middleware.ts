@@ -39,12 +39,18 @@ export async function middleware(req: NextRequest) {
 
     if (path.startsWith('/verify-otp')) {
         const otpFlag = req.cookies.get('otpPending')?.value;
+        const email = req.nextUrl.searchParams.get('email')?.trim();
 
-        if (otpFlag !== 'true') {
-            return NextResponse.redirect(new URL('/', req.url));
+        // API auth cookies (including otpPending) are set on the API host when
+        // NEXT_PUBLIC_API_BASE_URL is cross-origin, so they are not readable here.
+        // Allow OTP entry when the backend set otpPending on this origin, or when
+        // login/register supplied a target email query param. OTP is still validated
+        // server-side on POST /api/users/verify-otp.
+        if (otpFlag === 'true' || email) {
+            return NextResponse.next();
         }
 
-        return NextResponse.next();
+        return NextResponse.redirect(new URL('/', req.url));
     }
 
     const token = getAuthToken(req);

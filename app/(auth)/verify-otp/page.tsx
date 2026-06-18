@@ -8,6 +8,8 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { X } from 'lucide-react';
+import { logAuthRequest } from '@/utils/authDebug';
+import { parseAuthJsonResponse } from '@/utils/parseAuthErrorResponse';
 
 function VerifyOtpPage() {
     const searchParams = useSearchParams();
@@ -68,25 +70,36 @@ function VerifyOtpPage() {
         }
 
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/verify-otp`, {
+            const verifyUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/verify-otp`;
+            const res = await fetch(verifyUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, otp: joinedOtp }),
                 credentials: 'include',
             });
 
+            const { data, errorMessage } = await parseAuthJsonResponse<{
+                success?: boolean;
+                message?: string;
+                user?: { gender?: string; role?: string };
+            }>(res);
 
+            logAuthRequest({
+                endpoint: verifyUrl,
+                method: 'POST',
+                status: res.status,
+                credentialsIncluded: true,
+                body: data ?? undefined,
+            });
 
-            const data = await res.json();
-
-            if (data.success) {
+            if (data?.success && data.user) {
                 localStorage.setItem('user_session', 'true');
                 localStorage.setItem('user_gender', data.user.gender || '');
                 localStorage.setItem('user_role', data.user.role || '');
                 window.dispatchEvent(new Event('auth:login'));
                 router.push(data.user.role === 'business_owner' ? '/partners' : (safeRedirect || '/'));
             } else {
-                setError(data.message || 'Invalid OTP');
+                setError(errorMessage || data?.message || 'Invalid OTP');
             }
         } catch (err) {
             console.error('OTP verification error:', err);
@@ -102,19 +115,31 @@ function VerifyOtpPage() {
         setCountdown(30); // 30 second countdown
 
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/resend-otp`, {
+            const resendUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/resend-otp`;
+            const res = await fetch(resendUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, type }),
                 credentials: 'include',
             });
 
-            const data = await res.json();
+            const { data, errorMessage } = await parseAuthJsonResponse<{
+                success?: boolean;
+                message?: string;
+            }>(res);
 
-            if (data.success) {
+            logAuthRequest({
+                endpoint: resendUrl,
+                method: 'POST',
+                status: res.status,
+                credentialsIncluded: true,
+                body: data ?? undefined,
+            });
+
+            if (data?.success) {
                 toast.success('OTP resent successfully!');
             } else {
-                toast.error(data.message || 'Failed to resend OTP');
+                toast.error(errorMessage || data?.message || 'Failed to resend OTP');
             }
         } catch (err) {
             toast.error('Error while resending OTP');
