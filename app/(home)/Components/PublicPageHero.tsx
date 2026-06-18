@@ -21,7 +21,7 @@ const PublicPageHero = ({
   return (
     <section
       aria-labelledby={titleId}
-      className="relative w-full min-h-[220px] overflow-hidden border-b border-white/10 bg-market-bg md:min-h-[280px]"
+      className="relative w-full min-w-full min-h-[220px] overflow-hidden border-b border-white/10 bg-market-bg md:min-h-[280px]"
     >
       {imageUrl ? (
         <Image
@@ -42,23 +42,23 @@ const PublicPageHero = ({
       <div className="relative flex min-h-[220px] flex-col items-center justify-center px-4 py-10 text-center sm:px-6 md:min-h-[280px] md:py-12">
         {breadcrumbs.length > 0 ? (
           <nav aria-label="Breadcrumb" className="mb-3">
-            <ol className="flex flex-wrap items-center justify-center gap-x-1.5 font-montserrat text-xs text-market-muted sm:text-sm">
+            <ol className="flex flex-wrap items-center justify-center gap-x-1.5 font-montserrat text-xs text-market-text/80 sm:text-sm">
               {breadcrumbs.map((item, index) => (
                 <li key={`${item.label}-${index}`} className="flex items-center">
                   {index > 0 ? (
-                    <span className="mx-1.5 text-market-muted/60" aria-hidden>
+                    <span className="mx-1.5 text-market-text/50" aria-hidden>
                       /
                     </span>
                   ) : null}
                   {item.href ? (
                     <Link
                       href={item.href}
-                      className="market-nav-link rounded-sm transition-colors hover:text-market-gold"
+                      className="market-nav-link rounded-sm text-market-text/90 transition-colors hover:text-market-gold"
                     >
                       {item.label}
                     </Link>
                   ) : (
-                    <span className={index === breadcrumbs.length - 1 ? "text-market-text/80" : undefined}>
+                    <span className="text-market-text">
                       {item.label}
                     </span>
                   )}

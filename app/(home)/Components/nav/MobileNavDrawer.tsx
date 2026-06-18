@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import Link from "next/link";
 import { X } from "lucide-react";
@@ -54,7 +55,7 @@ function DrawerLink({
     <Link
       href={href}
       onClick={onClose}
-      className={`market-nav-link flex min-h-11 items-center py-2 pl-2 font-medium text-market-muted transition-colors hover:text-market-teal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-market-gold/50 ${className}`}
+      className={`market-nav-link flex min-h-11 items-center py-2 pl-2 font-medium text-market-text/90 transition-colors hover:text-market-teal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-market-gold/50 ${className}`}
     >
       {label}
     </Link>
@@ -69,6 +70,11 @@ export default function MobileNavDrawer({
   gender,
 }: MobileNavDrawerProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const [portalReady, setPortalReady] = useState(false);
+
+  useEffect(() => {
+    setPortalReady(true);
+  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -94,16 +100,16 @@ export default function MobileNavDrawer({
     }
   }, [open]);
 
-  if (!open) return null;
+  if (!open || !portalReady) return null;
 
   const topOffset = "calc(var(--header-h, 64px) + var(--announcement-h, 0px))";
   const bottomOffset = "var(--bottom-nav-h, 0px)";
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[55] xl:hidden" aria-hidden={!open}>
       <button
         type="button"
-        className="absolute inset-x-0 bg-black/50"
+        className="absolute inset-x-0 bg-market-bg/85"
         style={{ top: topOffset, bottom: bottomOffset }}
         aria-label="Close menu"
         onClick={onClose}
@@ -113,13 +119,13 @@ export default function MobileNavDrawer({
         role="dialog"
         aria-modal="true"
         aria-label="Site navigation"
-        className="absolute bottom-0 right-0 flex w-full max-w-sm flex-col border-l border-white/10 bg-market-surface shadow-xl transition-transform duration-300 ease-out"
+        className="market-mobile-drawer-panel absolute bottom-0 right-0 flex w-full max-w-sm flex-col transition-transform duration-300 ease-out"
         style={{
           top: topOffset,
           bottom: bottomOffset,
         }}
       >
-        <div className="flex shrink-0 items-center justify-between border-b border-white/10 px-4 py-3">
+        <div className="flex shrink-0 items-center justify-between border-b border-white/15 bg-market-elevated px-4 py-3">
           <span className="font-poppins text-lg font-semibold text-market-text">Menu</span>
           <button
             ref={closeButtonRef}
@@ -244,6 +250,7 @@ export default function MobileNavDrawer({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

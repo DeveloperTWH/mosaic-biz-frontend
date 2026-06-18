@@ -137,7 +137,19 @@ body {
 }
 
 .public-prose {
-  @apply font-montserrat text-sm leading-relaxed text-brand-muted sm:text-base;
+  @apply font-montserrat text-sm leading-relaxed text-market-text/90 sm:text-base;
+}
+
+.market-page-prose {
+  @apply font-montserrat text-sm leading-relaxed text-market-text/90 sm:text-base;
+}
+
+.market-page-prose-muted {
+  @apply font-montserrat text-sm leading-relaxed text-market-muted sm:text-base;
+}
+
+.market-section-body {
+  @apply font-montserrat text-sm leading-relaxed text-market-muted sm:text-base;
 }
 
 .public-grid-listing {
@@ -314,6 +326,18 @@ body {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.market-mobile-drawer-panel {
+  background: var(--market-header);
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.45);
+}
+
+.market-mobile-sheet-panel {
+  background: var(--market-header);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.45);
 }
 
 .market-input {
