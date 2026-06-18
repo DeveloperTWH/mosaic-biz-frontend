@@ -53,3 +53,59 @@ export const SEARCH_CTA: NavLink = {
   label: "Search marketplace",
   href: "/search",
 };
+
+/** Shop sub-links kept in hamburger drawer (Products/Search handled by bottom nav). */
+export const DRAWER_SHOP_LINKS: NavLink[] = SHOP_LINKS.filter(
+  (link) => link.href !== "/products" && link.href !== "/search"
+);
+
+export type BottomNavItemId = "home" | "shop" | "discover" | "cart" | "account";
+
+export type BottomNavItem = {
+  id: BottomNavItemId;
+  label: string;
+  href: string;
+};
+
+export const BOTTOM_NAV_ITEMS: BottomNavItem[] = [
+  { id: "home", label: "Home", href: "/" },
+  { id: "shop", label: "Shop", href: "/products" },
+  { id: "discover", label: "Discover", href: "/search" },
+  { id: "cart", label: "Cart", href: "/cart" },
+  { id: "account", label: "Account", href: "/login?type=customer" },
+];
+
+/** Routes where bottom nav should be hidden (checkout flow). */
+export const BOTTOM_NAV_HIDDEN_PREFIXES = ["/checkout"];
+
+export function getBottomNavActiveId(pathname: string): BottomNavItemId | null {
+  if (pathname === "/") return "home";
+  if (pathname === "/cart") return "cart";
+  if (pathname.startsWith("/search")) return "discover";
+  if (
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/signup") ||
+    pathname.startsWith("/customer") ||
+    pathname === "/partners/dashboard"
+  ) {
+    return "account";
+  }
+  if (
+    pathname.startsWith("/products") ||
+    pathname.startsWith("/product/") ||
+    pathname.startsWith("/foods") ||
+    pathname.startsWith("/services") ||
+    pathname.startsWith("/service/") ||
+    pathname.startsWith("/vendors") ||
+    pathname.startsWith("/vendor-profile")
+  ) {
+    return "shop";
+  }
+  return null;
+}
+
+export function getAccountNavHref(isLoggedIn: boolean, isCustomer: boolean): string {
+  if (!isLoggedIn) return "/login?type=customer";
+  if (isCustomer) return "/customer/order";
+  return "/partners/dashboard";
+}

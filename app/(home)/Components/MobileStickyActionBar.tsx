@@ -32,8 +32,10 @@ export default function MobileStickyActionBar({
 }: MobileStickyActionBarProps) {
   return (
     <div
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-market-header/95 backdrop-blur lg:hidden"
-      style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
+      className="fixed inset-x-0 z-40 border-t border-white/10 bg-market-header/95 backdrop-blur lg:hidden"
+      style={{
+        bottom: "var(--bottom-nav-h, 0px)",
+      }}
       role="region"
       aria-label="Quick actions"
     >
@@ -64,5 +66,5 @@ export default function MobileStickyActionBar({
   );
 }
 
-/** Apply to page root when a sticky bar is present */
-export const MOBILE_STICKY_BAR_PADDING = "pb-24 lg:pb-0";
+/** Extra page padding when sticky bar is present (body already reserves --bottom-nav-h). */
+export const MOBILE_STICKY_BAR_PADDING = "pb-[4.5rem] lg:pb-0";

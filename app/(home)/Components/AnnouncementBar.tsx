@@ -30,7 +30,7 @@ export default function AnnouncementBar() {
   }
 
   return (
-    <div className="fixed top-0 left-0 z-[60] flex min-h-9 w-full items-center justify-center bg-market-header px-12 pr-14 text-center text-xs text-market-text sm:px-4 sm:pr-12 sm:text-sm">
+    <div className="fixed top-0 left-0 z-[60] flex min-h-9 w-full items-center justify-center bg-market-header px-3 pr-10 text-center text-[11px] leading-snug text-market-text sm:px-4 sm:pr-12 sm:text-sm">
       <p className="font-poppins leading-snug">
         Shop minority-owned businesses and support the culture.{" "}
         <Link href="/products" className="market-nav-link font-semibold text-market-gold underline hover:text-market-gold-hover">

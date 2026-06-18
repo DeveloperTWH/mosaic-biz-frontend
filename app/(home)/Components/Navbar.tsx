@@ -85,7 +85,7 @@ const Navbar = () => {
   return (
     <header
       id="site-header"
-      className="market-glass-header fixed left-0 top-[var(--announcement-h,0px)] z-50 w-full px-4 py-4 font-poppins sm:px-6 lg:px-10 xl:px-20"
+      className="market-glass-header fixed left-0 top-[var(--announcement-h,0px)] z-50 w-full px-3 py-3 font-poppins sm:px-6 lg:px-10 xl:px-20 xl:py-4"
     >
       <CartSyncPrompt />
 
@@ -112,16 +112,7 @@ const Navbar = () => {
           bump={bump}
         />
 
-        <div className="flex items-center gap-1 xl:hidden">
-          <HeaderActions
-            variant="compact"
-            isLoggedIn={isLoggedIn}
-            isCustomer={isCustomer}
-            gender={gender}
-            cartCount={cartCount}
-            mounted={mounted}
-            bump={bump}
-          />
+        <div className="flex shrink-0 items-center xl:hidden">
           <button
             type="button"
             className="market-nav-link flex min-h-11 min-w-11 items-center justify-center rounded text-market-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-market-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-market-header"
@@ -154,8 +145,6 @@ const Navbar = () => {
         isLoggedIn={isLoggedIn}
         isCustomer={isCustomer}
         gender={gender}
-        cartCount={cartCount}
-        mounted={mounted}
       />
     </header>
   );

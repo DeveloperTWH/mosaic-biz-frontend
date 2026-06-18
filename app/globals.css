@@ -68,11 +68,30 @@ body {
 :root.with-fixed-header {
   --header-h: 64px;
   --announcement-h: 0px;
+  --bottom-nav-h: 0px;
 }
 
 /* padding only in pages rendered by this layout */
 :root.with-fixed-header body {
   padding-top: calc(var(--header-h) + var(--announcement-h));
+}
+
+@media (max-width: 1279px) {
+  :root.with-fixed-header {
+    --bottom-nav-h: calc(3.5rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  :root.with-fixed-header body {
+    padding-bottom: var(--bottom-nav-h);
+  }
+}
+
+.market-bottom-nav {
+  background: rgba(11, 20, 38, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 .glass-header {
