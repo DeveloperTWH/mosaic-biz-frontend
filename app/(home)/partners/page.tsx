@@ -16,6 +16,12 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import {
+  clearStaleClientSession,
+  getAuthenticatedUser,
+  isBusinessOwner,
+  persistClientSession,
+} from "@/utils/authUtils";
 
 interface Business {
   _id: string;
@@ -84,28 +90,6 @@ const Page: React.FC = () => {
   const [selectedStage, setSelectedStage] = useState<number>(1);
   const [showRegistrationModal, setShowRegistrationModal] = useState(false);
 
-  useEffect(() => {
-    axios
-      .get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/business/my`, {
-        withCredentials: true,
-      })
-      .then((response) => {
-        const list: Business[] = response.data.businesses;
-        setBusinesses(list);
-        setLoading(false);
-        checkApplicationId();
-      })
-      .catch((error) => {
-        console.error("Error fetching business data:", error);
-        if (error.response?.status === 401 || error.response?.status === 403) {
-          router.push("/login?type=vendor&redirect=%2Fpartners");
-          return;
-        }
-        setLoading(false);
-        setOnboardingLoading(false);
-      });
-  }, [router]);
-
   const checkApplicationId = async () => {
     try {
       setOnboardingLoading(true);
@@ -138,6 +122,65 @@ const Page: React.FC = () => {
       setOnboardingLoading(false);
     }
   };
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const redirectToVendorLogin = () => {
+      clearStaleClientSession();
+      router.push("/login?type=vendor&redirect=%2Fpartners");
+    };
+
+    const loadPartnerHub = async () => {
+      const user = await getAuthenticatedUser();
+      if (cancelled) return;
+
+      if (!user || !isBusinessOwner(user)) {
+        redirectToVendorLogin();
+        return;
+      }
+
+      persistClientSession(user);
+
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/business/my`,
+          { withCredentials: true }
+        );
+        if (cancelled) return;
+
+        const list: Business[] = response.data.businesses ?? [];
+        setBusinesses(list);
+        await checkApplicationId();
+      } catch (error: any) {
+        if (cancelled) return;
+
+        console.error("Error fetching business data:", error);
+        const status = error.response?.status;
+
+        if (status === 401) {
+          const recheck = await getAuthenticatedUser();
+          if (!recheck || !isBusinessOwner(recheck)) {
+            redirectToVendorLogin();
+            return;
+          }
+        }
+
+        setBusinesses([]);
+        await checkApplicationId();
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadPartnerHub();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [router]);
 
   const fetchOnboardingStatus = async (appId: string) => {
     try {
