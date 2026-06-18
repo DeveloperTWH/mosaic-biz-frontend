@@ -10,8 +10,8 @@
 
 | Batch | Branch | Issues | Status |
 |-------|--------|--------|--------|
-| Epic #54 Batch 1 | `polish/vendor-readability-global-cta` | #51, #55, #58, #62 | In progress |
-| Epic #54 Batch 2 | `polish/mobile-nav-responsive-pass` | #52, #53 | Pending |
+| Epic #54 Batch 1 | `polish/vendor-readability-global-cta` | #51, #55, #58, #62 | PR #64 |
+| Epic #54 Batch 2 | `polish/mobile-nav-responsive-pass` | #52, #53 | In progress |
 | Epic #54 Batch 3 | `polish/homepage-marketplace-experience` | #59, #60 | Pending |
 | Epic #54 Batch 4 | `polish/trust-howto-content-cleanup` | #56, #57, #61 | Pending |
 
@@ -71,7 +71,61 @@
 
 ---
 
-## Mobile fixes (Batch 2)
+---
+
+## Epic #54 Batch 2 — Mobile & navigation (#52, #53)
+
+**Branch:** `polish/mobile-nav-responsive-pass`
+
+### Mobile widths checked
+
+320, 360, 375, 390, 414, 430, 768, 1024 (code review + layout utilities; manual DevTools QA recommended)
+
+### Changes
+
+- Announcement bar: dismiss-button clearance on 320px (`px-12 pr-14`)
+- Navbar: tighter mobile padding; scrollable mobile menu; Vendors + Search in SHOP; trust links in MORE
+- Dropdown links: `min-h-11` tap targets + focus rings
+- Removed `w-screen ml-[-50vw]` overflow bands on FAQ, how-to, trust, and legal pages
+- FAQ/how-to: `VendorExpandCta` shared band
+
+### Navigation / link matrix
+
+| Link | Location | Expected destination | Result | Status |
+|------|----------|---------------------|--------|--------|
+| Home | Header / Footer logo | `/` | Route exists | Pass |
+| Products | Header SHOP / Footer | `/products` | Route exists | Pass |
+| Foods | Header SHOP / Footer | `/foods` | Route exists | Pass |
+| Services | Header SHOP / Footer | `/services` | Route exists | Pass |
+| Vendors | Header SHOP / Footer | `/vendors` | Route exists | Pass |
+| Search | Header SHOP / Footer | `/search` | Route exists | Pass |
+| Become a vendor | Header / Footer | `/become-a-vendor` | Route exists | Pass |
+| How to use | Header / Footer | `/how-to-use-this-app` | Route exists | Pass |
+| About | Header / Footer | `/about` | Route exists | Pass |
+| Contact | Header / Footer | `/contact` | Route exists | Pass |
+| FAQ | Header MORE / Footer | `/faq` | Route exists | Pass |
+| Trust badges – consumer | Header MORE / Footer | `/consumer/trustbadge` | Route exists | Pass |
+| Trust badges – vendor | Header MORE / Footer | `/vendor/trustbadge` | Route exists | Pass |
+| Terms / Privacy / Refunds / Dispute | Header MORE / Footer | Legal routes | Routes exist | Pass |
+| Vendor signup | Footer | `/signup?type=vendor` | Route exists | Pass |
+| Customer login | Footer | `/login?type=customer` | Route exists | Pass |
+| Cart | Header icon | `/cart` | Route exists | Pass |
+| `/foods/shop/[id]` | Listing deep link | Shop detail | Stub/minimal | **Deferred** |
+| Mock product detail `/products/[productid]/[id]` | Legacy route | Alternate detail | Coexists with `/product/[id]` | **Deferred** |
+
+### Deferred links / pages
+
+- `/foods/shop/[id]` — stub page; document only
+- Dual detail route strategy — no reroute without approval
+
+### Guardrails
+
+- No protected-route or API behavior changed
+- Production was not manually deployed
+
+---
+
+## Mobile fixes (Batch 2 — prior release)
 
 - Removed horizontal overflow: `w-screen` → `w-full overflow-x-hidden` on layout; contact image `w-[600px]` → responsive
 - `PublicFilterSection` padded wrapper on `/products`, `/foods`, `/services`

@@ -82,7 +82,7 @@ const Navbar = () => {
   return (
     <header
       id="site-header"
-      className="market-glass-header fixed left-0 z-50 w-full px-6 py-4 font-poppins top-[var(--announcement-h,0px)] md:px-10 lg:px-20"
+      className="market-glass-header fixed left-0 z-50 w-full px-4 py-4 font-poppins top-[var(--announcement-h,0px)] sm:px-6 md:px-10 lg:px-20"
     >
       <CartSyncPrompt />
       
@@ -126,6 +126,12 @@ const Navbar = () => {
                 <Link href="/services" className={`market-dropdown-link`}>
                   Services
                 </Link>
+                <Link href="/vendors" className="market-dropdown-link">
+                  Vendors
+                </Link>
+                <Link href="/search" className="market-dropdown-link">
+                  Search
+                </Link>
               </div>
             )}
           </div>
@@ -139,14 +145,14 @@ const Navbar = () => {
           
           <Link 
             href="/about" 
-            className={`text-market-muted hover:text-market-gold transition-colors font-medium uppercase `}
+            className="market-nav-link font-medium uppercase text-market-muted transition-colors hover:text-market-gold"
           >
             ABOUT
           </Link>
           
           <Link 
             href="/contact" 
-            className={`text-market-muted hover:text-market-gold transition-colors font-medium uppercase `}
+            className="market-nav-link font-medium uppercase text-market-muted transition-colors hover:text-market-gold"
           >
             CONTACT
           </Link>
@@ -197,7 +203,7 @@ const Navbar = () => {
             )}
 
           </div>
-              <Link href="/how-to-use-this-app"   className="text-market-muted hover:text-market-gold transition-colors font-medium uppercase font-poppins" >
+              <Link href="/how-to-use-this-app" className="market-nav-link font-medium uppercase text-market-muted transition-colors hover:text-market-gold font-poppins">
                   HOW TO USE THIS APP
               </Link>
         </nav>
@@ -347,7 +353,7 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="mt-4 space-y-4 border-t border-white/10 bg-market-surface pt-4 lg:hidden">
+        <div className="mt-4 max-h-[calc(100dvh-var(--header-h,4rem)-var(--announcement-h,0px))] space-y-4 overflow-y-auto border-t border-white/10 bg-market-surface pt-4 lg:hidden">
           <nav className="flex flex-col space-y-1">
             <Link href="/" onClick={() => setIsOpen(false)} className="market-nav-link flex min-h-11 items-center px-4 py-3 font-medium uppercase text-market-text hover:bg-white/5">
               HOME
@@ -364,6 +370,12 @@ const Navbar = () => {
                 </Link>
                 <Link href="/services" onClick={() => setIsOpen(false)} className="market-nav-link flex min-h-11 items-center py-2 pl-2 font-medium text-market-muted hover:text-market-teal">
                   Services
+                </Link>
+                <Link href="/vendors" onClick={() => setIsOpen(false)} className="market-nav-link flex min-h-11 items-center py-2 pl-2 font-medium text-market-muted hover:text-market-teal">
+                  Vendors
+                </Link>
+                <Link href="/search" onClick={() => setIsOpen(false)} className="market-nav-link flex min-h-11 items-center py-2 pl-2 font-medium text-market-muted hover:text-market-teal">
+                  Search
                 </Link>
               </div>
             </div>
@@ -387,6 +399,12 @@ const Navbar = () => {
             <div className="px-4 py-2">
               <div className="mb-2 flex min-h-11 items-center font-medium uppercase text-market-muted">MORE</div>
               <div className="ml-2 space-y-1">
+                <Link href="/consumer/trustbadge" onClick={() => setIsOpen(false)} className="market-nav-link flex min-h-11 items-center py-2 pl-2 font-medium text-market-muted hover:text-market-teal">
+                  Trust Badges – Consumer
+                </Link>
+                <Link href="/vendor/trustbadge" onClick={() => setIsOpen(false)} className="market-nav-link flex min-h-11 items-center py-2 pl-2 font-medium text-market-muted hover:text-market-teal">
+                  Trust Badges – Vendor
+                </Link>
                 <Link href="/faq" onClick={() => setIsOpen(false)} className="market-nav-link flex min-h-11 items-center py-2 pl-2 font-medium text-market-muted hover:text-market-teal">
                   FAQ
                 </Link>
@@ -424,7 +442,7 @@ const Navbar = () => {
                 <Link
                   href="/cart"
                   onClick={() => setIsOpen(false)}
-                  className="flex items-center rounded px-4 py-3 font-medium text-market-text hover:bg-white/5"
+                  className="market-nav-link flex min-h-11 items-center rounded px-4 py-3 font-medium text-market-text hover:bg-white/5"
                 >
                   <ShoppingCart size={20} className="mr-3" />
                   Cart

@@ -3,6 +3,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import PublicPageHero from '../Components/PublicPageHero';
+import VendorExpandCta from '../Components/VendorExpandCta';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Autoplay } from 'swiper/modules';
 
@@ -382,38 +383,7 @@ export default function HowToUseApp() {
                 </div>
             </div>
 
-            {/* Expand Your Reach Section - Full Width */}
-      <div className="relative left-1/2 right-1/2 w-screen ml-[-50vw] mr-[-50vw] mt-12 mb-8">
-        <div 
-          className="w-full bg-cover bg-center"
-          style={{ backgroundImage: "url('/contact/becomeVendor.png')" }}
-        >
-          <div className="bg-[#3333339E] py-24 px-8 text-center text-white">
-            <div className="max-w-[900px] mx-auto">
-              <h2 className="text-white text-3xl font-bold mb-2">EXPAND YOUR REACH -</h2>
-              <h2 className="text-white text-3xl font-bold mb-4">LIST YOUR BUSINESS ON OUR PLATFORM!</h2>
-              
-              <hr className="h-[2px] w-[180px] bg-white border-none mx-auto my-4" />
-              <hr className="h-[2px] w-[180px] bg-white border-none mx-auto mb-8" />
-              
-              <p className="text-white text-lg leading-relaxed max-w-[700px] mx-auto mb-10 opacity-95">
-                Take your business to new heights by listing it on Mosaic Biz Hub. 
-                Connect with customers who value minority-owned brands, showcase your 
-                unique products and services, and grow your presence in the digital 
-                marketplace. Join a community dedicated to supporting your success 
-                every step of the way.
-              </p>
-              
-              <Link 
-                href="/become-a-vendor" 
-                className="inline-block px-10 py-4 bg-transparent border-2 border-white text-white font-semibold text-lg transition-all duration-300 hover:bg-white hover:text-gray-800"
-              >
-                Become A Vendor
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
+            <VendorExpandCta />
         </div>
     );
 }
