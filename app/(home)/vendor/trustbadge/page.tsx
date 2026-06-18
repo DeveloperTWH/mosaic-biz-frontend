@@ -1,240 +1,117 @@
-import React from "react";
 import Link from "next/link";
+import PublicPageHero from "../../Components/PublicPageHero";
+import VendorExpandCta from "../../Components/VendorExpandCta";
 
-const TrustBadges = () => {
-  const badgeLevels = [
-    {
-      score: "0–29",
-      badge: "Pending",
-      meaning:
-        "We’re still verifying your business. Your listing stays hidden.",
-    },
-    {
-      score: "30–39",
-      badge: "Silver",
-      meaning:
-        "You meet our basic trust standards. Your listing is visible.",
-    },
-    {
-      score: "40–49",
-      badge: "Gold",
-      meaning:
-        "You’re fully verified and appear higher in search results.",
-    },
-    {
-      score: "50–79",
-      badge: "Platinum",
-      meaning: "You’re a top performer with strong visibility.",
-    },
-    {
-      score: "80–100",
-      badge: "💎 Diamond",
-      meaning:
-        "You’re an elite, community-driven business with premium placement.",
-    },
-  ];
+const badgeLevels = [
+  {
+    badge: "Pending",
+    tier: "In review",
+    meaning: "We are still verifying your business. Your listing stays hidden.",
+  },
+  {
+    badge: "Silver",
+    tier: "Verified",
+    meaning: "You meet our basic trust standards. Your listing is visible.",
+  },
+  {
+    badge: "Gold",
+    tier: "Fully verified",
+    meaning: "You are fully verified and appear higher in search results.",
+  },
+  {
+    badge: "Platinum",
+    tier: "High trust",
+    meaning: "You are a top performer with strong visibility.",
+  },
+  {
+    badge: "Diamond",
+    tier: "Top tier",
+    meaning:
+      "Elite, community-driven businesses with premium placement.",
+  },
+];
 
+export default function VendorTrustBadges() {
   return (
-    <div className="max-w-[900px] mx-auto p-8 font-sans leading-relaxed">
-      <h1 className="mb-2 text-3xl font-bold">Trust Badges - Vendor</h1>
+    <div className="flex flex-col">
+      <PublicPageHero
+        title="Trust Badges for Vendors"
+        breadcrumbs={[
+          { label: "Home", href: "/" },
+          { label: "Vendor Trust Badges" },
+        ]}
+      />
 
-      <p className="text-gray-500 mb-4 text-sm">
-        Last updated: January 2026
-      </p>
-
-      <div className="mb-8 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-        Trust badges reflect verified onboarding and profile completion steps reviewed by our team.
-        They are not automated reputation scores.
-      </div>
-
-      {/* Introduction */}
-      <section className="mb-6">
-        <p className="text-gray-700 font-bold">We aim to show customers your business is real, reliable, and ready.</p>
-        <p className="text-gray-700">
-          We aim to show customers your business is real, reliable, and ready.
-          When you join <strong>Mosaic Biz Hub</strong>, you earn a Trust Badge.
-          Your badge tells customers how complete your business verification is
-          — similar to a verified checkmark on social media but built for our
-          platform’s businesses.
+      <div className="container-page max-w-4xl py-12 sm:py-16">
+        <p className="mb-6 font-montserrat text-sm text-market-muted">
+          Last updated: January 2026
         </p>
 
-        <p className="text-gray-700 mt-4">
-          The more information our vendors verify, the higher your badge level
-          becomes.
-        </p>
-      </section>
-
-      {/* Trust Score */}
-      <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-3">
-          1. How Your Trust Score Works
-        </h2>
-
-        <p className="text-gray-700 mb-4">
-          You earn points by completing basic verification steps:
-        </p>
-
-        <ul className="pl-5 list-disc text-gray-700">
-          <li className="mb-3">
-            <span className="font-semibold">
-              Legal & Compliance (10 points):
-            </span>{" "}
-            You get points when we confirm your EIN or business license.
-          </li>
-
-          <li className="mb-3">
-            <span className="font-semibold">
-              Complete Your Registration (10 points):
-            </span>{" "}
-            You earn points by completing Step 1 and confirming your information
-            is accurate.
-          </li>
-
-          <li className="mb-3">
-            <span className="font-semibold">
-              Online Presence (5 points each):
-            </span>{" "}
-            Add your website or social media links. If they belong to your
-            business and open correctly, you earn points.
-          </li>
-        </ul>
-
-        <p className="text-gray-700 mt-4">
-          These are the only categories used for MVP. Everything else comes
-          later.
-        </p>
-      </section>
-
-      {/* Badge Levels */}
-      <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-4">
-          2. Badge Levels (What Customers See)
-        </h2>
-
-        <div className="overflow-x-auto">
-          <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
-            <thead className="bg-black text-white">
-              <tr>
-                <th className="text-left p-4">Your Score</th>
-                <th className="text-left p-4">Badge</th>
-                <th className="text-left p-4">What It Means</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {badgeLevels.map((item, index) => (
-                <tr key={index} className="border-b border-gray-200">
-                  <td className="p-4 text-gray-700 font-medium">
-                    {item.score}
-                  </td>
-
-                  <td className="p-4 font-semibold text-gray-900">
-                    {item.badge}
-                  </td>
-
-                  <td className="p-4 text-gray-700">{item.meaning}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="market-support-callout mb-10 text-left">
+          <p className="font-montserrat text-sm text-market-text sm:text-base">
+            Trust badges reflect verified onboarding and profile completion reviewed by our team.
+            They are <span className="font-semibold text-market-gold">not automated reputation scores</span> or customer ratings.
+          </p>
         </div>
-      </section>
 
-      {/* Increase Badge */}
-      <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-3">
-          3. How to Increase Your Badge Level
-        </h2>
+        <section className="mb-10">
+          <h2 className="market-section-heading text-2xl sm:text-3xl">
+            Show customers you are verified
+          </h2>
+          <div className="market-section-divider" />
+          <p className="mt-4 max-w-2xl font-montserrat text-sm leading-relaxed text-market-muted sm:text-base">
+            When you join Mosaic Biz Hub, you earn a trust badge that shows shoppers how complete
+            your business verification is. The more steps you complete, the higher your badge level.
+          </p>
+        </section>
 
-        <p className="text-gray-700 mb-3">
-          You can level up by:
-        </p>
-
-        <ul className="pl-5 list-disc text-gray-700">
-          <li className="mb-2">
-            Uploading your EIN or verifying your business license
-          </li>
-
-          <li className="mb-2">
-            Adding your website or social media links
-          </li>
-
-          <li className="mb-2">
-            Completing all required fields in Step 1
-          </li>
-
-          <li className="mb-2">
-            (Future) Adding reviews, community impact, or performance data
-          </li>
-        </ul>
-
-        <p className="text-gray-700 mt-4">
-          Only the first three matter for launch. Everything else activates in
-          future phases.
-        </p>
-      </section>
-
-      {/* Why This Matters */}
-      <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">
-          4. Why This Matters for You
-        </h2>
-
-        <p className="text-gray-700 mb-3">
-          Higher badges unlock:
-        </p>
-
-        <ul className="pl-5 list-disc text-gray-700">
-          <li className="mb-2">Better visibility in search</li>
-          <li className="mb-2">Featured placement</li>
-          <li className="mb-2">More customer trust</li>
-          <li className="mb-2">Spotlight opportunities</li>
-          <li className="mb-2">Stronger credibility</li>
-        </ul>
-
-        <p className="text-gray-700 mt-4">
-          Your badge is your trust signal — it helps customers feel confident
-          buying from you.
-        </p>
-      </section>
-
-      {/* CTA Section */}
-      <div className="mt-12 w-full">
-        <div
-          className="w-full bg-cover bg-center"
-          style={{ backgroundImage: "url('/contact/becomeVendor.png')" }}
-        >
-          <div className="bg-[#3333339E] py-24 px-8 text-center text-white">
-            <div className="max-w-[900px] mx-auto">
-              <h2 className="text-white text-3xl font-bold mb-2">
-                BUILD TRUST -
-              </h2>
-
-              <h2 className="text-white text-3xl font-bold mb-4">
-                VERIFY YOUR BUSINESS TODAY!
-              </h2>
-
-              <hr className="h-[2px] w-[180px] bg-white border-none mx-auto my-4" />
-              <hr className="h-[2px] w-[180px] bg-white border-none mx-auto mb-8" />
-
-              <p className="text-white text-lg leading-relaxed max-w-[700px] mx-auto mb-10 opacity-95">
-                Increase your visibility, earn customer confidence, and unlock
-                premium placement opportunities by completing your business
-                verification on Mosaic Biz Hub.
-              </p>
-
-              <Link
-                href="/become-a-vendor"
-                className="inline-block px-10 py-4 bg-transparent border-2 border-white text-white font-semibold text-lg transition-all duration-300 hover:bg-white hover:text-gray-800"
-              >
-                Get Verified
-              </Link>
-            </div>
+        <section className="mb-10">
+          <h2 className="mb-6 font-poppins text-xl font-semibold text-market-text">
+            Badge levels
+          </h2>
+          <div className="grid grid-cols-1 gap-4">
+            {badgeLevels.map((item) => (
+              <article key={item.badge} className="market-card-light">
+                <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+                  <h3 className="market-card-light-title">{item.badge}</h3>
+                  <span className="rounded-full bg-market-gold/15 px-3 py-1 font-montserrat text-xs font-semibold uppercase tracking-wide text-brand-navy">
+                    {item.tier}
+                  </span>
+                </div>
+                <p className="market-card-light-body">{item.meaning}</p>
+              </article>
+            ))}
           </div>
+        </section>
+
+        <section className="mb-10">
+          <h2 className="mb-4 font-poppins text-xl font-semibold text-market-text">
+            Verification steps
+          </h2>
+          <ul className="space-y-3 font-montserrat text-sm text-market-muted">
+            <li className="market-card-light">
+              <span className="market-card-light-title text-base">Legal & compliance</span>
+              <p className="market-card-light-body mt-1">Business registration, licenses, and EIN documentation.</p>
+            </li>
+            <li className="market-card-light">
+              <span className="market-card-light-title text-base">Profile completeness</span>
+              <p className="market-card-light-body mt-1">Logo, story, products or services, images, and contact info.</p>
+            </li>
+            <li className="market-card-light">
+              <span className="market-card-light-title text-base">Online presence</span>
+              <p className="market-card-light-body mt-1">Website or social links that confirm your business identity.</p>
+            </li>
+          </ul>
+        </section>
+
+        <div className="text-center">
+          <Link href="/become-a-vendor" className="market-btn-primary inline-block min-w-[240px]">
+            Start vendor application
+          </Link>
         </div>
       </div>
+
+      <VendorExpandCta ctaHref="/signup?type=vendor" ctaLabel="Apply now" />
     </div>
   );
-};
-
-export default TrustBadges;
+}

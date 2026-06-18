@@ -262,4 +262,6 @@ Inspired by stronger Digital Builders projects (ViZb, TOTL) — **Mosaic stays d
 | Vendor onboarding hub (`app/(home)/partners/page.tsx`) | v2 — `brand-*` on CTAs and progress |
 | Vendor education (`/become-a-vendor`) | **v3.2** — Epic #54 Batch 1: `PublicPageHero`, light cards, `market-btn-*` CTAs |
 | Vendor profiles / payment inline styles | Legacy — not yet migrated |
-| Legal pages (FAQ, privacy, terms) | Legacy — Arial CSS files |
+| Trust badges (`/consumer/trustbadge`, `/vendor/trustbadge`) | **v3.3** — Epic #54 Batch 4: hero, scannable cards, accurate trust language |
+| How to use (`/how-to-use-this-app`) | **v3.3** — customer/vendor paths, placeholder testimonials removed |
+| Legal pages (FAQ, privacy, terms) | Legacy — structure improved (overflow bands); full copy pass deferred |
