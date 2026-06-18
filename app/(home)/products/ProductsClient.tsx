@@ -1,10 +1,9 @@
 "use client"
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, Suspense } from 'react'
 import axios from "axios"
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import PublicPageHero from "../Components/PublicPageHero";
 import CategoryGrid from './components/CategoryGrid';
-import FeaturedProducts from './components/FeaturedProducts';
 import { ChevronRight, ChevronLeft, Star } from 'lucide-react';
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from 'swiper/modules';
@@ -17,7 +16,8 @@ import { Category, SubCategory, SubCategoryResponse, CategoryResponse } from '@/
 import Link from 'next/link';
 import PublicSearchFilterBar from "../Components/PublicSearchFilterBar";
 import PublicFilterSection from "../Components/PublicFilterSection";
-import { buildSearchPageUrl, PublicSearchFilters } from "../Components/publicSearch";
+import { buildSearchPageUrl, parseListingFiltersFromSearchParams, buildListingPageUrl, PublicSearchFilters } from "../Components/publicSearch";
+import { useListingFilters } from "@/hooks/useListingFilters";
 import MarketImage from "../Components/MarketImage";
 import MarketLoadingBlock from "../Components/MarketLoadingBlock";
 
@@ -65,8 +65,9 @@ const HorizontalLine = () => {
   return <p style={{ borderTop: '2px solid', color : "#2E2E2E",  margin: '10px 0' }}></p> ;
 };
 
-const Page = () => {
+const ProductsPageInner = () => {
     const router = useRouter();
+    const { filters: urlFilters, setFilters: setUrlFilters } = useListingFilters("/products");
 
     const [searchText, setSearchText] = useState("");
     const [minorityType, setMinorityType] = useState("");
@@ -186,9 +187,28 @@ const Page = () => {
     };
 
     useEffect(() => {
-        fetchProducts();
-        fetchServices();
-    }, []);
+        setSearchText(urlFilters.keyword);
+        setSearchLocation(urlFilters.location);
+        setMinorityType(urlFilters.minorityType);
+        if (urlFilters.badge) setSelectedBadge(urlFilters.badge);
+        if (urlFilters.category && categories.length) {
+            const cat = categories.find((c) => c._id === urlFilters.category);
+            if (cat) setSelectedCategory(cat);
+        }
+    }, [urlFilters, categories]);
+
+    useEffect(() => {
+        fetchProducts(
+            urlFilters.keyword,
+            urlFilters.minorityType,
+            urlFilters.location,
+            urlFilters.category,
+            urlFilters.subcategory,
+            urlFilters.badge,
+            urlFilters.priceMin ? Number(urlFilters.priceMin) : undefined,
+            urlFilters.priceMax ? Number(urlFilters.priceMax) : undefined
+        );
+    }, [urlFilters]);
 
     return (
         <div>
@@ -307,19 +327,19 @@ const Page = () => {
                         setSelectedCategory(category);
                         setSelectedSubcategory("");
                     }
-                    fetchProducts('', '', '', categoryId, undefined);
+                    setUrlFilters({ category: categoryId, subcategory: "" }, { replace: true });
                 }}
                 onSubcategorySelect={(subcategoryId) => {
-                    fetchProducts('', '', '', selectedCategory?._id, subcategoryId);
+                    setUrlFilters({ subcategory: subcategoryId }, { replace: true });
                 }}
                 onBadgeSelect={(badge) => {
                     setSelectedBadge(badge);
-                    fetchProducts('', '', '', selectedCategory?._id, selectedSubcategory || undefined, badge, priceMin, priceMax);
+                    setUrlFilters({ badge }, { replace: true });
                 }}
                 onPriceChange={(min, max) => {
                     setPriceMin(min);
                     setPriceMax(max);
-                    fetchProducts('', '', '', selectedCategory?._id, selectedSubcategory || undefined, selectedBadge, min, max);
+                    setUrlFilters({ priceMin: String(min), priceMax: String(max) }, { replace: true });
                 }}
                 onCategoryFilter={(category, subCategory) => {
                     console.log('Category filter from ProductServices:', category, subCategory);
@@ -588,5 +608,11 @@ function ProductCard({ item }: { item: RankedItem }) {
     );
 }
 
-export default Page;
+export default function Page() {
+    return (
+        <Suspense fallback={<MarketLoadingBlock label="Loading shop…" minHeight="min-h-[40vh]" />}>
+            <ProductsPageInner />
+        </Suspense>
+    );
+}
 

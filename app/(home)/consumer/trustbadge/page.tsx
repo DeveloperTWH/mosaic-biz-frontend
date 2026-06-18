@@ -118,6 +118,9 @@ export default function ConsumerTrustBadges() {
           <Link href="/vendors" className="market-btn-secondary min-w-[220px] text-center">
             Browse vendors
           </Link>
+          <Link href="/vendor/trustbadge" className="market-btn-secondary min-w-[220px] text-center">
+            Vendor badge guide
+          </Link>
         </div>
       </div>
     </div>

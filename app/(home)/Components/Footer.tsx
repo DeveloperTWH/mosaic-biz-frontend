@@ -29,6 +29,7 @@ export default function Footer() {
             <h4 className="mb-4 font-poppins text-lg font-semibold text-market-gold">For vendors</h4>
             <ul className="space-y-1 text-sm font-montserrat sm:space-y-2">
               <li><Link href="/become-a-vendor" className="market-footer-link">Become a vendor</Link></li>
+              <li><Link href="/refer-a-vendor" className="market-footer-link">Refer a vendor</Link></li>
               <li><Link href="/signup?type=vendor" className="market-footer-link">Vendor signup</Link></li>
               <li><Link href="/login?type=vendor" className="market-footer-link">Vendor login</Link></li>
               <li><Link href="/vendor/trustbadge" className="market-footer-link">Trust badges – vendor</Link></li>

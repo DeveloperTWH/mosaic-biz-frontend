@@ -6,28 +6,38 @@ import VendorExpandCta from "../Components/VendorExpandCta";
 const steps = [
   {
     number: 1,
-    title: "Register Your Business",
+    title: "Business Verification",
     body: (
       <>
-        Start by completing a quick vendor application and paying the one-time{" "}
-        <span className="font-semibold text-brand-navy">$24.99 verification fee</span>.
+        Complete your vendor application and pay the one-time{" "}
+        <span className="font-semibold text-brand-navy">$24.99 verification fee</span> to activate trust badge review.
       </>
     ),
   },
   {
     number: 2,
     title: "Choose Your Tier",
-    body: "Select from Silver, Gold, or Platinum plans based on your business goals and growth stage.",
+    body: "Select Silver, Gold, or Platinum based on your goals. Compare features before subscribing.",
   },
   {
     number: 3,
-    title: "Set Up Your Profile",
-    body: "Add your logo, business story, products/services, images, and contact info.",
+    title: "Business Profile",
+    body: "Add your logo, story, contact info, and minority-owned business details.",
   },
   {
     number: 4,
-    title: "Launch & Grow",
-    body: "Use built-in tools like promotions, analytics, CRM, and loyalty integration to scale your reach and revenue.",
+    title: "List Products & Services",
+    body: "Create your first product, service, or food listing so customers can discover you.",
+  },
+  {
+    number: 5,
+    title: "Payout Setup",
+    body: "Connect Stripe so you can receive payments securely when orders come in.",
+  },
+  {
+    number: 6,
+    title: "Final Review & Launch",
+    body: "Submit for review and go live on the marketplace when approved.",
   },
 ];
 
@@ -69,11 +79,11 @@ export default function BecomeAVendorPage() {
           </h2>
           <div className="market-section-divider" aria-hidden />
           <p className="mx-auto mt-4 max-w-2xl font-montserrat text-sm text-market-muted sm:text-base">
-            Four clear steps from application to launch — built for minority-owned
+            Six clear steps from application to launch — built for minority-owned
             businesses ready to grow online.
           </p>
 
-          <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {steps.map((step) => (
               <article key={step.number} className="market-card-light text-left">
                 <div className="market-step-badge mb-4">{step.number}</div>

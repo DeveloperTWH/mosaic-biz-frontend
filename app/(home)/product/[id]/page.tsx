@@ -21,6 +21,9 @@ import { toggleWishlist, isProductWishlisted } from '@/utils/wishlistUtils';
 import PublicSearchFilterBar from "../../Components/PublicSearchFilterBar";
 import PublicPageHero from "../../Components/PublicPageHero";
 import MarketLoadingBlock from "../../Components/MarketLoadingBlock";
+import MobileStickyActionBar, { MOBILE_STICKY_BAR_PADDING } from "../../Components/MobileStickyActionBar";
+import TrustBadge from "../../Components/TrustBadge";
+import { pickBadgeValue } from "@/lib/trustBadge";
 import { buildSearchPageUrl, PublicSearchFilters } from "../../Components/publicSearch";
 
 const getAttributeGroups = (variants: Variant[]): Map<string, Set<string>> => {
@@ -463,6 +466,25 @@ setMainImage(firstImage);
     }
   }, [isBlocking, performAddToCart, selectedVariant]);
 
+  const handleBuyNowClick = useCallback(() => {
+    if (!selectedVariant?.variantId) {
+      toast.error("Variant information is missing");
+      return;
+    }
+    const sizeValue = selectedVariant.attributes?.size || selectedVariant.attributes?.Size || "default";
+    const queryParams = new URLSearchParams({
+      type: "buy",
+      productId: product!._id,
+      variantId: selectedVariant.variantId,
+      size: sizeValue,
+      quantity: "1",
+      shippingMethod: selectedShipping,
+    });
+    router.push(`/checkout/buy-now?${queryParams.toString()}`);
+  }, [product, router, selectedShipping, selectedVariant]);
+
+  const productBadge = product ? pickBadgeValue(product as unknown as Record<string, unknown>) : null;
+
   const openReviewForm = () => {
     setReviewFormOpen((prev) => !prev);
   };
@@ -524,7 +546,7 @@ setMainImage(firstImage);
   }
 
   return (
-    <div className="min-h-screen bg-market-bg">
+    <div className={`min-h-screen bg-market-bg ${MOBILE_STICKY_BAR_PADDING}`}>
       <PublicPageHero
         title="Product"
         breadcrumbs={[
@@ -646,20 +668,23 @@ setMainImage(firstImage);
 
           {/* RIGHT: Info */}
           <div className="flex-1 space-y-3">
-            {/* Seller */}
-            <p className="text-xs text-[#c79b44]">
-              <span className="text-gray-400">Seller: </span>
-              {sellerBusinessId ? (
-                <Link
-                  href={`/vendor-profile/product-vendor/${sellerBusinessId}`}
-                  className="font-medium hover:underline cursor-pointer"
-                >
-                  {getSellerName()}
-                </Link>
-              ) : (
-                <span className="font-medium">{getSellerName()}</span>
-              )}
-            </p>
+            {/* Trust badge + seller */}
+            <div className="flex flex-wrap items-center gap-3">
+              <TrustBadge tier={productBadge} size="sm" linkToExplainer />
+              <p className="text-xs text-[#c79b44]">
+                <span className="text-gray-400">Seller: </span>
+                {sellerBusinessId ? (
+                  <Link
+                    href={`/vendor-profile/product-vendor/${sellerBusinessId}`}
+                    className="font-medium hover:underline cursor-pointer"
+                  >
+                    {getSellerName()}
+                  </Link>
+                ) : (
+                  <span className="font-medium">{getSellerName()}</span>
+                )}
+              </p>
+            </div>
 
             {/* Product Title */}
 <h1
@@ -1142,23 +1167,34 @@ setMainImage(firstImage);
         </div>
       </div>
 
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-market-header/95 p-3 backdrop-blur lg:hidden">
-        <div className="container-page flex items-center gap-3">
-          {price.current > 0 ? (
+      <MobileStickyActionBar
+        leading={
+          price.current > 0 ? (
             <span className="font-poppins text-lg font-semibold text-market-gold">
               ${price.current.toFixed(2)}
             </span>
-          ) : null}
-          <button
-            type="button"
-            className="market-btn-primary min-h-11 flex-1 text-sm normal-case"
-            disabled={isBlocking || loadingQty || !isVariantSelected() || Boolean(selectedVariant && selectedVariant.stock <= 0)}
-            onClick={handleAddToCartClick}
-          >
-            {!isVariantSelected() ? "Select options" : selectedVariant && selectedVariant.stock <= 0 ? "Out of stock" : "Add to cart"}
-          </button>
-        </div>
-      </div>
+          ) : undefined
+        }
+        primaryLabel={
+          !isVariantSelected()
+            ? "Select options"
+            : selectedVariant && selectedVariant.stock <= 0
+              ? "Out of stock"
+              : "Add to cart"
+        }
+        onPrimaryClick={handleAddToCartClick}
+        primaryDisabled={
+          isBlocking ||
+          loadingQty ||
+          !isVariantSelected() ||
+          Boolean(selectedVariant && selectedVariant.stock <= 0)
+        }
+        secondaryLabel="Buy now"
+        onSecondaryClick={handleBuyNowClick}
+        secondaryDisabled={
+          !isVariantSelected() || Boolean(selectedVariant && selectedVariant.stock <= 0)
+        }
+      />
     </div>
   );
 }
