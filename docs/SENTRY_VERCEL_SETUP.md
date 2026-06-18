@@ -1,6 +1,6 @@
 # Sentry Vercel Setup
 
-> **Status (2026-06-17):** Sentry PR [#1](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/1) — merging into `main`. See [PROJECT_STATUS.md](PROJECT_STATUS.md).
+> **Status (2026-06-18):** Sentry SDK merged on `main`. Production verification: [`FRONTEND_SENTRY_PRODUCTION_VERIFICATION.md`](FRONTEND_SENTRY_PRODUCTION_VERIFICATION.md) — **BLOCKED** until `NEXT_PUBLIC_SENTRY_DSN` is set in Vercel (legacy `SENTRY_DSN` alone is insufficient).
 
 Branch: `feat/sentry-monitoring`  
 PR: https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/1
