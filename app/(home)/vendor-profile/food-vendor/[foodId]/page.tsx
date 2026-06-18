@@ -10,6 +10,8 @@ import ClientTestimonials from "../../../Components/ClientTestimonials";
 import PublicSearchFilterBar from "../../../Components/PublicSearchFilterBar";
 import MobileStickyActionBar from "../../../Components/MobileStickyActionBar";
 import { buildSearchPageUrl, PublicSearchFilters } from "../../../Components/publicSearch";
+import MarketEmptyState from "../../../Components/MarketEmptyState";
+import MarketLoadingBlock from "../../../Components/MarketLoadingBlock";
 
 type CategoryRef = {
   _id?: string;
@@ -430,6 +432,7 @@ export default function FoodVendorProfilePage() {
   const [data, setData] = useState<ReturnType<typeof normalizeData> | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
   const [filters, setFilters] = useState<PublicSearchFilters>({
     keyword: "",
     location: "",
@@ -504,6 +507,8 @@ export default function FoodVendorProfilePage() {
     }
 
     (async () => {
+      setLoading(true);
+      setError(null);
       try {
         const base = (process.env.NEXT_PUBLIC_API_BASE_URL || "").replace(/\/$/, "");
         const res = await fetch(`${base}/api/public/foods/${foodId}`, {
@@ -523,7 +528,7 @@ export default function FoodVendorProfilePage() {
         setLoading(false);
       }
     })();
-  }, [foodId]);
+  }, [foodId, reloadKey]);
 
   useEffect(() => {
     if (!foodId) return;
@@ -580,20 +585,19 @@ export default function FoodVendorProfilePage() {
   }, [availableTimeSlots, bookForm.timeSlot]);
 
   if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-12 w-12 animate-spin rounded-full border-4 border-[#c79b44] border-t-transparent" />
-          <p className="text-sm font-medium text-gray-500">Loading profile...</p>
-        </div>
-      </div>
-    );
+    return <MarketLoadingBlock label="Loading profile…" minHeight="min-h-screen" />;
   }
 
   if (error) {
     return (
-      <div className="mx-auto max-w-3xl px-4 py-20 text-center">
-        <p className="font-medium text-red-600">{error}</p>
+      <div className="mx-auto max-w-3xl px-4 py-20">
+        <MarketEmptyState
+          title="Food vendor profile unavailable"
+          description={error}
+          ctaLabel="Browse foods"
+          ctaHref="/foods"
+          onRetry={() => setReloadKey((key) => key + 1)}
+        />
       </div>
     );
   }
@@ -1340,6 +1344,11 @@ export default function FoodVendorProfilePage() {
                 <button
                   type="button"
                   disabled={!bookingReady}
+                  onClick={() => {
+                    toast.info(
+                      "Table booking is not available yet. Use the contact options above to reach this business directly."
+                    );
+                  }}
                   className={`h-10 w-full text-[11px] font-poppins font-semibold uppercase tracking-wide text-white transition-colors ${
                     bookingReady ? "bg-[#C7A040] hover:bg-[#a88432]" : "cursor-not-allowed bg-[#d7c796]"
                   }`}
@@ -1347,9 +1356,7 @@ export default function FoodVendorProfilePage() {
                   Book Table
                 </button>
                 <p className="border border-dashed border-[#d8d0ba] bg-[#fffdf4] px-3 py-2 text-[11px] text-gray-500 leading-relaxed mt-3">
-  On submission of this form, your booking request will be shared with the business. 
-  They will <span className="font-medium text-[#1d1d1d]">confirm or decline</span> it based on availability. 
-  We’ll keep you updated.
+  Online table booking is coming soon. Contact the business above to reserve a table.
 </p>
               </div>
               )}

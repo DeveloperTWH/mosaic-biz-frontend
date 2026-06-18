@@ -37,6 +37,7 @@ const ServicePageContent = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [loading, setLoading] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [subcategories, setSubcategories] = useState<SubCategory[]>([]);
@@ -60,6 +61,7 @@ const ServicePageContent = () => {
   ) => {
     const requestId = ++latestRequestIdRef.current;
     setLoading(true);
+    setFetchError(null);
     try {
       const params: any = {
         search: q ?? searchText,
@@ -90,6 +92,11 @@ const ServicePageContent = () => {
       setItemsPerPage(typeof res.data.limit === "number" ? res.data.limit : Number(params.limit) || 10);
     } catch (err) {
       console.error(err);
+      if (requestId === latestRequestIdRef.current) {
+        setFetchError("Unable to load services right now. Please try again.");
+        setServices([]);
+        setTotalServices(0);
+      }
     } finally {
       if (requestId === latestRequestIdRef.current) {
         setLoading(false);
@@ -216,6 +223,21 @@ const ServicePageContent = () => {
         selectedCategory={selectedCategory}
         onCategorySelect={handleCategorySelect}
       />
+
+      {fetchError ? (
+        <div className="mx-auto max-w-[1400px] px-4 py-6">
+          <div className="rounded border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+            {fetchError}{" "}
+            <button
+              type="button"
+              onClick={() => fetchServices()}
+              className="font-semibold underline"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      ) : null}
 
       <BookServices services={services} totalProducts={totalServices} currentPage={currentPage} itemsPerPage={itemsPerPage} selectedCategory={selectedCategory} loading={loading} onCategorySelect={(categoryId) => {
         const category = categories.find(cat => cat._id === categoryId);

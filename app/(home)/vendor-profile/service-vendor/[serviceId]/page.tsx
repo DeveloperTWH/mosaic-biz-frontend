@@ -12,6 +12,8 @@ import PublicSearchFilterBar from "../../../Components/PublicSearchFilterBar";
 import MobileStickyActionBar from "../../../Components/MobileStickyActionBar";
 import TrustBadge from "../../../Components/TrustBadge";
 import { buildSearchPageUrl, PublicSearchFilters } from "../../../Components/publicSearch";
+import MarketEmptyState from "../../../Components/MarketEmptyState";
+import MarketLoadingBlock from "../../../Components/MarketLoadingBlock";
 
 /* ─────────────── Types based on actual API response ─────────────── */
 type ServiceContact = {
@@ -524,6 +526,7 @@ export default function ServiceVendorProfilePage() {
   const [data, setData] = useState<ReturnType<typeof normalizeData> | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
 
   /* filter / sort */
   const [filters, setFilters] = useState<PublicSearchFilters>({
@@ -604,6 +607,8 @@ export default function ServiceVendorProfilePage() {
   useEffect(() => {
     if (!serviceId) { setError("Invalid service id."); setLoading(false); return; }
     (async () => {
+      setLoading(true);
+      setError(null);
       try {
         const base = (process.env.NEXT_PUBLIC_API_BASE_URL || "").replace(/\/$/, "");
         const res = await fetch(`${base}/api/public/services/${serviceId}`, {
@@ -616,7 +621,7 @@ export default function ServiceVendorProfilePage() {
       } catch (e: any) { setError(e?.message || "Error loading profile."); }
       finally { setLoading(false); }
     })();
-  }, [serviceId]);
+  }, [serviceId, reloadKey]);
 
   useEffect(() => {
     if (!serviceId) return;
@@ -704,17 +709,18 @@ export default function ServiceVendorProfilePage() {
 
   /* ─── Loading / Error states ─── */
   if (loading) return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="flex flex-col items-center gap-4">
-        <div className="w-12 h-12 border-4 border-[#c79b44] rounded-full border-t-transparent animate-spin" />
-        <p className="text-sm font-medium text-gray-500">Loading profile…</p>
-      </div>
-    </div>
+    <MarketLoadingBlock label="Loading profile…" minHeight="min-h-screen" />
   );
 
   if (error) return (
-    <div className="max-w-3xl mx-auto px-4 py-20 text-center">
-      <p className="text-red-600 font-medium">{error}</p>
+    <div className="mx-auto max-w-3xl px-4 py-20">
+      <MarketEmptyState
+        title="Service profile unavailable"
+        description={error}
+        ctaLabel="Browse services"
+        ctaHref="/services"
+        onRetry={() => setReloadKey((key) => key + 1)}
+      />
     </div>
   );
 

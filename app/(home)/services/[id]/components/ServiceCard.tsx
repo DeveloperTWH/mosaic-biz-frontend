@@ -58,7 +58,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
           </div>
           <p className="text-sm text-market-muted line-clamp-3">{service.description}</p>
           <Link
-            href={`/service/${service.slug}`}
+            href={`/vendor-profile/service-vendor/${service._id}`}
             className="mt-4 inline-flex items-center gap-1 text-sm text-market-gold hover:text-market-gold-hover hover:underline"
             onClick={(e) => e.stopPropagation()}
           >
