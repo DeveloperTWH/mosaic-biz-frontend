@@ -332,14 +332,15 @@ const AddressComponent = ({
       `}</style>
 
       {/* Delivery Address Card */}
-      <div className="flex items-center justify-between p-4 mt-6 bg-white border border-gray-200 rounded-md">
+      <div className="mt-6 flex items-center justify-between rounded-md border border-gray-200 bg-white p-4 text-brand-navy">
         <div>
-          <div className="text-gray-600">Deliver to:</div>
-          <div className="mt-2 text-sm text-gray-800">{displayLine(selected)}</div>
+          <div className="font-medium text-brand-muted">Deliver to:</div>
+          <div className="mt-2 text-sm text-brand-navy">{displayLine(selected)}</div>
         </div>
         <div>
           <button
-            className="px-5 py-2 bg-[#FFC400] font-semibold"
+            type="button"
+            className="bg-[#FFC400] px-5 py-2 font-semibold text-brand-navy"
             onClick={() => { setEditingId(null); setNewAddress(emptyNew); setShowModal(true); }}
           >
             {addresses.length > 0 ? "Change" : "Add Address"}

@@ -65,7 +65,7 @@ const renderStars = (rating: number) => {
 
 export default function ClientTestimonials() {
   return (
-    <section className="px-5 py-20 text-white md:px-20">
+    <section className="px-5 py-20 text-brand-navy md:px-20">
       <div className="mb-12 text-center">
         <h2 className="text-4xl font-bold text-center text-gray-900 uppercase tracking-wide font-poppins">
           WHAT OUR CLIENTS SAY
