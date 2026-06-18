@@ -1,12 +1,21 @@
 # Visual Polish QA Report
 
 **Type:** Living QA document  
-**Last updated:** 2026-06-17  
+**Last updated:** 2026-06-18  
 **Repo:** `Digital-Builders-757/mosaic-biz-frontend-launch`
 
 ---
 
-## Release batch summary
+## Epic #54 sprint batches
+
+| Batch | Branch | Issues | Status |
+|-------|--------|--------|--------|
+| Epic #54 Batch 1 | `polish/vendor-readability-global-cta` | #51, #55, #58, #62 | In progress |
+| Epic #54 Batch 2 | `polish/mobile-nav-responsive-pass` | #52, #53 | Pending |
+| Epic #54 Batch 3 | `polish/homepage-marketplace-experience` | #59, #60 | Pending |
+| Epic #54 Batch 4 | `polish/trust-howto-content-cleanup` | #56, #57, #61 | Pending |
+
+### Prior release batches (merged)
 
 | Batch | Branch | Issues | Status |
 |-------|--------|--------|--------|
@@ -29,8 +38,36 @@
 | `/about` | Pass | Pass | Pass |
 | `/contact` | Pass | Pass | Pass |
 | `/how-to-use-this-app` | Pass | Pass | Pass |
+| `/become-a-vendor` | Pass (Epic #54 B1) | Pass (Epic #54 B1) | Pass |
 
 **Chrome:** Navbar mobile menu, footer link grouping, public filter bars, hero breadcrumbs, marketplace cards.
+
+---
+
+## Epic #54 Batch 1 — Vendor readability & CTA (#51, #55, #58, #62)
+
+**Branch:** `polish/vendor-readability-global-cta`
+
+### Changes
+
+- `/become-a-vendor`: `PublicPageHero`, readable light step/resource cards, `market-btn-primary` CTA, dusk support callout
+- `VendorExpandCta` shared component (replaces `w-screen` overflow band)
+- `globals.css`: `.market-card-light-*`, `.market-step-badge`, disabled CTA states
+- Navbar: vendor link uses `text-market-text` for contrast
+- `STYLE_GUIDE.md`: light-card rules, CTA hierarchy, house patterns
+
+### Manual QA checklist
+
+- [ ] Step card titles readable (navy on white) at 375px
+- [ ] Resource card titles readable at 375px
+- [ ] Primary CTA links to `/signup?type=vendor`
+- [ ] Bottom band CTA links to `/signup?type=vendor` (not self-referential)
+- [ ] No horizontal overflow on `/become-a-vendor`
+
+### Guardrails
+
+- No API/auth/checkout/Stripe/middleware changes
+- `/api/featured-products` remains canonical
 
 ---
 
