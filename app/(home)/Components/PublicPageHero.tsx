@@ -21,7 +21,7 @@ const PublicPageHero = ({
   return (
     <section
       aria-labelledby={titleId}
-      className="relative min-h-[220px] overflow-hidden border-b border-white/10 bg-market-bg md:min-h-[280px]"
+      className="relative w-full min-h-[220px] overflow-hidden border-b border-white/10 bg-market-bg md:min-h-[280px]"
     >
       {imageUrl ? (
         <Image

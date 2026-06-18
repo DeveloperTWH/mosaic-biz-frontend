@@ -12,7 +12,7 @@ export default function AboutContent() {
       </div>
       {/* Text content */}
       <div className="py-10 md:pl-10 md:order-1">
-        <h2 className="heading mb-2 text-3xl font-bold text-market-text">About Us</h2>
+        <h2 className="market-section-heading mb-2 text-3xl">About Us</h2>
         <div className="market-section-divider !mx-0 !mt-2 !w-28" />
         <p className="text-sm leading-relaxed text-market-muted">
           Mosaic Biz Hub was found with a single vision: to empower minority-owned businesses and provide them with success in the digital age. We think every business has a story—and every story should be heard.

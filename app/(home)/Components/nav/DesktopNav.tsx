@@ -10,6 +10,7 @@ import {
   LEARN_LINKS,
   MORE_DROPDOWN_LINKS,
 } from "./navConfig";
+import { useHomeClick } from "./useHomeNavigation";
 
 type DropdownProps = {
   label: string;
@@ -52,6 +53,8 @@ function NavDropdown({ label, links, widthClass = "w-48" }: DropdownProps) {
 }
 
 export default function DesktopNav() {
+  const onHomeClick = useHomeClick();
+
   return (
     <nav
       className="hidden items-center gap-6 text-xs font-medium tracking-wide xl:flex"
@@ -59,6 +62,7 @@ export default function DesktopNav() {
     >
       <Link
         href={HOME_LINK.href}
+        onClick={onHomeClick}
         className="market-nav-link whitespace-nowrap font-medium uppercase text-market-muted transition-colors hover:text-market-gold"
       >
         {HOME_LINK.label}

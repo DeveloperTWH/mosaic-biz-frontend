@@ -2,13 +2,16 @@
 
 import Link from "next/link";
 import BrandLogo from "./BrandLogo";
+import { useHomeClick } from "./nav/useHomeNavigation";
 
 export default function Footer() {
+  const onLogoClick = useHomeClick();
+
   return (
     <footer className="w-full bg-market-header pt-16 text-market-text">
       <div className="mx-auto w-[90%] max-w-6xl">
         <div className="mb-12">
-          <Link href="/" className="inline-flex focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-market-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-market-header rounded-sm">
+          <Link href="/" onClick={onLogoClick} className="inline-flex focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-market-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-market-header rounded-sm">
             <BrandLogo variant="footer" />
           </Link>
         </div>
