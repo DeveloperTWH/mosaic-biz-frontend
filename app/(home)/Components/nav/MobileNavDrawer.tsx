@@ -183,7 +183,13 @@ export default function MobileNavDrawer({
 
             <DrawerSection title="More">
               {MORE_LINKS.map((link) => (
-                <DrawerLink key={link.href} href={link.href} label={link.label} onClose={onClose} />
+                <DrawerLink
+                  key={link.href}
+                  href={link.href}
+                  label={link.label}
+                  onClose={onClose}
+                  className="text-market-text/90"
+                />
               ))}
             </DrawerSection>
           </nav>

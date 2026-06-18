@@ -72,15 +72,14 @@ if (!token) {
                 {/* Contact Form */}
                 <div className='p-4 sm:p-6 md:p-8 lg:p-10'>
                     <h2 className="market-section-heading mb-3 sm:text-4xl">CONNECT WITH US</h2>
-                    <hr className="h-[2px] w-[100px] bg-green-900" />
-                    <hr className="h-[2px] w-[100px] bg-green-900 mt-[1px] mb-4" />
-                    <p className="mb-6 text-sm text-market-muted font-montserrat">
+                    <div className="market-section-divider !mx-0 !mb-4 !w-28" />
+                    <p className="market-page-prose-muted mb-6">
                         Reach out to Mosaic Biz Hub anytime. We’re here to support your journey, answer your questions, and help your business thrive in the digital world.
                     </p>
 
                     <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <div className="flex flex-col">
-                            <label htmlFor="firstName" className="text-sm">First Name</label>
+                            <label htmlFor="firstName" className="text-sm text-market-text/90">First Name</label>
                             <input 
                                 id="firstName" 
                                 name="firstName"
@@ -94,7 +93,7 @@ if (!token) {
                         </div>
 
                         <div className="flex flex-col">
-                            <label htmlFor="lastName" className="text-sm">Last Name</label>
+                            <label htmlFor="lastName" className="text-sm text-market-text/90">Last Name</label>
                             <input 
                                 id="lastName" 
                                 name="lastName"
@@ -108,7 +107,7 @@ if (!token) {
                         </div>
 
                         <div className="flex flex-col">
-                            <label htmlFor="email" className="text-sm">Email</label>
+                            <label htmlFor="email" className="text-sm text-market-text/90">Email</label>
                             <input 
                                 id="email" 
                                 name="email"
@@ -122,7 +121,7 @@ if (!token) {
                         </div>
 
                         <div className="flex flex-col">
-                            <label htmlFor="phoneNo" className="text-sm">Phone Number</label>
+                            <label htmlFor="phoneNo" className="text-sm text-market-text/90">Phone Number</label>
                             <input 
                                 id="phoneNo" 
                                 name="phoneNo"
@@ -136,7 +135,7 @@ if (!token) {
                         </div>
 
                         <div className="flex flex-col md:col-span-2">
-                            <label htmlFor="subject" className="text-sm">Subject</label>
+                            <label htmlFor="subject" className="text-sm text-market-text/90">Subject</label>
                             <input 
                                 id="subject" 
                                 name="subject"
@@ -150,7 +149,7 @@ if (!token) {
                         </div>
 
                         <div className="flex flex-col md:col-span-2">
-                            <label htmlFor="howCanWeHelp" className="text-sm">How Can We Help You?</label>
+                            <label htmlFor="howCanWeHelp" className="text-sm text-market-text/90">How Can We Help You?</label>
                             <textarea 
                                 id="howCanWeHelp" 
                                 name="howCanWeHelp"
