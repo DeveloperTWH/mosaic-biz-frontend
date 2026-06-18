@@ -67,7 +67,7 @@ body {
 
 :root.with-fixed-header {
   --header-h: 64px;
-  --announcement-h: 2.25rem;
+  --announcement-h: 0px;
 }
 
 /* padding only in pages rendered by this layout */

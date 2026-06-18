@@ -216,7 +216,13 @@ Reuse `VendorExpandCta` from `app/(home)/Components/VendorExpandCta.tsx` instead
 
 ### Glass navbar
 
-Header uses `.glass-header` on `#site-header` with brand-navy frosted background.
+Header uses `.market-glass-header` on `#site-header` with marketplace dusk frosted background.
+
+**Breakpoints:** Full horizontal nav appears at **`xl` (1280px)+**. Below `xl`, the compact header shows logo, cart, account, and hamburger; navigation opens in `MobileNavDrawer` (right slide-in panel with backdrop).
+
+**Fixed offset:** `with-fixed-header` on `<html>`; `--header-h` (measured live via ResizeObserver), `--announcement-h` (default `0px`; `2.25rem` when announcement visible).
+
+**Nav config:** Single source of truth in `app/(home)/Components/nav/navConfig.ts` — desktop LEARN/MORE grouping, mobile drawer sections.
 
 ## House design patterns (Epic #54)
 
