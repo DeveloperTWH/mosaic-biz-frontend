@@ -79,6 +79,15 @@ const Navbar = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isOpen]);
+
   return (
     <header
       id="site-header"
@@ -353,7 +362,22 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="mt-4 max-h-[calc(100dvh-var(--header-h,4rem)-var(--announcement-h,0px))] space-y-4 overflow-y-auto border-t border-white/10 bg-market-surface pt-4 lg:hidden">
+        <div
+          className="fixed inset-x-0 bottom-0 z-40 mt-0 max-h-[calc(100dvh-var(--header-h,4rem)-var(--announcement-h,0px))] space-y-4 overflow-y-auto border-t border-white/10 bg-market-surface pt-4 lg:hidden"
+          style={{ top: "calc(var(--header-h, 4rem) + var(--announcement-h, 0px))" }}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Mobile navigation"
+        >
+          <div className="px-4 pb-2">
+            <Link
+              href="/search"
+              onClick={() => setIsOpen(false)}
+              className="market-btn-primary flex min-h-11 w-full items-center justify-center gap-2 text-sm normal-case"
+            >
+              Search marketplace
+            </Link>
+          </div>
           <nav className="flex flex-col space-y-1">
             <Link href="/" onClick={() => setIsOpen(false)} className="market-nav-link flex min-h-11 items-center px-4 py-3 font-medium uppercase text-market-text hover:bg-white/5">
               HOME
@@ -380,8 +404,8 @@ const Navbar = () => {
               </div>
             </div>
             
-            <Link href="/become-a-vendor" onClick={() => setIsOpen(false)} className="market-nav-link flex min-h-11 items-center px-4 py-3 font-medium uppercase text-market-text hover:bg-white/5">
-              BECOME A VENDOR
+            <Link href="/become-a-vendor" onClick={() => setIsOpen(false)} className="market-nav-link flex min-h-11 items-center px-4 py-3 font-medium uppercase text-market-gold hover:bg-white/5">
+              Become a vendor
             </Link>
             
             <Link href="/about" onClick={() => setIsOpen(false)} className="market-nav-link flex min-h-11 items-center px-4 py-3 font-medium uppercase text-market-text hover:bg-white/5">
@@ -483,7 +507,7 @@ const Navbar = () => {
                     await logoutUser();
                     setIsOpen(false);
                   }}
-                  className="w-full px-4 py-3 text-left text-red-500 hover:bg-red-50 rounded font-medium"
+                  className="market-nav-link min-h-11 w-full rounded px-4 py-3 text-left font-medium text-red-300 hover:bg-red-950/40"
                 >
                   Logout
                 </button>

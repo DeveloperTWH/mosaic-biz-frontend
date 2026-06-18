@@ -1,10 +1,18 @@
 import React from "react";
 import Link from "next/link";
+import PublicContentLayout from "../Components/PublicContentLayout";
 
 const ReturnRefundPolicy = () => {
   return (
-    <div className="max-w-[900px] mx-auto p-8 font-sans leading-relaxed">
-      <h1 className="mb-2 text-3xl font-bold">
+    <PublicContentLayout
+      title="Return & Refund Policy"
+      breadcrumbs={[
+        { label: "Home", href: "/" },
+        { label: "Return & Refund Policy" },
+      ]}
+      imageUrl="/about.png"
+    >
+      <h1 className="mb-2 font-poppins text-3xl font-bold text-brand-navy">
         Mosaic Biz Hub Return & Refund Policy
       </h1>
 
@@ -317,7 +325,7 @@ const ReturnRefundPolicy = () => {
           </div>
         </div>
       </div>
-    </div>
+    </PublicContentLayout>
   );
 };
 

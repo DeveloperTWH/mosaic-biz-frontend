@@ -3,6 +3,8 @@ import { Service } from "@/types/service";
 import { Category } from "@/types/Category";
 import FilterAccordion from "./FilterAccordion";
 import ProductCard from "./ProductCard";
+import MarketLoadingBlock from "../../Components/MarketLoadingBlock";
+import MarketEmptyState from "../../Components/MarketEmptyState";
 
 interface BookServicesProps {
   services: Service[];
@@ -34,6 +36,7 @@ const BookServices: React.FC<BookServicesProps> = ({
     subCategory: "",
     badge: "",
   });
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   const startItem = totalProducts > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0;
   const endItem = totalProducts > 0 ? Math.min(startItem + services.length - 1, totalProducts) : 0;
@@ -46,11 +49,20 @@ const BookServices: React.FC<BookServicesProps> = ({
   };
 
   return (
-    <section className="px-4 py-8 mx-auto max-w-7xl sm:px-6">
-      <div className="flex flex-col lg:flex-row gap-6">
-        <div className="lg:w-1/4">
-          <div className="space-y-6">
-            <FilterAccordion
+    <section className="container-page py-8">
+      <div className="flex flex-col gap-6 lg:flex-row">
+        <div className="w-full lg:w-1/4">
+          <button
+            type="button"
+            className="market-btn-secondary mb-4 w-full lg:hidden"
+            onClick={() => setFiltersOpen((prev) => !prev)}
+            aria-expanded={filtersOpen}
+          >
+            {filtersOpen ? "Hide filters" : "Filters"}
+          </button>
+          <div className={`${filtersOpen ? "block" : "hidden"} lg:block`}>
+            <div className="space-y-6">
+              <FilterAccordion
               selectedCategory={selectedCategory}
               onFilterChange={(category, subCategory) => {
                 console.log("Service filter clicked:", category, subCategory);
@@ -62,10 +74,11 @@ const BookServices: React.FC<BookServicesProps> = ({
               onBadgeSelect={onBadgeSelect}
               onPriceChange={onPriceChange}
             />
+            </div>
           </div>
         </div>
 
-        <div className="lg:w-3/4">
+        <div className="w-full min-w-0 lg:w-3/4">
           <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="market-result-count">
               (Showing {startItem} - {endItem} Service Of {totalProducts} Services)
@@ -91,14 +104,14 @@ const BookServices: React.FC<BookServicesProps> = ({
           </div>
 
           {loading ? (
-            <div className="flex h-64 items-center justify-center">
-              <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-market-gold"></div>
-            </div>
+            <MarketLoadingBlock label="Loading services…" minHeight="min-h-[256px]" />
           ) : services.length === 0 ? (
-            <div className="market-empty-state">
-              <p className="market-empty-state-title">No services found</p>
-              <p className="mt-2 text-sm text-market-muted">Try adjusting your filters or search terms.</p>
-            </div>
+            <MarketEmptyState
+              title="No services found"
+              description="Try adjusting your filters or search the marketplace."
+              ctaLabel="Search marketplace"
+              ctaHref="/search"
+            />
           ) : (
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
               {services.map((service) => (

@@ -18,6 +18,8 @@ import Link from 'next/link';
 import PublicSearchFilterBar from "../Components/PublicSearchFilterBar";
 import PublicFilterSection from "../Components/PublicFilterSection";
 import { buildSearchPageUrl, PublicSearchFilters } from "../Components/publicSearch";
+import MarketImage from "../Components/MarketImage";
+import MarketLoadingBlock from "../Components/MarketLoadingBlock";
 
 type MinorityType = { _id: string; name: string };
 
@@ -223,10 +225,7 @@ const Page = () => {
             />
             
             {loadingn && (
-                <div className="py-8 text-center">
-                    <div className="inline-block h-8 w-8 animate-spin rounded-full border-b-2 border-market-gold"></div>
-                    <p className="mt-2 text-market-muted">Searching products...</p>
-                </div>
+                <MarketLoadingBlock label="Searching products…" minHeight="min-h-[120px]" />
             )}
             
             <div className="relative px-4 py-10 sm:px-6">
@@ -517,16 +516,7 @@ function ProductCard({ item }: { item: RankedItem }) {
             className="market-card flex h-[460px] w-full max-w-[300px] cursor-pointer flex-col overflow-hidden p-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-market-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-market-bg"
         >
             <div className="market-card-media relative aspect-square w-full flex-shrink-0">
-                {images[0] ? (
-                <img
-                    src={images[0]}
-                    alt={title}
-                    loading="lazy"
-                    className="h-full w-full object-contain transition-transform duration-500 hover:scale-105"
-                />
-                ) : (
-                <div className="market-card-placeholder">No image</div>
-                )}
+                <MarketImage src={images[0]} alt={title} aspect="square" objectFit="contain" />
                 
                 {onSale && (
                     <div className="absolute top-3 left-3">

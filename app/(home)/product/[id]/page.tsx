@@ -19,6 +19,8 @@ import {
 } from '@/utils/cartUtils';
 import { toggleWishlist, isProductWishlisted } from '@/utils/wishlistUtils';
 import PublicSearchFilterBar from "../../Components/PublicSearchFilterBar";
+import PublicPageHero from "../../Components/PublicPageHero";
+import MarketLoadingBlock from "../../Components/MarketLoadingBlock";
 import { buildSearchPageUrl, PublicSearchFilters } from "../../Components/publicSearch";
 
 const getAttributeGroups = (variants: Variant[]): Map<string, Set<string>> => {
@@ -515,34 +517,24 @@ setMainImage(firstImage);
 
   if (!product) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="flex flex-col items-center gap-4 text-center">
-          <div className="w-12 h-12 border-4 border-[#c79b44] rounded-full border-t-transparent animate-spin" />
-          <p className="text-sm font-medium text-gray-600">Loading product details...</p>
-        </div>
+      <div className="bg-market-bg">
+        <MarketLoadingBlock label="Loading product details…" minHeight="min-h-[60vh]" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Header */}
-      <div className="relative w-full h-[180px] bg-gray-800 overflow-hidden">
-        <img src="/products/19099 1.png" alt="header" className="absolute inset-0 object-cover w-full h-full opacity-40" />
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/30 text-center px-4">
-          <h1 className="text-3xl md:text-4xl font-bold tracking-wide text-white uppercase">Shop Product
-</h1>
-          <nav className="mt-2 text-sm text-gray-300">
-            <span className="hover:text-white cursor-pointer">Home</span>
-            <span className="mx-2">//</span>
-            <span className="hover:text-white cursor-pointer">Shop</span>
-            <span className="mx-2">//</span>
-            <span className="text-[#c79b44]">Product</span>
-          </nav>
-        </div>
-      </div>
+    <div className="min-h-screen bg-market-bg">
+      <PublicPageHero
+        title="Product"
+        breadcrumbs={[
+          { label: "Home", href: "/" },
+          { label: "Shop", href: "/products" },
+          { label: "Product" },
+        ]}
+        imageUrl="/bgdetailpage.png"
+      />
 
-      {/* Filter Section */}
       <PublicSearchFilterBar filters={filters} onChange={setFilters} onSubmit={handleSearch} />
 
       {/* Blocking overlay */}
@@ -587,8 +579,8 @@ setMainImage(firstImage);
       )}
 
       {/* Main Content */}
-      <div className="max-w-6xl px-4 py-8 mx-auto lg:px-6">
-        <div className="flex flex-col gap-8 lg:flex-row lg:gap-10">
+      <div className="container-page py-8">
+        <div className="market-card-light flex flex-col gap-8 p-4 sm:p-6 lg:flex-row lg:gap-10">
 
           {/* LEFT: Images */}
           <div className="lg:w-[45%]">
@@ -1147,6 +1139,24 @@ setMainImage(firstImage);
         {/* Similar Products — full width below both columns */}
         <div className="mt-14">
           <SimilarProduct productId={product._id} />
+        </div>
+      </div>
+
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-market-header/95 p-3 backdrop-blur lg:hidden">
+        <div className="container-page flex items-center gap-3">
+          {price.current > 0 ? (
+            <span className="font-poppins text-lg font-semibold text-market-gold">
+              ${price.current.toFixed(2)}
+            </span>
+          ) : null}
+          <button
+            type="button"
+            className="market-btn-primary min-h-11 flex-1 text-sm normal-case"
+            disabled={isBlocking || loadingQty || !isVariantSelected() || Boolean(selectedVariant && selectedVariant.stock <= 0)}
+            onClick={handleAddToCartClick}
+          >
+            {!isVariantSelected() ? "Select options" : selectedVariant && selectedVariant.stock <= 0 ? "Out of stock" : "Add to cart"}
+          </button>
         </div>
       </div>
     </div>

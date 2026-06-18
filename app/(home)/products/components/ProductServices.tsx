@@ -5,6 +5,9 @@ import Image from "next/image";
 import Link from "next/link";
 import FilterAccordion from "./FilterAccordion";
 import { Star } from "lucide-react";
+import MarketImage from "../../Components/MarketImage";
+import MarketLoadingBlock from "../../Components/MarketLoadingBlock";
+import MarketEmptyState from "../../Components/MarketEmptyState";
 
 
 interface BookServicesProps {
@@ -67,6 +70,7 @@ const ProductSevices: React.FC<BookServicesProps> = ({
     subCategory: "",
     badge: ""
   });
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   const safeTotalProducts = Number(totalProducts) || 0;
   const startItem = safeTotalProducts === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
@@ -87,17 +91,22 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
   };
 
   return (
-    <section className="px-4 py-8 mx-auto max-w-7xl sm:px-6">
+    <section className="container-page py-8">
        
-      <div className="flex flex-col lg:flex-row gap-6">
+      <div className="flex flex-col gap-6 lg:flex-row">
 
-        {/* Left Sidebar - Filters with Orange Background */}
+        {/* Left Sidebar - Filters */}
         <div className="w-full lg:w-[300px] lg:flex-none">
-        
-
-            
+          <button
+            type="button"
+            className="market-btn-secondary mb-4 w-full lg:hidden"
+            onClick={() => setFiltersOpen((prev) => !prev)}
+            aria-expanded={filtersOpen}
+          >
+            {filtersOpen ? "Hide filters" : "Filters"}
+          </button>
+          <div className={`${filtersOpen ? "block" : "hidden"} lg:block`}>
             <div className="space-y-6">
-
               <FilterAccordion 
                 selectedCategory={selectedCategory}
                 onFilterChange={(category, subCategory) => {
@@ -152,6 +161,7 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
                 </div>
               </div> */}
             {/* </div> */}
+            </div>
           </div>
         </div>
 
@@ -187,14 +197,14 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
 
           {/* Services Grid - Compact Cards */}
           {loading ? (
-            <div className="flex h-64 items-center justify-center">
-              <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-market-gold"></div>
-            </div>
+            <MarketLoadingBlock label="Loading products…" minHeight="min-h-[256px]" />
           ) : services.length === 0 ? (
-            <div className="market-empty-state">
-              <p className="market-empty-state-title">No products found</p>
-              <p className="mt-2 text-sm text-market-muted">Try adjusting your filters or search terms.</p>
-            </div>
+            <MarketEmptyState
+              title="No products found"
+              description="Try adjusting your filters or search the marketplace."
+              ctaLabel="Search marketplace"
+              ctaHref="/search"
+            />
           ) : (
             <>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -401,16 +411,7 @@ function ProductCard({ item }: { item: RankedItem }) {
     <Link href={href} className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-market-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-market-bg rounded-2xl">
     <div className="market-card flex h-[480px] w-full max-w-[300px] cursor-pointer flex-col overflow-hidden p-2">
       <div className="market-card-media relative aspect-square w-full flex-shrink-0">
-        {images[0] ? (
-          <img
-            src={images[0]}
-            alt={title}
-            loading="lazy"
-            className="h-full w-full object-contain transition-transform duration-500 hover:scale-105"
-          />
-        ) : (
-          <div className="market-card-placeholder">No image</div>
-        )}
+        <MarketImage src={images[0]} alt={title} aspect="square" objectFit="contain" />
 
         {onSale && (
           <div className="absolute top-3 left-3">

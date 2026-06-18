@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import MarketImage from "../../Components/MarketImage";
 
 type ProductCardProps = {
   serviceId?: string;
@@ -23,13 +24,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
   logo,
 }) => {
   const cardContent = (
-    <div className="market-card flex h-[420px] flex-col overflow-hidden">
-      <div className="market-card-media h-[180px] w-full flex-shrink-0">
-        {image ? (
-          <img src={image} alt={title} className="h-full w-full object-cover" />
-        ) : (
-          <div className="market-card-placeholder">No image</div>
-        )}
+    <div className="market-card flex h-[420px] min-h-[420px] flex-col overflow-hidden">
+      <div className="relative flex-shrink-0">
+        <MarketImage src={image} alt={title} aspect="video" objectFit="cover" />
         {logo && (
           <img
             src={logo}

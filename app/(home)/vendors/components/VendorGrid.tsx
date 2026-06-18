@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import CustomSelect from './CustomSelect';
 import Link from 'next/link';
+import MarketLoadingBlock from '../../Components/MarketLoadingBlock';
+import MarketEmptyState from '../../Components/MarketEmptyState';
 
 interface Vendor {
     _id: string;
@@ -138,9 +140,14 @@ export default function VendorGrid() {
 
             {/* Vendor Grid */}
             {loading ? (
-                <div className="flex justify-center py-10">
-                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-market-muted border-t-market-gold"></div>
-                </div>
+                <MarketLoadingBlock label="Loading vendors…" />
+            ) : vendors.length === 0 ? (
+                <MarketEmptyState
+                    title="No vendors found"
+                    description="Try adjusting your filters or search the marketplace."
+                    ctaLabel="Search marketplace"
+                    ctaHref="/search"
+                />
             ) : (
                 <div className="mb-6 grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5">
                     {vendors.map((vendor) => (
@@ -160,9 +167,6 @@ export default function VendorGrid() {
                     ))}
                 </div>
             )}
-
-
-            {/* Pagination */}
             <div className="flex flex-col items-center justify-center gap-4 mt-4 sm:flex-row">
                 {totalPages > 0 ? (
                     <>

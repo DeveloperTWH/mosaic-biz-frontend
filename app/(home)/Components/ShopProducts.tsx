@@ -8,6 +8,9 @@ import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import { getFeaturedProducts, FeaturedProduct } from "@/lib/api/featured-products";
+import MarketImage from "./MarketImage";
+import MarketLoadingBlock from "./MarketLoadingBlock";
+import MarketEmptyState from "./MarketEmptyState";
 
 /* ---------- types ---------- */
 type RankedItem = {
@@ -173,7 +176,7 @@ export default function ShopProducts() {
   const nextButton = React.useRef(null);
 
   return (
-    <section className="mx-auto w-full max-w-[1400px] bg-market-bg px-4 py-12 sm:px-6 lg:px-12">
+    <section className="public-section container-page max-w-[1400px] bg-market-bg">
         <div className="mx-auto mb-12 max-w-3xl text-center">
           <h2 className="market-section-heading">Featured Products</h2>
           <div className="market-section-divider" />
@@ -183,29 +186,18 @@ export default function ShopProducts() {
         </div>
 
         {/* Products Carousel Section */}
-        {loading && (
-          <div className="text-center py-8">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-b-2 border-market-gold"></div>
-            <p className="mt-2 text-market-muted">Searching products...</p>
-          </div>
-        )}
+        {loading && <MarketLoadingBlock label="Loading featured products…" minHeight="min-h-[200px]" />}
         {items === null || (loading && items === null) ? (
           <SkeletonCarousel />
         ) : error ? (
           <ErrorBlock error={error} onRetry={reload} />
         ) : items.length === 0 ? (
-          <div className="market-card rounded-xl px-6 py-10 text-center">
-            <p className="font-semibold text-market-text">Featured products coming soon</p>
-            <p className="mt-2 text-sm text-market-muted">
-              Check back shortly or browse the full marketplace.
-            </p>
-            <Link
-              href="/products"
-              className="market-btn-secondary mt-4 inline-block px-6 py-2 text-sm normal-case"
-            >
-              Browse all products
-            </Link>
-          </div>
+          <MarketEmptyState
+            title="Featured products coming soon"
+            description="Check back shortly or browse the full marketplace."
+            ctaLabel="Browse all products"
+            ctaHref="/products"
+          />
         ) : (
           <div className="relative overflow-hidden px-2 sm:px-8">
             <div className="absolute top-1/2 left-0 z-10 hidden -translate-y-1/2 sm:block">
@@ -285,7 +277,6 @@ export default function ShopProducts() {
 function FeaturedProductCard({ item }: { item: FeaturedProduct }) {
   const title = item.title?.trim() || "Untitled product";
   const coverImage = item.coverImage?.trim();
-  const hasImage = Boolean(coverImage);
   const price =
     typeof item.price === "number" && Number.isFinite(item.price)
       ? item.price
@@ -304,16 +295,7 @@ function FeaturedProductCard({ item }: { item: FeaturedProduct }) {
     >
       <div className="flex h-full flex-col">
         <div className="market-card-media relative aspect-square w-full flex-shrink-0">
-          {hasImage ? (
-          <img
-            src={coverImage}
-            alt={title}
-            loading="lazy"
-            className="h-full w-full object-contain transition-transform duration-500 hover:scale-105"
-          />
-          ) : (
-            <div className="market-card-placeholder aspect-square">Image coming soon</div>
-          )}
+          <MarketImage src={coverImage} alt={title} aspect="square" objectFit="contain" fallbackLabel="Image coming soon" />
         </div>
 
         <div className="flex flex-1 flex-col p-3">

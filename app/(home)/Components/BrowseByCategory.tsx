@@ -6,8 +6,8 @@ import BrowseFoodAndGrocery from "./BrowsbyFoodndGrocerry";
 
 export default function BrowseByCategory() {
   return (
-    <section className="bg-market-bg">
-      <div className="mx-auto max-w-7xl px-4 pt-12 sm:px-6 lg:px-8">
+    <section className="public-section bg-market-bg">
+      <div className="container-page pt-0">
         <div className="text-center">
           <h2 className="market-section-heading">Browse by category</h2>
           <div className="market-section-divider" />
@@ -18,7 +18,7 @@ export default function BrowseByCategory() {
       </div>
       <BrowseServices showAllService={true} />
       <BrowseFoodAndGrocery />
-      <div className="mx-auto max-w-7xl px-4 pb-12 pt-4 text-center sm:px-6 lg:px-8">
+      <div className="container-page pb-0 pt-4 text-center">
         <div className="mb-6 flex flex-wrap items-center justify-center gap-3">
           <Link href="/products" className="market-btn-secondary min-w-[140px]">
             Shop products

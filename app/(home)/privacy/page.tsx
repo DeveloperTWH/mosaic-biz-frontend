@@ -1,10 +1,18 @@
 import React from "react";
 import Link from "next/link";
+import PublicContentLayout from "../Components/PublicContentLayout";
 
 const Privacy = () => {
   return (
-    <div className="max-w-[900px] mx-auto p-8 font-sans leading-relaxed">
-      <h1 className="mb-2 text-3xl font-bold">
+    <PublicContentLayout
+      title="Privacy Policy"
+      breadcrumbs={[
+        { label: "Home", href: "/" },
+        { label: "Privacy Policy" },
+      ]}
+      imageUrl="/about.png"
+    >
+      <h1 className="mb-2 font-poppins text-3xl font-bold text-brand-navy">
         Mosaic Biz Hub Privacy Policy
       </h1>
 
@@ -310,7 +318,7 @@ const Privacy = () => {
           className="w-full bg-cover bg-center"
           style={{ backgroundImage: "url('/contact/becomeVendor.png')" }}
         >
-          <div className="bg-[#3333339E] py-24 px-8 text-center text-white">
+          <div className="bg-[#3333339E] px-4 py-16 text-center text-white sm:px-8 sm:py-24">
             <div className="max-w-[900px] mx-auto">
               <h2 className="text-white text-3xl font-bold mb-2">
                 YOUR PRIVACY MATTERS -
@@ -339,7 +347,7 @@ const Privacy = () => {
           </div>
         </div>
       </div>
-    </div>
+    </PublicContentLayout>
   );
 };
 

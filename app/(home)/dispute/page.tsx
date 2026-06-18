@@ -1,10 +1,18 @@
 import React from "react";
 import Link from "next/link";
+import PublicContentLayout from "../Components/PublicContentLayout";
 
 const Dispute = () => {
   return (
-    <div className="max-w-[900px] mx-auto p-8 font-sans leading-relaxed">
-      <h1 className="mb-2 text-3xl font-bold">
+    <PublicContentLayout
+      title="Dispute Resolution"
+      breadcrumbs={[
+        { label: "Home", href: "/" },
+        { label: "Dispute Resolution" },
+      ]}
+      imageUrl="/about.png"
+    >
+      <h1 className="mb-2 font-poppins text-3xl font-bold text-brand-navy">
         Dispute Resolution Process
       </h1>
 
@@ -331,7 +339,7 @@ const Dispute = () => {
           className="w-full bg-cover bg-center"
           style={{ backgroundImage: "url('/contact/becomeVendor.png')" }}
         >
-          <div className="bg-[#3333339E] py-24 px-8 text-center text-white">
+          <div className="bg-[#3333339E] px-4 py-16 text-center text-white sm:px-8 sm:py-24">
             <div className="max-w-[900px] mx-auto">
               <h2 className="text-white text-3xl font-bold mb-2">
                 FAIR • TRANSPARENT • ACCOUNTABLE
@@ -360,7 +368,7 @@ const Dispute = () => {
           </div>
         </div>
       </div>
-    </div>
+    </PublicContentLayout>
   );
 };
 

@@ -5,6 +5,10 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Star } from "lucide-react";
 import PublicSearchFilterBar from "../Components/PublicSearchFilterBar";
+import PublicPageHero from "../Components/PublicPageHero";
+import PublicFilterSection from "../Components/PublicFilterSection";
+import MarketLoadingBlock from "../Components/MarketLoadingBlock";
+import MarketEmptyState from "../Components/MarketEmptyState";
 import { PublicSearchFilters } from "../Components/publicSearch";
 
 type ApiBusiness = {
@@ -402,11 +406,21 @@ const tabItems = [
 }>;
 
   return (
-    <div className="min-h-screen bg-[#FAF8F2]">
-      <PublicSearchFilterBar filters={filters} onChange={setFilters} onSubmit={handleSearch} />
+    <div className="min-h-screen bg-market-bg">
+      <PublicPageHero
+        title="Search"
+        breadcrumbs={[
+          { label: "Home", href: "/" },
+          { label: "Search" },
+        ]}
+        imageUrl="/bgdetailpage.png"
+      />
+      <PublicFilterSection>
+        <PublicSearchFilterBar filters={filters} onChange={setFilters} onSubmit={handleSearch} />
+      </PublicFilterSection>
 
-      <section className="mx-auto max-w-[1400px] px-4 py-10 sm:px-6 lg:px-12">
-        <div className="mb-8 flex flex-col items-center justify-center gap-3 md:flex-row">
+      <section className="container-page public-section max-w-[1400px]">
+        <div className="mb-8 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-center">
           {tabItems.map((tab) => {
             const isActive = activeTab === tab.key;
             return (
@@ -414,57 +428,43 @@ const tabItems = [
                 key={tab.key}
                 type="button"
                 onClick={() => setActiveTab(tab.key)}
-                className={`relative min-w-[220px] border px-6 py-3 text-sm font-semibold transition-colors ${
+                className={`relative w-full border px-4 py-3 text-sm font-semibold transition-colors sm:min-w-[180px] sm:w-auto lg:min-w-[220px] ${
                   isActive
-                    ? "border-[#C7A040] bg-[#C7A040] text-white"
-                    : "border-[#B6B8D6] bg-white text-[#1A1F71] hover:border-[#C7A040]"
+                    ? "border-market-gold bg-market-gold text-market-header"
+                    : "border-white/15 bg-market-elevated text-market-text hover:border-market-gold/40"
                 }`}
               >
                 {tab.label} ({tab.count})
-                {isActive ? (
-                  <span className="absolute left-1/2 top-full h-0 w-0 -translate-x-1/2 border-l-[8px] border-r-[8px] border-t-[8px] border-l-transparent border-r-transparent border-t-[#C7A040]" />
-                ) : null}
               </button>
             );
           })}
         </div>
 
-        <div className="mb-6 flex flex-col gap-2 text-sm text-gray-600 md:flex-row md:items-center md:justify-between">
-          <p>
+        <div className="mb-6 flex flex-col gap-2 text-sm text-market-muted md:flex-row md:items-center md:justify-between">
+          <p className="market-result-count">
             ({totalResults > 0 ? `Showing 1 - ${totalResults} results` : "No results yet"})
           </p>
-          <p className="text-xs uppercase tracking-[0.14em] text-gray-500">
+          <p className="text-xs uppercase tracking-[0.14em] text-market-muted">
             Keyword: {queryFilters.keyword || "Any"} | Location: {queryFilters.location || "Any"} | Minority:{" "}
             {queryFilters.minorityType || "Any"}
           </p>
         </div>
 
         {loading ? (
-          <div className="flex min-h-[320px] items-center justify-center">
-            <div className="flex flex-col items-center gap-4">
-              <div className="h-12 w-12 animate-spin rounded-full border-4 border-[#C7A040] border-t-transparent" />
-              <p className="text-sm font-medium text-gray-600">Searching results...</p>
-            </div>
-          </div>
+          <MarketLoadingBlock label="Searching results…" />
         ) : error ? (
-          <div className="rounded border border-red-200 bg-red-50 p-4 text-red-700">{error}</div>
+          <div className="market-card border-red-400/30 p-4 text-red-300">{error}</div>
         ) : totalResults === 0 ? (
-          <div className="rounded border border-[#E5DEC9] bg-white p-10 text-center">
-            <h2 className="text-xl font-semibold text-gray-900">No matches yet</h2>
-            <p className="mt-2 text-sm text-gray-600">
-              Try another keyword, state, or minority type to explore the marketplace.
-            </p>
-            <Link
-              href="/products"
-              className="mt-4 inline-block bg-[#1A1F71] px-6 py-2 text-sm font-semibold text-white hover:bg-blue-700"
-            >
-              Browse all products
-            </Link>
-          </div>
+          <MarketEmptyState
+            title="No matches yet"
+            description="Try another keyword, state, or minority type to explore the marketplace."
+            ctaLabel="Browse all products"
+            ctaHref="/products"
+          />
         ) : (
           <>
             {activeTab === "products" ? (
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              <div className="public-grid-listing">
                 {products.map((item) => (
                   <ProductCard key={item._id} item={item} />
                 ))}
@@ -472,7 +472,7 @@ const tabItems = [
             ) : null}
 
             {activeTab === "services" ? (
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              <div className="public-grid-listing">
                 {services.map((item) => (
                   <BusinessResultCard
                     key={item._id}
@@ -489,7 +489,7 @@ const tabItems = [
             ) : null}
 
             {activeTab === "foods" ? (
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              <div className="public-grid-listing">
                 {foods.map((item) => (
                   <BusinessResultCard
                     key={item._id}
@@ -513,15 +513,8 @@ const tabItems = [
 
 function SearchPageFallback() {
   return (
-    <div className="min-h-screen bg-white">
-      <section className="mx-auto max-w-[1400px] px-4 py-10 sm:px-6 lg:px-12">
-        <div className="flex min-h-[240px] items-center justify-center">
-          <div className="flex flex-col items-center gap-4">
-            <div className="h-12 w-12 animate-spin rounded-full border-4 border-[#c79b44] border-t-transparent" />
-            <p className="text-sm font-medium text-gray-500">Loading search...</p>
-          </div>
-        </div>
-      </section>
+    <div className="min-h-screen bg-market-bg">
+      <MarketLoadingBlock label="Loading search…" />
     </div>
   );
 }

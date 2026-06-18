@@ -21,7 +21,8 @@ Epic #54 sprint closeout: [EPIC_54_SPRINT_CLOSEOUT.md](EPIC_54_SPRINT_CLOSEOUT.m
 | Deploy model | Vercel auto-deploy on merge to `main` |
 | Preview access | Vercel deployment protection / SSO (HTTP 401 for unauthenticated automation) |
 | Build gate | `npm run build` passes on `main` |
-| Epic #54 visual polish | **Merged + closed** — issues #54, #51–#62 closed |
+| Epic #69–#76 mobile public polish | **In progress** on branch `polish/mobile-69-layout` — see [MOBILE_QA_PROOF_PACK.md](MOBILE_QA_PROOF_PACK.md) |
+| Staging promotion readiness | Pending merge to `staging` + QA sign-off before `staging` → `main` |
 
 ### Epic #54 sprint PRs (merged 2026-06-18)
 

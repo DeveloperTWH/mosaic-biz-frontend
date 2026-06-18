@@ -14,7 +14,7 @@ const Hero = () => {
   return (
     <div className="relative bg-market-bg">
       <section
-        className="relative flex min-h-[520px] items-center overflow-hidden bg-market-hero bg-cover bg-center sm:min-h-[580px] lg:min-h-[640px]"
+        className="hero-mobile-cap relative flex items-center overflow-hidden bg-market-hero bg-cover bg-center"
         style={{
           backgroundImage:
             "linear-gradient(180deg, rgba(18,11,47,0.75) 0%, rgba(33,23,71,0.82) 100%), url(/herobanner.png)",
@@ -44,11 +44,11 @@ const Hero = () => {
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Link href="/products" className="market-btn-primary min-w-[220px] text-center">
+              <Link href="/products" className="market-btn-primary w-full text-center sm:min-w-[220px] sm:w-auto">
                 Shop the Marketplace
               </Link>
-              <Link href="/become-a-vendor" className="market-btn-outline min-w-[220px] text-center">
-                Apply to Become a Vendor
+              <Link href="/become-a-vendor" className="market-btn-outline w-full text-center sm:min-w-[220px] sm:w-auto">
+                Become a vendor
               </Link>
             </div>
           )}

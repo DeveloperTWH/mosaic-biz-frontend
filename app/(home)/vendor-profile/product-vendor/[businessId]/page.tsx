@@ -197,7 +197,7 @@ function RevealConsentModal({
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="h-11 min-w-[140px] border border-[#d6cfba] px-5 text-sm font-semibold uppercase tracking-wide text-[#4b5563] transition-colors hover:bg-[#f7f4ea] disabled:cursor-not-allowed disabled:opacity-60"
+              className="h-11 w-full border border-[#d6cfba] px-5 text-sm font-semibold uppercase tracking-wide text-[#4b5563] transition-colors hover:bg-[#f7f4ea] disabled:cursor-not-allowed disabled:opacity-60 sm:min-w-[140px] sm:w-auto"
             >
               Cancel
             </button>
@@ -205,7 +205,7 @@ function RevealConsentModal({
               type="button"
               onClick={onConfirm}
               disabled={loading}
-              className="h-11 min-w-[180px] bg-[#C7A040] px-5 text-sm font-semibold uppercase tracking-wide text-white transition-colors hover:bg-[#a88432] disabled:cursor-not-allowed disabled:opacity-60"
+              className="h-11 w-full bg-[#C7A040] px-5 text-sm font-semibold uppercase tracking-wide text-white transition-colors hover:bg-[#a88432] disabled:cursor-not-allowed disabled:opacity-60 sm:min-w-[180px] sm:w-auto"
             >
               {loading ? "Please wait..." : isSignIn ? "Sign In & Continue" : "I Agree"}
             </button>

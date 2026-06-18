@@ -1,10 +1,18 @@
 import React from "react";
 import Link from 'next/link';
+import PublicContentLayout from "../Components/PublicContentLayout";
 
 const Terms = () => {
   return (
-    <div className="max-w-[900px] mx-auto p-8 font-sans leading-relaxed">
-      <h1 className="mb-2 text-3xl font-bold">Terms & Conditions</h1>
+    <PublicContentLayout
+      title="Terms & Conditions"
+      breadcrumbs={[
+        { label: "Home", href: "/" },
+        { label: "Terms & Conditions" },
+      ]}
+      imageUrl="/about.png"
+    >
+      <h1 className="mb-2 font-poppins text-3xl font-bold text-brand-navy">Terms & Conditions</h1>
       <p className="text-gray-500 mb-8 text-sm">Last updated: January 2026</p>
 
       <section className="mb-6">
@@ -163,7 +171,7 @@ const Terms = () => {
           className="w-full bg-cover bg-center"
           style={{ backgroundImage: "url('/contact/becomeVendor.png')" }}
         >
-          <div className="bg-[#3333339E] py-24 px-8 text-center text-white">
+          <div className="bg-[#3333339E] px-4 py-16 text-center text-white sm:px-8 sm:py-24">
             <div className="max-w-[900px] mx-auto">
               <h2 className="text-white text-3xl font-bold mb-2">EXPAND YOUR REACH -</h2>
               <h2 className="text-white text-3xl font-bold mb-4">LIST YOUR BUSINESS ON OUR PLATFORM!</h2>
@@ -183,13 +191,13 @@ const Terms = () => {
                 href="/become-a-vendor" 
                 className="inline-block px-10 py-4 bg-transparent border-2 border-white text-white font-semibold text-lg transition-all duration-300 hover:bg-white hover:text-gray-800"
               >
-                Become A Vendor
+                Become a vendor
               </Link>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </PublicContentLayout>
   );
 };
 

@@ -1,4 +1,6 @@
 'use client';
+import PublicPageHero from '../../Components/PublicPageHero';
+import MarketLoadingBlock from '../../Components/MarketLoadingBlock';
 import FeatureBlogs from '@/app/(home)/Components/FeatureBlogs';
 import { Loader2, AlertTriangle, Camera, CircleUserRound, Globe, Import, Mail, MapPin, PenTool, PhoneCall, Share2 } from 'lucide-react';
 import Image from 'next/image';
@@ -142,43 +144,38 @@ const ServiceDetailPage = () => {
 
 
     if (loading) return (
-        <div className="flex items-center justify-center p-5 text-custom-blue">
-            <Loader2 className="w-6 h-6 mr-2 animate-spin" />
-            <span>Loading...</span>
+        <div className="bg-market-bg">
+            <MarketLoadingBlock label="Loading service…" minHeight="min-h-[50vh]" />
         </div>
     );
 
     if (!service) return (
-        <div className="flex flex-col items-center justify-center p-5 text-red-600">
-            <AlertTriangle className="w-10 h-10 mb-2" />
-            <span>Service not found</span>
+        <div className="bg-market-bg">
+            <PublicPageHero title="Service" breadcrumbs={[{ label: "Home", href: "/" }, { label: "Services", href: "/services" }, { label: "Not found" }]} />
+            <div className="container-page py-12 text-center text-market-muted">
+                <AlertTriangle className="mx-auto mb-2 h-10 w-10 text-red-400" />
+                <span>Service not found</span>
+            </div>
         </div>
     );
     return (
         <>
-            <main className="px-4 py-8 mx-auto max-w-7xl">
-                {/* Breadcrumb */}
-                <nav className="mb-4 text-sm text-gray-500">
-                    <Link href="/" className="hover:underline">
-                        Home
-                    </Link>{" "}
-                    &gt;{" "}
-                    <Link href="/services" className="hover:underline">
-                        Services
-                    </Link>{" "}
-                    &gt;{" "}
-                    <span className="font-semibold text-black">{service.title}</span>
-                </nav>
-
-
-                {/* Top Split Section: Banner + Booking Form */}
-                <section className="grid gap-8 mb-10 md:grid-cols-3">
-                    {/* Left - Banner */}
-                    <div className="space-y-6 md:col-span-2">
+            <PublicPageHero
+                title={service.title || "Service"}
+                breadcrumbs={[
+                    { label: "Home", href: "/" },
+                    { label: "Services", href: "/services" },
+                    { label: service.title || "Service" },
+                ]}
+                imageUrl={service.coverImage || "/bgdetailpage.png"}
+            />
+            <main className="container-page py-8">
+                <section className="mb-10 grid grid-cols-1 gap-8 lg:grid-cols-3">
+                    <div className="space-y-6 lg:col-span-2">
                         <img
                             src={service.coverImage}
-                            alt="Service"
-                            className="object-cover w-full h-auto rounded-lg"
+                            alt={service.title || "Service"}
+                            className="h-auto w-full rounded-lg object-cover"
                         />
                         <div>
                             <div>
@@ -231,11 +228,10 @@ const ServiceDetailPage = () => {
 
                             </div>
                         </div>
-
                     </div>
 
                     {/* Right - Booking Form */}
-                    <aside className="space-y-6">
+                    <aside className="space-y-6 lg:col-span-1">
                         <div className="p-4 pt-0 border rounded-lg shadow-sm">
                             <h3 className="mb-4 text-lg font-semibold heading">Schedule a Booking</h3>
                             <form className="space-y-3" onSubmit={handleSubmit}>
