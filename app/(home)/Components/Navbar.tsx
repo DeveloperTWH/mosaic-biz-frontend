@@ -132,7 +132,7 @@ const Navbar = () => {
           
           <Link 
             href="/become-a-vendor" 
-            className={`text-market-muted hover:text-market-gold transition-colors font-medium uppercase `}
+            className="market-nav-link font-medium uppercase text-market-text transition-colors hover:text-market-gold"
           >
             BECOME A VENDOR
           </Link>

@@ -146,11 +146,16 @@ Shared UI lives in `components/ui/`. Prefer these over hand-rolled buttons:
 
 ### Public marketplace utility classes (`app/globals.css`)
 
-Use on `/`, `/products`, `/foods`, `/services`, `/vendors` only.
+Use on public marketplace routes and education pages inside the `market-page` shell.
 
 | Class | Use |
 |-------|-----|
-| `.market-btn-primary` / `.market-btn-secondary` / `.market-btn-outline` | Marketplace CTAs with `focus-visible` rings |
+| `.market-btn-primary` / `.market-btn-secondary` / `.market-btn-outline` | Marketplace CTAs with `focus-visible` rings and `:disabled` opacity |
+| `.market-card-light` | White elevated card on dusk pages — step cards, resource cards |
+| `.market-card-light-title` | Headings on white cards — `text-brand-navy` |
+| `.market-card-light-body` | Body copy on white cards — `text-brand-muted` |
+| `.market-step-badge` | Numbered step badges (gold circle) |
+| `.market-support-callout` | Info callout on dusk background (not `bg-blue-50`) |
 | `.market-input` | Text fields; border `white/15`, gold focus ring |
 | `.market-label` | Form field labels (`text-market-muted`) |
 | `.market-select` | Native `<select>` — extends `.market-input` with `appearance-none pr-10` |
@@ -183,16 +188,45 @@ Use on `/`, `/products`, `/foods`, `/services`, `/vendors` only.
 </section>
 ```
 
-### Hero CTA
+### Hero CTA (public marketplace)
 
 ```tsx
-<button className="btn-primary min-w-[220px]">Explore the Marketplace</button>
-<button className="btn-outline-white min-w-[220px]">Apply to Become a Vendor</button>
+<Link href="/products" className="market-btn-primary min-w-[220px]">Explore Marketplace</Link>
+<Link href="/become-a-vendor" className="market-btn-outline min-w-[220px]">Become a Vendor</Link>
 ```
+
+### Light card on dusk page
+
+When placing `bg-white` cards inside `market-page`, **always** use light-card utilities — never inherit `market-text`:
+
+```tsx
+<article className="market-card-light">
+  <h3 className="market-card-light-title">Step title</h3>
+  <p className="market-card-light-body">Body copy</p>
+</article>
+```
+
+### Vendor expand CTA band
+
+Reuse `VendorExpandCta` from `app/(home)/Components/VendorExpandCta.tsx` instead of duplicating `w-screen ml-[-50vw]` bands.
 
 ### Glass navbar
 
 Header uses `.glass-header` on `#site-header` with brand-navy frosted background.
+
+## House design patterns (Epic #54)
+
+Inspired by stronger Digital Builders projects (ViZb, TOTL) — **Mosaic stays distinct**:
+
+| Pattern | Mosaic implementation |
+|---------|----------------------|
+| Bold section hierarchy | `market-section-heading` + `market-section-divider` on dusk; centered subcopy `text-market-muted` |
+| Dark-background discipline | `market-page` shell; no pale lavender (`market-text`) on white surfaces |
+| Elevated cards | `market-card` (dusk) or `market-card-light` (white on dusk) with `shadow-market-card` |
+| Readable text hierarchy | Titles `font-poppins semibold`; body `font-montserrat` with `leading-relaxed` and `max-w-2xl` subcopy |
+| Premium buttons | `market-btn-primary` for primary path; `market-btn-outline` for secondary on dark bands |
+| Visible focus states | `focus-visible:ring-market-gold/*` on nav, footer, buttons |
+| Mobile-first polish | `min-h-11` tap targets; stack grids at `md:` / `lg:` breakpoints |
 
 ## Do / Don't
 
@@ -206,6 +240,9 @@ Header uses `.glass-header` on `#site-header` with brand-navy frosted background
 **Don't**
 
 - Hardcode `#hex` in `className` or inline `style`
+- Use `text-market-text` or inherit dusk body color on `bg-white` cards — use `market-card-light-title` / `market-card-light-body`
+- Use pale lavender subcopy on white cards (fails WCAG)
+- Use `w-screen ml-[-50vw]` full-bleed bands (causes horizontal overflow) — use `VendorExpandCta` or `w-full`
 - Load fonts from Google CDN in CSS
 - Use `custom-*` in new code (use `brand-*` equivalents)
 - Mix `max-w-6xl` and `max-w-7xl` on adjacent sections without reason
@@ -222,6 +259,6 @@ Header uses `.glass-header` on `#site-header` with brand-navy frosted background
 | Payment success (`app/(home)/payment-success`) | v2 — `brand-*` |
 | Partner dashboard | v2 — `surface-*` / `dashboard-*` (forms partially migrated) |
 | Vendor onboarding hub (`app/(home)/partners/page.tsx`) | v2 — `brand-*` on CTAs and progress |
-| Product / service / vendor detail pages | Legacy — light UI; Phase 2 roadmap |
+| Vendor education (`/become-a-vendor`) | **v3.2** — Epic #54 Batch 1: `PublicPageHero`, light cards, `market-btn-*` CTAs |
 | Vendor profiles / payment inline styles | Legacy — not yet migrated |
 | Legal pages (FAQ, privacy, terms) | Legacy — Arial CSS files |
