@@ -377,7 +377,7 @@ function PartnerDashboardContent() {
     <>
       <Navbar />
 
-      <main className="min-h-screen bg-[#f7f2eb] pt-[110px]">
+      <main className="min-h-screen overflow-x-hidden bg-[#f7f2eb] pt-[110px]">
         <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
           <h1 className="mb-4 text-center text-2xl font-bold uppercase tracking-wide text-gray-800">
             Vendor Dashboard
@@ -411,48 +411,52 @@ function PartnerDashboardContent() {
             </div>
           )}
 
-          <div className="mb-8 overflow-x-auto">
-            <div className="min-w-[760px] px-2">
-              <div
-                className={`grid gap-3 ${
-                  dashboardTabCount === 8
-                    ? "grid-cols-8"
-                    : dashboardTabCount === 7
-                    ? "grid-cols-7"
+          <div
+            className="mb-8 -mx-1 max-w-[calc(100%+0.5rem)] overflow-x-auto overscroll-x-contain px-1 pb-1 [-webkit-overflow-scrolling:touch] md:mx-0 md:max-w-none md:overflow-visible md:px-0 md:pb-0"
+            role="tablist"
+            aria-label="Dashboard sections"
+          >
+            <div
+              className={`flex w-max snap-x snap-mandatory gap-3 md:grid md:w-full md:snap-none ${
+                dashboardTabCount === 8
+                  ? "md:grid-cols-8"
+                  : dashboardTabCount === 7
+                    ? "md:grid-cols-7"
                     : dashboardTabCount === 6
-                    ? "grid-cols-6"
-                    : dashboardTabCount === 5
-                      ? "grid-cols-5"
-                      : "grid-cols-4"
-                }`}
-              >
-                {dashboardTabs.map((tab) => {
-                  return (
-                    <button
-                      key={tab.key}
-                      type="button"
-                      onClick={() => setActiveTab(tab.key)}
-                      className={`min-h-[76px] rounded-xl border px-2.5 py-3.5 text-left transition-all ${
-                        activeTab === tab.key
-                          ? "border-[#c9a44a] bg-[#f7f2df] text-[#8b6a15] shadow-sm"
-                          : "border-gray-200 bg-white text-gray-500 hover:border-[#d7c17d] hover:text-gray-700"
+                      ? "md:grid-cols-6"
+                      : dashboardTabCount === 5
+                        ? "md:grid-cols-5"
+                        : "md:grid-cols-4"
+              }`}
+            >
+              {dashboardTabs.map((tab) => {
+                return (
+                  <button
+                    key={tab.key}
+                    type="button"
+                    role="tab"
+                    aria-selected={activeTab === tab.key}
+                    onClick={() => setActiveTab(tab.key)}
+                    className={`min-h-[76px] w-[9.5rem] shrink-0 snap-start rounded-xl border px-2.5 py-3.5 text-left transition-all sm:w-[10.5rem] md:w-auto md:shrink ${
+                      activeTab === tab.key
+                        ? "border-[#c9a44a] bg-[#f7f2df] text-[#8b6a15] shadow-sm"
+                        : "border-gray-200 bg-white text-gray-500 hover:border-[#d7c17d] hover:text-gray-700"
+                    }`}
+                  >
+                    <span
+                      className={`block text-xs font-semibold leading-tight break-words md:text-sm ${
+                        activeTab === tab.key ? "text-[#8b6a15]" : "text-inherit"
                       }`}
                     >
-                      <span
-                        className={`block text-xs md:text-sm font-semibold leading-tight break-words ${
-                          activeTab === tab.key ? "text-[#8b6a15]" : "text-inherit"
-                        }`}
-                      >
-                        {tab.label}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
+                      {tab.label}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+          <div className="overflow-x-hidden rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
             <h3 className="mb-5 border-b border-gray-100 pb-3 font-semibold text-gray-900">
               {selectedTab?.label}
             </h3>

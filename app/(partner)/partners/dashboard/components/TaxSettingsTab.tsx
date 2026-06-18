@@ -302,7 +302,7 @@ export default function TaxSettingsTab({
         <p className={sectionEyebrowClassName}>Tax Categories & Rates</p>
 
         <div className="mt-3 overflow-hidden rounded-2xl border border-[#e6dccd] bg-white">
-          <div className="grid grid-cols-[1.4fr_180px] border-b border-[#e6dccd] bg-[#f9f6f0] px-4 py-3 sm:px-6">
+          <div className="hidden border-b border-[#e6dccd] bg-[#f9f6f0] px-4 py-3 sm:grid sm:grid-cols-[1.4fr_180px] sm:px-6">
             <p className="font-montserrat text-xs font-semibold uppercase tracking-[0.18em] text-[#8e816d]">
               Tax Category
             </p>
@@ -323,7 +323,7 @@ export default function TaxSettingsTab({
               return (
                 <div
                   key={category.code || `${category.label}-${index}`}
-                  className={`grid grid-cols-[1.4fr_180px] gap-4 px-4 py-4 sm:px-6 ${
+                  className={`grid grid-cols-1 gap-3 px-4 py-4 sm:grid-cols-[1.4fr_180px] sm:gap-4 sm:px-6 ${
                     index !== categories.length - 1 ? "border-b border-[#f0e7da]" : ""
                   }`}
                 >
@@ -336,7 +336,10 @@ export default function TaxSettingsTab({
                     </p>
                   </div>
 
-                  <div className="relative">
+                  <div className="relative max-w-full sm:max-w-none">
+                    <p className="mb-1 font-montserrat text-xs font-semibold uppercase tracking-[0.18em] text-[#8e816d] sm:sr-only">
+                      Rate (%)
+                    </p>
                     <input
                       type="number"
                       min="0"
