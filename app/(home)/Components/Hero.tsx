@@ -44,21 +44,41 @@ const Hero = () => {
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Link href="/products">
-                <button type="button" className="market-btn-primary min-w-[220px]">
-                  Explore the Marketplace
-                </button>
+              <Link href="/products" className="market-btn-primary min-w-[220px] text-center">
+                Shop the Marketplace
               </Link>
-              <Link href="/become-a-vendor">
-                <button type="button" className="market-btn-outline min-w-[220px]">
-                  Apply to Become a Vendor
-                </button>
+              <Link href="/become-a-vendor" className="market-btn-outline min-w-[220px] text-center">
+                Apply to Become a Vendor
               </Link>
             </div>
           )}
 
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+            {[
+              { href: "/products", label: "Products" },
+              { href: "/services", label: "Services" },
+              { href: "/foods", label: "Foods" },
+              { href: "/vendors", label: "Vendors" },
+            ].map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="market-nav-link rounded-full border border-white/15 bg-market-elevated/80 px-4 py-2 font-montserrat text-xs font-medium text-market-text transition-colors hover:border-market-gold/40 hover:text-market-gold sm:text-sm"
+              >
+                {item.label}
+              </Link>
+            ))}
+          </div>
+
+          <p className="mt-6 font-montserrat text-xs text-market-muted">
+            <Link href="/consumer/trustbadge" className="text-market-gold underline hover:text-market-gold-hover">
+              Learn about trust badges
+            </Link>
+            {" — "}verified onboarding, not customer ratings.
+          </p>
+
           {isLoggedIn === false ? (
-            <p className="mt-6 text-xs text-market-muted">
+            <p className="mt-3 text-xs text-market-muted">
               Already have an account?{" "}
               <Link
                 href="/login?type=customer"

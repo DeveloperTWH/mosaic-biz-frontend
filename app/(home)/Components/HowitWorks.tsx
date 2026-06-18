@@ -108,6 +108,9 @@ export default function HowItWorks() {
             </div>
 
 <div className="flex flex-1 flex-col gap-1.5 font-montserrat text-[13px] font-medium capitalize leading-5 text-market-muted">
+  <h3 className="font-poppins text-base font-semibold uppercase tracking-wide text-market-text">
+    {tabContent[tabClick].title}
+  </h3>
   <p>{tabContent[tabClick].description}</p>
 </div>
           </div>

@@ -207,9 +207,8 @@ export default function ShopProducts() {
             </Link>
           </div>
         ) : (
-          <div className="relative">
-            {/* Navigation Buttons */}
-            <div className="absolute top-1/2 left-0 -translate-y-1/2 -translate-x-4 z-10">
+          <div className="relative overflow-hidden px-2 sm:px-8">
+            <div className="absolute top-1/2 left-0 z-10 hidden -translate-y-1/2 sm:block">
               <button
                 ref={prevButton}
                 className="market-carousel-btn h-12 w-12"
@@ -219,7 +218,7 @@ export default function ShopProducts() {
               </button>
             </div>
             
-            <div className="absolute top-1/2 right-0 -translate-y-1/2 translate-x-4 z-10">
+            <div className="absolute top-1/2 right-0 z-10 hidden -translate-y-1/2 sm:block">
               <button
                 ref={nextButton}
                 className="market-carousel-btn h-12 w-12"
@@ -285,7 +284,8 @@ export default function ShopProducts() {
 /* ---------- Featured Product Card ---------- */
 function FeaturedProductCard({ item }: { item: FeaturedProduct }) {
   const title = item.title?.trim() || "Untitled product";
-  const coverImage = item.coverImage?.trim() || "/ShopProduct/Aria-SK6-Helmet 1.png";
+  const coverImage = item.coverImage?.trim();
+  const hasImage = Boolean(coverImage);
   const price =
     typeof item.price === "number" && Number.isFinite(item.price)
       ? item.price
@@ -304,20 +304,24 @@ function FeaturedProductCard({ item }: { item: FeaturedProduct }) {
     >
       <div className="flex h-full flex-col">
         <div className="market-card-media relative aspect-square w-full flex-shrink-0">
+          {hasImage ? (
           <img
             src={coverImage}
             alt={title}
             loading="lazy"
             className="h-full w-full object-contain transition-transform duration-500 hover:scale-105"
           />
+          ) : (
+            <div className="market-card-placeholder aspect-square">Image coming soon</div>
+          )}
         </div>
 
         <div className="flex flex-1 flex-col p-3">
-          <h3 className="market-card-title line-clamp-2 h-[42px] uppercase tracking-tight">
+          <h3 className="market-card-title line-clamp-2 min-h-[42px] uppercase tracking-tight">
             {title}
           </h3>
 
-          <p className="market-card-desc mb-2 h-[40px] overflow-hidden">
+          <p className="market-card-desc mb-2 min-h-[40px] overflow-hidden">
             {trimmedDescription || "\u00a0"}
           </p>
 
@@ -325,10 +329,11 @@ function FeaturedProductCard({ item }: { item: FeaturedProduct }) {
             Featured Product
           </p>
 
-          <div className="mt-auto flex-shrink-0">
+          <div className="mt-auto flex flex-shrink-0 items-center justify-between gap-2 border-t border-white/10 pt-3">
             <span className="market-card-price text-base">
               {price !== null ? `$${price.toFixed(2)}` : "Price on request"}
             </span>
+            <span className="market-card-action">View</span>
           </div>
         </div>
       </div>

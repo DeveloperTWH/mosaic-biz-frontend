@@ -235,6 +235,10 @@ body {
   @apply flex min-h-[52px] items-center justify-between rounded-lg border border-white/10 bg-market-elevated px-4 py-2;
 }
 
+.market-card-action {
+  @apply font-poppins text-xs font-semibold uppercase tracking-wide text-market-gold;
+}
+
 .market-empty-state {
   @apply market-card p-8 text-center;
 }

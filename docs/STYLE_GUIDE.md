@@ -166,6 +166,7 @@ Use on public marketplace routes and education pages inside the `market-page` sh
 | `.market-card-title` / `.market-card-desc` | Title and body hierarchy |
 | `.market-card-price` / `.market-card-price-sale` | Price display (gold / sale red) |
 | `.market-card-footer` | Badge/footer row inside cards |
+| `.market-card-action` | Card CTA label (View, Shop, etc.) |
 | `.market-empty-state` / `.market-empty-state-title` | Empty listing panels |
 | `.market-result-count` | “Showing X–Y of Z” result counts |
 | `.market-carousel-btn` | Carousel prev/next with focus ring |
