@@ -114,8 +114,7 @@ Cherry-pick conflicted on files touched by both stale PR #130 and post-redesign 
 - Product PDP embedded search filter bar clutter on mobile
 - Legacy mock routes (`/service/[slug]`, etc.) — redirects exist in `next.config.ts`
 - Become-a-vendor → `/signup?type=vendor` extra hop vs direct `/partners/business/new`
-- Full nav cleanup (bottom nav, hamburger IA) — on separate branch, not merged to `main` yet
-- Partner dashboard tab horizontal overflow
+- Partner dashboard tab horizontal overflow (PR #132)
 
 ---
 
@@ -175,8 +174,8 @@ New captures recommended on Vercel preview after merge: hero CTAs, `/search` dis
 
 ## Remaining non-launch improvements
 
-1. Merge nav cleanup branch (bottom nav, simplified hamburger, footer-only legal)
-2. Normalize search URL params (`keyword` / `q`, `location` / `city`)
+1. ~~Merge nav cleanup branch~~ — **Done on main via PR #108** (launch QA in PR #134)
+2. Normalize search URL params — **PR #133**
 3. Remove or hide legacy mock detail routes in dev
 4. Wire food table booking when backend endpoint is MVP-ready
 5. Product detail marketplace shell / sticky commerce bar (Phase 2)

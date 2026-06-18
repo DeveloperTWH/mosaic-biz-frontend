@@ -82,7 +82,7 @@ Production URL base: `https://mosaic-biz-frontend-launch.vercel.app`
 | Type | Item | Severity |
 |------|------|----------|
 | Frontend (non-launch) | Lint debt (662 problems) | Low |
-| Frontend (non-launch) | Nav cleanup branch, search param normalization | Low |
+| Frontend (non-launch) | Search param normalization (PR #133) | Low |
 | Backend/external | Logged-in vendor dashboard **200** flows (needs test creds) | Medium |
 | Backend/external | Food Book Table toast — no food listings in prod API (`total=0`) | Medium |
 | Backend/external | Curated vendor spotlight, vendor stories CMS | Info |

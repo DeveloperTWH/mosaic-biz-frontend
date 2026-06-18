@@ -13,7 +13,7 @@ export default function VendorCtaBand() {
           href="/become-a-vendor"
           className="market-btn-primary mt-8 inline-block w-full sm:min-w-[240px] sm:w-auto"
         >
-          Become a vendor
+          Become a Vendor
         </Link>
       </div>
     </section>
