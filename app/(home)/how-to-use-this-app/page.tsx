@@ -4,53 +4,10 @@ import Link from 'next/link';
 import Image from 'next/image';
 import PublicPageHero from '../Components/PublicPageHero';
 import VendorExpandCta from '../Components/VendorExpandCta';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Pagination, Autoplay } from 'swiper/modules';
-
-import 'swiper/css';
-import 'swiper/css/pagination';
-
-const testimonials = [
-    {
-        id: 1,
-        quote: "I have been using Mosaic Biz Hub for the past 6 months and it has completely transformed my business. The platform is easy to use and the support team is always there to help.",
-        name: "John Doe",
-        role: "CEO Of ABC Salon",
-        // avatar: "/testimonials/john-doe.jpg"
-    },
-    {
-        id: 2,
-        quote: "The resources and support available are incredible. I've been able to connect with vendors who share my values and grow my business exponentially.",
-        name: "Jane Smith",
-        role: "Creative Director",
-        // avatar: "/testimonials/jane-smith.jpg"
-    },
-    {
-        id: 3,
-        quote: "Connecting with vendors who share my values has been game-changing. The platform has helped me reach new customers and expand my business.",
-        name: "Mike Johnson",
-        role: "Small Business Owner",
-        // avatar: "/testimonials/mike-johnson.jpg"
-    },
-    {
-        id: 4,
-        quote: "Mosaic Biz Hub has been instrumental in helping us scale our operations. The visibility and connections we've made are invaluable.",
-        name: "Sarah Williams",
-        role: "Founder & CEO",
-        // avatar: "/testimonials/sarah-williams.jpg"
-    },
-    {
-        id: 5,
-        quote: "An amazing platform that truly understands the needs of minority-owned businesses. Highly recommend to anyone looking to grow their brand.",
-        name: "David Chen",
-        role: "Marketing Director",
-        avatar: "/testimonials/david-chen.jpg"
-    }
-];
 
 export default function HowToUseApp() {
     return (
-        <div className="flex flex-col min-h-screen bg-white">
+        <div className="flex flex-col">
             <PublicPageHero
                 title="How to Use This App"
                 breadcrumbs={[
@@ -60,17 +17,51 @@ export default function HowToUseApp() {
                 imageUrl="/how-to-use/banner.png"
             />
 
-            {/* Main Content */}
-            <div className="max-w-6xl mx-auto w-full px-6 py-12 lg:px-12">
-                
-                {/* Tagline Section */}
-                <div className="text-center mb-16 max-w-3xl mx-auto">
-                    <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 leading-tight">
+            <div className="container-page py-12 sm:py-16">
+                <div className="mb-12 text-center">
+                    <h2 className="market-section-heading text-2xl sm:text-3xl">
+                        Choose your path
+                    </h2>
+                    <div className="market-section-divider" />
+                    <p className="mx-auto mt-4 max-w-2xl font-montserrat text-sm text-market-muted sm:text-base">
+                        Whether you are shopping or selling, Mosaic Biz Hub connects you with verified minority-owned businesses.
+                    </p>
+                </div>
+
+                <div className="mb-16 grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <article className="market-card-light">
+                        <h3 className="market-card-light-title mb-3">For shoppers</h3>
+                        <ul className="market-card-light-body space-y-2 text-left">
+                            <li>Browse products, services, and food</li>
+                            <li>Filter by category and location</li>
+                            <li>View trust badges before you buy</li>
+                            <li>Checkout when listings support cart</li>
+                        </ul>
+                        <Link href="/products" className="market-btn-primary mt-6 inline-block">
+                            Start shopping
+                        </Link>
+                    </article>
+                    <article className="market-card-light">
+                        <h3 className="market-card-light-title mb-3">For vendors</h3>
+                        <ul className="market-card-light-body space-y-2 text-left">
+                            <li>Apply and complete verification</li>
+                            <li>Choose your tier and set up your profile</li>
+                            <li>List products or services</li>
+                            <li>Access vendor resources and support</li>
+                        </ul>
+                        <Link href="/become-a-vendor" className="market-btn-secondary mt-6 inline-block">
+                            Become a vendor
+                        </Link>
+                    </article>
+                </div>
+
+                <div className="mb-12 text-center">
+                    <h2 className="font-poppins text-xl font-semibold text-market-text sm:text-2xl">
                         Shop With Purpose. Sell With Power. Connect With Community.
                     </h2>
-                 <p className="font-montserrat font-[500] text-base leading-[28px] text-gray-600 text-center capitalize">
-  Whether you're a conscious consumer or a verified vendor, Mosaic Biz Hub makes it easy to discover, support, and grow with minority-owned businesses across the country. Here's how to make the most of your experience:
-</p>
+                    <p className="mx-auto mt-4 max-w-3xl font-montserrat text-sm leading-relaxed text-market-muted sm:text-base">
+                        Follow the steps below to get the most from Mosaic Biz Hub today.
+                    </p>
                 </div>
             </div>
 
@@ -267,7 +258,7 @@ export default function HowToUseApp() {
           <span className="text-[#C7A040] font-[700] mt-1">•</span>
           <span>
             <span className="font-[700] text-gray-900">Launch & Grow:</span>{" "}
-            Use built-in tools like promotions, analytics, CRM, and loyalty integration to scale your reach and revenue.
+            Use platform tools to manage listings and grow your reach.
           </span>
         </li>
       </ul>
@@ -318,68 +309,18 @@ export default function HowToUseApp() {
   </div>
 </div>
 
-            {/* Trusted By Section - Carousel */}
-            <div className="w-full bg-gray-50 py-16">
-                <div className="text-center mb-12">
-                    <h3 className="text-2xl font-bold text-gray-900 uppercase tracking-widest">Trusted By Business Owners</h3>
-                    <div className="flex justify-center mt-4">
-                        <div className="w-16 h-0.5 bg-gray-300"></div>
+            {/* Vendor stories — coming soon */}
+            <div className="w-full bg-market-surface py-16">
+                <div className="market-card mx-auto max-w-2xl p-8 text-center">
+                    <h3 className="market-section-heading text-xl">Vendor stories coming soon</h3>
+                    <div className="market-section-divider" />
+                    <p className="mt-4 font-montserrat text-sm text-market-muted">
+                        We are collecting real vendor stories for this section. Browse the marketplace or apply to become a vendor today.
+                    </p>
+                    <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
+                        <Link href="/vendors" className="market-btn-secondary min-w-[180px]">Browse vendors</Link>
+                        <Link href="/become-a-vendor" className="market-btn-primary min-w-[180px]">Become a vendor</Link>
                     </div>
-                </div>
-                
-                <div className="max-w-4xl mx-auto px-6">
-                    <Swiper
-                        modules={[Pagination, Autoplay]}
-                        spaceBetween={30}
-                        slidesPerView={1}
-                        pagination={{ clickable: true }}
-                        autoplay={{ delay: 5000, disableOnInteraction: false }}
-                        className="testimonial-swiper"
-                    >
-                        {testimonials.map((testimonial) => (
-                            <SwiperSlide key={testimonial.id}>
-                                <div className="bg-white rounded-lg p-10 md:p-12 shadow-sm">
-                                    {/* Quote Icon */}
-                                    <div className="mb-6">
-                                        <svg width="40" height="32" viewBox="0 0 40 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M0 32V19.2C0 15.2533 0.96 11.7333 2.88 8.64C4.8 5.54667 7.46667 2.98667 10.88 0.96L15.04 6.72C12.3733 8.32 10.24 10.2933 8.64 12.64C7.04 14.9867 6.24 17.3867 6.24 19.84V32H0ZM24 32V19.2C24 15.2533 24.96 11.7333 26.88 8.64C28.8 5.54667 31.4667 2.98667 34.88 0.96L39.04 6.72C36.3733 8.32 34.24 10.2933 32.64 12.64C31.04 14.9867 30.24 17.3867 30.24 19.84V32H24Z" fill="#C7A040"/>
-                                        </svg>
-                                    </div>
-                                    
-                                    {/* Quote Text */}
-                                    <p className="text-gray-700 text-base leading-relaxed mb-8">
-                                        {testimonial.quote}
-                                    </p>
-                                    
-                                    {/* Divider */}
-                                    <div className="w-full h-px bg-gray-200 mb-6"></div>
-                                    
-                                    {/* Author */}
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-14 h-14 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
-                                            {testimonial.avatar ? (
-                                                <Image 
-                                                    src={testimonial.avatar} 
-                                                    alt={testimonial.name}
-                                                    width={56}
-                                                    height={56}
-                                                    className="object-cover w-full h-full"
-                                                />
-                                            ) : (
-                                                <span className="text-gray-600 text-sm font-bold">
-                                                    {testimonial.name.split(' ').map(n => n[0]).join('')}
-                                                </span>
-                                            )}
-                                        </div>
-                                        <div>
-                                            <p className="font-bold text-gray-900 text-lg">{testimonial.name}</p>
-                                            <p className="text-[#C7A040] text-sm font-medium">{testimonial.role}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </SwiperSlide>
-                        ))}
-                    </Swiper>
                 </div>
             </div>
 

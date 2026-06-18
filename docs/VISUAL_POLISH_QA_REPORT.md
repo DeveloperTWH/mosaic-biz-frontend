@@ -13,7 +13,7 @@
 | Epic #54 Batch 1 | `polish/vendor-readability-global-cta` | #51, #55, #58, #62 | PR #64 |
 | Epic #54 Batch 2 | `polish/mobile-nav-responsive-pass` | #52, #53 | In progress |
 | Epic #54 Batch 3 | `polish/homepage-marketplace-experience` | #59, #60 | In progress |
-| Epic #54 Batch 4 | `polish/trust-howto-content-cleanup` | #56, #57, #61 | Pending |
+| Epic #54 Batch 4 | `polish/trust-howto-content-cleanup` | #56, #57, #61 | In progress |
 
 ### Prior release batches (merged)
 
@@ -37,8 +37,28 @@
 | `/vendors` | Pass | Pass | Pass |
 | `/about` | Pass | Pass | Pass |
 | `/contact` | Pass | Pass | Pass |
-| `/how-to-use-this-app` | Pass | Pass | Pass |
-| `/become-a-vendor` | Pass (Epic #54 B1) | Pass (Epic #54 B1) | Pass |
+| `/consumer/trustbadge` | Pass (Epic #54 B4) | Pass | Pass |
+| `/how-to-use-this-app` | Pass (Epic #54 B4) | Pass | Pass |
+
+---
+
+## Epic #54 Batch 4 — Trust, how-to, content (#56, #57, #61)
+
+### Changes
+- Consumer/vendor trust badge pages: `PublicPageHero`, scannable badge cards, accurate disclaimers
+- Removed automated score framing from vendor trust page
+- How-to page: customer/vendor path cards; removed placeholder testimonials
+- Softened unsupported feature promises in vendor step copy
+
+### Legal/content items flagged
+- Legal pages (`/terms`, `/privacy`, etc.) — structure-only overflow fix; **full legal copy needs approval**
+- Vendor stories section — explicitly marked coming soon
+
+### Guardrails
+- No legal/policy meaning rewritten
+- No API/auth/checkout changes
+
+---
 
 **Chrome:** Navbar mobile menu, footer link grouping, public filter bars, hero breadcrumbs, marketplace cards.
 
