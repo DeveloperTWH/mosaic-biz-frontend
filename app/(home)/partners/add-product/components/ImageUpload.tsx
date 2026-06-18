@@ -122,7 +122,7 @@ export default function ImageUpload({
             </div>
           </div>
           <p className="text-xs text-gray-400 mt-2">
-           maximum 5 image allowed baced on your subscription plan
+            uploding gallary images allowed baced on your subsritpion plan
           </p>
           {errors?.galleryImages && (
             <p className="mt-2 text-xs text-red-600">{errors.galleryImages}</p>

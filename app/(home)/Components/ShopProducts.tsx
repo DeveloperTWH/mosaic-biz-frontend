@@ -177,7 +177,7 @@ export default function ShopProducts() {
 
   return (
     <section className="public-section container-page max-w-[1400px] bg-market-bg">
-        <div className="mx-auto mb-12 max-w-3xl text-center">
+        <div className="mx-auto mb-8 max-w-3xl text-center sm:mb-12">
           <h2 className="market-section-heading">Featured Products</h2>
           <div className="market-section-divider" />
           <p className="mx-auto mt-4 max-w-2xl font-montserrat text-sm text-market-muted sm:text-base">
@@ -253,7 +253,7 @@ export default function ShopProducts() {
               className="py-4"
             >
               {items.map((p) => (
-                <SwiperSlide key={p._id} className="py-4 h-auto flex justify-center">
+                <SwiperSlide key={p._id} className="flex h-auto justify-stretch py-2 sm:py-4">
                   <FeaturedProductCard item={p} />
                 </SwiperSlide>
               ))}
@@ -261,7 +261,7 @@ export default function ShopProducts() {
           </div>
         )}
 
-        <div className="mt-12 flex justify-center">
+        <div className="mt-8 flex justify-center sm:mt-12">
           <Link
             href="/products"
             className="market-btn-secondary inline-block px-12 py-3 font-montserrat text-sm normal-case"
@@ -289,36 +289,29 @@ function FeaturedProductCard({ item }: { item: FeaturedProduct }) {
       : strippedDescription;
 
   return (
-    <Link
-      href={`/product/${item._id}`}
-      className="market-card block h-[460px] w-full max-w-[300px] overflow-hidden hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-market-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-market-bg"
-    >
-      <div className="flex h-full flex-col">
-        <div className="market-card-media relative aspect-square w-full flex-shrink-0">
+    <Link href={`/product/${item._id}`} className="market-listing-card-link h-full">
+      <article className="market-listing-card">
+        <div className="market-card-media relative aspect-[4/3] w-full shrink-0 sm:aspect-square">
           <MarketImage src={coverImage} alt={title} aspect="square" objectFit="contain" fallbackLabel="Image coming soon" />
         </div>
 
-        <div className="flex flex-1 flex-col p-3">
-          <h3 className="market-card-title line-clamp-2 min-h-[42px] uppercase tracking-tight">
-            {title}
-          </h3>
+        <div className="flex flex-1 flex-col gap-2 p-3 sm:p-4">
+          <h3 className="market-card-title line-clamp-2">{title}</h3>
 
-          <p className="market-card-desc mb-2 min-h-[40px] overflow-hidden">
-            {trimmedDescription || "\u00a0"}
+          <p className="market-card-desc line-clamp-2">{trimmedDescription || "Explore this listing on Mosaic Biz Hub."}</p>
+
+          <p className="font-poppins text-[10px] font-semibold uppercase tracking-wide text-market-teal sm:text-xs">
+            Featured product
           </p>
 
-          <p className="mb-2 font-poppins text-[10px] uppercase tracking-wide text-market-teal">
-            Featured Product
-          </p>
-
-          <div className="mt-auto flex flex-shrink-0 items-center justify-between gap-2 border-t border-white/10 pt-3">
-            <span className="market-card-price text-base">
+          <div className="mt-auto flex items-center justify-between gap-2 border-t border-white/10 pt-3">
+            <span className="market-card-price text-base sm:text-lg">
               {price !== null ? `$${price.toFixed(2)}` : "Price on request"}
             </span>
             <span className="market-card-action">View</span>
           </div>
         </div>
-      </div>
+      </article>
     </Link>
   );
 }
@@ -337,14 +330,12 @@ function SkeletonCarousel() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 py-4">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="market-card flex h-[480px] animate-pulse flex-col overflow-hidden">
-            <div className="h-48 flex-shrink-0 bg-market-elevated"></div>
-            <div className="flex flex-grow flex-col p-5">
-              <div className="mb-3 h-5 rounded bg-market-elevated"></div>
-              <div className="mb-2 h-4 rounded bg-market-elevated"></div>
-              <div className="mb-3 h-4 rounded bg-market-elevated"></div>
-              <div className="mb-4 h-5 w-1/2 rounded bg-market-elevated"></div>
-              <div className="mt-auto h-10 rounded bg-market-elevated"></div>
+          <div key={i} className="market-listing-card flex animate-pulse flex-col overflow-hidden">
+            <div className="aspect-[4/3] shrink-0 bg-market-elevated sm:aspect-square" />
+            <div className="flex flex-col gap-2 p-4">
+              <div className="h-5 rounded bg-market-elevated" />
+              <div className="h-4 rounded bg-market-elevated" />
+              <div className="mt-auto h-8 rounded bg-market-elevated" />
             </div>
           </div>
         ))}

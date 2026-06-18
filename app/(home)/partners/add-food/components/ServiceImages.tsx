@@ -88,7 +88,7 @@ export default function ServiceImages({
         <h3 className="text-sm font-semibold text-gray-900 mb-1 border-l-4 border-[#c9a227] pl-3">
           Food Gallery
         </h3>
-        <p className="text-xs text-gray-500 mb-3 pl-4">Max 5 images allowed based on your subscription plan.</p>
+        <p className="text-xs text-gray-500 mb-3 pl-4">uploding gallary images allowed baced on your subsritpion plan</p>
         {galleryError ? <p className="mb-3 pl-4 text-xs text-red-600">{galleryError}</p> : null}
         <div className="mb-3">
           <input

@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 import { Review } from "@/types/review";
 import ClientTestimonials from "../../../Components/ClientTestimonials";
 import PublicSearchFilterBar from "../../../Components/PublicSearchFilterBar";
-import MobileStickyActionBar, { MOBILE_STICKY_BAR_PADDING } from "../../../Components/MobileStickyActionBar";
+import MobileStickyActionBar from "../../../Components/MobileStickyActionBar";
 import { buildSearchPageUrl, PublicSearchFilters } from "../../../Components/publicSearch";
 
 type CategoryRef = {
@@ -743,7 +743,7 @@ export default function FoodVendorProfilePage() {
   };
 
   return (
-    <div className={`market-surface-light min-h-screen font-sans ${MOBILE_STICKY_BAR_PADDING}`}>
+    <div className="market-surface-light min-h-screen font-sans">
       <div className="relative h-[180px] w-full overflow-hidden bg-gray-800">
         <img
           src="/products/19099 1.png"

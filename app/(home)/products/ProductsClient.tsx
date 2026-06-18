@@ -4,7 +4,7 @@ import axios from "axios"
 import { useRouter, useSearchParams } from "next/navigation";
 import PublicPageHero from "../Components/PublicPageHero";
 import CategoryGrid from './components/CategoryGrid';
-import { ChevronRight, ChevronLeft, Star } from 'lucide-react';
+import { ChevronRight, ChevronLeft } from 'lucide-react';
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from 'swiper/modules';
 import ProductSevices from './components/ProductServices';
@@ -19,6 +19,7 @@ import PublicFilterSection from "../Components/PublicFilterSection";
 import { buildSearchPageUrl, parseListingFiltersFromSearchParams, buildListingPageUrl, PublicSearchFilters } from "../Components/publicSearch";
 import { useListingFilters } from "@/hooks/useListingFilters";
 import MarketImage from "../Components/MarketImage";
+import CardRatingRow from "../Components/CardRatingRow";
 import MarketLoadingBlock from "../Components/MarketLoadingBlock";
 
 type MinorityType = { _id: string; name: string };
@@ -504,7 +505,6 @@ function stripHtml(html: string): string {
 }
 
 function ProductCard({ item }: { item: RankedItem }) {
-    const router = useRouter();
     const href = `/product/${item._id}`;
     const title = pickTitle(item);
     const description = item.description ?? "";
@@ -514,97 +514,51 @@ function ProductCard({ item }: { item: RankedItem }) {
     const images = gatherImages(item);
     const { price, effective, onSale } = pickPrice(item);
     const rating = pickRating(item);
-    const ratingCount = pickRatingCount(item);
-
-    // const avgRating = item.averageRating
-    const reviewCount = item.totalReviews;
-
-    const fullStars = Math.floor(rating);
-    const fractional = rating % 1;
-    const hasHalfStar = fractional >= 0.25 && fractional < 0.75;
-
-    const handleCardClick = () => {
-        router.push(`/product/${item._id}`);
-    };
+    const reviewCount = item.totalReviews ?? 0;
 
     return (
-        <div 
-            onClick={handleCardClick}
-            onKeyDown={(e) => e.key === 'Enter' && handleCardClick()}
-            role="button"
-            tabIndex={0}
-            className="market-card flex h-[460px] w-full max-w-[300px] cursor-pointer flex-col overflow-hidden p-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-market-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-market-bg"
-        >
-            <div className="market-card-media relative aspect-square w-full flex-shrink-0">
-                <MarketImage src={images[0]} alt={title} aspect="square" objectFit="contain" />
-                
-                {onSale && (
-                    <div className="absolute top-3 left-3">
-                        <span className="rounded-full bg-red-600 px-3 py-1 text-xs font-bold text-white">
-                            SALE
-                        </span>
-                    </div>
-                )}
-            </div>
+        <Link href={href} className="market-listing-card-link h-full sm:max-w-[300px]">
+            <article className="market-listing-card p-2">
+                <div className="market-card-media relative aspect-[4/3] w-full shrink-0 sm:aspect-square">
+                    <MarketImage src={images[0]} alt={title} aspect="square" objectFit="contain" />
 
-            <div className="flex flex-1 flex-col p-3">
-                <h3 className="market-card-title line-clamp-2 h-[42px]">
-                    {title}
-                </h3>
-
-                <p className="market-card-desc mb-2 h-[40px] overflow-hidden">
-                    {trimmedDescription || "\u00a0"}
-                </p>
-
-                {(rating > 0 || (reviewCount ?? 0) > 0) && (
-                <div className="min-h-[20px] flex-shrink-0">
-                    <div className="mb-1 flex items-center">
-                        <div className="flex">
-                            {[...Array(5)].map((_, i) => (
-                                <Star
-                                    key={i}
-                                    size={14}
-                                    fill={i < fullStars ? "#E2B84B" : i === fullStars && hasHalfStar ? "#E2B84B" : "transparent"}
-                                    stroke={i < fullStars || (i === fullStars && hasHalfStar) ? "#E2B84B" : "#A9A2D8"}
-                                    className={i < fullStars || (i === fullStars && hasHalfStar) ? "text-market-gold" : "text-market-muted/40"}
-                                />
-                            ))}
+                    {onSale && (
+                        <div className="absolute left-3 top-3">
+                            <span className="rounded-full bg-red-600 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white sm:text-xs">
+                                Sale
+                            </span>
                         </div>
-                        <p className="ml-2 font-poppins text-[10px] leading-tight text-market-muted">
-                            {ratingCount} Ratings And {reviewCount} Reviews
-                        </p>
+                    )}
+                </div>
+
+                <div className="flex flex-1 flex-col gap-2 p-3">
+                    <h3 className="market-card-title line-clamp-2">{title}</h3>
+
+                    <p className="market-card-desc line-clamp-2">
+                        {trimmedDescription || "Explore this product on Mosaic Biz Hub."}
+                    </p>
+
+                    <CardRatingRow rating={rating} reviewCount={reviewCount} />
+
+                    <div className="mt-auto">
+                        {onSale ? (
+                            <div className="flex flex-col gap-0.5">
+                                <span className="text-xs text-market-muted">Starting from</span>
+                                <div className="flex flex-wrap items-center gap-2">
+                                    <span className="market-card-price-sale">${effective.toFixed(2)}</span>
+                                    <span className="text-sm text-market-muted line-through">${price.toFixed(2)}</span>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="flex flex-col gap-0.5">
+                                <span className="text-xs text-market-muted">Starting from</span>
+                                <span className="market-card-price">${price.toFixed(2)}</span>
+                            </div>
+                        )}
                     </div>
                 </div>
-                )}
-
-                <div className="mt-auto flex-shrink-0">
-  {onSale ? (
-    <div className="flex flex-col leading-tight">
-      <span className="text-xs text-market-muted">
-        Starting from
-      </span>
-      <div className="flex items-center gap-3">
-        <span className="market-card-price-sale text-base">
-          ${effective.toFixed(2)}
-        </span>
-        <span className="text-sm text-market-muted line-through">
-          ${price.toFixed(2)}
-        </span>
-      </div>
-    </div>
-  ) : (
-    <div className="flex flex-col leading-tight">
-      <span className="text-xs text-market-muted">
-        Starting from
-      </span>
-      <span className="market-card-price text-base">
-        ${price.toFixed(2)}
-      </span>
-    </div>
-  )}
-</div>
-            </div>
-        </div>
+            </article>
+        </Link>
     );
 }
 

@@ -18,8 +18,8 @@ export default function BrowseByCategory() {
       </div>
       <BrowseServices showAllService={true} />
       <BrowseFoodAndGrocery />
-      <div className="container-page pb-0 pt-4 text-center">
-        <div className="mb-6 flex flex-wrap items-center justify-center gap-3">
+      <div className="container-page pb-0 pt-2 text-center sm:pt-4">
+        <div className="mb-4 flex flex-wrap items-center justify-center gap-2 sm:mb-6 sm:gap-3">
           <Link href="/products" className="market-btn-secondary min-w-[140px]">
             Shop products
           </Link>

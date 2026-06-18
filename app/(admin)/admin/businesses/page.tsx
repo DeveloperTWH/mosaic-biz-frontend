@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import axios from "axios";
 import Sidebar from "../components/Sidebar"; // Import Sidebar component
 import Topbar from "../components/Topbar"; // Import Topbar component
+import BusinessStatusModal from "../components/BusinessStatusModal";
 
 const BusinessPage = () => {
     const [isSidebarOpen, setSidebarOpen] = useState(true);
@@ -13,29 +13,52 @@ const BusinessPage = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [noBusinesses, setNoBusinesses] = useState<boolean>(false);
     const [totalBusiness, settotalBusiness] = useState<number>(0);
-    const [notApprovedCount, setNotApprovedCount] = useState<number>(0);
+    const [activeBusinessCount, setActiveBusinessCount] = useState<number>(0);
+    const [inactiveBusinessCount, setInactiveBusinessCount] = useState<number>(0);
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [totalPages, setTotalPages] = useState<number>(1);
-
-    const router = useRouter();
+    const [businessFilter, setBusinessFilter] = useState<"all" | "active" | "inactive">("all");
+    const [statusModalOpen, setStatusModalOpen] = useState<boolean>(false);
+    const [selectedBusinessIndex, setSelectedBusinessIndex] = useState<number | null>(null);
+    const [deactivationRemark, setDeactivationRemark] = useState<string>("");
+    const [updatingStatus, setUpdatingStatus] = useState<boolean>(false);
 
     const fetchBusinesses = async () => {
+        setLoading(true);
         try {
+            const filterQuery =
+                businessFilter === "all" ? "" : `&isActive=${businessFilter === "active"}`;
             const response = await axios.get(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/api/business?limit=10&page=${currentPage}`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/business?page=${currentPage}&limit=10${filterQuery}`,
                 {
                     withCredentials: true,
                 }
             );
 
-            const { data } = response.data;
+            const data = Array.isArray(response.data.data) ? response.data.data : [];
 
             if (!data || data.length === 0) {
                 setNoBusinesses(true);
+                setBusinesses([]);
+                settotalBusiness(0);
+                setActiveBusinessCount(0);
+                setInactiveBusinessCount(0);
+                setTotalPages(1);
             } else {
                 setBusinesses(data);
-                settotalBusiness(response.data.totalBusinesses);
-                setNotApprovedCount(response.data.notApprovedCount);
+                settotalBusiness(response.data.totalBusinesses ?? data.length);
+                const activeCount =
+                    response.data.activeBusinessCount ??
+                    response.data.activeBusinesses ??
+                    response.data.activeCount ??
+                    data.filter((business: any) => business.isActive ?? business.isApproved).length;
+                const inactiveCount =
+                    response.data.inactiveBusinessCount ??
+                    response.data.inactiveBusinesses ??
+                    response.data.inactiveCount ??
+                    data.filter((business: any) => !(business.isActive ?? business.isApproved)).length;
+                setActiveBusinessCount(activeCount);
+                setInactiveBusinessCount(inactiveCount);
                 setTotalPages(response.data.totalPages || 1);
                 setNoBusinesses(false);
             }
@@ -45,6 +68,11 @@ const BusinessPage = () => {
             setLoading(false);
             if (error.response && error.response.status === 404) {
                 setNoBusinesses(true);
+                setBusinesses([]);
+                settotalBusiness(0);
+                setActiveBusinessCount(0);
+                setInactiveBusinessCount(0);
+                setTotalPages(1);
             } else {
                 toast.error("Failed to fetch businesses. Please try again later.");
                 console.error("Error fetching businesses:", error);
@@ -56,46 +84,70 @@ const BusinessPage = () => {
     // Call fetchBusinesses on component mount
     useEffect(() => {
         fetchBusinesses();
-    }, [currentPage]);
+    }, [currentPage, businessFilter]);
 
 
-    // Function to toggle the approval status
-    const toggleApproval = async (index: number) => {
+    const updateBusinessStatus = async (index: number, nextStatus: boolean, remark?: string) => {
         const business = businesses[index];
-        const updatedBusinesses = [...businesses];
-        const status = business.isApproved ? "Disapproved" : "Approved";
+        const statusLabel = nextStatus ? "activated" : "deactivated";
 
         try {
-            // Send approval/disapproval request to the backend
-            await axios.post(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/api/business/approve/${business._id}`,
-                {},
+            setUpdatingStatus(true);
+            // Send activate/deactivate request to the backend
+            await axios.patch(
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/business/status/${business._id}`,
                 {
-                    withCredentials: true, // Ensure cookies are sent with the request
+                    isActive: nextStatus,
+                    remark:
+                        remark ||
+                        (nextStatus
+                            ? "Activated by admin from the business management screen."
+                            : "Deactivated by admin from the business management screen."),
+                },
+                {
+                    withCredentials: true,
                 }
             );
 
-            // Update the state after toggling
-            updatedBusinesses[index].isApproved =
-                !updatedBusinesses[index].isApproved;
-            setBusinesses(updatedBusinesses);
-
-            // Update the notApprovedCount
-            const updatedNotApprovedCount = updatedBusinesses.filter(
-                (business) => !business.isApproved
-            ).length;
-
-            // Set the new count of not approved businesses
-            setNotApprovedCount(updatedNotApprovedCount);
-
             // Show success message
-            toast.success(`${business.businessName} has been ${status}.`);
+            toast.success(`${business.businessName} has been ${statusLabel}.`);
+            setStatusModalOpen(false);
+            setSelectedBusinessIndex(null);
+            setDeactivationRemark("");
+            await fetchBusinesses();
         } catch (error) {
             toast.error(
-                `Failed to ${status.toLowerCase()} ${business.businessName}.`
+                `Failed to ${nextStatus ? "activate" : "deactivate"} ${business.businessName}.`
             );
-            console.error("Error during approval/disapproval:", error);
+            console.error("Error during active status update:", error);
+        } finally {
+            setUpdatingStatus(false);
         }
+    };
+
+    const openDeactivateModal = (index: number) => {
+        setSelectedBusinessIndex(index);
+        setDeactivationRemark("");
+        setStatusModalOpen(true);
+    };
+
+    const confirmDeactivate = async () => {
+        if (selectedBusinessIndex === null) return;
+        if (!deactivationRemark.trim()) {
+            toast.error("Please add a remark before deactivating this business.");
+            return;
+        }
+
+        await updateBusinessStatus(selectedBusinessIndex, false, deactivationRemark.trim());
+    };
+
+    const activateBusiness = async (index: number) => {
+        await updateBusinessStatus(index, true);
+    };
+
+    const handleFilterChange = (filter: "all" | "active" | "inactive") => {
+        setBusinessFilter(filter);
+        setCurrentPage(1);
     };
 
     if (loading) {
@@ -127,19 +179,42 @@ const BusinessPage = () => {
 
                         {/* Stats Card 2 */}
                         <div className="p-8 transition-all duration-300 transform bg-white rounded-lg shadow-lg hover:shadow-2xl hover:scale-105">
-                            <h3 className="text-lg font-semibold text-gray-800">Approved Business</h3>
-                            <p className="text-3xl font-bold text-green-600">{noBusinesses ? "N/A" : totalBusiness - notApprovedCount}</p>
+                            <h3 className="text-lg font-semibold text-gray-800">Active Businesses</h3>
+                            <p className="text-3xl font-bold text-green-600">{noBusinesses ? "N/A" : activeBusinessCount}</p>
                         </div>
 
                         {/* Stats Card 3 */}
                         <div className="p-8 transition-all duration-300 transform bg-white rounded-lg shadow-lg hover:shadow-2xl hover:scale-105">
                             <h3 className="text-lg font-semibold text-gray-800">
-                                Pending Approvals
+                                Inactive Businesses
                             </h3>
                             <p className="text-3xl font-bold text-orange-600">
-                                {noBusinesses ? "N/A" : notApprovedCount}
+                                {noBusinesses ? "N/A" : inactiveBusinessCount}
                             </p>
                         </div>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-3 mb-6">
+                        <span className="text-sm font-semibold uppercase tracking-wide text-gray-500">
+                            Filter
+                        </span>
+                        {(["all", "active", "inactive"] as const).map((filter) => (
+                            <button
+                                key={filter}
+                                onClick={() => handleFilterChange(filter)}
+                                className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+                                    businessFilter === filter
+                                        ? "bg-indigo-600 text-white shadow-md"
+                                        : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
+                                }`}
+                            >
+                                {filter === "all"
+                                    ? "All Businesses"
+                                    : filter === "active"
+                                        ? "Active Only"
+                                        : "Inactive Only"}
+                            </button>
+                        ))}
                     </div>
 
                     {/* No Businesses Found Message */}
@@ -178,24 +253,28 @@ const BusinessPage = () => {
                                                 <td className="px-6 py-4">
                                                     <span
                                                         className={
-                                                            business.isApproved
+                                                            Boolean(business.isActive ?? business.isApproved)
                                                                 ? "text-green-600"
                                                                 : "text-red-600"
                                                         }
                                                     >
-                                                        {business.isApproved ? "Approved" : "Not Approved"}
+                                                        {Boolean(business.isActive ?? business.isApproved) ? "Active" : "Inactive"}
                                                     </span>
                                                 </td>
 
                                                 <td className="px-6 py-4">
                                                     <button
-                                                        className={`${business.isApproved
+                                                        className={`${Boolean(business.isActive ?? business.isApproved)
                                                             ? "bg-red-500 hover:bg-red-600"
                                                             : "bg-green-500 hover:bg-green-600"
                                                             } text-white px-4 py-2 rounded-lg shadow-md transition-all duration-300`}
-                                                        onClick={() => toggleApproval(index)}
+                                                        onClick={() =>
+                                                            Boolean(business.isActive ?? business.isApproved)
+                                                                ? openDeactivateModal(index)
+                                                                : activateBusiness(index)
+                                                        }
                                                     >
-                                                        {business.isApproved ? "Disapprove" : "Approve"}
+                                                        {Boolean(business.isActive ?? business.isApproved) ? "Deactivate" : "Activate"}
                                                     </button>
                                                 </td>
                                             </tr>
@@ -231,6 +310,19 @@ const BusinessPage = () => {
                     )}
                 </main>
             </div>
+            <BusinessStatusModal
+                isOpen={statusModalOpen}
+                businessName={selectedBusinessIndex !== null ? businesses[selectedBusinessIndex]?.businessName || "this business" : "this business"}
+                remark={deactivationRemark}
+                setRemark={setDeactivationRemark}
+                loading={updatingStatus}
+                onClose={() => {
+                    setStatusModalOpen(false);
+                    setSelectedBusinessIndex(null);
+                    setDeactivationRemark("");
+                }}
+                onConfirm={confirmDeactivate}
+            />
         </div>
     );
 };

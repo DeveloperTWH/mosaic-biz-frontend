@@ -68,11 +68,45 @@ body {
 :root.with-fixed-header {
   --header-h: 64px;
   --announcement-h: 0px;
+  --bottom-nav-h: 0px;
+  --commerce-sticky-h: calc(4.25rem + env(safe-area-inset-bottom, 0px));
 }
 
 /* padding only in pages rendered by this layout */
 :root.with-fixed-header body {
   padding-top: calc(var(--header-h) + var(--announcement-h));
+}
+
+@media (max-width: 1279px) {
+  :root.with-fixed-header {
+    --bottom-nav-h: calc(3.5rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  :root.with-fixed-header body {
+    padding-bottom: var(--bottom-nav-h);
+  }
+
+  /* Commerce detail pages: sticky purchase bar replaces global bottom nav */
+  :root.with-fixed-header.with-commerce-sticky {
+    --bottom-nav-h: 0px;
+  }
+
+  :root.with-fixed-header.with-commerce-sticky body {
+    padding-bottom: var(--commerce-sticky-h);
+  }
+}
+
+.market-bottom-nav {
+  background: rgba(11, 20, 38, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.market-commerce-sticky-bar {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.35);
 }
 
 .glass-header {
@@ -99,7 +133,7 @@ body {
 }
 
 .public-section {
-  @apply py-10 sm:py-12 lg:py-16;
+  @apply py-8 sm:py-12 lg:py-16;
 }
 
 .public-prose {
@@ -119,7 +153,7 @@ body {
 }
 
 .public-grid-listing {
-  @apply grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4;
+  @apply grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4;
 }
 
 .hero-mobile-cap {
@@ -267,6 +301,26 @@ body {
   @apply rounded-2xl border border-white/15 bg-market-surface shadow-market-card transition-all duration-300 hover:border-market-gold/25 hover:bg-market-elevated hover:shadow-market-glow;
 }
 
+.market-listing-card {
+  @apply market-card flex h-full w-full min-h-0 flex-col overflow-hidden;
+}
+
+.market-listing-card-link {
+  @apply block h-full w-full rounded-2xl transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-market-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-market-bg;
+}
+
+.market-card-rating-row {
+  @apply flex min-w-0 items-center gap-1.5;
+}
+
+.market-card-rating-meta {
+  @apply truncate font-montserrat text-xs text-market-muted;
+}
+
+.market-journey-action {
+  @apply market-card flex min-h-11 items-center gap-3 p-3 transition-transform active:scale-[0.99] sm:p-4;
+}
+
 .market-glass-header {
   background: rgba(10, 6, 24, 0.9);
   backdrop-filter: blur(12px);
@@ -401,14 +455,13 @@ body {
   background-repeat: no-repeat;
 }
 
-.swiper-pagination-bullet {
-  background-color: #a3a3a3;
+.how-it-works-swiper .swiper-pagination-bullet {
+  background-color: rgba(169, 162, 216, 0.55);
   opacity: 1;
 }
 
-.swiper-pagination-bullet-active {
-  background-color: #CE5F44;
-  color: black;
+.how-it-works-swiper .swiper-pagination-bullet-active {
+  background-color: #e2b84b;
 }
 
 /* Scoped custom classes for Featured Vendors slider */

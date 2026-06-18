@@ -4,19 +4,16 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import Link from "next/link";
-import { X, ShoppingCart } from "lucide-react";
+import { X } from "lucide-react";
 import { logoutUser } from "@/utils/logoutUser";
 import {
   MOBILE_DRAWER_ID,
-  HOME_LINK,
-  SHOP_LINKS,
+  DRAWER_SHOP_LINKS,
   BECOME_VENDOR_LINK,
   LEARN_LINKS,
   MORE_LINKS,
-  SEARCH_CTA,
   LOGIN_LINKS,
 } from "./navConfig";
-import { useHomeClick } from "./useHomeNavigation";
 
 type MobileNavDrawerProps = {
   open: boolean;
@@ -24,8 +21,6 @@ type MobileNavDrawerProps = {
   isLoggedIn: boolean | null;
   isCustomer: boolean | null;
   gender: string | null;
-  cartCount: number;
-  mounted: boolean;
 };
 
 function DrawerSection({
@@ -73,11 +68,8 @@ export default function MobileNavDrawer({
   isLoggedIn,
   isCustomer,
   gender,
-  cartCount,
-  mounted,
 }: MobileNavDrawerProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
-  const onHomeClick = useHomeClick(onClose);
   const [portalReady, setPortalReady] = useState(false);
 
   useEffect(() => {
@@ -111,13 +103,14 @@ export default function MobileNavDrawer({
   if (!open || !portalReady) return null;
 
   const topOffset = "calc(var(--header-h, 64px) + var(--announcement-h, 0px))";
+  const bottomOffset = "var(--bottom-nav-h, 0px)";
 
   return createPortal(
     <div className="fixed inset-0 z-[55] xl:hidden" aria-hidden={!open}>
       <button
         type="button"
-        className="absolute inset-x-0 bottom-0 bg-market-bg/85"
-        style={{ top: topOffset }}
+        className="absolute inset-x-0 bg-market-bg/85"
+        style={{ top: topOffset, bottom: bottomOffset }}
         aria-label="Close menu"
         onClick={onClose}
       />
@@ -129,7 +122,7 @@ export default function MobileNavDrawer({
         className="market-mobile-drawer-panel absolute bottom-0 right-0 flex w-full max-w-sm flex-col transition-transform duration-300 ease-out"
         style={{
           top: topOffset,
-          paddingBottom: "env(safe-area-inset-bottom, 0px)",
+          bottom: bottomOffset,
         }}
       >
         <div className="flex shrink-0 items-center justify-between border-b border-white/15 bg-market-elevated px-4 py-3">
@@ -146,27 +139,9 @@ export default function MobileNavDrawer({
         </div>
 
         <div className="flex-1 space-y-2 overflow-y-auto py-4">
-          <div className="px-4 pb-2">
-            <Link
-              href={SEARCH_CTA.href}
-              onClick={onClose}
-              className="market-btn-primary flex min-h-11 w-full items-center justify-center gap-2 text-sm normal-case focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-market-gold/50"
-            >
-              {SEARCH_CTA.label}
-            </Link>
-          </div>
-
-          <nav className="flex flex-col space-y-1" aria-label="Mobile navigation">
-            <Link
-              href={HOME_LINK.href}
-              onClick={onHomeClick}
-              className="market-nav-link flex min-h-11 items-center px-4 py-3 font-medium uppercase text-market-text hover:bg-white/5"
-            >
-              {HOME_LINK.label}
-            </Link>
-
+          <nav className="flex flex-col space-y-1" aria-label="Secondary navigation">
             <DrawerSection title="Shop">
-              {SHOP_LINKS.map((link) => (
+              {DRAWER_SHOP_LINKS.map((link) => (
                 <DrawerLink key={link.href} href={link.href} label={link.label} onClose={onClose} />
               ))}
             </DrawerSection>
@@ -217,19 +192,6 @@ export default function MobileNavDrawer({
                   />
                   <span className="font-medium text-market-text">My Account</span>
                 </div>
-                <Link
-                  href="/cart"
-                  onClick={onClose}
-                  className="market-nav-link flex min-h-11 items-center rounded px-4 py-3 font-medium text-market-text hover:bg-white/5"
-                >
-                  <ShoppingCart size={20} className="mr-3" aria-hidden="true" />
-                  Cart
-                  {mounted && cartCount > 0 && (
-                    <span className="ml-auto rounded-full bg-red-600 px-2 py-1 text-xs font-bold text-white">
-                      {cartCount > 99 ? "99+" : cartCount}
-                    </span>
-                  )}
-                </Link>
                 {isCustomer ? (
                   <>
                     <Link
@@ -274,27 +236,14 @@ export default function MobileNavDrawer({
                   onClick={onClose}
                   className="market-btn-primary flex min-h-11 w-full items-center justify-center px-4 py-3.5 text-sm uppercase tracking-wide focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-market-gold/50"
                 >
-                  Customer
+                  Customer Login
                 </Link>
                 <Link
                   href={LOGIN_LINKS[1].href}
                   onClick={onClose}
                   className="market-btn-outline flex min-h-11 w-full items-center justify-center px-4 py-3.5 text-sm uppercase tracking-wide focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-market-gold/50"
                 >
-                  Vendor
-                </Link>
-                <Link
-                  href="/cart"
-                  onClick={onClose}
-                  className="market-nav-link flex min-h-11 items-center rounded px-4 py-3 font-medium text-market-text hover:bg-white/5"
-                >
-                  <ShoppingCart size={20} className="mr-3" aria-hidden="true" />
-                  Cart
-                  {mounted && cartCount > 0 && (
-                    <span className="ml-auto rounded-full bg-red-600 px-2 py-1 text-xs font-bold text-white">
-                      {cartCount > 99 ? "99+" : cartCount}
-                    </span>
-                  )}
+                  Vendor Login
                 </Link>
               </div>
             )}
