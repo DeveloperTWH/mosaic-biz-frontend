@@ -7,7 +7,7 @@ export interface VendorExpandCtaProps {
 
 export default function VendorExpandCta({
   ctaHref = "/signup?type=vendor",
-  ctaLabel = "Become A Vendor",
+  ctaLabel = "Become a Vendor",
 }: VendorExpandCtaProps) {
   return (
     <section

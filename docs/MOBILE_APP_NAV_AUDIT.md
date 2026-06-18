@@ -78,7 +78,7 @@ flowchart TD
 | **Vendor marketing** | `/become-a-vendor`, `/refer-a-vendor` | Onboarding entry points |
 | **Vendor registration** | `/partners`, `/partners/business/new`, `/partners/business/payment`, `/partners/tier-selection`, `/partners/tier-selection/checkout`, `/partners/tier-selection/success`, `/partners/business-profile`, `/partners/products`, `/partners/services`, `/partners/foods`, `/partners/add-product`, `/partners/add-service`, `/partners/add-food`, `/partners/payout-setup`, `/partners/connect/return`, `/partners/connect/refresh`, `/partners/final-review`, `/partners/business/[businessid]/setup` | Under `(home)` — keeps Navbar |
 | **Vendor dashboard** | `/partners/dashboard`, `/partners/[businessid]`, `/partners/[businessid]/inventory/*`, `/partners/[businessid]/orders`, `/partners/[businessid]/bookings`, `/partners/[businessid]/finance`, `/partners/[businessid]/my-account` | `(partner)` group — separate layout |
-| **Static / legal** | `/about`, `/contact`, `/how-to-use-this-app`, `/faq`, `/terms`, `/privacy`, `/dispute`, `/refund-return`, `/consumer/terms`, `/consumer/trustbadge`, `/vendor/terms`, `/vendor/trustbadge` | Linked from LEARN / MORE in nav |
+| **Static / legal** | `/about`, `/contact`, `/how-to-use-this-app`, `/faq`, `/terms`, `/privacy`, `/dispute`, `/refund-return`, `/consumer/terms`, `/consumer/trustbadge`, `/vendor/terms`, `/vendor/trustbadge` | Linked from LEARN (desktop) and Explore (hamburger); legal links footer-only after PR #108 |
 
 ### Routes that do NOT exist (do not invent for bottom nav)
 
@@ -199,7 +199,7 @@ flowchart TD
 
 | Viewport | Header | Navigation |
 |----------|--------|------------|
-| **≥1280px (`xl`)** | Full desktop nav: HOME, SHOP, BECOME A VENDOR, LEARN, MORE + login/cart | Inline `DesktopNav` + `HeaderActions` desktop variant |
+| **≥1280px (`xl`)** | Full desktop nav: HOME, SHOP, BECOME A VENDOR, LEARN + login/cart | Inline `DesktopNav` + `HeaderActions` desktop variant (MORE removed in PR #108) |
 | **<1280px** | Compact: logo, cart, account, hamburger | All primary links in `MobileNavDrawer` |
 
 ### Nav link config (`navConfig.ts`)
@@ -210,19 +210,18 @@ flowchart TD
 | SHOP | `/products`, `/foods`, `/services`, `/vendors`, `/search` |
 | BECOME A VENDOR | `/become-a-vendor` |
 | LEARN | `/about`, `/contact`, `/how-to-use-this-app`, `/faq` |
-| MORE | FAQ, terms, privacy, dispute, refunds, consumer/vendor terms, trust badges |
 | LOGIN | `/login?type=customer`, `/login?type=vendor` |
+| FOOTER LEGAL | Terms, privacy, dispute, refunds, consumer/vendor terms, trust badges (via `FOOTER_LEGAL_LINKS` — not in header/drawer after PR #108) |
 | SEARCH CTA | `/search` ("Search marketplace") |
 
-### Mobile drawer structure (today)
+### Mobile drawer structure (post PR #108)
 
-1. **Search** — primary CTA → `/search`
-2. **Home** → `/`
-3. **Shop** — Products, Foods, Services, Vendors, Search
-4. **Become a Vendor** — button CTA
-5. **Learn** — About, Contact, How to Use, FAQ
-6. **More** — all legal/trust links
-7. **Account** — Cart, login buttons or avatar + orders/bookings/dashboard + logout
+1. **Marketplace** — Foods, Services, Vendors
+2. **Become a Vendor** — button CTA → `/become-a-vendor`
+3. **Explore** — About, Contact, How to Use, FAQ
+4. **Account** — login buttons or avatar + orders/bookings/dashboard + logout
+
+Legal/policy links are footer-only (`FOOTER_LEGAL_LINKS`).
 
 ### Cart behavior
 
