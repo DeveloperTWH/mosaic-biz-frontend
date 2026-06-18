@@ -1,7 +1,7 @@
 # Header & Mobile Navigation QA — Epic #107–#111
 
 **Type:** QA / regression proof  
-**Last updated:** 2026-06-17  
+**Last updated:** 2026-06-18  
 **Repo:** mosaic-biz-frontend  
 **Scope:** Public header, announcement bar, desktop nav, tablet compact bar, mobile drawer
 
@@ -19,7 +19,7 @@
 
 | Viewport | Behavior |
 |----------|----------|
-| **≥1280px (xl)** | Full desktop nav: HOME, SHOP, BECOME A VENDOR, LEARN, MORE + login/cart |
+| **≥1280px (xl)** | Full desktop nav: HOME, SHOP, BECOME A VENDOR, LEARN + login/cart |
 | **<1280px** | Compact header (logo, cart, account, hamburger) + slide-in drawer |
 
 **Source files:**
@@ -41,23 +41,24 @@
 | SHOP | Products, Foods, Services, Vendors, Search |
 | BECOME A VENDOR | `/become-a-vendor` |
 | LEARN | About, Contact, How to Use This App, FAQ |
-| MORE | Terms, Privacy, Dispute, Refunds, Consumer/Vendor terms, Trust badges |
+
+Legal/policy links live in the **footer Legal** column only (not header or hamburger). See [NAVIGATION_CLEANUP_AUDIT.md](NAVIGATION_CLEANUP_AUDIT.md).
 
 ### Mobile/tablet drawer
 
-1. **Search** — primary CTA → `/search`
-2. **Shop** — marketplace discovery links
-3. **Become a Vendor** — primary button CTA
-4. **Learn** — About, Contact, How to Use, FAQ
-5. **More** — all legal/trust links (includes consumer/vendor terms — mobile parity fixed)
-6. **Account** — Cart, login, orders/bookings/dashboard, logout
+1. **Marketplace** — Foods, Services, Vendors (Products/Search via bottom nav)
+2. **Become a Vendor** — primary button CTA
+3. **Explore** — About, Contact, How It Works, FAQ, Refer a Vendor
+4. **Account** — login, orders/bookings/dashboard, logout
+
+Bottom nav (mobile): Home, Shop, Discover, Cart, Account — see [MOBILE_APP_NAV_QA_PROOF.md](MOBILE_APP_NAV_QA_PROOF.md).
 
 ## Screenshot matrix (attach to PR)
 
 | State | 375px | 768px | 1280px | 1440px |
 |-------|-------|-------|--------|--------|
 | Header closed | ☐ | ☐ | ☐ | ☐ |
-| Drawer open (Shop/Learn/Account visible) | ☐ | ☐ | N/A | N/A |
+| Drawer open (Marketplace/Explore/Account visible) | ☐ | ☐ | N/A | N/A |
 | Announcement bar visible | ☐ | ☐ | ☐ | ☐ |
 | Logged-out login dropdown (desktop) | N/A | N/A | ☐ | ☐ |
 
@@ -112,8 +113,8 @@ Verify **no horizontal scroll** at:
 | `/cart` | Cart icon/badge |
 | `/login?type=customer` | Login links work |
 | `/become-a-vendor` | CTA visible desktop + drawer |
-| `/faq` | Under LEARN dropdown |
-| `/consumer/terms` | Under MORE (mobile parity) |
+| `/faq` | Under LEARN dropdown (desktop) and Explore (drawer) |
+| `/consumer/terms` | Footer Legal column only |
 
 ## Announcement bar
 

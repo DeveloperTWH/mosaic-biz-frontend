@@ -15,14 +15,15 @@ Epic #54 sprint closeout: [EPIC_54_SPRINT_CLOSEOUT.md](EPIC_54_SPRINT_CLOSEOUT.m
 | Item | Status |
 |------|--------|
 | Launch repo | `Digital-Builders-757/mosaic-biz-frontend-launch` |
-| Production branch | `main` @ `c8ab0e31` |
-| Production deployed | **Yes** — Vercel auto-deploy on Epic #54 PRs [#64](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/64)–[#68](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/68) merge (2026-06-18) |
+| Production branch | `main` @ `1dd5b64c` |
+| Production deployed | **Yes** — Vercel auto-deploy on merge to `main` |
 | Production URL | https://mosaic-biz-frontend-launch.vercel.app |
 | Deploy model | Vercel auto-deploy on merge to `main` |
 | Preview access | Vercel deployment protection / SSO (HTTP 401 for unauthenticated automation) |
 | Build gate | `npm run build` passes on `main` |
-| Epic #69–#76 mobile public polish | **In progress** on branch `polish/mobile-69-layout` — see [MOBILE_QA_PROOF_PACK.md](MOBILE_QA_PROOF_PACK.md) |
-| Staging promotion readiness | Pending merge to `staging` + QA sign-off before `staging` → `main` |
+| Mobile app nav (#95–#103) | **Merged** — PR [#106](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/106) (2026-06-18); Epic #95 closed; #101 sticky commerce E2E remains open |
+| Header nav cleanup | **In PR** — `sprint/remove-header-more-section` (hamburger simplification, desktop MORE removal, footer Legal IA) |
+| Staging promotion readiness | Pending QA sign-off on preview with live API |
 
 ### Epic #54 sprint PRs (merged 2026-06-18)
 
@@ -33,6 +34,7 @@ Epic #54 sprint closeout: [EPIC_54_SPRINT_CLOSEOUT.md](EPIC_54_SPRINT_CLOSEOUT.m
 | [#66](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/66) | Homepage and marketplace visual hierarchy | #59, #60 | Merged |
 | [#67](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/67) | Trust, how-to, and public content pages | #56, #57, #61 | Merged |
 | [#68](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/68) | Docs closeout | — | Merged |
+| [#106](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/106) | Mobile app nav reconciliation (#95–#103) | #96–#103 | Merged |
 
 ### Prior significant merges
 

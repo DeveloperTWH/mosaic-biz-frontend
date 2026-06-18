@@ -194,7 +194,7 @@ function SignupContent() {
         {/* Terms Modal */}
         <TermsModal isOpen={modalOpen} onClose={closeModal} type={modalType} />
 
-        <header className="w-full px-0 py-4 flex items-center justify-between bg-white md:bg-transparent absolute top-0 left-20 z-20">
+        <header className="absolute left-0 right-0 top-0 z-20 flex w-full items-center justify-between bg-white px-4 py-4 md:left-20 md:bg-transparent md:px-0">
           <span className="text-xl font-bold tracking-wide text-blue-900 md:text-white">
             <img
               src="/login/logo.png"
@@ -206,7 +206,7 @@ function SignupContent() {
           </span>
         </header>
 
-        <div className="min-h-screen grid grid-cols-1 md:grid-cols-[40%_60%]">
+        <div className="min-h-screen grid max-w-[100vw] grid-cols-1 overflow-x-hidden md:grid-cols-[40%_60%]">
           <div className="relative hidden  md:flex bg-gradient-to-br from-blue-950 via-blue-900 to-teal-800 text-white">
             <img
               src="/login/sideImgVendor.png"
@@ -406,7 +406,7 @@ function SignupContent() {
         {/* Terms Modal */}
         <TermsModal isOpen={modalOpen} onClose={closeModal} type={modalType} />
 
-        <header className="w-full px-0 py-4 flex items-center justify-between bg-white md:bg-transparent absolute top-0 left-20 z-20">
+        <header className="absolute left-0 right-0 top-0 z-20 flex w-full items-center justify-between bg-white px-4 py-4 md:left-20 md:bg-transparent md:px-0">
           <span className="text-xl font-bold tracking-wide text-blue-900 md:text-white">
             <img
               src="/login/logo.png"
@@ -418,7 +418,7 @@ function SignupContent() {
           </span>
         </header>
 
-        <div className="min-h-screen grid grid-cols-1 md:grid-cols-2">
+        <div className="min-h-screen grid max-w-[100vw] grid-cols-1 overflow-x-hidden md:grid-cols-2">
           <div className="relative hidden md:flex bg-gradient-to-br from-blue-950 via-blue-900 to-teal-800 text-white">
             <img
               src="/login/sideImg.png"

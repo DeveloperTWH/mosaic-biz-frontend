@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { CalendarCheck } from "lucide-react";
 
 const blogs = [
@@ -85,14 +84,14 @@ export default function FeatureBlogs() {
                   {blog.description}
                 </p>
 
-                <Link
-                  href="/blogs"
-                  className={`font-medium inline-flex items-center text-sm hover:underline hover:text-custom-orange ${
-                    isMiddleCard ? "text-white" : ""
+                <span
+                  className={`inline-flex items-center text-sm opacity-70 ${
+                    isMiddleCard ? "text-gray-300" : "text-gray-500"
                   }`}
+                  aria-hidden="true"
                 >
-                  Read More <span className="ml-1">→</span>
-                </Link>
+                  Stories coming soon
+                </span>
               </div>
             </div>
           );

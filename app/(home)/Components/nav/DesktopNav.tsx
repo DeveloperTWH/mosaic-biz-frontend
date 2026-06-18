@@ -8,7 +8,6 @@ import {
   SHOP_LINKS,
   BECOME_VENDOR_LINK,
   LEARN_LINKS,
-  MORE_DROPDOWN_LINKS,
 } from "./navConfig";
 import { useHomeClick } from "./useHomeNavigation";
 
@@ -78,8 +77,6 @@ export default function DesktopNav() {
       </Link>
 
       <NavDropdown label="LEARN" links={LEARN_LINKS} />
-
-      <NavDropdown label="MORE" links={MORE_DROPDOWN_LINKS} widthClass="w-56" />
     </nav>
   );
 }

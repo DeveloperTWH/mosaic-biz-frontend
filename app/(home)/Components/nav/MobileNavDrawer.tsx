@@ -8,10 +8,9 @@ import { X } from "lucide-react";
 import { logoutUser } from "@/utils/logoutUser";
 import {
   MOBILE_DRAWER_ID,
-  DRAWER_SHOP_LINKS,
+  DRAWER_MARKETPLACE_LINKS,
+  DRAWER_EXPLORE_LINKS,
   BECOME_VENDOR_LINK,
-  LEARN_LINKS,
-  MORE_LINKS,
   LOGIN_LINKS,
 } from "./navConfig";
 
@@ -140,8 +139,8 @@ export default function MobileNavDrawer({
 
         <div className="flex-1 space-y-2 overflow-y-auto py-4">
           <nav className="flex flex-col space-y-1" aria-label="Secondary navigation">
-            <DrawerSection title="Shop">
-              {DRAWER_SHOP_LINKS.map((link) => (
+            <DrawerSection title="Marketplace">
+              {DRAWER_MARKETPLACE_LINKS.map((link) => (
                 <DrawerLink key={link.href} href={link.href} label={link.label} onClose={onClose} />
               ))}
             </DrawerSection>
@@ -156,20 +155,9 @@ export default function MobileNavDrawer({
               </Link>
             </div>
 
-            <DrawerSection title="Learn">
-              {LEARN_LINKS.map((link) => (
+            <DrawerSection title="Explore">
+              {DRAWER_EXPLORE_LINKS.map((link) => (
                 <DrawerLink key={link.href} href={link.href} label={link.label} onClose={onClose} />
-              ))}
-            </DrawerSection>
-
-            <DrawerSection title="More">
-              {MORE_LINKS.map((link) => (
-                <DrawerLink
-                  key={link.href}
-                  href={link.href}
-                  label={link.label}
-                  onClose={onClose}
-                />
               ))}
             </DrawerSection>
           </nav>

@@ -37,6 +37,7 @@ export const logoutUser = async (): Promise<boolean> => {
       localStorage.removeItem("user_session");
       localStorage.removeItem("user_gender");
       localStorage.removeItem("user_name");
+      localStorage.removeItem("user_role");
       localStorage.removeItem("token");
       sessionStorage.removeItem("cart_sync_checked"); // allow re-prompt next time
       window.dispatchEvent(new Event("auth:logout"));
