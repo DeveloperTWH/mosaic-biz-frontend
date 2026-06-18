@@ -184,7 +184,48 @@ New captures recommended on Vercel preview after merge: hero CTAs, `/search` dis
 
 ---
 
-## Manual test checklist (PR #131 release)
+## Post-merge production verification (main @ fd918585)
+
+**Merged PR:** https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/131  
+**Production URL:** https://mosaic-biz-frontend-launch.vercel.app  
+**Deployed SHA:** `fd918585aadf7688196ee33baf957d249326562f`  
+**Vercel deployment:** `dpl_FPZJRHSa4FoGrEWYjBARJcyoYsvc` (Ready @ 2026-06-18T18:21:13Z)  
+**Tested:** 2026-06-18 (production browser smoke)
+
+### Build / lint on merged `main`
+
+| Check | Result |
+|-------|--------|
+| `npm run build` | **Pass** — 68 routes |
+| `npm run lint` | **Fail (pre-existing debt)** — 662 problems (345 errors, 317 warnings); not introduced by PR #131 |
+
+### Production smoke matrix
+
+| Check | Production result |
+|-------|-------------------|
+| `/` hero CTAs (logged out, desktop) | **Pass** — Explore Marketplace + Become a Vendor |
+| `/` mobile @ 390px | **Pass** — mobile shell + bottom nav |
+| `/search` discovery empty state | **Pass** |
+| `/products` | **Pass** — TEST PRODUCT 17 jun |
+| `/services` | **Pass** |
+| `/foods` | **Pass** — honest empty state (API has 0 foods) |
+| `/product/invalid-id-test` unavailable UI | **Pass** |
+| `/partners/dashboard` (unauth) | **Pass** — no prerender crash |
+| `/partners/connect/refresh` | **Pass** — HTTP 200, recovery UI |
+| `/login?type=customer` @ 390px | **Pass** — no horizontal overflow |
+| `/signup?type=vendor` @ 390px | **Pass** — no horizontal overflow |
+| `/services/education-and-coaching-services` (1 API result) | **Pass** — no false empty state |
+| `GET /api/featured-products` | **Pass** — 200 from production origin |
+| `/api/products/featured` usages | **Pass** — 0 in codebase |
+
+**Not re-run on production (low risk / blocked by data):**
+
+- `/search?keyword=test` zero-results — logic present; not exercised this pass
+- Food Book Table toast — **blocked:** prod API returns `total=0` foods (no live food vendor ID)
+
+---
+
+## Manual test checklist (PR #131 release — pre-merge preview)
 
 **Release PR:** https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/131  
 **Vercel preview URL:** https://mosaic-biz-frontend-launch-git-release-0b7777-digital-builders.vercel.app  
@@ -202,7 +243,7 @@ New captures recommended on Vercel preview after merge: hero CTAs, `/search` dis
 | `GET /api/featured-products` | N/A (SSO) | **Pass** — direct API probe 200 |
 | `/api/products/featured` usages | N/A | **Pass** — 0 in codebase |
 
-**Deferred (post-merge bug-fix pass):** `/search?keyword=test` zero-results, `/services/[category]` single-result live check, food Book Table toast, auth @ 390px mobile viewport on production.
+**Superseded by post-merge production verification above.**
 
 ---
 

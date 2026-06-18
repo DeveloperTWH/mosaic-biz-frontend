@@ -69,7 +69,21 @@ sequenceDiagram
 3. Click **Restart Stripe setup** as a logged-in vendor — Network shows credentialed `POST …/api/connect/…/account-link` → redirect to Stripe.
 4. Logged out or invalid business — inline error; **Back to payout setup** and **Go to dashboard** links work; page does not crash.
 5. `/partners/connect/return` still redirects to payout setup with `refresh=1`.
-6. `npm run build` and `npm run lint` pass.
+6. `npm run build` passes; `npm run lint` has pre-existing repo debt (662 problems on `main` @ fd918585).
+
+### Production verification (post-merge PR #131)
+
+**Date:** 2026-06-18 · **SHA:** `fd918585` · **URL:** https://mosaic-biz-frontend-launch.vercel.app/partners/connect/refresh
+
+| Check | Result |
+|-------|--------|
+| Route HTTP status | **200** (was 404 pre-merge) |
+| Recovery heading | **Pass** — "Stripe setup session expired" |
+| CTAs visible | **Pass** — Restart Stripe setup (disabled when logged out), Back to payout setup, Go to dashboard |
+| Page crash (logged out) | **Pass** — safe error path, no crash |
+| Logged-in account-link redirect | **Pending** — requires vendor test credentials |
+
+Production behavior matches documented refresh flow; no doc changes required beyond this verification note.
 
 ---
 

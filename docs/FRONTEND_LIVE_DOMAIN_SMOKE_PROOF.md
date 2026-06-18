@@ -12,7 +12,87 @@
 
 ---
 
-## Post-consolidation revalidation (2026-06-18)
+## Post-merge production verification (PR #131 @ fd918585)
+
+**Date (UTC):** 2026-06-18T18:40:00Z  
+**Merged PR:** https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/131  
+**Local / remote `main` SHA:** `fd918585aadf7688196ee33baf957d249326562f`  
+**GitHub Production deployment:** `5113558118` @ `2026-06-18T18:21:13Z`  
+**Vercel deployment ID:** `dpl_FPZJRHSa4FoGrEWYjBARJcyoYsvc` — **Ready**
+
+| Surface | URL |
+|---------|-----|
+| **Production alias** | https://mosaic-biz-frontend-launch.vercel.app |
+| **Deployment URL** | https://mosaic-biz-frontend-launch-4lrtp8ysl-digital-builders.vercel.app |
+| **Git-main alias** | https://mosaic-biz-frontend-launch-git-main-digital-builders.vercel.app |
+| **API** | https://api.mosaicbizhub.com |
+
+### Build / lint (local `main` @ fd918585)
+
+| Check | Result | Notes |
+|-------|--------|-------|
+| `npm install` | Skipped | `node_modules` present |
+| `npm run build` | **Pass** | Next.js **16.1.2** · **68** routes (includes `/partners/connect/refresh`) |
+| `npm run lint` | **Fail (debt)** | **662** problems (345 errors, 317 warnings) — pre-existing repo-wide; not a deployment blocker |
+
+### Production route smoke (browser + HTTP)
+
+Production URL base: `https://mosaic-biz-frontend-launch.vercel.app`
+
+| Route | Page HTTP | Expected behavior | Result |
+|-------|-----------|-------------------|--------|
+| `/` (desktop) | 200 | Hero CTAs + featured carousel | **Pass** — Explore Marketplace / Become a Vendor; featured API loads |
+| `/` (390px mobile) | 200 | Mobile shell, bottom nav | **Pass** |
+| `/search` (no params) | 200 | Discovery empty state | **Pass** — "Search the marketplace" + Browse products CTA |
+| `/products` | 200 | Product grid from API | **Pass** — TEST PRODUCT 17 jun renders |
+| `/services` | 200 | Services listing shell | **Pass** |
+| `/foods` | 200 | Honest empty when no listings | **Pass** — "No foods found" (API `total=0`) |
+| `/product/invalid-id-test` | 200 | Product unavailable UI | **Pass** — retry + browse CTA (not infinite spinner) |
+| `/partners/dashboard` (unauth) | 200 | No prerender crash | **Pass** — Vendor Dashboard shell renders |
+| `/partners/connect/refresh` | 200 | Recovery UI (not 404) | **Pass** — "Stripe setup session expired" + recovery links |
+| `/login?type=customer` @ 390px | 200 | No horizontal overflow | **Pass** — `scrollWidth === clientWidth` |
+| `/signup?type=vendor` @ 390px | 200 | No horizontal overflow | **Pass** |
+| `/services/education-and-coaching-services` | 200 | Single-result category (API count=1) | **Pass** — category loads; no false "Service not found" |
+
+### Network verification (production origin)
+
+| Check | Result |
+|-------|--------|
+| Homepage calls `GET /api/featured-products?page=1&limit=12` | **Pass** — browser Performance API |
+| Direct `GET /api/featured-products` | **200** |
+| `/api/products/featured` in app code | **0** matches |
+| Production requests to `localhost` | **0** |
+| Production requests to `undefined/api` | **0** |
+| Elastic Beanstalk URLs in app code | **0** |
+| `GET /api/users/auth/check` from prod origin | **401** + CORS allowlist (not network failure) |
+| CORS preflight auth/check | **204** · `Allow-Origin` = production alias · `Allow-Credentials: true` |
+
+**Browser-origin API hosts observed:** `api.mosaicbizhub.com` only (no stale domains).
+
+### Env var status (post-merge)
+
+| Variable | Preview (Vercel CLI) | Production (Vercel CLI) | Live effective |
+|----------|----------------------|-------------------------|----------------|
+| `NEXT_PUBLIC_API_BASE_URL` | `https://api.mosaicbizhub.com` | Masked empty (Sensitive) | **Pass** — production pages call `api.mosaicbizhub.com` |
+| `NEXT_PUBLIC_API_URL` | N/A | N/A | **0** app usages |
+| `process.env.API_BASE_URL` | N/A | N/A | **0** production env usages |
+
+### Remaining blockers
+
+| Type | Item | Severity |
+|------|------|----------|
+| Frontend (non-launch) | Lint debt (662 problems) | Low |
+| Frontend (non-launch) | Nav cleanup branch, search param normalization | Low |
+| Backend/external | Logged-in vendor dashboard **200** flows (needs test creds) | Medium |
+| Backend/external | Food Book Table toast — no food listings in prod API (`total=0`) | Medium |
+| Backend/external | Curated vendor spotlight, vendor stories CMS | Info |
+| Ops | Confirm production `NEXT_PUBLIC_API_BASE_URL` in Vercel dashboard (CLI masks value) | Low |
+
+**Production verified:** Yes — deployed URL proof at `fd918585` on `https://mosaic-biz-frontend-launch.vercel.app`.
+
+---
+
+## Post-consolidation revalidation (2026-06-18, pre-merge)
 
 **Release PR:** https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/131  
 **Release branch:** `release/frontend-post-main-ux-smoke-consolidation` @ `9a625575`  
