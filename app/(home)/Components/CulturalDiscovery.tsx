@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import MarketEmptyState from "./MarketEmptyState";
+import MarketImage from "./MarketImage";
 
 type CulturalCollection = {
   id: string;
   title: string;
   description: string;
   href: string;
-  image?: string;
+  image: string;
 };
 
 const STATIC_COLLECTIONS: CulturalCollection[] = [
@@ -17,21 +18,21 @@ const STATIC_COLLECTIONS: CulturalCollection[] = [
     title: "Black-Owned Excellence",
     description: "Discover products and services from Black-owned businesses in your community.",
     href: "/search?minorityType=Black",
-    image: "/bgdetailpage.png",
+    image: "/Carousel/nature-3.jpg",
   },
   {
     id: "latinx",
     title: "Latinx Heritage",
     description: "Celebrate culture through food, services, and goods from Latinx entrepreneurs.",
     href: "/search?minorityType=Latinx",
-    image: "/bgdetailpage.png",
+    image: "/Carousel/nature-2.jpg",
   },
   {
     id: "women-owned",
     title: "Women-Owned Ventures",
     description: "Support women-led businesses building the future of local commerce.",
     href: "/search?minorityType=Woman",
-    image: "/bgdetailpage.png",
+    image: "/Carousel/nature-1.jpg",
   },
 ];
 
@@ -58,9 +59,12 @@ export function CulturalDiscoveryCollections() {
             href={col.href}
             className="market-card group overflow-hidden p-0 transition-transform hover:-translate-y-0.5"
           >
-            <div
-              className="h-36 bg-cover bg-center"
-              style={{ backgroundImage: `url(${col.image || "/bgdetailpage.png"})` }}
+            <MarketImage
+              src={col.image}
+              alt={col.title}
+              aspect="video"
+              className="h-36 !aspect-auto shrink-0"
+              fallbackLabel="Image coming soon"
             />
             <div className="p-4">
               <h3 className="font-poppins text-lg font-semibold text-market-text group-hover:text-market-gold">

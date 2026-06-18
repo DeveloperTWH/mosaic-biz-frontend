@@ -15,6 +15,7 @@ import {
   SEARCH_CTA,
   LOGIN_LINKS,
 } from "./navConfig";
+import { useHomeClick } from "./useHomeNavigation";
 
 type MobileNavDrawerProps = {
   open: boolean;
@@ -75,6 +76,7 @@ export default function MobileNavDrawer({
   mounted,
 }: MobileNavDrawerProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const onHomeClick = useHomeClick(onClose);
 
   useEffect(() => {
     if (!open) return;
@@ -151,7 +153,7 @@ export default function MobileNavDrawer({
           <nav className="flex flex-col space-y-1" aria-label="Mobile navigation">
             <Link
               href={HOME_LINK.href}
-              onClick={onClose}
+              onClick={onHomeClick}
               className="market-nav-link flex min-h-11 items-center px-4 py-3 font-medium uppercase text-market-text hover:bg-white/5"
             >
               {HOME_LINK.label}

@@ -10,7 +10,7 @@ import HowItWorks from "./components/HowitWorks";
 
 export default function AboutPage() {
   return (
-    <main className="flex flex-col items-center w-full">
+    <main className="flex w-full flex-col">
       <PublicPageHero
         title="About"
         breadcrumbs={[

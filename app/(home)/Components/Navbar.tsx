@@ -10,6 +10,7 @@ import DesktopNav from "./nav/DesktopNav";
 import HeaderActions from "./nav/HeaderActions";
 import MobileNavDrawer from "./nav/MobileNavDrawer";
 import { MOBILE_DRAWER_ID } from "./nav/navConfig";
+import { useHomeClick } from "./nav/useHomeNavigation";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -79,6 +80,7 @@ const Navbar = () => {
   }, [isOpen]);
 
   const closeMenu = () => setIsOpen(false);
+  const onLogoClick = useHomeClick();
 
   return (
     <header
@@ -91,6 +93,7 @@ const Navbar = () => {
         <div className="flex min-w-0 shrink items-center">
           <Link
             href="/"
+            onClick={onLogoClick}
             className="inline-flex shrink-0 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-market-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-market-header"
           >
             <BrandLogo variant="header" priority />
