@@ -14,6 +14,8 @@ import BookingsTab from "./components/BookingsTab";
 import ShippingSettingsTab from "./components/ShippingSettingsTab";
 import TaxSettingsTab from "./components/TaxSettingsTab";
 import PayoutSetupTab from "@/app/(home)/partners/payout-setup/page";
+import LaunchReadinessPanel from "@/app/(home)/partners/components/LaunchReadinessPanel";
+import Link from "next/link";
 
 type ListingType = "product" | "service" | "food";
 type DashboardTab =
@@ -381,7 +383,9 @@ function PartnerDashboardContent() {
             Vendor Dashboard
           </h1>
           {!loading && activeBusiness && (
-            <div className="mb-8 rounded-xl border border-[#e8dfc8] bg-[#fcfaf6] px-5 py-4 text-sm text-gray-700">
+            <div className="mb-8 space-y-4">
+              <LaunchReadinessPanel currentStage={3} />
+              <div className="rounded-xl border border-[#e8dfc8] bg-[#fcfaf6] px-5 py-4 text-sm text-gray-700">
               <p className="font-semibold text-gray-900">Your next steps</p>
               <p className="mt-1">
                 Keep your profile current, manage listings, and monitor orders from this dashboard.
@@ -398,6 +402,12 @@ function PartnerDashboardContent() {
                   </>
                 ) : null}
               </p>
+              <p className="mt-3">
+                <Link href="/refer-a-vendor" className="font-semibold text-[#8b6a15] hover:underline">
+                  Refer another vendor →
+                </Link>
+              </p>
+            </div>
             </div>
           )}
 

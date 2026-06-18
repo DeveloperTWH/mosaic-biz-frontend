@@ -3,6 +3,9 @@ import { Service } from "@/types/service";
 import { Category } from "@/types/Category";
 import FilterAccordion from "./FilterAccordion";
 import ProductCard from "./ProductCard";
+import MarketLoadingBlock from "../../Components/MarketLoadingBlock";
+import MarketEmptyState from "../../Components/MarketEmptyState";
+import MobileFilterDrawer from "../../Components/MobileFilterDrawer";
 
 interface BookServicesProps {
   services: Service[];
@@ -29,76 +32,62 @@ const BookServices: React.FC<BookServicesProps> = ({
   onBadgeSelect,
   onPriceChange,
 }) => {
-  const [selectedFilters, setSelectedFilters] = useState({
-    category: "",
-    subCategory: "",
-    badge: "",
-  });
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const startItem = totalProducts > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0;
   const endItem = totalProducts > 0 ? Math.min(startItem + services.length - 1, totalProducts) : 0;
 
-  const handleFilterChange = (filterType: keyof typeof selectedFilters, value: string) => {
-    setSelectedFilters((prev) => ({
-      ...prev,
-      [filterType]: prev[filterType] === value ? "" : value,
-    }));
-  };
+  const filterPanel = (
+    <FilterAccordion
+      selectedCategory={selectedCategory}
+      onFilterChange={() => {}}
+      onCategorySelect={onCategorySelect}
+      onSubcategorySelect={onSubcategorySelect}
+      onBadgeSelect={onBadgeSelect}
+      onPriceChange={onPriceChange}
+    />
+  );
 
   return (
-    <section className="px-4 py-8 mx-auto max-w-7xl sm:px-6">
-      <div className="flex flex-col lg:flex-row gap-6">
-        <div className="lg:w-1/4">
-          <div className="space-y-6">
-            <FilterAccordion
-              selectedCategory={selectedCategory}
-              onFilterChange={(category, subCategory) => {
-                console.log("Food filter clicked:", category, subCategory);
-                handleFilterChange("category", category);
-                handleFilterChange("subCategory", subCategory);
-              }}
-              onCategorySelect={onCategorySelect}
-              onSubcategorySelect={onSubcategorySelect}
-              onBadgeSelect={onBadgeSelect}
-              onPriceChange={onPriceChange}
-            />
-          </div>
+    <section className="container-page py-8">
+      <div className="flex flex-col gap-6 lg:flex-row">
+        <div className="hidden w-full lg:block lg:w-1/4">
+          <div className="space-y-6">{filterPanel}</div>
         </div>
 
-        <div className="lg:w-3/4">
+        <div className="w-full min-w-0 lg:w-3/4">
+          <button
+            type="button"
+            className="market-btn-secondary mb-4 w-full min-h-11 lg:hidden"
+            onClick={() => setDrawerOpen(true)}
+            aria-expanded={drawerOpen}
+          >
+            Filters
+          </button>
+
+          <MobileFilterDrawer
+            open={drawerOpen}
+            onClose={() => setDrawerOpen(false)}
+            resultCount={totalProducts}
+          >
+            {filterPanel}
+          </MobileFilterDrawer>
+
           <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="market-result-count">
-              (Showing {startItem} - {endItem} foods Of {totalProducts} foods)
+              (Showing {startItem} - {endItem} foods of {totalProducts} foods)
             </p>
-
-            <div className="flex items-center gap-2">
-              <span className="market-result-count">Sort By:</span>
-              <div className="market-select-wrap">
-                <select className="market-select w-auto min-w-[140px] px-3 py-1 text-sm">
-                  <option>Default</option>
-                  <option>Price: Low to High</option>
-                  <option>Price: High to Low</option>
-                  <option>Most Popular</option>
-                  <option>Newest</option>
-                </select>
-                <div className="market-select-chevron">
-                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </div>
-              </div>
-            </div>
           </div>
 
           {loading ? (
-            <div className="flex h-64 items-center justify-center">
-              <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-market-gold"></div>
-            </div>
+            <MarketLoadingBlock label="Loading foods…" minHeight="min-h-[256px]" />
           ) : services.length === 0 ? (
-            <div className="market-empty-state">
-              <p className="market-empty-state-title">No foods found</p>
-              <p className="mt-2 text-sm text-market-muted">Try adjusting your filters or search terms.</p>
-            </div>
+            <MarketEmptyState
+              title="No foods found"
+              description="Try adjusting your filters or search the marketplace."
+              ctaLabel="Search marketplace"
+              ctaHref="/search"
+            />
           ) : (
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
               {services.map((service) => (
@@ -107,8 +96,10 @@ const BookServices: React.FC<BookServicesProps> = ({
                   foodId={service._id}
                   image={service.coverImage}
                   businessName={service.businessId?.businessName || service.title}
-                  businessDescription={service.businessId?.description || service.description || "No description available"}
-                  badge={service.businessId?.badge || (service as any).badge}
+                  businessDescription={
+                    service.businessId?.description || service.description || "No description available"
+                  }
+                  badge={service.businessId?.badge || (service as { badge?: string }).badge}
                   logo={service.businessId?.logo}
                 />
               ))}

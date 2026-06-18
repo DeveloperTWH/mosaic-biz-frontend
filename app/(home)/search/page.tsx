@@ -9,7 +9,7 @@ import PublicPageHero from "../Components/PublicPageHero";
 import PublicFilterSection from "../Components/PublicFilterSection";
 import MarketLoadingBlock from "../Components/MarketLoadingBlock";
 import MarketEmptyState from "../Components/MarketEmptyState";
-import { PublicSearchFilters } from "../Components/publicSearch";
+import { PublicSearchFilters, parseListingFiltersFromSearchParams, buildSearchPageUrlWithTab } from "../Components/publicSearch";
 
 type ApiBusiness = {
   _id?: string;
@@ -275,14 +275,21 @@ function SearchPageContent() {
   const [response, setResponse] = useState<SearchApiResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<SearchTab>("products");
+  const [activeTab, setActiveTab] = useState<SearchTab>(() => {
+    const tab = searchParams.get("tab");
+    if (tab === "services" || tab === "foods" || tab === "products") return tab;
+    return "products";
+  });
 
   const queryFilters = useMemo(
-    () => ({
-      keyword: searchParams.get("keyword") || "",
-      location: searchParams.get("location") || "",
-      minorityType: searchParams.get("minorityType") || "",
-    }),
+    () => {
+      const parsed = parseListingFiltersFromSearchParams(searchParams);
+      return {
+        keyword: parsed.keyword,
+        location: parsed.location,
+        minorityType: parsed.minorityType,
+      };
+    },
     [searchParams]
   );
 
@@ -427,7 +434,15 @@ const tabItems = [
               <button
                 key={tab.key}
                 type="button"
-                onClick={() => setActiveTab(tab.key)}
+                onClick={() => {
+                  setActiveTab(tab.key);
+                  router.replace(
+                    buildSearchPageUrlWithTab({
+                      ...filters,
+                      tab: tab.key,
+                    })
+                  );
+                }}
                 className={`relative w-full border px-4 py-3 text-sm font-semibold transition-colors sm:min-w-[180px] sm:w-auto lg:min-w-[220px] ${
                   isActive
                     ? "border-market-gold bg-market-gold text-market-header"

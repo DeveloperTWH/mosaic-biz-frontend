@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 import { Review } from "@/types/review";
 import ClientTestimonials from "../../../Components/ClientTestimonials";
 import PublicSearchFilterBar from "../../../Components/PublicSearchFilterBar";
+import MobileStickyActionBar, { MOBILE_STICKY_BAR_PADDING } from "../../../Components/MobileStickyActionBar";
 import { buildSearchPageUrl, PublicSearchFilters } from "../../../Components/publicSearch";
 
 type CategoryRef = {
@@ -742,7 +743,7 @@ export default function FoodVendorProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-white font-sans">
+    <div className={`min-h-screen bg-white font-sans ${MOBILE_STICKY_BAR_PADDING}`}>
       <div className="relative h-[180px] w-full overflow-hidden bg-gray-800">
         <img
           src="/products/19099 1.png"
@@ -1137,7 +1138,7 @@ export default function FoodVendorProfilePage() {
               </div>
             </div>
 
-            <div className="overflow-hidden border border-[#e2c46a] bg-[#fff8e8] mt-6">
+            <div id="booking-section" className="overflow-hidden border border-[#e2c46a] bg-[#fff8e8] mt-6">
               <div className="border-b border-[#e6d3a3] px-5 py-4">
                 <h3 className="text-[14px] font-poppins font-bold uppercase tracking-wide text-[#1A1F71]">
                   {hasDirectBookingLink ? "Book Now" : "Book A Table"}
@@ -1401,6 +1402,22 @@ export default function FoodVendorProfilePage() {
         error={revealError}
         onClose={closeRevealModal}
         onConfirm={handleRevealConfirm}
+      />
+      <MobileStickyActionBar
+        primaryLabel={hasDirectBookingLink ? "Book now" : "Book a table"}
+        onPrimaryClick={() => {
+          if (hasDirectBookingLink && data.bookingToolLink) {
+            window.open(data.bookingToolLink, "_blank", "noopener,noreferrer");
+            return;
+          }
+          document.getElementById("booking-section")?.scrollIntoView({ behavior: "smooth" });
+        }}
+        secondaryLabel={hasDirectBookingLink ? undefined : "View form"}
+        onSecondaryClick={
+          hasDirectBookingLink
+            ? undefined
+            : () => document.getElementById("booking-section")?.scrollIntoView({ behavior: "smooth" })
+        }
       />
 {selectedImage && (
   <div
