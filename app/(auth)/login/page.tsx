@@ -6,6 +6,8 @@ import Image from 'next/image'
 import { useEffect, useState, Suspense } from 'react'
 import Link from 'next/link'
 import { Eye, EyeOff, X } from 'lucide-react';
+import { logAuthRequest } from '@/utils/authDebug';
+import { parseAuthJsonResponse } from '@/utils/parseAuthErrorResponse';
 
 function LoginContent() {
 
@@ -65,7 +67,8 @@ function LoginContent() {
     setError('');
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/login`, {
+      const loginUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/login`;
+      const res = await fetch(loginUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -76,9 +79,22 @@ function LoginContent() {
         credentials: 'include'
       });
 
-      const data = await res.json();
+      const { data, errorMessage } = await parseAuthJsonResponse<{
+        success?: boolean;
+        otpPending?: boolean;
+        message?: string;
+        user?: { gender?: string; role?: string; email?: string };
+      }>(res);
 
-      if (data.success) {
+      logAuthRequest({
+        endpoint: loginUrl,
+        method: 'POST',
+        status: res.status,
+        credentialsIncluded: true,
+        body: data ?? undefined,
+      });
+
+      if (data?.success && data.user) {
         localStorage.setItem('user_session', 'true');
         localStorage.setItem('user_gender', data.user.gender || '');
         localStorage.setItem('user_role', data.user.role || '');
@@ -86,14 +102,14 @@ function LoginContent() {
   
         router.push(data.user.role === 'business_owner' ? '/partners' : (safeRedirect || '/'));
 
-      } else if (data.otpPending) {
+      } else if (data?.otpPending && data.user?.email) {
         const otpType = data.user.role === 'business_owner' ? 'vendor' : data.user.role;
         const nextUrl = safeRedirect
-          ? `/verify-otp?email=${encodeURIComponent(data.user.email)}&type=${encodeURIComponent(otpType)}&redirect=${encodeURIComponent(safeRedirect)}`
-          : `/verify-otp?email=${encodeURIComponent(data.user.email)}&type=${encodeURIComponent(otpType)}`;
+          ? `/verify-otp?email=${encodeURIComponent(data.user.email)}&type=${encodeURIComponent(otpType || 'customer')}&redirect=${encodeURIComponent(safeRedirect)}`
+          : `/verify-otp?email=${encodeURIComponent(data.user.email)}&type=${encodeURIComponent(otpType || 'customer')}`;
         router.push(nextUrl);
       } else {
-        setError(data.message || 'Login failed');
+        setError(errorMessage || data?.message || 'Login failed');
       }
     } catch (err) {
       console.error('Login error:', err);
