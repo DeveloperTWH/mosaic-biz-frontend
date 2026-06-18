@@ -176,6 +176,44 @@ body {
   @apply font-montserrat text-sm leading-relaxed text-brand-muted;
 }
 
+.market-surface-light {
+  @apply bg-white text-brand-navy;
+}
+
+.market-card-light-list {
+  @apply font-montserrat text-sm leading-relaxed text-brand-muted;
+}
+
+.market-card-light-list a {
+  @apply text-brand-navy-light underline hover:text-brand-teal-dark;
+}
+
+.market-accordion-light {
+  @apply rounded-lg border border-gray-200 bg-gray-50 p-3 shadow-sm;
+}
+
+.market-accordion-light summary {
+  @apply cursor-pointer font-poppins text-base font-semibold text-brand-navy;
+}
+
+.market-accordion-light summary::-webkit-details-marker {
+  display: none;
+}
+
+.market-accordion-light > ul,
+.market-accordion-light > p,
+.market-accordion-light .market-accordion-light-body {
+  @apply mt-2 space-y-1 font-montserrat text-sm leading-relaxed text-brand-muted;
+}
+
+.market-accordion-light > ul {
+  @apply list-disc pl-5;
+}
+
+.market-accordion-light a {
+  @apply text-brand-navy-light underline hover:text-brand-teal-dark;
+}
+
 .market-step-badge {
   @apply flex h-12 w-12 items-center justify-center rounded-full bg-market-gold font-poppins text-xl font-bold text-market-header;
 }

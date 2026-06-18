@@ -1,8 +1,10 @@
 const Offered = () => {
   return (
-    <div>
-      <h3 className="text-lg font-semibold mb-4">What We Offer</h3>
-      <p className="text-gray-600">This section will showcase the detailed offerings provided by the vendor.</p>
+    <div className="market-card-light p-6 text-center">
+      <h3 className="market-card-light-title mb-3">What We Offer</h3>
+      <p className="market-card-light-body">
+        Offerings for this vendor are not available yet. Check back soon or contact the vendor directly.
+      </p>
     </div>
   );
 };

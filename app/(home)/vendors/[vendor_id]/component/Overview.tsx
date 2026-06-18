@@ -68,12 +68,12 @@ const Overview: React.FC<OverviewProps> = ({ vendor }) => {
 
             {/* SERVICES */}
             <div className="mt-10">
-                <h3 className="font-semibold text-lg">Book Your Services</h3>
+                <h3 className="market-card-light-title mb-3">Book Your Services</h3>
                 <div className="space-y-2 mt-2">
                     {vendor.services.map((service, index) => (
-                        <details key={index} className="bg-gray-100 p-3 rounded shadow-lg">
-                            <summary className="cursor-pointer heading">{service.title}</summary>
-                            <ul className="pl-4 list-disc mt-1">
+                        <details key={index} className="market-accordion-light">
+                            <summary>{service.title.startsWith("Services ") ? `Service group ${index + 1}` : service.title}</summary>
+                            <ul className="market-card-light-list">
                                 {service.items.map((item, i) => (
                                     <li key={i}>{item}</li>
                                 ))}

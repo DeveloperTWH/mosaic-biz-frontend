@@ -14,7 +14,7 @@ export default function Mission() {
       </div>
       {/* Text content */}
       <div className="py-10 md:pl-10 md:order-1">
-        <h2 className="mb-2 text-3xl font-bold heading">Mission:</h2>
+        <h2 className="market-section-heading mb-2 text-3xl">Mission:</h2>
         <hr className="h-[2px] w-[120px] bg-green-900" />
         <hr className="h-[2px] w-[120px] bg-green-900 mt-[1px] mb-5" />
         <p className="text-sm leading-relaxed text-gray-700">

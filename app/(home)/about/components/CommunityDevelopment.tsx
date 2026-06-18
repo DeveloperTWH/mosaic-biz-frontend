@@ -4,7 +4,7 @@ export default function CommunityDevelopment() {
   return (
     <section className="w-full px-6 md:px-16 py-16 text-center">
       {/* Heading */}
-      <h2 className="text-3xl font-bold mb-4 heading">COMMUNITY DEVELOPMENT:</h2>
+      <h2 className="market-section-heading mb-4 text-3xl">COMMUNITY DEVELOPMENT:</h2>
       <hr className="h-[2px] w-[120px] bg-green-900 mx-auto" />
       <hr className="h-[2px] w-[120px] bg-green-900 mt-[1px] mb-10 mx-auto" />
 
