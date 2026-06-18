@@ -180,6 +180,11 @@ body {
   @apply bg-white text-brand-navy;
 }
 
+.market-surface-light .market-card-light,
+.market-surface-light .market-accordion-light {
+  @apply text-brand-navy;
+}
+
 .market-card-light-list {
   @apply font-montserrat text-sm leading-relaxed text-brand-muted;
 }
@@ -201,16 +206,40 @@ body {
 }
 
 .market-accordion-light > ul,
+.market-accordion-light > ol,
 .market-accordion-light > p,
-.market-accordion-light .market-accordion-light-body {
+.market-accordion-light .market-accordion-light-body,
+.market-accordion-light .market-card-light-list {
   @apply mt-2 space-y-1 font-montserrat text-sm leading-relaxed text-brand-muted;
 }
 
-.market-accordion-light > ul {
+.market-accordion-light > ul,
+.market-accordion-light > ol,
+.market-accordion-light .market-card-light-list {
   @apply list-disc pl-5;
 }
 
+.market-accordion-light li {
+  @apply text-brand-muted;
+}
+
 .market-accordion-light a {
+  @apply text-brand-navy-light underline hover:text-brand-teal-dark;
+}
+
+.market-prose-light {
+  @apply max-w-none font-montserrat text-sm leading-relaxed text-brand-muted;
+}
+
+.market-prose-light :where(p, li, span, div, td, th) {
+  @apply text-brand-muted;
+}
+
+.market-prose-light :where(h1, h2, h3, h4, h5, h6, strong, b) {
+  @apply text-brand-navy;
+}
+
+.market-prose-light :where(a) {
   @apply text-brand-navy-light underline hover:text-brand-teal-dark;
 }
 

@@ -998,7 +998,7 @@ setMainImage(firstImage);
   About Item
 </h3>
                 <div 
-                  className="market-card-light-body prose prose-sm max-w-none"
+                  className="market-card-light-body market-prose-light"
                   style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '14px' }}
                   dangerouslySetInnerHTML={{ __html: product.description }}
                 />

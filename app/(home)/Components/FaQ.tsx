@@ -76,8 +76,8 @@ export default function FAQSection() {
                 </span>
               </div>
               {openIndex === index && (
-                <div className="pb-10 shadow-md shadow-black/30">
-                  <p className="market-card-light-body px-5 mt-5">{faq.answer}</p>
+                <div className="bg-white px-5 pb-5 pt-2 shadow-md shadow-black/30">
+                  <p className="market-card-light-body">{faq.answer}</p>
                 </div>
               )}
             </div>

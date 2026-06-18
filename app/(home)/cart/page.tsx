@@ -439,27 +439,31 @@ export default function CartPage() {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-[60vh]">
+            <div className="flex min-h-[60vh] items-center justify-center bg-[#ebecef] text-brand-navy">
                 <div className="flex flex-col items-center gap-4 text-center">
-                    <div className="w-12 h-12 border-4 border-yellow-400 rounded-full border-t-transparent animate-spin" />
-                    <p className="text-sm font-medium text-gray-600">Loading your cart...</p>
+                    <div className="h-12 w-12 animate-spin rounded-full border-4 border-brand-gold border-t-transparent" />
+                    <p className="text-sm font-medium text-brand-muted">Loading your cart...</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="bg-[#ebecef]">
-            <div className="flex flex-wrap gap-5 px-4 py-6 mx-auto max-w-7xl">
+        <div className="bg-[#ebecef] text-brand-navy">
+            <div className="mx-auto flex max-w-7xl flex-wrap gap-5 px-4 py-6">
                 {/* Tab Navigation */}
                 <div className="w-full lg:w-[68%]">
-                    <div className="flex gap-5 px-5 mb-8 bg-white">
+                    <div className="mb-8 flex gap-5 bg-white px-5 text-brand-navy">
                         <button
-                            className={`sm:p-5 p-2 pt-3 sm:text-lg text-sm font-semibold ${selectedTab === "product" ? "border-b-4 border-blue-500" : "text-gray-800"
-                                }`}
+                            type="button"
+                            className={`p-2 pt-3 text-sm font-semibold sm:p-5 sm:text-lg ${
+                                selectedTab === "product"
+                                    ? "border-b-4 border-blue-900 text-brand-navy"
+                                    : "text-brand-muted hover:text-brand-navy"
+                            }`}
                             onClick={() => setSelectedTab("product")}
                         >
-                            Items  ({effectiveTotalQtyProduct})
+                            Items ({effectiveTotalQtyProduct})
                         </button>
                         {/* <button
                             className={`sm:p-5 p-2 pt-3 sm:text-lg text-sm font-semibold ${selectedTab === "food" ? "border-b-4 border-blue-500" : "text-gray-800"
@@ -472,16 +476,16 @@ export default function CartPage() {
 
                     {/* Cart Items */}
 {selectedTab === "product" ? (
-  <div className="mt-6 space-y-6 bg-white">
+  <div className="mt-6 space-y-6 bg-white text-brand-navy">
     {itemsProduct.length === 0 ? (
-      <div className="p-8 text-center text-gray-600">
+      <div className="p-8 text-center font-montserrat text-brand-muted">
         Your cart is empty.
       </div>
     ) : (
       itemsProduct.map((item) => (
         <div
           key={`${item.productId}-${item.variantId}-${item.size}`}
-          className="p-4 border border-gray-200 rounded-md"
+          className="rounded-md border border-gray-200 p-4 text-brand-navy"
         >
           {/* TOP ROW */}
           <div className="flex items-start justify-between gap-3">
@@ -495,11 +499,11 @@ export default function CartPage() {
 
               {/* INFO */}
               <div className="min-w-0">
-                <div className="font-semibold text-gray-800 truncate">
+                <div className="truncate font-semibold text-brand-navy">
                   {item.title || "Product"}
                 </div>
 
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-brand-muted">
                   {/* {item.label ? `${item.label}: ` : ""} */}
                   {item.color ? `${item.color}: ` : ""}
                   {item.size}
@@ -537,11 +541,11 @@ export default function CartPage() {
                           : 0;
 
                       return (
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-base text-gray-800">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-base font-semibold text-brand-navy">
                             ${resolved.current.toFixed(2)}
                           </span>
-                          <span className="text-sm text-gray-400 line-through">
+                          <span className="text-sm text-brand-muted line-through">
                             ${resolved.original.toFixed(2)}
                           </span>
                           {pct > 0 && (
@@ -557,7 +561,7 @@ export default function CartPage() {
 
                     return (
                       <div className="flex flex-col gap-1">
-                        <span className="text-base text-gray-800">
+                        <span className="text-base font-semibold text-brand-navy">
                           ${resolved.current.toFixed(2)}
                         </span>
                         {/* {(item.taxIncluded ?? true) && (
@@ -570,9 +574,9 @@ export default function CartPage() {
                   })()}
                 </div>
 
-                <div className="mt-2 flex flex-wrap items-center gap-4 text-xs text-gray-500">
-                    <span className="text-xs text-gray-500">
-                            Tax included : ${Number(item.lineTaxAmount ?? 0).toFixed(2)}
+                <div className="mt-2 flex flex-wrap items-center gap-4 text-xs text-brand-muted">
+                    <span>
+                            Tax included: ${Number(item.lineTaxAmount ?? 0).toFixed(2)}
                     </span>
                   {/* <span>
                     Qty: {item.quantity}
@@ -589,8 +593,9 @@ export default function CartPage() {
 
             {/* REMOVE BUTTON */}
             <button
+              type="button"
               onClick={() => removeLine(item)}
-              className="text-xs text-red-600 whitespace-nowrap"
+              className="whitespace-nowrap text-xs font-medium text-red-600"
             >
               Remove
             </button>
@@ -599,7 +604,7 @@ export default function CartPage() {
           {/* BOTTOM ROW */}
           <div className="flex items-center justify-between mt-4">
             {/* SHIPPING */}
-            <div className="text-xs text-gray-500">
+            <div className="text-xs text-brand-muted">
               {(() => {
                 const shippingOptions = getShippingOptions(item);
                 const effectiveShippingCost = getEffectiveShippingCost(item);
@@ -655,20 +660,22 @@ export default function CartPage() {
               {/* QUANTITY */}
               <div className="flex items-center gap-2">
                 <button
+                  type="button"
                   onClick={() => dec(item)}
-                  className="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-full"
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-brand-navy"
                   disabled={item.quantity <= 1}
                 >
                   -
                 </button>
 
-                <div className="text-sm w-6 text-center">
+                <div className="w-6 text-center text-sm font-medium text-brand-navy">
                   {item.quantity}
                 </div>
 
                 <button
+                  type="button"
                   onClick={() => inc(item)}
-                  className="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-full"
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-brand-navy"
                 >
                   +
                 </button>
@@ -693,17 +700,17 @@ export default function CartPage() {
                     {selectedTab === "product" &&
                     itemsProduct.length > 0 &&
                     availableDeliverySpeeds.length > 0 ? (
-                        <div className="mt-6 rounded-md border border-gray-200 bg-white p-4">
+                        <div className="mt-6 rounded-md border border-gray-200 bg-white p-4 text-brand-navy">
                             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                                 <div>
-                                    <h3 className="text-sm font-semibold text-gray-800">
+                                    <h3 className="text-sm font-semibold text-brand-navy">
                                         Shipping Speed
                                     </h3>
-                                    <p className="mt-1 text-xs text-gray-500">
-                                        Choose shipping Speed for your order
+                                    <p className="mt-1 text-xs text-brand-muted">
+                                        Choose shipping speed for your order
                                     </p>
                                     {selectedDeliverySpeed ? (
-                                        <p className="mt-2 text-sm font-medium text-gray-700">
+                                        <p className="mt-2 text-sm font-medium text-brand-navy">
                                             Selected: {getShippingLabel(selectedDeliverySpeed)} - $
                                             {effectiveShippingTotalProduct.toFixed(2)}
                                         </p>
@@ -774,9 +781,9 @@ export default function CartPage() {
 
                 {/* Price Details */}
                 <div className="w-full lg:w-[30%] lg:mt-0">
-                    <div className="w-full bg-white border border-gray-200">
-                        <div className="p-5 mb-2 text-lg text-gray-800 border-b-2 border-gray-200">
-                            <h3 className="pt-2 text-lg text-gray-800">Price Details</h3>
+                    <div className="w-full border border-gray-200 bg-white text-brand-navy">
+                        <div className="mb-2 border-b-2 border-gray-200 p-5">
+                            <h3 className="pt-2 text-lg font-semibold text-brand-navy">Price Details</h3>
                         </div>
 
                         {selectedTab === "product" ? (
@@ -797,19 +804,19 @@ export default function CartPage() {
                                     </div>
                                 )} */}
 
-                                <div className="flex justify-between mt-3 text-sm text-gray-600">
+                                <div className="mt-3 flex justify-between text-sm text-brand-muted">
                                     <div>Subtotal Excl. Tax</div>
                                     <div>${effectiveSubtotalExclTaxProduct.toFixed(2)}</div>
                                 </div>
 
-                                <div className="flex justify-between mt-3 text-sm text-gray-600">
+                                <div className="mt-3 flex justify-between text-sm text-brand-muted">
                                     <div>Tax Total</div>
-                                    <div className={effectiveTaxAmountProduct === 0 ? "text-green-600" : ""}>
+                                    <div className={effectiveTaxAmountProduct === 0 ? "text-green-600" : "text-brand-navy"}>
                                         ${effectiveTaxAmountProduct.toFixed(2)}
                                     </div>
                                 </div>
 
-                                <div className="flex justify-between mt-3 text-sm text-gray-600">
+                                <div className="mt-3 flex justify-between text-sm text-brand-muted">
                                     <div>Shipping</div>
                                     <div>${effectiveShippingTotalProduct.toFixed(2)}</div>
                                 </div>
@@ -835,7 +842,7 @@ export default function CartPage() {
                                 )}
 
                                 <div className="mt-5">
-                                    <label className="block mb-2 text-sm font-medium text-gray-700">
+                                    <label className="mb-2 block text-sm font-medium text-brand-navy">
                                         Discount Coupon
                                     </label>
                                     <div className="flex gap-2">
@@ -844,7 +851,7 @@ export default function CartPage() {
                                             value={couponCode}
                                             onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
                                             placeholder="Enter coupon code"
-                                            className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded outline-none focus:border-blue-500"
+                                            className="flex-1 rounded border border-gray-300 px-3 py-2 text-sm text-brand-navy outline-none placeholder:text-brand-muted focus:border-blue-500"
                                         />
                                         <button
                                                     type="button"
@@ -872,14 +879,14 @@ export default function CartPage() {
                                     )}
                                 </div>
 
-                                <div className="flex justify-between mt-4 text-sm text-gray-600">
+                                <div className="mt-4 flex justify-between text-sm text-brand-muted">
                                     <div>Discount</div>
-                                    <div className={discountAmountProduct > 0 ? "text-green-600" : ""}>
+                                    <div className={discountAmountProduct > 0 ? "text-green-600" : "text-brand-navy"}>
                                         ${discountAmountProduct.toFixed(2)}
                                     </div>
                                 </div>
 
-                                <div className="flex justify-between mt-4 text-lg font-semibold text-gray-900">
+                                <div className="mt-4 flex justify-between text-lg font-semibold text-brand-navy">
                                     <div>Total</div>
                                     <div>${payableTotalProduct.toFixed(2)}</div>
                                 </div>
@@ -923,7 +930,7 @@ export default function CartPage() {
                             </div>
                         ) : (
                             <div className="p-5">
-                                <div className="text-sm text-gray-600">
+                                <div className="text-sm text-brand-muted">
                                     Grocery checkout coming soon.
                                 </div>
                             </div>

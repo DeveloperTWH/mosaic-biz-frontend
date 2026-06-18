@@ -16,6 +16,13 @@ type OverviewProps = {
     vendor: Vendor;
 };
 
+function formatServiceTitle(title: string, index: number): string {
+    if (/^services?\s*0\d/i.test(title.trim())) {
+        return `Service group ${index + 1}`;
+    }
+    return title;
+}
+
 const Overview: React.FC<OverviewProps> = ({ vendor }) => {
     const mapContainerRef = useRef<HTMLDivElement>(null);
     const [mapSize, setMapSize] = useState({ width: 1, height: 1 });
@@ -70,16 +77,28 @@ const Overview: React.FC<OverviewProps> = ({ vendor }) => {
             <div className="mt-10">
                 <h3 className="market-card-light-title mb-3">Book Your Services</h3>
                 <div className="space-y-2 mt-2">
-                    {vendor.services.map((service, index) => (
-                        <details key={index} className="market-accordion-light">
-                            <summary>{service.title.startsWith("Services ") ? `Service group ${index + 1}` : service.title}</summary>
-                            <ul className="market-card-light-list">
-                                {service.items.map((item, i) => (
-                                    <li key={i}>{item}</li>
-                                ))}
-                            </ul>
-                        </details>
-                    ))}
+                    {vendor.services.length === 0 ? (
+                        <p className="market-card-light-body rounded-lg border border-gray-200 bg-gray-50 p-4">
+                            This vendor has not added service details yet.
+                        </p>
+                    ) : (
+                        vendor.services.map((service, index) => (
+                            <details key={index} className="market-accordion-light">
+                                <summary>{formatServiceTitle(service.title, index)}</summary>
+                                {service.items.length === 0 ? (
+                                    <p className="market-accordion-light-body">
+                                        This vendor has not added service details yet.
+                                    </p>
+                                ) : (
+                                    <ul className="market-card-light-list">
+                                        {service.items.map((item, i) => (
+                                            <li key={i}>{item}</li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </details>
+                        ))
+                    )}
                 </div>
             </div>
 
