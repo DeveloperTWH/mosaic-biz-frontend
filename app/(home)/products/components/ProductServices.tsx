@@ -4,8 +4,8 @@ import { Category } from "@/types/Category";
 import Image from "next/image";
 import Link from "next/link";
 import FilterAccordion from "./FilterAccordion";
-import { Star } from "lucide-react";
 import MarketImage from "../../Components/MarketImage";
+import CardRatingRow from "../../Components/CardRatingRow";
 import MarketLoadingBlock from "../../Components/MarketLoadingBlock";
 import MarketEmptyState from "../../Components/MarketEmptyState";
 import MobileFilterDrawer from "../../Components/MobileFilterDrawer";
@@ -162,7 +162,7 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
             />
           ) : (
             <>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <div className="public-grid-listing">
                 {services.map((service, index) => (
                   // <div key={service._id} className="overflow-hidden border rounded-lg shadow-sm hover:shadow transition-shadow">
                   //   {/* Compact Image */}
@@ -341,7 +341,7 @@ function ProductCard({ item }: { item: RankedItem }) {
   const reviewCount = item.totalReviews || 0;
   const badge = pickBadgeValue(item as any);
   const badgeImagePath = badge ? buildBadgeImagePath(badge) : null;
-  
+
   // Get price from item.price or fallback to variant price
   let displayPrice = 0;
   if ((item as any).price) {
@@ -357,106 +357,64 @@ function ProductCard({ item }: { item: RankedItem }) {
     displayPrice = variantPrice;
   }
 
-  const fullStars = Math.floor(rating);
-  const fractional = rating % 1;
-  const hasHalfStar = fractional >= 0.25 && fractional < 0.75;
-
   return (
+    <Link href={href} className="market-listing-card-link h-full">
+      <article className="market-listing-card p-2 sm:max-w-none">
+        <div className="market-card-media relative aspect-[4/3] w-full shrink-0 sm:aspect-square">
+          <MarketImage src={images[0]} alt={title} aspect="square" objectFit="contain" />
 
-    <Link href={href} className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-market-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-market-bg rounded-2xl">
-    <div className="market-card flex h-[480px] w-full max-w-[300px] cursor-pointer flex-col overflow-hidden p-2">
-      <div className="market-card-media relative aspect-square w-full flex-shrink-0">
-        <MarketImage src={images[0]} alt={title} aspect="square" objectFit="contain" />
-
-        {onSale && (
-          <div className="absolute top-3 left-3">
-            <span className="rounded-full bg-red-600 px-3 py-1 text-xs font-bold text-white">
-              SALE
-            </span>
-          </div>
-        )}
-      </div>
-
-      <div className="flex flex-1 flex-col p-3">
-        <h3 className="market-card-title line-clamp-2 h-[42px]">
-          {title}
-        </h3>
-
-        <p className="market-card-desc mb-2 h-[40px] overflow-hidden">
-          {trimmedDescription || "\u00a0"}
-        </p>
-
-        {(rating > 0 || reviewCount > 0) && (
-        <div className="min-h-[20px] flex-shrink-0">
-          <div className="mb-1 flex items-center">
-            <div className="flex">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  size={14}
-                  fill={i < fullStars ? "#E2B84B" : i === fullStars && hasHalfStar ? "#E2B84B" : "transparent"}
-                  stroke={i < fullStars || (i === fullStars && hasHalfStar) ? "#E2B84B" : "#A9A2D8"}
-                  className={i < fullStars || (i === fullStars && hasHalfStar) ? "text-market-gold" : "text-market-muted/40"}
-                />
-              ))}
+          {onSale && (
+            <div className="absolute left-3 top-3">
+              <span className="rounded-full bg-red-600 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white sm:text-xs">
+                Sale
+              </span>
             </div>
-            <p className="ml-2 font-poppins text-[10px] leading-tight text-market-muted">
-              {ratingCount} Ratings And {reviewCount} Reviews
-            </p>
-          </div>
+          )}
         </div>
-        )}
 
-        <div className="mt-auto flex-shrink-0">
-  {onSale ? (
-    <div className="flex flex-col leading-tight">
-      <span className="text-xs text-market-muted">
-        Starting from
-      </span>
-      <div className="flex items-center gap-2">
-        <span className="market-card-price-sale">
-          ${effective.toFixed(2)}
-        </span>
-        <span className="text-sm text-market-muted line-through">
-          ${displayPrice.toFixed(2)}
-        </span>
-      </div>
-    </div>
-  ) : (
-    <div className="flex flex-col leading-tight">
-      <span className="text-xs text-market-muted">
-        Starting from
-      </span>
-      <span className="market-card-price">
-        ${displayPrice.toFixed(2)}
-      </span>
-    </div>
-  )}
-</div>
+        <div className="flex flex-1 flex-col gap-2 p-3">
+          <h3 className="market-card-title line-clamp-2">{title}</h3>
 
-        <div className="market-card-footer mt-3">
-  <span className="text-sm font-semibold text-market-muted">
-    Earned Badge:
-  </span>
+          <p className="market-card-desc line-clamp-2">
+            {trimmedDescription || "Explore this product on Mosaic Biz Hub."}
+          </p>
 
-  {badge ? (
-<img
-  src={badgeImagePath || "/badge.png"}
-  alt={`${badge} badge`}
-  className="h-12 object-contain"
-  onError={(e) => {
-    const img = e.currentTarget;
-    if (img.src.endsWith("/badge.png")) return;
-    img.src = "/badge.png";
-  }}
-/>
-  ) : (
-    <div className="h-14 w-[90px]" />
-  )}
-</div>
+          <CardRatingRow rating={rating} reviewCount={reviewCount} />
 
-      </div>
-    </div>
+          <div className="mt-auto">
+            {onSale ? (
+              <div className="flex flex-col gap-0.5">
+                <span className="text-xs text-market-muted">Starting from</span>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="market-card-price-sale">${effective.toFixed(2)}</span>
+                  <span className="text-sm text-market-muted line-through">${displayPrice.toFixed(2)}</span>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-0.5">
+                <span className="text-xs text-market-muted">Starting from</span>
+                <span className="market-card-price">${displayPrice.toFixed(2)}</span>
+              </div>
+            )}
+          </div>
+
+          {badge ? (
+            <div className="market-card-footer mt-2 gap-2 py-2">
+              <span className="text-xs font-semibold text-market-muted">Earned badge</span>
+              <img
+                src={badgeImagePath || "/badge.png"}
+                alt={`${badge} badge`}
+                className="h-10 object-contain sm:h-12"
+                onError={(e) => {
+                  const img = e.currentTarget;
+                  if (img.src.endsWith("/badge.png")) return;
+                  img.src = "/badge.png";
+                }}
+              />
+            </div>
+          ) : null}
+        </div>
+      </article>
     </Link>
   );
 }

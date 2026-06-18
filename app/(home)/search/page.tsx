@@ -3,12 +3,12 @@
 import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Star } from "lucide-react";
 import PublicSearchFilterBar from "../Components/PublicSearchFilterBar";
 import PublicPageHero from "../Components/PublicPageHero";
 import PublicFilterSection from "../Components/PublicFilterSection";
 import MarketLoadingBlock from "../Components/MarketLoadingBlock";
 import MarketEmptyState from "../Components/MarketEmptyState";
+import MarketImage from "../Components/MarketImage";
 import { PublicSearchFilters, parseListingFiltersFromSearchParams, buildSearchPageUrlWithTab } from "../Components/publicSearch";
 
 type ApiBusiness = {
@@ -127,60 +127,45 @@ function ProductCard({ item }: { item: ApiProduct }) {
     description.length > 100 ? `${description.slice(0, 100).trimEnd()}...` : description;
   const price = toNumber(item.price);
   const badgeImage = getBadgeImage(item.businessId?.badge);
+  const vendorName = item.businessId?.businessName?.trim();
 
   return (
-    <Link
-      href={`/product/${item._id}`}
-      className="flex h-full flex-col overflow-hidden border-2 border-[#D9D9D9] bg-white p-2 shadow-lg transition-all duration-300 hover:shadow-2xl"
-    >
-      <div className="relative w-full flex-shrink-0 overflow-hidden bg-gray-100 aspect-square">
-        <img
-          src={item.coverImage || "/ShopProduct/Aria-SK6-Helmet 1.png"}
-          alt={title}
-          className="h-full w-full object-contain transition-transform duration-500 hover:scale-105"
-        />
-      </div>
+    <Link href={`/product/${item._id}`} className="market-listing-card-link h-full">
+      <article className="market-listing-card p-2">
+        <div className="market-card-media relative aspect-[4/3] w-full shrink-0 sm:aspect-square">
+          <MarketImage src={item.coverImage} alt={title} aspect="square" objectFit="contain" fallbackLabel="Image coming soon" />
+        </div>
 
-      <div className="flex flex-1 flex-col p-3">
-        <h3 className="h-[42px] line-clamp-2 text-base font-bold uppercase leading-snug tracking-tight text-gray-900 font-poppins">
-          {title}
-        </h3>
-        <p className="mb-2 h-[40px] overflow-hidden text-xs leading-5 text-gray-600 font-montserrat">
-          {trimmedDescription || "\u00a0"}
-        </p>
-
-        <div className="mb-2 flex items-center">
-          <div className="flex">
-            {[...Array(5)].map((_, index) => (
-              <Star key={index} size={14} fill="#FBBF24" stroke="#FBBF24" className="text-yellow-400" />
-            ))}
-          </div>
-          <p className="ml-2 text-[10px] leading-tight text-gray-500 font-poppins">
-            {item.businessId?.businessName || "Verified Business"}
+        <div className="flex flex-1 flex-col gap-2 p-3">
+          <h3 className="market-card-title line-clamp-2">{title}</h3>
+          <p className="market-card-desc line-clamp-2">
+            {trimmedDescription || "Explore this product on Mosaic Biz Hub."}
           </p>
-        </div>
 
-        <div className="mt-auto flex flex-col leading-tight">
-          <span className="text-xs text-gray-500">Starting from</span>
-          <span className="text-lg font-semibold text-gray-900">${price.toFixed(2)}</span>
-        </div>
+          {vendorName ? (
+            <p className="market-card-rating-meta">{vendorName}</p>
+          ) : null}
 
-        <div className="mt-3 flex min-h-[52px] items-center justify-between rounded bg-gray-100 px-4 py-2">
-          <span className="text-sm font-semibold text-gray-600">Earned Badge:</span>
+          <div className="mt-auto flex flex-col gap-0.5">
+            <span className="text-xs text-market-muted">Starting from</span>
+            <span className="market-card-price">${price.toFixed(2)}</span>
+          </div>
+
           {badgeImage ? (
-            <img
-              src={badgeImage}
-              alt={`${item.businessId?.badge || "Business"} badge`}
-              className="h-12 object-contain"
-              onError={(e) => {
-                e.currentTarget.src = "/badge.png";
-              }}
-            />
-          ) : (
-            <div className="h-12 w-[90px]" />
-          )}
+            <div className="market-card-footer mt-2 gap-2 py-2">
+              <span className="text-xs font-semibold text-market-muted">Earned badge</span>
+              <img
+                src={badgeImage}
+                alt={`${item.businessId?.badge || "Business"} badge`}
+                className="h-10 object-contain sm:h-12"
+                onError={(e) => {
+                  e.currentTarget.src = "/badge.png";
+                }}
+              />
+            </div>
+          ) : null}
         </div>
-      </div>
+      </article>
     </Link>
   );
 }
@@ -205,60 +190,49 @@ function BusinessResultCard({
   const badgeImage = getBadgeImage(badge);
 
   return (
-    <Link
-      href={href}
-      className="block h-[460px] w-full overflow-hidden border-2 border-[#D9D9D9] bg-white shadow-lg transition-transform hover:-translate-y-0.5"
-    >
-      <div className="relative h-[220px] w-full flex-shrink-0 bg-gray-100">
-        {image ? (
-          <img src={image} alt={title} className="h-full w-full object-cover" />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center text-sm font-semibold text-gray-500">
-            NO IMAGE
-          </div>
-        )}
-
-        {logo ? (
-          <img
-            src={logo}
-            alt={`${title} logo`}
-            className="absolute bottom-3 right-3 h-14 w-14 rounded-full bg-white object-contain p-1 shadow-md"
-          />
-        ) : null}
-      </div>
-
-      <div className="flex h-[240px] flex-col p-4">
-        <h3 className="mb-2 line-clamp-2 min-h-[48px] text-base font-bold text-gray-900">{title}</h3>
-        <p
-          className="mb-2 min-h-[60px] text-sm text-[#5F5F5F] font-montserrat"
-          style={{
-            display: "-webkit-box",
-            WebkitLineClamp: 3,
-            WebkitBoxOrient: "vertical",
-            overflow: "hidden",
-          }}
-        >
-          {description || "Business information available on vendor profile."}
-        </p>
-
-        {/* <p className="mb-3 min-h-[32px] text-xs text-gray-500">{meta || "\u00a0"}</p> */}
-
-        <div className="mt-auto flex items-center justify-between">
-          <span className="text-xs font-semibold uppercase tracking-wide text-[#C7A040]">View Details</span>
-          {badgeImage ? (
-            <img
-              src={badgeImage}
-              alt={`${badge || "Business"} badge`}
-              className="h-12 object-contain"
-              onError={(e) => {
-                e.currentTarget.src = "/badge.png";
-              }}
-            />
+    <Link href={href} className="market-listing-card-link h-full">
+      <article className="market-listing-card overflow-hidden p-0">
+        <div className="market-card-media relative aspect-[16/10] w-full shrink-0">
+          {image ? (
+            <MarketImage src={image} alt={title} aspect="video" objectFit="cover" fallbackLabel="Image coming soon" />
           ) : (
-            <div className="h-12 w-[90px]" />
+            <div className="market-card-placeholder aspect-[16/10] w-full text-sm normal-case">
+              Image coming soon
+            </div>
           )}
+
+          {logo ? (
+            <img
+              src={logo}
+              alt=""
+              className="absolute bottom-2 right-2 h-10 w-10 rounded-full border border-white/15 bg-market-surface object-contain p-1 shadow-market-card sm:h-12 sm:w-12"
+            />
+          ) : null}
         </div>
-      </div>
+
+        <div className="flex flex-1 flex-col gap-2 p-4">
+          <h3 className="market-card-title line-clamp-2">{title}</h3>
+          <p className="market-card-desc line-clamp-3">
+            {description || "Business information available on vendor profile."}
+          </p>
+
+          {meta ? <p className="market-card-rating-meta">{meta}</p> : null}
+
+          <div className="mt-auto flex items-center justify-between gap-2 border-t border-white/10 pt-3">
+            <span className="market-card-action">View details</span>
+            {badgeImage ? (
+              <img
+                src={badgeImage}
+                alt={`${badge || "Business"} badge`}
+                className="h-10 object-contain sm:h-12"
+                onError={(e) => {
+                  e.currentTarget.src = "/badge.png";
+                }}
+              />
+            ) : null}
+          </div>
+        </div>
+      </article>
     </Link>
   );
 }

@@ -25,50 +25,47 @@ const ProductCard: React.FC<ProductCardProps> = ({
   logo,
 }) => {
   const cardContent = (
-    <div className="market-card flex h-[420px] min-h-[420px] flex-col overflow-hidden">
-      <div className="relative flex-shrink-0">
-        <MarketImage src={image} alt={title} aspect="video" objectFit="cover" />
-        {logo && (
+    <article className="market-listing-card">
+      <div className="market-card-media relative aspect-[16/10] w-full shrink-0">
+        <MarketImage src={image} alt={title} aspect="video" objectFit="cover" fallbackLabel="Image coming soon" />
+        {logo ? (
           <img
             src={logo}
-            alt="Business Logo"
-            className="absolute bottom-2 right-2 h-12 w-12 rounded-full border border-white/15 bg-market-surface object-contain p-1 shadow-market-card"
+            alt=""
+            className="absolute bottom-2 right-2 h-10 w-10 rounded-full border border-white/15 bg-market-surface object-contain p-1 shadow-market-card sm:h-12 sm:w-12"
           />
-        )}
+        ) : null}
       </div>
 
-      <div className="flex flex-1 flex-col p-4">
-        <h3 className="market-card-title mb-2 line-clamp-1">{title || "Untitled listing"}</h3>
+      <div className="flex flex-1 flex-col gap-2 p-3 sm:p-4">
+        <h3 className="market-card-title line-clamp-2">{title || "Untitled listing"}</h3>
 
-        <p
-          className="market-card-desc mb-3 overflow-hidden"
-          style={{
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical",
-            textOverflow: "ellipsis",
-          }}
-          title={description}
-        >
-          {description || "\u00a0"}
+        <p className="market-card-desc line-clamp-2" title={description}>
+          {description || "View services from this verified vendor."}
         </p>
 
-        <div className="mt-auto flex items-center justify-center gap-3">
+        <div className="mt-auto flex items-center justify-center gap-3 pt-1">
           <div className="h-px flex-1 bg-white/15" />
-          <span className="font-montserrat text-xs font-medium text-market-gold">View Details</span>
+          <span className="font-montserrat text-xs font-semibold text-market-gold">View details</span>
+          <div className="h-px flex-1 bg-white/15" />
         </div>
 
-        <div className="market-card-footer mt-3 flex min-h-[64px] flex-col items-center justify-center gap-1">
-          <span className="text-sm font-semibold text-market-muted">Earned Badge:</span>
-          {badge ? <TrustBadge tier={badge} size="lg" linkToExplainer /> : <div className="h-14 w-[90px]" />}
-        </div>
+        {badge ? (
+          <div className="market-card-footer flex-col gap-1 py-2">
+            <span className="text-xs font-semibold text-market-muted">Earned badge</span>
+            <TrustBadge tier={badge} size="lg" linkToExplainer />
+          </div>
+        ) : null}
       </div>
-    </div>
+    </article>
   );
 
   if (serviceId) {
     return (
-      <Link href={`/vendor-profile/service-vendor/${serviceId}`} className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-market-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-market-bg rounded-2xl">
+      <Link
+        href={`/vendor-profile/service-vendor/${serviceId}`}
+        className="market-listing-card-link h-full"
+      >
         {cardContent}
       </Link>
     );

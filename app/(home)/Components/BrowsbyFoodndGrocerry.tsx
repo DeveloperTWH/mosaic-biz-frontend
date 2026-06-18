@@ -7,47 +7,44 @@ export default function BrowseFoodAndGrocery() {
   const categories = [
     {
       name: "Restaurants",
-      href: "/restaurants",
+      href: "/foods",
       image: "/restorant.png",
     },
     {
       name: "Grocery",
-      href: "/grocery",
+      href: "/foods",
       image: "/grocerry.png",
     },
     {
       name: "Others",
-      href: "/others",
+      href: "/foods",
       image: "/others.png",
     },
   ];
 
   return (
-    <section className="bg-market-bg py-16 sm:py-20">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <div className="mb-12 text-center sm:mb-16">
-          <h2 className="font-poppins text-2xl font-bold uppercase tracking-wide text-market-text sm:text-3xl">
-            Browse Food & Grocery
-          </h2>
+    <section className="bg-market-bg py-6 sm:py-10">
+      <div className="container-page">
+        <div className="mb-6 text-center sm:mb-8">
+          <h2 className="market-section-heading">Browse Food & Grocery</h2>
           <div className="market-section-divider" />
         </div>
 
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-10">
-          {categories.map((category, index) => (
-            <Link key={index} href={"/foods"} className="group text-center">
-              <div className="market-card relative h-56 w-full overflow-hidden rounded-xl sm:h-64">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-6">
+          {categories.map((category) => (
+            <Link key={category.name} href={category.href} className="group text-center">
+              <div className="market-card relative h-44 w-full overflow-hidden sm:h-52">
                 <Image
                   src={category.image}
                   alt={category.name}
                   fill
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-market-header/80 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-market-header/85 via-market-header/20 to-transparent" />
+                <p className="absolute inset-x-0 bottom-0 px-3 py-3 font-poppins text-base font-semibold text-market-text sm:text-lg">
+                  {category.name}
+                </p>
               </div>
-
-              <p className="mt-4 font-poppins text-base font-semibold text-market-text sm:text-lg">
-                {category.name}
-              </p>
             </Link>
           ))}
         </div>
