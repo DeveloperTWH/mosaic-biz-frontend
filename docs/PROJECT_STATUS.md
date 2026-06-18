@@ -15,22 +15,23 @@ Epic #54 sprint closeout: [EPIC_54_SPRINT_CLOSEOUT.md](EPIC_54_SPRINT_CLOSEOUT.m
 | Item | Status |
 |------|--------|
 | Launch repo | `Digital-Builders-757/mosaic-biz-frontend-launch` |
-| Production branch | `main` @ `f15cf314` |
-| Production deployed | **Yes** — prior polish PRs [#48](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/48) + [#49](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/49) |
+| Production branch | `main` @ `c8ab0e31` |
+| Production deployed | **Yes** — Vercel auto-deploy on Epic #54 PRs [#64](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/64)–[#68](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/68) merge (2026-06-18) |
 | Production URL | https://mosaic-biz-frontend-launch.vercel.app |
 | Deploy model | Vercel auto-deploy on merge to `main` |
 | Preview access | Vercel deployment protection / SSO (HTTP 401 for unauthenticated automation) |
-| Build gate | `npm run build` passes |
-| Epic #54 visual polish | **PRs open** — [#64](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/64)–[#67](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/67) awaiting merge |
+| Build gate | `npm run build` passes on `main` |
+| Epic #54 visual polish | **Merged + closed** — issues #54, #51–#62 closed |
 
-### Epic #54 sprint PRs (2026-06-18)
+### Epic #54 sprint PRs (merged 2026-06-18)
 
-| PR | Title | Issues |
-|----|-------|--------|
-| [#64](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/64) | Vendor readability and CTA system | #51, #55, #58, #62 |
-| [#65](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/65) | Mobile navigation and responsive layout | #52, #53 |
-| [#66](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/66) | Homepage and marketplace visual hierarchy | #59, #60 |
-| [#67](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/67) | Trust, how-to, and public content pages | #56, #57, #61 |
+| PR | Title | Issues | Status |
+|----|-------|--------|--------|
+| [#64](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/64) | Vendor readability and CTA system | #51, #55, #58, #62 | Merged |
+| [#65](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/65) | Mobile navigation and responsive layout | #52, #53 | Merged |
+| [#66](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/66) | Homepage and marketplace visual hierarchy | #59, #60 | Merged |
+| [#67](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/67) | Trust, how-to, and public content pages | #56, #57, #61 | Merged |
+| [#68](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/68) | Docs closeout | — | Merged |
 
 ### Prior significant merges
 
@@ -89,7 +90,6 @@ Details: [HOMEPAGE_MARKETPLACE_REDESIGN_QA_REPORT.md](HOMEPAGE_MARKETPLACE_REDES
 
 | Item | Priority | Notes |
 |------|----------|-------|
-| Merge Epic #54 PRs #64–#67 | P0 | Then rebase docs closeout PR |
 | Human preview sign-off on `/products` | P0 | ~2 min with Vercel SSO |
 | Product / food / service **detail** pages | P2 | Deferred from Epic #54 — legacy light UI |
 | Legal pages full copy pass | P2 | Needs legal approval; overflow fixed in #65 |
@@ -121,4 +121,4 @@ Before promoting beyond RC:
 2. Run [FRONTEND_SMOKE_CHECKLIST.md](FRONTEND_SMOKE_CHECKLIST.md) on RC preview with evidence.
 3. Do **not** block RC on empty homepage featured section until backend populates featured inventory.
 
-**Production was not manually deployed from this workstation.** Epic #54 code awaits merge; production remains at `main` @ `f15cf314` until PRs #64–#67 land.
+**Production was not manually deployed from this workstation.** Vercel auto-deployed `main` @ `c8ab0e31` on Epic #54 PR merges (2026-06-18).

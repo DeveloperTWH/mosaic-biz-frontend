@@ -6,21 +6,21 @@
 
 ---
 
-## Sprint PRs (awaiting merge)
+## Sprint PRs (merged 2026-06-18)
 
-| Batch | PR | Branch | Issues |
-|-------|-----|--------|--------|
-| 1 | [#64](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/64) | `polish/vendor-readability-global-cta` | #51, #55, #58, #62 |
-| 2 | [#65](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/65) | `polish/mobile-nav-responsive-pass` | #52, #53 |
-| 3 | [#66](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/66) | `polish/homepage-marketplace-experience` | #59, #60 |
-| 4 | [#67](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/67) | `polish/trust-howto-content-cleanup` | #56, #57, #61 |
-| 5 | (this PR) | `docs/frontend-visual-polish-closeout` | Docs closeout |
+| Batch | PR | Branch | Issues | Status |
+|-------|-----|--------|--------|--------|
+| 1 | [#64](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/64) | `polish/vendor-readability-global-cta` | #51, #55, #58, #62 | **Merged** |
+| 2 | [#65](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/65) | `polish/mobile-nav-responsive-pass` | #52, #53 | **Merged** |
+| 3 | [#66](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/66) | `polish/homepage-marketplace-experience` | #59, #60 | **Merged** |
+| 4 | [#67](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/67) | `polish/trust-howto-content-cleanup` | #56, #57, #61 | **Merged** |
+| 5 | [#68](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/68) | `docs/frontend-visual-polish-closeout` | Docs closeout | **Merged** |
 
-**Merge order recommended:** #64 → #65 → #66 → #67 → docs closeout (rebase docs PR after code PRs merge).
+**Final `main` commit:** `c8ab0e31` (merge PR #68)
 
 ---
 
-## Issues completed (code in PRs above)
+## Issues completed (closed 2026-06-18)
 
 | Issue | Title | PR |
 |-------|-------|-----|
@@ -56,10 +56,11 @@
 
 | Item | Value |
 |------|-------|
-| Production branch | `main` @ `f15cf314` (pre–Epic #54 merge) |
-| Epic #54 production deploy | **Pending** — awaits PR #64–#67 merge to `main` |
+| Production branch | `main` @ `c8ab0e31` |
+| Epic #54 production deploy | **Yes** — Vercel auto-deploy on PR #64–#68 merges (2026-06-18) |
 | Deploy model | Vercel auto-deploy on merge |
-| Manual production deploy | **No** — not performed from this sprint |
+| Manual production deploy | **No** — not performed from this workstation |
+| GitHub issues | #54, #51–#62 **closed** |
 
 ---
 
@@ -73,7 +74,7 @@
 
 ## Build result
 
-`npm run build` — **PASS** on all Epic #54 batch branches (2026-06-18)
+`npm run build` — **PASS** on `main` @ `c8ab0e31` (2026-06-18)
 
 ## Guardrails confirmed
 
