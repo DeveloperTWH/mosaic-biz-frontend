@@ -12,9 +12,9 @@
 |------|-------|
 | Branch | `docs/frontend-as-built-documentation-pack` |
 | Base commit (launch `main`) | `ebf3f4dcfe57dd56f74a38d5169bdbf4968f95aa` |
-| Documentation commit SHA | See git log after push |
+| Documentation commit SHA | `2fe2d225ba59a82d941ce922942b39108b0b6798` |
 | Remote | `launch` → `Digital-Builders-757/mosaic-biz-frontend-launch` |
-| PR link | See pull request on launch repo (created after push) |
+| PR link | https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/147 |
 
 ---
 
