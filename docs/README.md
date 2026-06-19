@@ -1,11 +1,11 @@
 # Mosaic Biz Hub — Documentation Hub
 
 **Audience:** Internal team (Digital Builders, dev, QA, release control)  
-**Last updated:** 2026-06-17
+**Last updated:** 2026-06-19
 
 Mosaic Biz Hub is a Next.js marketplace frontend connecting consumers to verified minority-owned businesses (products, services, food). This repo (`mosaic-biz-frontend`) is the customer-facing app, vendor onboarding flows, partner dashboard, and admin UI. The API lives in a separate backend repo — see [Backend](#backend-repo) below.
 
-**Start here if you are new:** [../README.md](../README.md) → [ARCHITECTURE.md](ARCHITECTURE.md) → [STYLE_GUIDE.md](STYLE_GUIDE.md)
+**Start here if you are new:** [../README.md](../README.md) → [PROJECT_BREAKDOWN.md](PROJECT_BREAKDOWN.md) → [ARCHITECTURE.md](ARCHITECTURE.md) → [STYLE_GUIDE.md](STYLE_GUIDE.md)
 
 ---
 
@@ -15,6 +15,7 @@ Mosaic Biz Hub is a Next.js marketplace frontend connecting consumers to verifie
 |----------|------|--------------|--------------|
 | [PROJECT_STATUS.md](PROJECT_STATUS.md) | **Living** | 2026-06-17 | Current release posture, what shipped, blockers, verified vs pending QA |
 | [ROADMAP.md](ROADMAP.md) | **Living** | 2026-06-17 | Phased next steps and explicit non-goals |
+| [PROJECT_BREAKDOWN.md](PROJECT_BREAKDOWN.md) | Reference | 2026-06-19 | Full end-to-end picture: journeys, auth, data flow, code layout |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Reference | 2026-06-17 | Route groups, env vars, deployment model, auth summary |
 | [API_CONTRACTS.md](API_CONTRACTS.md) | Reference | 2026-06-17 | Canonical endpoints the frontend calls |
 | [STYLE_GUIDE.md](STYLE_GUIDE.md) | Reference | 2026-06-17 | Design tokens (`brand-*`, `market-*`, dashboard surfaces) |
@@ -27,6 +28,22 @@ Mosaic Biz Hub is a Next.js marketplace frontend connecting consumers to verifie
 | [vendor/](vendor/) | Reference | — | Vendor feature notes (service creation, prefill) |
 | [qa-screenshots/](qa-screenshots/) | Assets | 2026-06-17 | Visual QA captures |
 
+### Launch readiness — as-built pack (`docs/frontend/`)
+
+**Start here for launch evidence:** [frontend/FRONTEND_DOCUMENTATION_EVIDENCE_LOG.md](frontend/FRONTEND_DOCUMENTATION_EVIDENCE_LOG.md)
+
+| Document | Type | Last updated | When to read |
+|----------|------|--------------|--------------|
+| [frontend/FRONTEND_DOCUMENTATION_EVIDENCE_LOG.md](frontend/FRONTEND_DOCUMENTATION_EVIDENCE_LOG.md) | **Evidence** | 2026-06-19 | Index: branch, build/lint, API findings, gaps |
+| [frontend/FRONTEND_ARCHITECTURE_AS_BUILT.md](frontend/FRONTEND_ARCHITECTURE_AS_BUILT.md) | Reference | 2026-06-19 | As-built architecture and boundaries |
+| [frontend/FRONTEND_ROUTE_MAP.md](frontend/FRONTEND_ROUTE_MAP.md) | Reference | 2026-06-19 | All App Router pages → URLs |
+| [frontend/FRONTEND_API_USAGE_INVENTORY.md](frontend/FRONTEND_API_USAGE_INVENTORY.md) | Reference | 2026-06-19 | Frontend → backend API calls |
+| [frontend/FRONTEND_ENVIRONMENT_VARIABLES_NAMES_ONLY.md](frontend/FRONTEND_ENVIRONMENT_VARIABLES_NAMES_ONLY.md) | Reference | 2026-06-19 | Env var names only (no values) |
+| [frontend/FRONTEND_AUTH_AND_CREDENTIALS_BEHAVIOR.md](frontend/FRONTEND_AUTH_AND_CREDENTIALS_BEHAVIOR.md) | Reference | 2026-06-19 | Auth session and credentials |
+| [frontend/FRONTEND_MARKETPLACE_SURFACE_MAP.md](frontend/FRONTEND_MARKETPLACE_SURFACE_MAP.md) | Reference | 2026-06-19 | Consumer marketplace surfaces |
+| [frontend/FRONTEND_ADMIN_VENDOR_CUSTOMER_SURFACE_MAP.md](frontend/FRONTEND_ADMIN_VENDOR_CUSTOMER_SURFACE_MAP.md) | Reference | 2026-06-19 | Admin, vendor, customer surfaces |
+| [frontend/FRONTEND_VISUAL_QA_SURFACE.md](frontend/FRONTEND_VISUAL_QA_SURFACE.md) | Reference | 2026-06-19 | Human visual QA surface list |
+
 **Rule of thumb:** For “where are we today?” read **PROJECT_STATUS**. For “what’s next?” read **ROADMAP**. Do not treat historical audits as current blockers without checking PROJECT_STATUS.
 
 ---
@@ -36,15 +53,18 @@ Mosaic Biz Hub is a Next.js marketplace frontend connecting consumers to verifie
 ### New developer
 
 1. [../README.md](../README.md) — clone, env, run locally
-2. [ARCHITECTURE.md](ARCHITECTURE.md) — App Router layout, branches, deployment
-3. [API_CONTRACTS.md](API_CONTRACTS.md) — which endpoints are canonical
-4. [STYLE_GUIDE.md](STYLE_GUIDE.md) — tokens and component patterns
+2. [PROJECT_BREAKDOWN.md](PROJECT_BREAKDOWN.md) — how the whole frontend fits together
+3. [ARCHITECTURE.md](ARCHITECTURE.md) — App Router layout, branches, deployment
+4. [API_CONTRACTS.md](API_CONTRACTS.md) — which endpoints are canonical
+5. [STYLE_GUIDE.md](STYLE_GUIDE.md) — tokens and component patterns
 
 ### Release / QA
 
-1. [PROJECT_STATUS.md](PROJECT_STATUS.md) — RC branch, preview URL, pending human sign-off
-2. [FRONTEND_SMOKE_CHECKLIST.md](FRONTEND_SMOKE_CHECKLIST.md) — full smoke pass on Vercel preview
-3. [HOMEPAGE_MARKETPLACE_REDESIGN_QA_REPORT.md](HOMEPAGE_MARKETPLACE_REDESIGN_QA_REPORT.md) — post-merge `/products` gate evidence
+1. [frontend/FRONTEND_DOCUMENTATION_EVIDENCE_LOG.md](frontend/FRONTEND_DOCUMENTATION_EVIDENCE_LOG.md) — as-built evidence pack index (launch readiness)
+2. [PROJECT_STATUS.md](PROJECT_STATUS.md) — RC branch, preview URL, pending human sign-off
+3. [FRONTEND_SMOKE_CHECKLIST.md](FRONTEND_SMOKE_CHECKLIST.md) — full smoke pass on Vercel preview
+4. [frontend/FRONTEND_VISUAL_QA_SURFACE.md](frontend/FRONTEND_VISUAL_QA_SURFACE.md) — priority visual QA URLs
+5. [HOMEPAGE_MARKETPLACE_REDESIGN_QA_REPORT.md](HOMEPAGE_MARKETPLACE_REDESIGN_QA_REPORT.md) — post-merge `/products` gate evidence
 
 ### Designer / frontend (public marketplace)
 
