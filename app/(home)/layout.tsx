@@ -12,6 +12,10 @@ import { fontVariables } from "@/lib/fonts";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://mosaicbizhub.com"),
+  icons: {
+    icon: "/mosaic-brand-logo.png",
+    apple: "/mosaic-brand-logo.png",
+  },
   title: {
     default: "Mosaic Biz Hub — Where Culture and Commerce Connect",
     template: "%s | Mosaic Biz Hub",
