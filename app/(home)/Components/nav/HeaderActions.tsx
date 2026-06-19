@@ -57,7 +57,7 @@ export default function HeaderActions({
               width={40}
               height={40}
               alt=""
-              className="rounded-full border border-gray-300"
+              className="rounded-full border border-market-gold/40 ring-1 ring-white/10"
             />
           </button>
           {showDropdown && (
@@ -91,7 +91,7 @@ export default function HeaderActions({
               <button
                 type="button"
                 onClick={async () => await logoutUser()}
-                className="w-full rounded-b-lg px-4 py-3 text-left text-sm font-medium text-red-500 hover:bg-red-50"
+                className="w-full rounded-b-lg px-4 py-3 text-left text-sm font-medium text-red-300 hover:bg-red-950/40"
               >
                 Logout
               </button>
