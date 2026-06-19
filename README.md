@@ -64,6 +64,7 @@ All internal docs live under [`docs/`](docs/README.md):
 
 - **[Project status](docs/PROJECT_STATUS.md)** — where we are today (living)
 - **[Roadmap](docs/ROADMAP.md)** — phased next steps
+- **[Project breakdown](docs/PROJECT_BREAKDOWN.md)** — full end-to-end architecture overview
 - **[Architecture](docs/ARCHITECTURE.md)** — routes, env, deployment, auth
 - **[API contracts](docs/API_CONTRACTS.md)** — canonical endpoints
 - **[Style guide](docs/STYLE_GUIDE.md)** — design tokens
