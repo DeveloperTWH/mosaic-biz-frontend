@@ -44,6 +44,7 @@ Mosaic Biz Hub is a Next.js marketplace frontend connecting consumers to verifie
 | [frontend/FRONTEND_ADMIN_VENDOR_CUSTOMER_SURFACE_MAP.md](frontend/FRONTEND_ADMIN_VENDOR_CUSTOMER_SURFACE_MAP.md) | Reference | 2026-06-19 | Admin, vendor, customer surfaces |
 | [frontend/FRONTEND_VISUAL_QA_SURFACE.md](frontend/FRONTEND_VISUAL_QA_SURFACE.md) | Reference | 2026-06-19 | Human visual QA surface list |
 | [frontend/FRONTEND_LAUNCH_CONTRACT_ALIGNMENT.md](frontend/FRONTEND_LAUNCH_CONTRACT_ALIGNMENT.md) | **Evidence** | 2026-06-19 | Launch contract alignment: legacy paths, env vars, fix-owner matrix, preview smoke |
+| [frontend/FRONTEND_VENDOR_AUTH_E2E_SMOKE.md](frontend/FRONTEND_VENDOR_AUTH_E2E_SMOKE.md) | **Evidence** | 2026-06-19 | Vendor auth E2E smoke gate (#143): preview SSO block + supplementary signup path |
 
 **Rule of thumb:** For “where are we today?” read **PROJECT_STATUS**. For “what’s next?” read **ROADMAP**. Do not treat historical audits as current blockers without checking PROJECT_STATUS.
 
