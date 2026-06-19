@@ -308,7 +308,7 @@ const ReturnRefundPolicy = () => {
               </p>
 
               <Link
-                href="/vendors"
+                href="/contact"
                 className="inline-block px-10 py-4 bg-transparent border-2 border-white text-white font-semibold text-lg transition-all duration-300 hover:bg-white hover:text-gray-800"
               >
                 Browse Vendors

@@ -253,13 +253,13 @@ if (!token) {
                     <hr className="h-[2px] w-[50px] bg-white" />
                     <hr className="h-[2px] w-[50px] bg-white mt-[1px] mb-5" />
                     <div className="flex gap-4">
-                        <a href="#" className="hover:opacity-80 transition-opacity">
+                        <a href="https://www.facebook.com/people/Mosaic-Biz-Hub/61576840627758/" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
                             <Facebook size={24} />
                         </a>
-                        <a href="#" className="hover:opacity-80 transition-opacity">
+                        <a href="https://www.instagram.com/mosaicbizhub/" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
                             <Instagram size={24} />
                         </a>
-                        <a href="#" className="hover:opacity-80 transition-opacity">
+                        <a href="https://www.linkedin.com/company/mosaic-biz-hub" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
                             <Linkedin size={24} />
                         </a>
                     </div>
