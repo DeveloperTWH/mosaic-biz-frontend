@@ -297,6 +297,10 @@ export default function BusinessProfilePage({
       setLoading(true);
       const data = await getOnboardingData();
 
+      if (!data) {
+        return;
+      }
+
       // Set prefilled non-editable data
       setPrefilledData({
         businessName: data.businessName || '',
