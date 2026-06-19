@@ -400,7 +400,6 @@ function VendorBusinessPaymentContent() {
               </div>
               <div style={{ textAlign: 'right' }}>
                 <span style={{ fontSize: '1.875rem', fontWeight: 700, color: '#1e3a5f' }}>${paymentAmount}</span>
-                <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>.00</span>
               </div>
             </div>
 

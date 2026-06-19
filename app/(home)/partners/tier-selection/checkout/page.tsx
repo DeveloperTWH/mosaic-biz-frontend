@@ -301,15 +301,15 @@ function StripePaymentForm({ plan }: { plan: SubscriptionPlanResponse }) {
         <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: '1rem', marginTop: '1.5rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
             <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>Sub Total</span>
-            <span style={{ fontSize: '0.875rem', color: '#374151' }}>${plan.price}.00</span>
+            <span style={{ fontSize: '0.875rem', color: '#374151' }}>${plan.price}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
             <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>Tax</span>
-            <span style={{ fontSize: '0.875rem', color: '#374151' }}>$0.00</span>
+            <span style={{ fontSize: '0.875rem', color: '#374151' }}>$0</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '0.75rem', borderTop: '1px solid #e5e7eb' }}>
             <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#111827' }}>Total Amount</span>
-            <span style={{ fontSize: '1.125rem', fontWeight: 700, color: '#111827' }}>${plan.price}.00</span>
+            <span style={{ fontSize: '1.125rem', fontWeight: 700, color: '#111827' }}>${plan.price}</span>
           </div>
         </div>
 

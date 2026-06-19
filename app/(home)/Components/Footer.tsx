@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { Facebook, Instagram, Linkedin } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -42,7 +43,7 @@ export default function Footer() {
               <li><Link href="/how-to-use-this-app" className="text-custom-yellow font-montserrat">How to Use this App </Link></li>
               <li><Link href="/consumer/trustbadge" className="text-custom-yellow font-montserrat">Trust Badges – Consumer </Link></li>
               <li><Link href="/consumer/terms" className="text-custom-yellow font-montserrat">Terms and Conditions – Consumer </Link></li>
-              <li><Link href="#" className="text-custom-yellow font-montserrat">Consumer Login </Link></li>
+              <li><Link href="/login" className="text-custom-yellow font-montserrat">Consumer Login </Link></li>
             </ul>
           </div>
 
@@ -64,8 +65,19 @@ export default function Footer() {
 
       </div>
       <div className="border-t border-custom-yellow pt-4 pb-4 text-lg text-custom-yellow">
-        <div className="w-[80%] mx-auto font-montserrat">
-          Copyright 2025. All Rights Reserved.
+        <div className="w-[80%] mx-auto font-montserrat flex flex-col sm:flex-row items-center justify-between gap-4">
+          <span>Copyright 2025. All Rights Reserved.</span>
+          <div className="flex gap-4">
+            <a href="https://www.facebook.com/people/Mosaic-Biz-Hub/61576840627758/" target="_blank" rel="noopener noreferrer" className="hover:opacity-70 transition-opacity">
+              <Facebook size={20} />
+            </a>
+            <a href="https://www.instagram.com/mosaicbizhub/" target="_blank" rel="noopener noreferrer" className="hover:opacity-70 transition-opacity">
+              <Instagram size={20} />
+            </a>
+            <a href="https://www.linkedin.com/company/mosaic-biz-hub" target="_blank" rel="noopener noreferrer" className="hover:opacity-70 transition-opacity">
+              <Linkedin size={20} />
+            </a>
+          </div>
         </div>
       </div>
     </footer>
