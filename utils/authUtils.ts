@@ -21,6 +21,60 @@ export interface AuthenticatedUser {
 export const isBusinessOwner = (user: AuthenticatedUser | null | undefined): boolean =>
   user?.role === 'business_owner';
 
+export const isCustomer = (user: AuthenticatedUser | null | undefined): boolean =>
+  user?.role === 'customer';
+
+export type CheckoutAccessDenied =
+  | { kind: 'redirect_login' }
+  | { kind: 'toast'; message: string }
+  | { kind: 'redirect'; path: string; message?: string };
+
+export type CheckoutAccessResult =
+  | { allowed: true; user: AuthenticatedUser }
+  | { allowed: false; denial: CheckoutAccessDenied };
+
+export async function resolveCheckoutAccess(): Promise<CheckoutAccessResult> {
+  const user = await getAuthenticatedUser();
+
+  if (!user) {
+    return { allowed: false, denial: { kind: 'redirect_login' } };
+  }
+
+  if (isCustomer(user)) {
+    return { allowed: true, user };
+  }
+
+  if (user.role === 'business_owner') {
+    return {
+      allowed: false,
+      denial: {
+        kind: 'toast',
+        message:
+          'Checkout requires a customer account. Please switch to a customer account to place an order.',
+      },
+    };
+  }
+
+  if (user.role === 'admin') {
+    return {
+      allowed: false,
+      denial: {
+        kind: 'redirect',
+        path: '/admin',
+        message: 'Checkout is for customer accounts only.',
+      },
+    };
+  }
+
+  return {
+    allowed: false,
+    denial: {
+      kind: 'toast',
+      message: 'Checkout is unavailable for this account type.',
+    },
+  };
+}
+
 export const clearStaleClientSession = (): void => {
   if (typeof window === 'undefined') return;
   localStorage.removeItem('user_session');
