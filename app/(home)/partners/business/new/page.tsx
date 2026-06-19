@@ -300,6 +300,16 @@ const validateFile = (file: File): { isValid: boolean; error?: string } => {
 };
 
 /* ======================================================
+   BRAND TOKENS
+====================================================== */
+
+const FORM_INPUT_CLASS = "market-input";
+const FORM_SELECT_CLASS = "market-select";
+const CONTROL_CHECKED = "border-market-gold bg-market-gold";
+const CONTROL_UNCHECKED = "border-white/20";
+const LINK_CLASS = "text-market-gold hover:underline";
+
+/* ======================================================
    FORM COMPONENTS
 ====================================================== */
 
@@ -319,11 +329,11 @@ const InputField: React.FC<InputFieldProps> = ({
   className = '' 
 }) => (
   <div className={`mb-6 ${className}`}>
-    <label className="block text-sm font-medium text-gray-700 mb-2">
-      {label} {required && <span className="text-red-500">*</span>}
+    <label className="market-label">
+      {label} {required && <span className="text-red-400">*</span>}
     </label>
     {children}
-    {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
+    {error && <p className="mt-1 text-sm text-red-400">{error}</p>}
   </div>
 );
 
@@ -617,54 +627,55 @@ const handlePayAndSubmit = async () => {
   ====================================================== */
 
   return (
-    <div 
-      className="min-h-screen py-8"
-      style={{
-        backgroundImage: 'url(/become-a-vendor/vendor-registion-bg.png)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        backgroundAttachment: 'fixed'
-      }}
-    >
-      {/* Full width blue background for header */}
-{/* Full width blue background for header and title */}
-<div className="w-full bg-gradient-to-r from-blue-900 to-blue-700 mt-1 ">
-  <div className="max-w-4xl mx-auto px-4">
-    {/* Back button */}
-    <div className="py-2">
-      <Link
-        href="/partners"
-        className="inline-flex items-center gap-1 rounded-lg bg-white/95 px-4 py-1.5 text-sm font-medium text-[#1e3a5f] shadow-sm transition hover:bg-white"
-      >
-        <ArrowLeft className="h-2 w-4" />
-        Back to dashboard
-      </Link>
-    </div>
+    <div className="relative min-h-screen bg-market-bg pb-10">
+      <div
+        className="pointer-events-none absolute inset-0 opacity-20"
+        style={{
+          backgroundImage: "url(/become-a-vendor/vendor-registion-bg.png)",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+        aria-hidden
+      />
+      <div className="pointer-events-none absolute inset-0 bg-market-hero" aria-hidden />
+      <div className="pointer-events-none absolute inset-0 bg-market-glow-radial" aria-hidden />
 
-    {/* Header with badge and title - NOW IN BLUE SECTION */}
-    <div className="text-center py-8">
-      <span className="inline-block px-6 py-2 bg-[#c9a227] text-white text-sm font-medium rounded-full mb-4">
-        Business Owner
-      </span>
-      <h1 className="text-4xl font-bold text-white mb-2 uppercase tracking-wide font-poppins">
-        Vendor Registration Request
-      </h1>
-      <p className="font-montserrat font-medium text-blue-100 max-w-3xl mx-auto">
-        A non-refundable $24.99 Business Verification Fee is charged at vendor sign-up to conduct a standard background validation of your business (via our contracted screening provider) and activate your Trust Badge upon approval.
-      </p>
-    </div>
-  </div>
-</div>
-      <div className="max-w-4xl mx-auto px-2">
+      <div className="relative w-full border-b border-white/10">
+        <div className="mx-auto max-w-4xl px-4">
+          <div className="py-4">
+            <Link
+              href="/partners"
+              className="market-btn-outline inline-flex items-center gap-1 px-4 py-2 text-sm normal-case"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to dashboard
+            </Link>
+          </div>
+
+          <div className="pb-10 pt-2 text-center">
+            <span className="mb-4 inline-block rounded-full bg-market-gold px-6 py-2 text-sm font-medium text-market-header">
+              Business Owner
+            </span>
+            <h1 className="mb-2 font-poppins text-3xl font-bold uppercase tracking-wide text-market-text sm:text-4xl">
+              Vendor Registration Request
+            </h1>
+            <div className="market-section-divider mx-auto" aria-hidden />
+            <p className="mx-auto mt-4 max-w-3xl font-montserrat text-sm font-medium text-market-muted sm:text-base">
+              A non-refundable $24.99 Business Verification Fee is charged at vendor sign-up to conduct a standard background validation of your business (via our contracted screening provider) and activate your Trust Badge upon approval.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="relative mx-auto max-w-4xl px-4 pt-8">
         {/* Form Container */}
-        <div className="bg-white rounded-1xl p-3 md:p-8">
+        <div className="rounded-2xl border border-white/10 bg-market-elevated p-4 shadow-market-card md:p-8">
           {/* Business Information Section */}
           <div className="mb-4">
             <InputField label="Business Name" required error={formErrors.businessName}>
               <input
                 type="text"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                className={FORM_INPUT_CLASS}
                 value={form.businessName}
                 onChange={e => update('businessName', e.target.value)}
                 placeholder="Enter Your Business Name"
@@ -672,7 +683,7 @@ const handlePayAndSubmit = async () => {
             </InputField>
 
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Minority Owned Business</label>
+              <label className="market-label">Minority Owned Business</label>
               <div className="flex gap-6">
                 <label className="inline-flex items-center cursor-pointer">
                   <input 
@@ -681,10 +692,10 @@ const handlePayAndSubmit = async () => {
                     checked={form.isMinorityOwned} 
                     onChange={() => update('isMinorityOwned', true)} 
                   />
-                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${form.isMinorityOwned ? 'border-[#1e3a5f] bg-[#1e3a5f]' : 'border-gray-300'}`}>
+                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${form.isMinorityOwned ? 'border-market-gold bg-market-gold' : 'border-white/20'}`}>
                     {form.isMinorityOwned && <div className="w-2 h-2 rounded-full bg-white"></div>}
                   </div>
-                  <span className="ml-2 text-gray-700">Yes</span>
+                  <span className="ml-2 text-market-muted">Yes</span>
                 </label>
                 <label className="inline-flex items-center cursor-pointer">
                   <input 
@@ -693,33 +704,33 @@ const handlePayAndSubmit = async () => {
                     checked={!form.isMinorityOwned} 
                     onChange={() => update('isMinorityOwned', false)} 
                   />
-                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${!form.isMinorityOwned ? 'border-[#1e3a5f] bg-[#1e3a5f]' : 'border-gray-300'}`}>
+                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${!form.isMinorityOwned ? 'border-market-gold bg-market-gold' : 'border-white/20'}`}>
                     {!form.isMinorityOwned && <div className="w-2 h-2 rounded-full bg-white"></div>}
                   </div>
-                  <span className="ml-2 text-gray-700">No</span>
+                  <span className="ml-2 text-market-muted">No</span>
                 </label>
               </div>
               {!form.isMinorityOwned && (
-    <div className="flex flex-col items-center mt-6 p-6 rounded-lg border border-blue-300 bg-blue-50 text-center">
-      <p className="text-sm text-red-800">{minorityOnlyMessage}</p>
+    <div className="mt-6 flex flex-col items-center rounded-lg border border-market-gold/30 bg-market-gold/10 p-6 text-center">
+      <p className="text-sm text-red-300">{minorityOnlyMessage}</p>
       <button
         onClick={() => router.push("/")}
-        className="mt-2 px-6 py-2 bg-blue-900 text-white font-semibold rounded hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-300 transition"
+        className="market-btn-primary mt-2 px-6 py-2 normal-case"
       >
        Okay I understand
       </button>
     </div>
               )}
               {formErrors.isMinorityOwned && (
-                <p className="mt-2 text-sm text-red-600">{formErrors.isMinorityOwned}</p>
+                <p className="mt-2 text-sm text-red-400">{formErrors.isMinorityOwned}</p>
               )}
             </div>
 
             {form.isMinorityOwned && (
               <>
                 <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Minority Owner Category (Tick Boxes For Multiple Selection) {formErrors.minorityCategories && <span className="text-red-500">*</span>}
+                  <label className="market-label">
+                    Minority Owner Category (Tick Boxes For Multiple Selection) {formErrors.minorityCategories && <span className="text-red-400">*</span>}
                   </label>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                     {['African-American', 'Asian', 'LatinX', 'Woman', 'Disabled Veteran'].map(cat => (
@@ -736,14 +747,14 @@ const handlePayAndSubmit = async () => {
                             }
                           }}
                         />
-                        <div className={`w-4 h-4 border-2 rounded flex items-center justify-center mr-2 ${form.minorityCategories.includes(cat) ? 'bg-[#1e3a5f] border-[#1e3a5f]' : 'border-gray-300'}`}>
+                        <div className={`w-4 h-4 border-2 rounded flex items-center justify-center mr-2 ${form.minorityCategories.includes(cat) ? 'bg-market-gold border-market-gold' : 'border-white/20'}`}>
                           {form.minorityCategories.includes(cat) && (
                             <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                             </svg>
                           )}
                         </div>
-                        <span className="text-gray-700 text-sm">{cat}</span>
+                        <span className="text-market-muted text-sm">{cat}</span>
                       </label>
                     ))}
                     
@@ -761,14 +772,14 @@ const handlePayAndSubmit = async () => {
                           }
                         }}
                       />
-                      <div className={`w-4 h-4 border-2 rounded flex items-center justify-center mr-2 ${form.minorityCategories.includes('Other') ? 'bg-[#1e3a5f] border-[#1e3a5f]' : 'border-gray-300'}`}>
+                      <div className={`w-4 h-4 border-2 rounded flex items-center justify-center mr-2 ${form.minorityCategories.includes('Other') ? 'bg-market-gold border-market-gold' : 'border-white/20'}`}>
                         {form.minorityCategories.includes('Other') && (
                           <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                           </svg>
                         )}
                       </div>
-                      <span className="text-gray-700 text-sm">Other (Please Specify)</span>
+                      <span className="text-market-muted text-sm">Other (Please Specify)</span>
                     </label>
                   </div>
                   
@@ -776,22 +787,22 @@ const handlePayAndSubmit = async () => {
                     <div className="mt-3">
                       <input
                         type="text"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                        className={FORM_INPUT_CLASS}
                         value={form.otherMinorityCategory}
                         onChange={e => update('otherMinorityCategory', e.target.value)}
                         placeholder="Mention Your Minority Category"
                       />
                     </div>
                   )}
-                  {formErrors.minorityCategories && <p className="mt-1 text-sm text-red-600">{formErrors.minorityCategories}</p>}
+                  {formErrors.minorityCategories && <p className="mt-1 text-sm text-red-400">{formErrors.minorityCategories}</p>}
                 </div>
 
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="market-label mb-1">
                     Upload Supporting Documents Proving Majority Stakes In The Name Of The Minority Founder
                   </label>
                   <div className="flex items-center gap-4">
-                    <div className="flex-1 px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 text-sm">
+                    <div className="flex-1 px-4 py-3 border border-white/20 rounded-lg bg-white/5 text-market-muted text-sm">
                       {selectedFiles['minority-proof'] ? selectedFiles['minority-proof'].name : 'No File Chosen'}
                     </div>
                     <input
@@ -804,7 +815,7 @@ const handlePayAndSubmit = async () => {
                     />
                     <label 
                       htmlFor="minority-proof-upload" 
-                      className="px-6 py-3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors cursor-pointer font-medium flex items-center gap-2"
+                      className="market-btn-secondary flex cursor-pointer items-center gap-2 px-6 py-3 normal-case"
                     >
                       <span>+</span> Upload File
                     </label>
@@ -813,16 +824,16 @@ const handlePayAndSubmit = async () => {
                   {form.minorityProofDocuments.length > 0 && (
                     <div className="mt-4 space-y-2">
                       {form.minorityProofDocuments.map((doc, index) => (
-                        <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div key={index} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
                           <div className="flex items-center">
-                            <svg className="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-5 h-5 text-market-muted mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
-                            <span className="text-sm text-gray-700 truncate">{doc.url.split('/').pop()}</span>
+                            <span className="text-sm text-market-muted truncate">{doc.url.split('/').pop()}</span>
                           </div>
                           <div className="flex space-x-2">
-                            <a href={doc.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700">View</a>
-                            <button onClick={() => removeDocument('minority-proof', index)} className="text-red-600 hover:text-red-700">Remove</button>
+                            <a href={doc.url} target="_blank" rel="noopener noreferrer" className={LINK_CLASS}>View</a>
+                            <button onClick={() => removeDocument('minority-proof', index)} className="text-red-400 hover:text-red-300">Remove</button>
                           </div>
                         </div>
                       ))}
@@ -835,12 +846,12 @@ const handlePayAndSubmit = async () => {
 
           {form.isMinorityOwned && (
             <>
-          <hr className="border-gray-200 my-4" />
+          <hr className="border-white/10 my-4" />
 
           {/* Legal & Tax Section */}
           <div className="mb-4">
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Do You Have An Employee Identification Number (EIN)</label>
+              <label className="market-label">Do You Have An Employee Identification Number (EIN)</label>
               <div className="flex gap-4">
                 <label className="inline-flex items-center cursor-pointer">
                   <input 
@@ -849,10 +860,10 @@ const handlePayAndSubmit = async () => {
                     checked={form.hasEIN} 
                     onChange={() => update('hasEIN', true)} 
                   />
-                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${form.hasEIN ? 'border-[#1e3a5f] bg-[#1e3a5f]' : 'border-gray-300'}`}>
+                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${form.hasEIN ? 'border-market-gold bg-market-gold' : 'border-white/20'}`}>
                     {form.hasEIN && <div className="w-2 h-2 rounded-full bg-white"></div>}
                   </div>
-                  <span className="ml-2 text-gray-700">Yes</span>
+                  <span className="ml-2 text-market-muted">Yes</span>
                 </label>
                 <label className="inline-flex items-center cursor-pointer">
                   <input 
@@ -861,10 +872,10 @@ const handlePayAndSubmit = async () => {
                     checked={!form.hasEIN} 
                     onChange={() => update('hasEIN', false)} 
                   />
-                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${!form.hasEIN ? 'border-[#1e3a5f] bg-[#1e3a5f]' : 'border-gray-300'}`}>
+                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${!form.hasEIN ? 'border-market-gold bg-market-gold' : 'border-white/20'}`}>
                     {!form.hasEIN && <div className="w-2 h-2 rounded-full bg-white"></div>}
                   </div>
-                  <span className="ml-2 text-gray-700">No</span>
+                  <span className="ml-2 text-market-muted">No</span>
                 </label>
               </div>
             </div>
@@ -874,7 +885,7 @@ const handlePayAndSubmit = async () => {
                 <InputField label="Employee Identification Number (EIN)" required error={formErrors.einNumber}>
                   <input
                     type="text"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                    className={FORM_INPUT_CLASS}
                     value={form.einNumber}
                     onChange={e => update('einNumber', e.target.value)}
                     placeholder="9 Digit Number"
@@ -882,11 +893,11 @@ const handlePayAndSubmit = async () => {
                 </InputField>
 
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="market-label">
                     Upload Supporting Documents
                   </label>
                   <div className="flex items-center gap-4">
-                    <div className="flex-1 px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 text-sm">
+                    <div className="flex-1 px-4 py-2 border border-white/20 rounded-lg bg-white/5 text-market-muted text-sm">
                       {selectedFiles['tax-doc'] ? selectedFiles['tax-doc'].name : 'No File Chosen'}
                     </div>
                     <input
@@ -899,7 +910,7 @@ const handlePayAndSubmit = async () => {
                     />
                     <label 
                       htmlFor="tax-doc-upload" 
-                      className="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors cursor-pointer font-medium flex items-center gap-2"
+                      className="market-btn-secondary flex cursor-pointer items-center gap-2 px-6 py-2 normal-case"
                     >
                       <span>+</span> Upload File
                     </label>
@@ -908,16 +919,16 @@ const handlePayAndSubmit = async () => {
                   {form.taxDocuments.length > 0 && (
                     <div className="mt-4 space-y-2">
                       {form.taxDocuments.map((doc, index) => (
-                        <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div key={index} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
                           <div className="flex items-center">
-                            <svg className="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-5 h-5 text-market-muted mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
-                            <span className="text-sm text-gray-700 truncate">{doc.url.split('/').pop()}</span>
+                            <span className="text-sm text-market-muted truncate">{doc.url.split('/').pop()}</span>
                           </div>
                           <div className="flex space-x-2">
-                            <a href={doc.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700">View</a>
-                            <button onClick={() => removeDocument('tax-doc', index)} className="text-red-600 hover:text-red-700">Remove</button>
+                            <a href={doc.url} target="_blank" rel="noopener noreferrer" className={LINK_CLASS}>View</a>
+                            <button onClick={() => removeDocument('tax-doc', index)} className="text-red-400 hover:text-red-300">Remove</button>
                           </div>
                         </div>
                       ))}
@@ -929,7 +940,7 @@ const handlePayAndSubmit = async () => {
               <InputField label="Social Security Number" required error={formErrors.ssnLast9}>
                 <input
                   type="text"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  className={FORM_INPUT_CLASS}
                   value={form.ssnLast9}
                   onChange={e => update('ssnLast9', e.target.value)}
                   placeholder="Enter SSN"
@@ -939,12 +950,12 @@ const handlePayAndSubmit = async () => {
           </div>
 
           {/* ===== ADD THIS AFTER TAX DOCUMENTS SECTION ===== */}
-<hr className="border-gray-200 my-4" />
+<hr className="border-white/10 my-4" />
 
 {/* Business License Section */}
 <div className="mb-4">
   {/* <div className="mb-3">
-    <label className="block text-sm font-medium text-gray-700 mb-3">
+    <label className="market-label mb-3">
       Do You Have A Business License?
     </label>
     <div className="flex gap-6">
@@ -955,10 +966,10 @@ const handlePayAndSubmit = async () => {
           checked={form.hasBusinessLicense} 
           onChange={() => update('hasBusinessLicense', true)} 
         />
-        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${form.hasBusinessLicense ? 'border-[#1e3a5f] bg-[#1e3a5f]' : 'border-gray-300'}`}>
+        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${form.hasBusinessLicense ? 'border-market-gold bg-market-gold' : 'border-white/20'}`}>
           {form.hasBusinessLicense && <div className="w-2 h-2 rounded-full bg-white"></div>}
         </div>
-        <span className="ml-2 text-gray-700">Yes</span>
+        <span className="ml-2 text-market-muted">Yes</span>
       </label>
       <label className="inline-flex items-center cursor-pointer">
         <input 
@@ -967,10 +978,10 @@ const handlePayAndSubmit = async () => {
           checked={!form.hasBusinessLicense} 
           onChange={() => update('hasBusinessLicense', false)} 
         />
-        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${!form.hasBusinessLicense ? 'border-[#1e3a5f] bg-[#1e3a5f]' : 'border-gray-300'}`}>
+        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${!form.hasBusinessLicense ? 'border-market-gold bg-market-gold' : 'border-white/20'}`}>
           {!form.hasBusinessLicense && <div className="w-2 h-2 rounded-full bg-white"></div>}
         </div>
-        <span className="ml-2 text-gray-700">No</span>
+        <span className="ml-2 text-market-muted">No</span>
       </label>
     </div>
   </div> */}
@@ -981,7 +992,7 @@ const handlePayAndSubmit = async () => {
 <InputField label="Business License Number" required error={formErrors.licenseNumber}>
   <input
     type="text"
-    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+    className={FORM_INPUT_CLASS}
     value={form.licenseNumber || ''}
     onChange={e => update('licenseNumber', e.target.value)}
     placeholder="Enter your business license number"
@@ -990,11 +1001,11 @@ const handlePayAndSubmit = async () => {
 
       {/* Business License Documents Upload */}
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
- Upload Business License Document  <span className="text-red-500 ml-1">*</span>
+        <label className="market-label">
+ Upload Business License Document  <span className="text-red-400 ml-1">*</span>
 </label>
         <div className="flex items-center gap-4">
-          <div className="flex-1 px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 text-sm">
+          <div className="flex-1 px-4 py-3 border border-white/20 rounded-lg bg-white/5 text-market-muted text-sm">
             {selectedFiles['business-license'] ? selectedFiles['business-license'].name : 'No File Chosen'}
           </div>
           <input
@@ -1007,7 +1018,7 @@ const handlePayAndSubmit = async () => {
           />
           <label 
             htmlFor="business-license-upload" 
-            className="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors cursor-pointer font-medium flex items-center gap-2"
+            className="market-btn-secondary flex cursor-pointer items-center gap-2 px-6 py-2 normal-case"
           >
             <span>+</span> Upload File
           </label>
@@ -1016,16 +1027,16 @@ const handlePayAndSubmit = async () => {
         {form.businessLicenseDocuments.length > 0 && (
           <div className="mt-3 space-y-2">
             {form.businessLicenseDocuments.map((doc, index) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div key={index} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
                 <div className="flex items-center">
-                  <svg className="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-market-muted mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
-                  <span className="text-sm text-gray-700 truncate">{doc.url.split('/').pop()}</span>
+                  <span className="text-sm text-market-muted truncate">{doc.url.split('/').pop()}</span>
                 </div>
                 <div className="flex space-x-2">
-                  <a href={doc.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700">View</a>
-                  <button onClick={() => removeDocument('business-license', index)} className="text-red-600 hover:text-red-700">Remove</button>
+                  <a href={doc.url} target="_blank" rel="noopener noreferrer" className={LINK_CLASS}>View</a>
+                  <button onClick={() => removeDocument('business-license', index)} className="text-red-400 hover:text-red-300">Remove</button>
                 </div>
               </div>
             ))}
@@ -1037,7 +1048,7 @@ const handlePayAndSubmit = async () => {
 
   {/* Error message for business license when required */}
   {formErrors.businessLicenseDocuments && (
-    <p className="mt-2 text-sm text-red-600">{formErrors.businessLicenseDocuments}</p>
+    <p className="mt-2 text-sm text-red-400">{formErrors.businessLicenseDocuments}</p>
   )}
 </div>
 
@@ -1049,7 +1060,7 @@ const handlePayAndSubmit = async () => {
               <InputField label="Primary Contact Name" required error={formErrors.primaryContactName}>
                 <input
                   type="text"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  className={FORM_INPUT_CLASS}
                   value={form.primaryContactName}
                   onChange={e => update('primaryContactName', e.target.value)}
                   placeholder="Primary Contact Name"
@@ -1058,7 +1069,7 @@ const handlePayAndSubmit = async () => {
 
               <InputField label="Primary Contact Designation" required error={formErrors.primaryContactDesignation}>
                 <select 
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white"
+                  className={FORM_SELECT_CLASS}
                   value={form.primaryContactDesignation}
                   onChange={e => update('primaryContactDesignation', e.target.value)}
                 >
@@ -1073,7 +1084,7 @@ const handlePayAndSubmit = async () => {
               <InputField label="Contact Email Address" required error={formErrors.contactEmail}>
                 <input
                   type="email"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  className={FORM_INPUT_CLASS}
                   value={form.contactEmail}
                   onChange={e => update('contactEmail', e.target.value)}
                   placeholder="Contact Email Address"
@@ -1083,7 +1094,7 @@ const handlePayAndSubmit = async () => {
               <InputField label="Business Email Address" required error={formErrors.businessEmail}>
                 <input
                   type="email"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  className={FORM_INPUT_CLASS}
                   value={form.businessEmail}
                   onChange={e => update('businessEmail', e.target.value)}
                   placeholder="Business Email Address"
@@ -1093,7 +1104,7 @@ const handlePayAndSubmit = async () => {
               <InputField label="Primary Contact Phone Number" required error={formErrors.contactPhone} className="md:col-span-2">
                 <input
                   type="tel"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  className={FORM_INPUT_CLASS}
                   value={form.contactPhone}
                   onChange={e => update('contactPhone', e.target.value)}
                   placeholder="Primary Contact Phone Number"
@@ -1104,14 +1115,14 @@ const handlePayAndSubmit = async () => {
 
           
 
-          <hr className="border-gray-200 my-4" />
+          <hr className="border-white/10 my-4" />
 
           {/* Address Section */}
           <div className="mb-8">
             <InputField label="Full Address" required error={formErrors.address_street}>
               <input
                 type="text"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                className={FORM_INPUT_CLASS}
                 value={form.address.street}
                 onChange={e => updateAddress('street', e.target.value)}
                 placeholder="Enter Your Full Address"
@@ -1122,7 +1133,7 @@ const handlePayAndSubmit = async () => {
               <InputField label="City" required error={formErrors.address_city}>
                 <input
                   type="text"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  className={FORM_INPUT_CLASS}
                   value={form.address.city}
                   onChange={e => updateAddress('city', e.target.value)}
                   placeholder="City"
@@ -1131,7 +1142,7 @@ const handlePayAndSubmit = async () => {
 
 <InputField label="State">
   <select
-    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white"
+    className={FORM_SELECT_CLASS}
     value={form.address.state}
     onChange={e => updateAddress('state', e.target.value)}
   >
@@ -1191,7 +1202,7 @@ const handlePayAndSubmit = async () => {
 
               <InputField label="Country">
                 <select
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white"
+                  className={FORM_SELECT_CLASS}
                   value={form.address.country}
                   onChange={e => updateAddress('country', e.target.value)}
                 >
@@ -1206,7 +1217,7 @@ const handlePayAndSubmit = async () => {
               <InputField label="Zip Code" required error={formErrors.address_zipCode}>
                 <input
                   type="text"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  className={FORM_INPUT_CLASS}
                   value={form.address.zipCode}
                   onChange={e => updateAddress('zipCode', e.target.value)}
                   placeholder="Zip Code"
@@ -1215,14 +1226,14 @@ const handlePayAndSubmit = async () => {
             </div>
           </div>
 
-          <hr className="border-gray-200 my-4" />
+          <hr className="border-white/10 my-4" />
 
           {/* Business Details Section */}
           <div className="mb-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <InputField label="Ownership Type" required error={formErrors.businessOwnershipType}>
                 <select 
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white"
+                  className={FORM_SELECT_CLASS}
                   value={form.businessOwnershipType}
                   onChange={e => update('businessOwnershipType', e.target.value as OwnershipType)}
                 >
@@ -1237,7 +1248,7 @@ const handlePayAndSubmit = async () => {
 
               <InputField label="Years in Business" required error={formErrors.yearsInBusiness}>
                 <select 
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white"
+                  className={FORM_SELECT_CLASS}
                   value={form.yearsInBusiness}
                   onChange={e => update('yearsInBusiness', e.target.value)}
                 >
@@ -1250,7 +1261,7 @@ const handlePayAndSubmit = async () => {
 
               <InputField label="Business Type" required error={formErrors.businessType}>
                 <select 
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white"
+                  className={FORM_SELECT_CLASS}
                   value={form.businessType}
                   onChange={e => update('businessType', e.target.value as BusinessType)}
                 >
@@ -1263,7 +1274,7 @@ const handlePayAndSubmit = async () => {
 
               <InputField label="Number Of Employees">
                 <select 
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white"
+                  className={FORM_SELECT_CLASS}
                   value={form.numberOfEmployees}
                   onChange={e => update('numberOfEmployees', e.target.value)}
                 >
@@ -1277,16 +1288,16 @@ const handlePayAndSubmit = async () => {
             </div>
           </div>
 
-<hr className="border-gray-200 my-4" />
+<hr className="border-white/10 my-4" />
 
 {/* Online Presence Section */}
 <div className="mb-4">
-  <h3 className="text-lg font-semibold text-gray-900 mb-3">Online Presence (optional)</h3>
+  <h3 className="font-poppins text-lg font-semibold text-market-text mb-3">Online Presence (optional)</h3>
   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
     <InputField label="Website URL">
       <input
         type="url"
-        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+        className={FORM_INPUT_CLASS}
         value={form.websiteUrl}
         onChange={e => update('websiteUrl', e.target.value)}
         placeholder="https://www.yourbusiness.com"
@@ -1296,7 +1307,7 @@ const handlePayAndSubmit = async () => {
     <InputField label="Facebook URL">
       <input
         type="url"
-        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+        className={FORM_INPUT_CLASS}
         value={form.facebookUrl}
         onChange={e => update('facebookUrl', e.target.value)}
         placeholder="https://facebook.com/yourbusiness"
@@ -1306,7 +1317,7 @@ const handlePayAndSubmit = async () => {
     <InputField label="Instagram URL">
       <input
         type="url"
-        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+        className={FORM_INPUT_CLASS}
         value={form.instagramUrl}
         onChange={e => update('instagramUrl', e.target.value)}
         placeholder="https://instagram.com/yourbusiness"
@@ -1316,7 +1327,7 @@ const handlePayAndSubmit = async () => {
     <InputField label="LinkedIn URL">
       <input
         type="url"
-        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+        className={FORM_INPUT_CLASS}
         value={form.linkedinUrl}
         onChange={e => update('linkedinUrl', e.target.value)}
         placeholder="https://linkedin.com/company/yourbusiness"
@@ -1326,7 +1337,7 @@ const handlePayAndSubmit = async () => {
     <InputField label="TikTok URL">
       <input
         type="url"
-        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+        className={FORM_INPUT_CLASS}
         value={form.tiktokUrl}
         onChange={e => update('tiktokUrl', e.target.value)}
         placeholder="https://tiktok.com/@yourbusiness"
@@ -1335,7 +1346,7 @@ const handlePayAndSubmit = async () => {
   </div>
 </div>
 
-          <hr className="border-gray-200 my-4" />
+          <hr className="border-white/10 my-4" />
 
           {/* Terms & Conditions Section */}
 <div className="mb-6">
@@ -1347,19 +1358,19 @@ const handlePayAndSubmit = async () => {
         checked={form.acceptedTerms}
         onChange={e => update('acceptedTerms', e.target.checked)}
       />
-      <div className={`w-4 h-4 border-2 rounded flex items-center justify-center mr-3 mt-0.5 ${form.acceptedTerms ? 'bg-[#1e3a5f] border-[#1e3a5f]' : 'border-gray-300'}`}>
+      <div className={`w-4 h-4 border-2 rounded flex items-center justify-center mr-3 mt-0.5 ${form.acceptedTerms ? 'bg-market-gold border-market-gold' : 'border-white/20'}`}>
         {form.acceptedTerms && (
           <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
           </svg>
         )}
       </div>
-      <span className="text-gray-700 text-sm">
+      <span className="text-market-muted text-sm">
         I Agree To The{" "}
         <button
           type="button"
           onClick={() => openModal("terms")}
-          className="text-[#1e3a5f] hover:underline font-medium"
+          className="text-market-gold hover:underline font-medium"
         >
           Terms & Conditions
         </button>
@@ -1373,14 +1384,14 @@ const handlePayAndSubmit = async () => {
         checked={form.declarationAccepted}
         onChange={e => update('declarationAccepted', e.target.checked)}
       />
-      <div className={`w-4 h-4 border-2 rounded flex items-center justify-center mr-3 mt-0.5 ${form.declarationAccepted ? 'bg-[#1e3a5f] border-[#1e3a5f]' : 'border-gray-300'}`}>
+      <div className={`w-4 h-4 border-2 rounded flex items-center justify-center mr-3 mt-0.5 ${form.declarationAccepted ? 'bg-market-gold border-market-gold' : 'border-white/20'}`}>
         {form.declarationAccepted && (
           <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
           </svg>
         )}
       </div>
-      <span className="text-gray-700 text-sm">
+      <span className="text-market-muted text-sm">
         The Information Provided Above Is Accurate To My Knowledge.
       </span>
     </label>
@@ -1400,7 +1411,7 @@ const handlePayAndSubmit = async () => {
   <div className="flex flex-col md:flex-row justify-center items-center gap-4 mt-12">
     {/* <button
       onClick={() => setForm(initialState)}
-      className="w-full md:w-auto px-8 py-3 bg-gray-400 text-white rounded-lg hover:bg-gray-500 transition-colors font-medium min-w-[160px]"
+      className="w-full md:w-auto px-8 py-3 bg-gray-400 text-white rounded-lg hover:bg-white/50 transition-colors font-medium min-w-[160px]"
       disabled={loading}
     >
       Clear Response
@@ -1408,7 +1419,7 @@ const handlePayAndSubmit = async () => {
 
     <button
       onClick={saveDraft}
-      className="w-full md:w-auto px-8 py-3 bg-[#1e3a5f] text-white rounded-lg hover:bg-[#162b46] transition-colors font-medium min-w-[160px]"
+      className="market-btn-secondary w-full min-w-[160px] normal-case md:w-auto"
       disabled={loading}
     >
       {loading ? 'Saving...' : 'Save data'}
@@ -1417,7 +1428,7 @@ const handlePayAndSubmit = async () => {
     {!shouldHideProceedButton && (
       <button
         onClick={handlePayAndSubmit}
-        className="w-full md:w-auto px-8 py-3 bg-[#c9a227] text-white rounded-lg hover:bg-[#b8921f] transition-colors font-medium min-w-[160px]"
+        className="market-btn-primary w-full min-w-[160px] normal-case md:w-auto"
         disabled={loading}
       >
         {loading ? 'Processing...' : 'Proceed To Payment'}
@@ -1452,7 +1463,7 @@ const handlePayAndSubmit = async () => {
           {/* <div className="flex flex-col md:flex-row justify-center items-center gap-4 mt-12">
             <button
               onClick={() => setForm(initialState)}
-              className="w-full md:w-auto px-8 py-3 bg-gray-400 text-white rounded-lg hover:bg-gray-500 transition-colors font-medium min-w-[160px]"
+              className="w-full md:w-auto px-8 py-3 bg-gray-400 text-white rounded-lg hover:bg-white/50 transition-colors font-medium min-w-[160px]"
               disabled={loading}
             >
               Clear Response
@@ -1460,7 +1471,7 @@ const handlePayAndSubmit = async () => {
 
             <button
               onClick={saveDraft}
-              className="w-full md:w-auto px-8 py-3 bg-[#1e3a5f] text-white rounded-lg hover:bg-[#162b46] transition-colors font-medium min-w-[160px]"
+              className="market-btn-secondary w-full min-w-[160px] normal-case md:w-auto"
               disabled={loading || !form.isMinorityOwned}
             >
               {loading ? 'Saving...' : form.isMinorityOwned ? 'Save Draft' : 'Save Disabled'}
@@ -1468,7 +1479,7 @@ const handlePayAndSubmit = async () => {
              
             <button
               onClick={handlePayAndSubmit}
-              className="w-full md:w-auto px-8 py-3 bg-[#c9a227] text-white rounded-lg hover:bg-[#b8921f] transition-colors font-medium min-w-[160px]"
+              className="market-btn-primary w-full min-w-[160px] normal-case md:w-auto"
               disabled={loading || !form.isMinorityOwned}
             >
               {loading ? 'Processing...' : form.isMinorityOwned ? 'Proceed To Payment' : 'Proceeding Stopped'}
