@@ -43,6 +43,8 @@ Mosaic Biz Hub is a Next.js marketplace frontend connecting consumers to verifie
 | [frontend/FRONTEND_MARKETPLACE_SURFACE_MAP.md](frontend/FRONTEND_MARKETPLACE_SURFACE_MAP.md) | Reference | 2026-06-19 | Consumer marketplace surfaces |
 | [frontend/FRONTEND_ADMIN_VENDOR_CUSTOMER_SURFACE_MAP.md](frontend/FRONTEND_ADMIN_VENDOR_CUSTOMER_SURFACE_MAP.md) | Reference | 2026-06-19 | Admin, vendor, customer surfaces |
 | [frontend/FRONTEND_VISUAL_QA_SURFACE.md](frontend/FRONTEND_VISUAL_QA_SURFACE.md) | Reference | 2026-06-19 | Human visual QA surface list |
+| [frontend/FRONTEND_LAUNCH_CONTRACT_ALIGNMENT.md](frontend/FRONTEND_LAUNCH_CONTRACT_ALIGNMENT.md) | **Evidence** | 2026-06-19 | Launch contract alignment: legacy paths, env vars, fix-owner matrix, preview smoke |
+| [frontend/FRONTEND_VENDOR_AUTH_E2E_SMOKE.md](frontend/FRONTEND_VENDOR_AUTH_E2E_SMOKE.md) | **Evidence** | 2026-06-19 | Vendor auth E2E smoke gate (#143): preview SSO block + supplementary signup path |
 
 **Rule of thumb:** For “where are we today?” read **PROJECT_STATUS**. For “what’s next?” read **ROADMAP**. Do not treat historical audits as current blockers without checking PROJECT_STATUS.
 
@@ -61,7 +63,8 @@ Mosaic Biz Hub is a Next.js marketplace frontend connecting consumers to verifie
 ### Release / QA
 
 1. [frontend/FRONTEND_DOCUMENTATION_EVIDENCE_LOG.md](frontend/FRONTEND_DOCUMENTATION_EVIDENCE_LOG.md) — as-built evidence pack index (launch readiness)
-2. [PROJECT_STATUS.md](PROJECT_STATUS.md) — RC branch, preview URL, pending human sign-off
+2. [frontend/FRONTEND_LAUNCH_CONTRACT_ALIGNMENT.md](frontend/FRONTEND_LAUNCH_CONTRACT_ALIGNMENT.md) — API contract alignment, legacy paths, Vercel smoke steps
+3. [PROJECT_STATUS.md](PROJECT_STATUS.md) — RC branch, preview URL, pending human sign-off
 3. [FRONTEND_SMOKE_CHECKLIST.md](FRONTEND_SMOKE_CHECKLIST.md) — full smoke pass on Vercel preview
 4. [frontend/FRONTEND_VISUAL_QA_SURFACE.md](frontend/FRONTEND_VISUAL_QA_SURFACE.md) — priority visual QA URLs
 5. [HOMEPAGE_MARKETPLACE_REDESIGN_QA_REPORT.md](HOMEPAGE_MARKETPLACE_REDESIGN_QA_REPORT.md) — post-merge `/products` gate evidence
