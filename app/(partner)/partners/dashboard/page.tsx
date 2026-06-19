@@ -16,8 +16,15 @@ import TaxSettingsTab from "./components/TaxSettingsTab";
 import PayoutSetupTab from "@/app/(home)/partners/payout-setup/page";
 import LaunchReadinessPanel from "@/app/(home)/partners/components/LaunchReadinessPanel";
 import Link from "next/link";
+import {
+  clearStaleClientSession,
+  getAuthenticatedUser,
+  isBusinessOwner,
+  persistClientSession,
+} from "@/utils/authUtils";
 
 type ListingType = "product" | "service" | "food";
+type AuthStatus = "checking" | "allowed";
 type DashboardTab =
   | "edit-profile"
   | "manage-listings"
@@ -66,6 +73,7 @@ const baseDashboardTabs = [
 function PartnerDashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [authStatus, setAuthStatus] = useState<AuthStatus>("checking");
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<DashboardTab>("edit-profile");
@@ -100,6 +108,58 @@ function PartnerDashboardContent() {
   }, [searchParams]);
 
   useEffect(() => {
+    let cancelled = false;
+
+    const redirectToVendorLogin = () => {
+      clearStaleClientSession();
+      router.replace("/login?type=vendor&redirect=%2Fpartners%2Fdashboard");
+    };
+
+    const redirectByRole = (role: string) => {
+      switch (role) {
+        case "customer":
+          router.replace("/customer/order");
+          break;
+        case "admin":
+          router.replace("/admin");
+          break;
+        default:
+          router.replace("/");
+      }
+    };
+
+    const checkAccess = async () => {
+      const user = await getAuthenticatedUser();
+      if (cancelled) return;
+
+      if (!user) {
+        redirectToVendorLogin();
+        return;
+      }
+
+      if (!isBusinessOwner(user)) {
+        redirectByRole(user.role);
+        return;
+      }
+
+      persistClientSession(user);
+      if (!cancelled) {
+        setAuthStatus("allowed");
+      }
+    };
+
+    checkAccess();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [router]);
+
+  useEffect(() => {
+    if (authStatus !== "allowed") {
+      return;
+    }
+
     const fetchBusinesses = async () => {
       try {
         const response = await axios.get(
@@ -116,7 +176,7 @@ function PartnerDashboardContent() {
     };
 
     fetchBusinesses();
-  }, []);
+  }, [authStatus]);
 
   const activeBusiness = useMemo(
     () => businesses.find((business) => business.isActive) ?? businesses[0],
@@ -140,7 +200,7 @@ function PartnerDashboardContent() {
   }, [listingType]);
 
   useEffect(() => {
-    if (activeTab !== "inquiries") {
+    if (authStatus !== "allowed" || activeTab !== "inquiries") {
       return;
     }
 
@@ -166,9 +226,13 @@ function PartnerDashboardContent() {
     };
 
     fetchInquiries();
-  }, [activeTab]);
+  }, [activeTab, authStatus]);
 
   useEffect(() => {
+    if (authStatus !== "allowed") {
+      return;
+    }
+
     const resolveBookingAvailability = async () => {
       if (!activeBusiness?._id || activeBusiness.listingType === "product") {
         setHasBookingLink(false);
@@ -220,7 +284,7 @@ function PartnerDashboardContent() {
     };
 
     resolveBookingAvailability();
-  }, [activeBusiness]);
+  }, [activeBusiness, authStatus]);
 
   const dashboardTabs = useMemo(() => {
     const manageListingsLabel = `Add/Edit ${listingLabel}`;
@@ -372,6 +436,16 @@ function PartnerDashboardContent() {
       </div>
     );
   };
+
+  if (authStatus !== "allowed") {
+    return (
+      <main className="min-h-screen bg-[#f7f2eb] pt-[110px]">
+        <div className="mx-auto max-w-6xl px-4 py-10 text-center text-sm text-gray-600">
+          Loading dashboard...
+        </div>
+      </main>
+    );
+  }
 
   return (
     <>

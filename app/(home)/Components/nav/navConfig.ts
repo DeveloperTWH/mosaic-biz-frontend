@@ -151,8 +151,9 @@ export function getAccountNavHref(
   if (!isLoggedIn) return "/login?type=customer";
   if (storedRole === "business_owner") return "/partners/dashboard";
   if (storedRole === "customer") return "/customer/order";
+  if (storedRole === "admin") return "/admin";
   if (isCustomer) return "/customer/order";
-  return "/partners/dashboard";
+  return "/";
 }
 
 /** Sync role hint from localStorage (set on login/OTP). Client-only. */

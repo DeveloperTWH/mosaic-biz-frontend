@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 import { logoutUser } from "@/utils/logoutUser";
-import { LOGIN_LINKS } from "./navConfig";
+import { LOGIN_LINKS, getStoredUserRole } from "./navConfig";
 import CartButton from "./CartButton";
 
 type HeaderActionsProps = {
@@ -29,6 +29,9 @@ export default function HeaderActions({
 }: HeaderActionsProps) {
   const [showDropdown, setShowDropdown] = useState(false);
   const [openLogin, setOpenLogin] = useState(false);
+  const storedRole = getStoredUserRole();
+  const showCustomerNav = isCustomer === true || storedRole === "customer";
+  const showVendorNav = storedRole === "business_owner";
 
   const visibilityClass = variant === "desktop" ? "hidden xl:flex" : "flex xl:hidden";
 
@@ -62,7 +65,7 @@ export default function HeaderActions({
           </button>
           {showDropdown && (
             <div className="absolute right-0 z-50 mt-2 w-48 rounded-lg border border-white/10 bg-market-elevated shadow-market-card">
-              {isCustomer ? (
+              {showCustomerNav ? (
                 <>
                   <Link
                     href="/customer/order"
@@ -79,7 +82,7 @@ export default function HeaderActions({
                     My Bookings
                   </Link>
                 </>
-              ) : (
+              ) : showVendorNav ? (
                 <Link
                   href="/partners/dashboard"
                   className="market-dropdown-link rounded-t-lg px-4 py-3"
@@ -87,7 +90,7 @@ export default function HeaderActions({
                 >
                   Dashboard
                 </Link>
-              )}
+              ) : null}
               <button
                 type="button"
                 onClick={async () => await logoutUser()}

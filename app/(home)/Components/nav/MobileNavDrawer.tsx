@@ -12,6 +12,7 @@ import {
   DRAWER_EXPLORE_LINKS,
   BECOME_VENDOR_LINK,
   LOGIN_LINKS,
+  getStoredUserRole,
 } from "./navConfig";
 
 type MobileNavDrawerProps = {
@@ -70,6 +71,9 @@ export default function MobileNavDrawer({
 }: MobileNavDrawerProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const [portalReady, setPortalReady] = useState(false);
+  const storedRole = getStoredUserRole();
+  const showCustomerNav = isCustomer === true || storedRole === "customer";
+  const showVendorNav = storedRole === "business_owner";
 
   useEffect(() => {
     setPortalReady(true);
@@ -180,7 +184,7 @@ export default function MobileNavDrawer({
                   />
                   <span className="font-medium text-market-text">My Account</span>
                 </div>
-                {isCustomer ? (
+                {showCustomerNav ? (
                   <>
                     <Link
                       href="/customer/order"
@@ -197,7 +201,7 @@ export default function MobileNavDrawer({
                       My Bookings
                     </Link>
                   </>
-                ) : (
+                ) : showVendorNav ? (
                   <Link
                     href="/partners/dashboard"
                     onClick={onClose}
@@ -205,7 +209,7 @@ export default function MobileNavDrawer({
                   >
                     Dashboard
                   </Link>
-                )}
+                ) : null}
                 <button
                   type="button"
                   onClick={async () => {
