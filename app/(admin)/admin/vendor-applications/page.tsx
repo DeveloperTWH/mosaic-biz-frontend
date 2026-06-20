@@ -80,7 +80,16 @@ const VendorApplicationsPage = () => {
       );
 
       if (res.data.success) {
-        setApplications(res.data.data || []);
+        const payload = res.data.data;
+        if (!Array.isArray(payload)) {
+          setApplications([]);
+          setFetchError({
+            kind: "api",
+            message: "Unexpected vendor applications response from server.",
+          });
+          return;
+        }
+        setApplications(payload);
       } else {
         setApplications([]);
         setFetchError({
