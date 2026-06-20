@@ -21,6 +21,18 @@ export interface AuthenticatedUser {
 export const isBusinessOwner = (user: AuthenticatedUser | null | undefined): boolean =>
   user?.role === 'business_owner';
 
+export const isAdmin = (user: AuthenticatedUser | null | undefined): boolean =>
+  user?.role === 'admin';
+
+export function getPostLoginRedirectPath(
+  user: AuthenticatedUser,
+  safeRedirect?: string | null
+): string {
+  if (isAdmin(user)) return safeRedirect || '/admin';
+  if (isBusinessOwner(user)) return '/partners';
+  return safeRedirect || '/';
+}
+
 export const clearStaleClientSession = (): void => {
   if (typeof window === 'undefined') return;
   localStorage.removeItem('user_session');
