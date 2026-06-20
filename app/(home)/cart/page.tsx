@@ -903,7 +903,7 @@ export default function CartPage() {
                                         className="px-4 py-2 text-white bg-blue-900"
                                         onClick={() => {
                                             if (!selectedAddress) {
-                                                alert("Please add address");
+                                                toast.error("Please add a delivery address before placing your order.");
                                                 return;
                                             }
                                             handlePlaceOrderFlow(
