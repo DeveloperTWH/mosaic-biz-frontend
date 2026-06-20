@@ -8,7 +8,13 @@ import { AlertCircle, Loader, CheckCircle, Lock, ArrowLeft } from 'lucide-react'
 import { FaCcVisa, FaCcMastercard, FaCcAmex } from "react-icons/fa";
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import { submitStage1 } from '@/lib/api/vendorOnboarding';
+import {
+  submitStage1,
+  VendorSubmissionError,
+  waitForStage1PaymentConfirmation,
+} from '@/lib/api/vendorOnboarding';
+
+type PostPaymentPhase = 'idle' | 'confirming' | 'submitting' | 'pending' | 'success';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -35,10 +41,10 @@ const CheckIcon = () => (
 
 // Payment Form Component
 function VendorPaymentForm({ 
-  onSuccess, 
+  onPaymentSucceeded, 
   onError 
 }: { 
-  onSuccess: () => void;
+  onPaymentSucceeded: () => Promise<void>;
   onError: (error: string) => void;
 }) {
   const stripe = useStripe();
@@ -77,13 +83,7 @@ function VendorPaymentForm({
       if (error) {
         onError(error.message || 'Payment failed');
       } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-        try {
-          await submitStage1();
-          onSuccess();
-        } catch (submitError: any) {
-          console.error('Submission error:', submitError);
-          onError('Payment successful but submission failed. Our team will contact you.');
-        }
+        await onPaymentSucceeded();
       }
     } catch (err: any) {
       onError(err.message || 'Payment failed');
@@ -132,7 +132,10 @@ function VendorBusinessPaymentContent() {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [postPaymentPhase, setPostPaymentPhase] = useState<PostPaymentPhase>('idle');
+  const [isRetrying, setIsRetrying] = useState(false);
   const [paymentAmount, setPaymentAmount] = useState<number>(99);
 
   useEffect(() => {
@@ -189,6 +192,7 @@ function VendorBusinessPaymentContent() {
 
   const handlePaymentSuccess = () => {
     setSuccess(true);
+    setPostPaymentPhase('success');
     
     sessionStorage.removeItem('vendorRegistrationPayment');
     
@@ -197,9 +201,50 @@ function VendorBusinessPaymentContent() {
     }, 2000);
   };
 
+  const confirmAndSubmitApplication = async () => {
+    setPostPaymentPhase('confirming');
+    setPaymentError(null);
+
+    try {
+      const ready = await waitForStage1PaymentConfirmation();
+      if (!ready) {
+        setPostPaymentPhase('pending');
+        return;
+      }
+
+      setPostPaymentPhase('submitting');
+      await submitStage1();
+      handlePaymentSuccess();
+    } catch (err) {
+      if (err instanceof VendorSubmissionError && err.status === 402) {
+        setPostPaymentPhase('pending');
+        return;
+      }
+
+      console.error('Submission error:', err);
+      setPostPaymentPhase('pending');
+    }
+  };
+
+  const handlePaymentSucceeded = async () => {
+    await confirmAndSubmitApplication();
+  };
+
+  const handleRetryConfirmation = async () => {
+    setIsRetrying(true);
+    try {
+      await confirmAndSubmitApplication();
+    } finally {
+      setIsRetrying(false);
+    }
+  };
+
   const handleGoBack = () => {
     router.push('/partners');
   };
+
+  const showPaymentForm =
+    postPaymentPhase === 'idle' && !success;
 
   const features = [
     'Vendor registration application',
@@ -472,7 +517,83 @@ function VendorBusinessPaymentContent() {
                   Redirecting to success page...
                 </p>
               </div>
-            ) : (
+            ) : postPaymentPhase === 'confirming' ? (
+              <div style={{ textAlign: 'center', padding: '2rem' }}>
+                <Loader style={{ width: '2rem', height: '2rem', color: '#C9A962', animation: 'spin 1s linear infinite', margin: '0 auto 1rem' }} />
+                <h3 style={{ fontSize: '1.125rem', fontWeight: 600, color: '#111827', marginBottom: '0.5rem' }}>
+                  Confirming payment with Mosaic…
+                </h3>
+                <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>
+                  Please wait while we verify your payment.
+                </p>
+              </div>
+            ) : postPaymentPhase === 'submitting' ? (
+              <div style={{ textAlign: 'center', padding: '2rem' }}>
+                <Loader style={{ width: '2rem', height: '2rem', color: '#C9A962', animation: 'spin 1s linear infinite', margin: '0 auto 1rem' }} />
+                <h3 style={{ fontSize: '1.125rem', fontWeight: 600, color: '#111827', marginBottom: '0.5rem' }}>
+                  Submitting your application…
+                </h3>
+                <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>
+                  Almost done. This should only take a moment.
+                </p>
+              </div>
+            ) : postPaymentPhase === 'pending' ? (
+              <div style={{ textAlign: 'center', padding: '2rem' }}>
+                <div style={{
+                  width: '3rem',
+                  height: '3rem',
+                  backgroundColor: '#fef3c7',
+                  borderRadius: '9999px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto 1rem'
+                }}>
+                  <Loader style={{ width: '1.5rem', height: '1.5rem', color: '#d97706', animation: 'spin 1s linear infinite' }} />
+                </div>
+                <h3 style={{ fontSize: '1.125rem', fontWeight: 600, color: '#92400e', marginBottom: '0.75rem' }}>
+                  Payment received
+                </h3>
+                <p style={{ fontSize: '0.875rem', color: '#78350f', marginBottom: '1.5rem', lineHeight: 1.5 }}>
+                  We are still confirming your application. Please refresh or contact support if this does not update shortly.
+                </p>
+                <button
+                  onClick={handleRetryConfirmation}
+                  disabled={isRetrying}
+                  style={{
+                    width: '100%',
+                    padding: '0.875rem',
+                    backgroundColor: '#C9A962',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '0.375rem',
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                    cursor: isRetrying ? 'not-allowed' : 'pointer',
+                    opacity: isRetrying ? 0.7 : 1,
+                    marginBottom: '0.75rem',
+                  }}
+                >
+                  {isRetrying ? 'Checking confirmation…' : 'Retry confirmation'}
+                </button>
+                <button
+                  onClick={handleGoBack}
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem',
+                    backgroundColor: 'transparent',
+                    color: '#6b7280',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '0.375rem',
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                    cursor: 'pointer',
+                  }}
+                >
+                  Back to partners hub
+                </button>
+              </div>
+            ) : showPaymentForm ? (
               <>
                 <Elements 
                   key={clientSecret}
@@ -494,8 +615,8 @@ function VendorBusinessPaymentContent() {
                   }}
                 >
                   <VendorPaymentForm 
-                    onSuccess={handlePaymentSuccess}
-                    onError={(error) => setError(error)}
+                    onPaymentSucceeded={handlePaymentSucceeded}
+                    onError={(message) => setPaymentError(message)}
                   />
                 </Elements>
 
@@ -526,22 +647,11 @@ function VendorBusinessPaymentContent() {
                   gap: '1rem',
                   flexWrap: 'wrap'
                 }}>
-                  {/* <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <Lock size={12} style={{ color: '#9ca3af' }} />
-                    <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>256-bit SSL</span>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                      <circle cx="6" cy="6" r="5" stroke="#9ca3af" strokeWidth="1"/>
-                      <path d="M4 6L5.5 7.5L8 4.5" stroke="#9ca3af" strokeWidth="1"/>
-                    </svg>
-                    <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>PCI Compliant</span>
-                  </div> */}
                 </div>
               </>
-            )}
+            ) : null}
 
-            {error && !success && (
+            {paymentError && showPaymentForm && (
               <div style={{ 
                 padding: '0.75rem', 
                 backgroundColor: '#fef2f2', 
@@ -549,7 +659,7 @@ function VendorBusinessPaymentContent() {
                 marginTop: '1rem' 
               }}>
                 <p style={{ fontSize: '0.875rem', color: '#dc2626', textAlign: 'center' }}>
-                  {error}
+                  {paymentError}
                 </p>
               </div>
             )}
