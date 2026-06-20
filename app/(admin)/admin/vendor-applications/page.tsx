@@ -52,10 +52,16 @@ type VendorApplication = {
   submittedAt?: string;
 };
 
+type FetchErrorState = {
+  kind: "auth" | "forbidden" | "api";
+  message: string;
+};
+
 const VendorApplicationsPage = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [applications, setApplications] = useState<VendorApplication[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [fetchError, setFetchError] = useState<FetchErrorState | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState<string>("");
 
@@ -64,25 +70,49 @@ const VendorApplicationsPage = () => {
   const fetchApplications = async () => {
     try {
       setLoading(true);
-      
-      // Use the exact API endpoint from your curl
+      setFetchError(null);
+
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/vendor-onboarding/pending`,
-        { 
-          withCredentials: true, // This sends cookies automatically
-          // No need for Authorization header, cookies handle it
+        {
+          withCredentials: true,
         }
       );
-      
-      console.log("API Response:", res.data); // Debug log
-      
+
       if (res.data.success) {
         setApplications(res.data.data || []);
+      } else {
+        setApplications([]);
+        setFetchError({
+          kind: "api",
+          message: res.data.message || "Failed to load vendor applications.",
+        });
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const axiosErr = err as {
+        response?: { status?: number; data?: { message?: string } };
+      };
+      const status = axiosErr.response?.status;
+      const message =
+        axiosErr.response?.data?.message || "Failed to fetch applications.";
+
       console.error("Error fetching applications:", err);
-      toast.error(err.response?.data?.message || "Failed to fetch applications");
-      // Set empty array if error
+
+      if (status === 401) {
+        setFetchError({
+          kind: "auth",
+          message: "Your admin session expired. Sign in again to view applications.",
+        });
+      } else if (status === 403) {
+        setFetchError({
+          kind: "forbidden",
+          message: "You do not have permission to view vendor applications.",
+        });
+      } else {
+        setFetchError({ kind: "api", message });
+        toast.error(message);
+      }
+
       setApplications([]);
     } finally {
       setLoading(false);
@@ -296,6 +326,41 @@ const VendorApplicationsPage = () => {
               <div className="p-6 text-center">
                 <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                 <p className="mt-2 text-sm text-gray-500">Loading applications...</p>
+              </div>
+            ) : fetchError ? (
+              <div className="p-8 text-center">
+                <AlertCircle className="w-12 h-12 mx-auto text-amber-500" />
+                <p className="mt-3 text-sm font-medium text-gray-900">
+                  {fetchError.kind === "auth"
+                    ? "Admin session required"
+                    : fetchError.kind === "forbidden"
+                      ? "Access denied"
+                      : "Could not load applications"}
+                </p>
+                <p className="mt-2 text-sm text-gray-600">{fetchError.message}</p>
+                <div className="mt-4 flex flex-col items-center gap-2 sm:flex-row sm:justify-center">
+                  {fetchError.kind === "auth" ? (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        router.push(
+                          "/signin?redirect=%2Fadmin%2Fvendor-applications"
+                        )
+                      }
+                      className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700"
+                    >
+                      Admin sign in
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={fetchApplications}
+                      className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700"
+                    >
+                      Try again
+                    </button>
+                  )}
+                </div>
               </div>
             ) : filteredApplications.length === 0 ? (
               <div className="p-6 text-center">
