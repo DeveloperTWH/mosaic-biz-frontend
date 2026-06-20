@@ -24,6 +24,18 @@ export const isBusinessOwner = (user: AuthenticatedUser | null | undefined): boo
 export const isCustomer = (user: AuthenticatedUser | null | undefined): boolean =>
   user?.role === 'customer';
 
+export const isAdmin = (user: AuthenticatedUser | null | undefined): boolean =>
+  user?.role === 'admin';
+
+export function getPostLoginRedirectPath(
+  user: AuthenticatedUser,
+  safeRedirect?: string | null
+): string {
+  if (isAdmin(user)) return safeRedirect || '/admin';
+  if (isBusinessOwner(user)) return '/partners';
+  return safeRedirect || '/';
+}
+
 export type CheckoutAccessDenied =
   | { kind: 'redirect_login' }
   | { kind: 'toast'; message: string }
@@ -44,7 +56,7 @@ export async function resolveCheckoutAccess(): Promise<CheckoutAccessResult> {
     return { allowed: true, user };
   }
 
-  if (user.role === 'business_owner') {
+  if (isBusinessOwner(user)) {
     return {
       allowed: false,
       denial: {
@@ -55,7 +67,7 @@ export async function resolveCheckoutAccess(): Promise<CheckoutAccessResult> {
     };
   }
 
-  if (user.role === 'admin') {
+  if (isAdmin(user)) {
     return {
       allowed: false,
       denial: {
