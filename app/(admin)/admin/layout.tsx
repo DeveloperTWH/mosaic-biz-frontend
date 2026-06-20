@@ -1,7 +1,27 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { getAuthenticatedUser, isAdmin } from "@/utils/authUtils";
+
+type AuthState =
+  | { status: "checking" }
+  | { status: "allowed" }
+  | { status: "unauthenticated" }
+  | { status: "forbidden"; homeHref: string }
+  | { status: "error"; message: string };
+
+function getHomeHrefForRole(role: string): string {
+  switch (role) {
+    case "business_owner":
+      return "/partners";
+    case "customer":
+      return "/customer/order";
+    default:
+      return "/";
+  }
+}
 
 export default function AdminAppLayout({
   children,
@@ -10,39 +30,43 @@ export default function AdminAppLayout({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const [checkingAuth, setCheckingAuth] = useState(true);
+  const [authState, setAuthState] = useState<AuthState>({ status: "checking" });
 
   useEffect(() => {
     let cancelled = false;
 
     const verifyAdmin = async () => {
       try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/auth/check`,
-          {
-            credentials: "include",
-          }
-        );
-
-        if (!res.ok) {
-          throw new Error("Unauthorized");
-        }
-
-        const data = await res.json();
+        const user = await getAuthenticatedUser();
 
         if (cancelled) {
           return;
         }
 
-        if (data?.user?.role !== "admin") {
-          router.replace(`/signin?redirect=${encodeURIComponent(pathname || "/admin")}`);
+        if (!user) {
+          setAuthState({ status: "unauthenticated" });
+          router.replace(
+            `/signin?redirect=${encodeURIComponent(pathname || "/admin")}`
+          );
           return;
         }
 
-        setCheckingAuth(false);
-      } catch (error) {
+        if (!isAdmin(user)) {
+          setAuthState({
+            status: "forbidden",
+            homeHref: getHomeHrefForRole(user.role),
+          });
+          return;
+        }
+
+        setAuthState({ status: "allowed" });
+      } catch {
         if (!cancelled) {
-          router.replace(`/signin?redirect=${encodeURIComponent(pathname || "/admin")}`);
+          setAuthState({
+            status: "error",
+            message:
+              "Unable to verify admin access. Check your connection and try again.",
+          });
         }
       }
     };
@@ -54,7 +78,7 @@ export default function AdminAppLayout({
     };
   }, [pathname, router]);
 
-  if (checkingAuth) {
+  if (authState.status === "checking" || authState.status === "unauthenticated") {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-100">
         <div className="text-center">
@@ -62,6 +86,60 @@ export default function AdminAppLayout({
           <p className="mt-4 text-sm font-medium text-gray-600">
             Checking admin access...
           </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (authState.status === "forbidden") {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4">
+        <div className="max-w-md rounded-lg bg-white p-8 text-center shadow-lg">
+          <h1 className="text-xl font-semibold text-gray-900">Admin access required</h1>
+          <p className="mt-3 text-sm text-gray-600">
+            Your account is signed in but does not have permission to view the admin
+            console.
+          </p>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
+            <Link
+              href={authState.homeHref}
+              className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+            >
+              Go to your account
+            </Link>
+            <Link
+              href="/signin"
+              className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            >
+              Admin sign in
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (authState.status === "error") {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4">
+        <div className="max-w-md rounded-lg bg-white p-8 text-center shadow-lg">
+          <h1 className="text-xl font-semibold text-gray-900">Could not verify access</h1>
+          <p className="mt-3 text-sm text-gray-600">{authState.message}</p>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+            >
+              Try again
+            </button>
+            <Link
+              href={`/signin?redirect=${encodeURIComponent(pathname || "/admin")}`}
+              className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            >
+              Admin sign in
+            </Link>
+          </div>
         </div>
       </div>
     );

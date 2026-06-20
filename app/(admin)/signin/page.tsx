@@ -3,13 +3,21 @@
 import { useState, Suspense } from "react";
 import { toast } from "react-toastify";
 import { useRouter, useSearchParams } from "next/navigation";
+import { logAuthRequest } from "@/utils/authDebug";
+import { parseAuthJsonResponse } from "@/utils/parseAuthErrorResponse";
+import {
+  getAuthenticatedUser,
+  getPostLoginRedirectPath,
+  isAdmin,
+  persistClientSession,
+} from "@/utils/authUtils";
 
 const SignInContent = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false); // Global loader
-  const [buttonLoading, setButtonLoading] = useState(false); // Button loader
-  const [error, setError] = useState(""); // Error message state
+  const [loading, setLoading] = useState(false);
+  const [buttonLoading, setButtonLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -21,51 +29,81 @@ const SignInContent = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setButtonLoading(true); // Show button loader
-    setLoading(true); // Show page loader
-    setError(""); // Reset any previous error message
+    setButtonLoading(true);
+    setLoading(true);
+    setError("");
 
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/login`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email,
-            password,
-            role: "admin",
-          }),
-          credentials: "include",
+      const loginUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/login`;
+      const res = await fetch(loginUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          password,
+          role: "admin",
+        }),
+        credentials: "include",
+      });
+
+      const { data, errorMessage } = await parseAuthJsonResponse<{
+        success?: boolean;
+        otpPending?: boolean;
+        message?: string;
+        user?: { gender?: string; role?: string; email?: string; name?: string };
+      }>(res);
+
+      logAuthRequest({
+        endpoint: loginUrl,
+        method: "POST",
+        status: res.status,
+        credentialsIncluded: true,
+        body: data ?? undefined,
+      });
+
+      if (data?.success && data.user) {
+        const sessionUser = await getAuthenticatedUser();
+
+        logAuthRequest({
+          endpoint: `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/auth/check`,
+          method: "GET",
+          status: sessionUser ? 200 : 401,
+          credentialsIncluded: true,
+          body: sessionUser
+            ? { success: true, user: { role: sessionUser.role } }
+            : undefined,
+        });
+
+        if (!sessionUser) {
+          setError(
+            "Sign-in succeeded but session was not established. Try again or contact support."
+          );
+          return;
         }
-      );
 
-      const data = await res.json();
+        if (!isAdmin(sessionUser)) {
+          setError("This account does not have admin access.");
+          return;
+        }
 
-      console.log(data);
-      
-
-      if (data.success) {
+        persistClientSession(sessionUser);
         toast.success("Welcome!");
-        localStorage.setItem("user_session", "true");
-        localStorage.setItem("user_gender", data.user.gender || "");
-        localStorage.setItem("user_name", data.user.name || "");
-        router.push(safeRedirect);
-      } else if (data.otpPending) {
+        router.push(getPostLoginRedirectPath(sessionUser, safeRedirect));
+      } else if (data?.otpPending && data.user?.email) {
         router.push(
           `/verify-otp?email=${encodeURIComponent(data.user.email)}&type=${encodeURIComponent(
-            data.user.role
+            data.user.role || "admin"
           )}&redirect=${encodeURIComponent(safeRedirect)}`
         );
       } else {
-        setError(data.message || "Login failed");
+        setError(errorMessage || data?.message || "Login failed");
       }
     } catch (err) {
       console.error("Login error:", err);
       setError("Something went wrong. Please try again.");
     } finally {
-      setLoading(false); // Hide page loader
-      setButtonLoading(false); // Hide button loader
+      setLoading(false);
+      setButtonLoading(false);
     }
   };
 
@@ -106,7 +144,6 @@ const SignInContent = () => {
             />
           </div>
 
-          {/* Error message section */}
           {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
 
           <div className="flex items-center justify-between">
