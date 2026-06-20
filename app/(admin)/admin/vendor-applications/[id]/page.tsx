@@ -296,9 +296,26 @@ const normalizeUrl = (url?: string) => {
         toast.error(res.data.message || "Failed to load application");
         router.push("/admin/vendor-applications");
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error fetching application:", err);
-      toast.error(err.response?.data?.message || "Failed to fetch application details");
+      const axiosErr = err as {
+        response?: { status?: number; data?: { message?: string } };
+      };
+      const status = axiosErr.response?.status;
+      const message =
+        axiosErr.response?.data?.message || "Failed to fetch application details";
+
+      toast.error(message);
+
+      if (status === 401) {
+        router.push(
+          `/signin?redirect=${encodeURIComponent(
+            `/admin/vendor-applications/${applicationId}`
+          )}`
+        );
+        return;
+      }
+
       router.push("/admin/vendor-applications");
     } finally {
       setLoading(false);
@@ -409,6 +426,21 @@ const normalizeUrl = (url?: string) => {
   };
 
   const canFinalize = () => {
+    if (!application) return false;
+
+    const reviewableStatuses = ["submitted", "under_review"];
+    if (!reviewableStatuses.includes(application.status)) {
+      return false;
+    }
+
+    const verificationProgress = getVerificationProgress();
+    if (
+      verificationProgress.totalRequired > 0 &&
+      verificationProgress.required !== verificationProgress.totalRequired
+    ) {
+      return false;
+    }
+
     return true;
   };
 
