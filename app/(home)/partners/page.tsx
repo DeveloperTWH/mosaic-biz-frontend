@@ -22,6 +22,11 @@ import {
   isBusinessOwner,
   persistClientSession,
 } from "@/utils/authUtils";
+import {
+  submitStage1,
+  VendorSubmissionError,
+  waitForStage1PaymentConfirmation,
+} from "@/lib/api/vendorOnboarding";
 
 interface Business {
   _id: string;
@@ -111,6 +116,16 @@ function isStage1Complete(status: string): boolean {
   return status === "verified" || status === "approved";
 }
 
+function isPaidNeedsSubmit(
+  status: string,
+  paymentStatus: string
+): boolean {
+  return (
+    paymentStatus === "paid" &&
+    (status === "draft" || status === "pending")
+  );
+}
+
 const Page: React.FC = () => {
   const router = useRouter();
   const [businesses, setBusinesses] = useState<Business[]>([]);
@@ -121,6 +136,9 @@ const Page: React.FC = () => {
   const [onboardingLoading, setOnboardingLoading] = useState(true);
   const [selectedStage, setSelectedStage] = useState<number>(1);
   const [showRegistrationModal, setShowRegistrationModal] = useState(false);
+  const [submitLoading, setSubmitLoading] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [stripeReturnProcessing, setStripeReturnProcessing] = useState(false);
 
   const checkApplicationId = async () => {
     try {
@@ -227,7 +245,6 @@ const Page: React.FC = () => {
       );
 
       if (response.data.success) {
-        
         setOnboardingStatus(response.data);
       }
     } catch (error) {
@@ -236,6 +253,89 @@ const Page: React.FC = () => {
       setOnboardingLoading(false);
     }
   };
+
+  const confirmAndSubmitApplication = async (appId: string) => {
+    setSubmitLoading(true);
+    setSubmitError(null);
+
+    try {
+      const ready = await waitForStage1PaymentConfirmation();
+      if (!ready) {
+        setSubmitError(
+          "Payment is still being confirmed. Please wait a moment and try again."
+        );
+        return false;
+      }
+
+      await submitStage1();
+      await fetchOnboardingStatus(appId);
+      return true;
+    } catch (err) {
+      if (err instanceof VendorSubmissionError && err.status === 402) {
+        setSubmitError(
+          "Payment confirmation is still processing. Please try again shortly."
+        );
+      } else {
+        setSubmitError(
+          err instanceof Error
+            ? err.message
+            : "Failed to submit application. Please try again."
+        );
+      }
+      return false;
+    } finally {
+      setSubmitLoading(false);
+    }
+  };
+
+  const handleSubmitApplication = async () => {
+    if (!applicationId) return;
+    await confirmAndSubmitApplication(applicationId);
+  };
+
+  useEffect(() => {
+    if (typeof window === "undefined" || loading || !applicationId) {
+      return;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const paymentIntentId = params.get("payment_intent");
+    const redirectStatus = params.get("redirect_status");
+
+    if (!paymentIntentId || redirectStatus !== "succeeded") {
+      return;
+    }
+
+    const processedKey = `vendor_stage1_submit_${paymentIntentId}`;
+    if (sessionStorage.getItem(processedKey) === "done") {
+      router.replace("/partners");
+      return;
+    }
+
+    let cancelled = false;
+
+    const runStripeReturnSubmit = async () => {
+      setStripeReturnProcessing(true);
+      sessionStorage.setItem(processedKey, "done");
+
+      const succeeded = await confirmAndSubmitApplication(applicationId);
+      if (cancelled) return;
+
+      setStripeReturnProcessing(false);
+      router.replace("/partners");
+
+      if (!succeeded) {
+        sessionStorage.removeItem(processedKey);
+      }
+    };
+
+    runStripeReturnSubmit();
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, applicationId]);
 
   useEffect(() => {
     if (onboardingStatus?.data?.currentStage) {
@@ -327,8 +427,23 @@ const Page: React.FC = () => {
     if (!onboardingStatus) return null;
 
     if (selectedStage === 1) {
+      const stage1 = onboardingStatus.data.details.stage1;
+      const paidNeedsSubmit = isPaidNeedsSubmit(
+        stage1.status,
+        stage1.paymentStatus
+      );
+
       return (
         <div className="space-y-4">
+          {stripeReturnProcessing && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-start gap-3">
+              <Clock className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5 animate-pulse" />
+              <p className="text-sm text-blue-800">
+                Payment received. Submitting your application for admin review…
+              </p>
+            </div>
+          )}
+
           <div className="grid gap-3 md:grid-cols-3">
             <div className="p-3 bg-gray-50 rounded-lg">
               <p className="text-xs text-gray-500 mb-1">Status</p>
@@ -375,11 +490,59 @@ const Page: React.FC = () => {
             </div>
           )}
 
-          {onboardingStatus.data.details.stage1.status === "draft" && (
+          {paidNeedsSubmit && (
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 space-y-3">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-amber-900">
+                    Payment received — one step left
+                  </p>
+                  <p className="text-sm text-amber-800 mt-1">
+                    Submit your application to send it to the admin review queue.
+                    Your application is not under review until submission completes.
+                  </p>
+                </div>
+              </div>
+              {submitError && (
+                <p className="text-sm text-red-700">{submitError}</p>
+              )}
+              <div className="flex flex-wrap justify-end gap-2">
+                <Link href="/partners/business/new">
+                  <button
+                    type="button"
+                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                  >
+                    Edit application
+                  </button>
+                </Link>
+                <button
+                  type="button"
+                  onClick={handleSubmitApplication}
+                  disabled={submitLoading || stripeReturnProcessing}
+                  className="px-6 py-2 bg-indigo-900 text-white text-sm font-medium rounded-lg hover:bg-indigo-800 transition-colors disabled:opacity-60"
+                >
+                  {submitLoading ? "Submitting…" : "Submit application"}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {stage1.status === "draft" && !paidNeedsSubmit && (
             <div className="flex justify-end">
               <Link href="/partners/business/new">
                 <button className="px-6 py-2 bg-indigo-900 text-white text-sm font-medium rounded-lg hover:bg-indigo-800 transition-colors">
                   Continue Draft
+                </button>
+              </Link>
+            </div>
+          )}
+
+          {stage1.status === "pending" && !paidNeedsSubmit && stage1.paymentStatus !== "paid" && (
+            <div className="flex justify-end">
+              <Link href="/partners/business/new">
+                <button className="px-6 py-2 bg-indigo-900 text-white text-sm font-medium rounded-lg hover:bg-indigo-800 transition-colors">
+                  Continue application
                 </button>
               </Link>
             </div>

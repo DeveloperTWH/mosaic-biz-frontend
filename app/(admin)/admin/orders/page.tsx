@@ -7,7 +7,7 @@ import { toast } from "react-toastify";
 import Sidebar from "../components/Sidebar";
 import Topbar from "../components/Topbar";
 import {
-  CreditCard,
+  AlertCircle,
   CheckCircle2,
   Clock3,
   XCircle,
@@ -19,6 +19,7 @@ import {
   Ban,
   Undo2,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 type Order = {
   _id: string;
@@ -63,10 +64,32 @@ type StatusSummary = {
 
 const LIMIT = 20;
 
+type FetchErrorState = {
+  kind: "auth" | "forbidden" | "api";
+  message: string;
+};
+
+function getPopulatedField(
+  ref: { [key: string]: unknown } | string | null | undefined,
+  field: string,
+  fallback = "—"
+): string {
+  if (ref && typeof ref === "object") {
+    const value = ref[field];
+    return value != null ? String(value) : fallback;
+  }
+  if (ref == null || ref === "") {
+    return fallback;
+  }
+  return String(ref);
+}
+
 export default function OrdersPage() {
+  const router = useRouter();
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<FetchErrorState | null>(null);
 
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -94,6 +117,8 @@ export default function OrdersPage() {
   const fetchOrders = async () => {
     try {
       setLoading(true);
+      setFetchError(null);
+
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/orders/admin`,
         {
@@ -102,16 +127,57 @@ export default function OrdersPage() {
         }
       );
 
-      const { data, pagination, summary } = res.data || {};
-      setOrders(data || []);
+      if (!res.data?.success) {
+        setOrders([]);
+        setFetchError({
+          kind: "api",
+          message: res.data?.message || "Failed to load orders.",
+        });
+        return;
+      }
+
+      const { data, pagination, summary } = res.data;
+      if (!Array.isArray(data)) {
+        setOrders([]);
+        setFetchError({
+          kind: "api",
+          message: "Unexpected orders response from server.",
+        });
+        return;
+      }
+
+      setOrders(data);
       setTotal(pagination?.total || 0);
       setTotalPages(pagination?.totalPages || 1);
 
       if (summary?.payment) setPaymentSummary(summary.payment);
       if (summary?.status) setStatusSummary(summary.status);
-    } catch (e) {
+    } catch (e: unknown) {
+      const axiosErr = e as {
+        response?: { status?: number; data?: { message?: string } };
+      };
+      const status = axiosErr.response?.status;
+      const message =
+        axiosErr.response?.data?.message || "Failed to fetch orders.";
+
       console.error(e);
-      toast.error("Failed to fetch orders.");
+
+      if (status === 401) {
+        setFetchError({
+          kind: "auth",
+          message: "Your admin session expired. Sign in again to view orders.",
+        });
+      } else if (status === 403) {
+        setFetchError({
+          kind: "forbidden",
+          message: "You do not have permission to view orders.",
+        });
+      } else {
+        setFetchError({ kind: "api", message });
+        toast.error(message);
+      }
+
+      setOrders([]);
     } finally {
       setLoading(false);
     }
@@ -279,6 +345,39 @@ export default function OrdersPage() {
 
             {loading ? (
               <div className="p-6 text-sm text-gray-500">Loading orders…</div>
+            ) : fetchError ? (
+              <div className="p-8 text-center">
+                <AlertCircle className="w-12 h-12 mx-auto text-amber-500" />
+                <p className="mt-3 text-sm font-medium text-gray-900">
+                  {fetchError.kind === "auth"
+                    ? "Admin session required"
+                    : fetchError.kind === "forbidden"
+                      ? "Access denied"
+                      : "Could not load orders"}
+                </p>
+                <p className="mt-2 text-sm text-gray-600">{fetchError.message}</p>
+                <div className="mt-4 flex flex-col items-center gap-2 sm:flex-row sm:justify-center">
+                  {fetchError.kind === "auth" ? (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        router.push("/signin?redirect=%2Fadmin%2Forders")
+                      }
+                      className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700"
+                    >
+                      Admin sign in
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={fetchOrders}
+                      className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700"
+                    >
+                      Try again
+                    </button>
+                  )}
+                </div>
+              </div>
             ) : orders.length === 0 ? (
               <div className="p-6 text-sm text-gray-500">No orders found.</div>
             ) : (
@@ -300,18 +399,12 @@ export default function OrdersPage() {
                     </thead>
                     <tbody className="divide-y">
                       {orders.map((o) => {
-                        const businessName =
-                          typeof o.businessId === "object"
-                            ? (o.businessId as any).businessName
-                            : String(o.businessId);
-                        const vendorName =
-                          typeof o.vendorId === "object"
-                            ? (o.vendorId as any).name
-                            : String(o.vendorId);
-                        const userName =
-                          typeof o.userId === "object"
-                            ? (o.userId as any).name
-                            : String(o.userId);
+                        const businessName = getPopulatedField(
+                          o.businessId,
+                          "businessName"
+                        );
+                        const vendorName = getPopulatedField(o.vendorId, "name");
+                        const userName = getPopulatedField(o.userId, "name");
 
                         return (
                           <tr key={o._id} className="hover:bg-gray-50/60">
