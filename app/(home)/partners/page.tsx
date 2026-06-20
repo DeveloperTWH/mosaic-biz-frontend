@@ -43,7 +43,14 @@ interface OnboardingStatus {
     nextAction: string;
     details: {
       stage1: {
-        status: "pending" | "draft" | "submitted" | "approved" | "rejected";
+        status:
+          | "pending"
+          | "draft"
+          | "submitted"
+          | "under_review"
+          | "approved"
+          | "verified"
+          | "rejected";
         points: number;
         paymentStatus: "pending" | "paid" | "failed";
       };
@@ -78,6 +85,31 @@ const onboardingSteps = [
   { number: 5, label: "Payout & Bank Setup" },
   { number: 6, label: "Final Review" },
 ];
+
+function getStage1StatusLabel(status: string): string {
+  switch (status) {
+    case "rejected":
+      return "Rejected";
+    case "verified":
+      return "Verified";
+    case "approved":
+      return "Approved";
+    case "submitted":
+      return "Submitted";
+    case "under_review":
+      return "Under Review";
+    case "draft":
+      return "Draft";
+    case "pending":
+      return "Pending";
+    default:
+      return status;
+  }
+}
+
+function isStage1Complete(status: string): boolean {
+  return status === "verified" || status === "approved";
+}
 
 const Page: React.FC = () => {
   const router = useRouter();
@@ -216,9 +248,11 @@ const Page: React.FC = () => {
       case "draft":
         return <FileText className="w-5 h-5 text-gray-500" />;
       case "submitted":
+      case "under_review":
       case "in_progress":
         return <Clock className="w-5 h-5 text-yellow-500" />;
       case "approved":
+      case "verified":
       case "completed":
         return <CheckCircle className="w-5 h-5 text-green-500" />;
       case "pending":
@@ -237,9 +271,11 @@ const Page: React.FC = () => {
       case "draft":
         return "bg-gray-100 text-gray-800";
       case "submitted":
+      case "under_review":
       case "in_progress":
         return "bg-yellow-100 text-yellow-800";
       case "approved":
+      case "verified":
       case "completed":
         return "bg-green-100 text-green-800";
       case "pending":
@@ -306,9 +342,7 @@ const Page: React.FC = () => {
                     onboardingStatus.data.details.stage1.status
                   )}`}
                 >
-                  {onboardingStatus.data.details.stage1.status === "rejected"
-                    ? "Rejected"
-                    : onboardingStatus.data.details.stage1.status}
+                  {getStage1StatusLabel(onboardingStatus.data.details.stage1.status)}
                 </span>
               </div>
             </div>
@@ -353,6 +387,30 @@ const Page: React.FC = () => {
 
           {onboardingStatus.data.details.stage1.status === "submitted" && (
             <p className="text-xs text-gray-500">Awaiting admin review (24-48 hours)</p>
+          )}
+
+          {onboardingStatus.data.details.stage1.status === "under_review" && (
+            <p className="text-xs text-gray-500">Your application is under admin review.</p>
+          )}
+
+          {isStage1Complete(onboardingStatus.data.details.stage1.status) && (
+            <div className="space-y-3">
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-start gap-3">
+                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-green-800">
+                  Verification complete. Continue to the next onboarding step below.
+                </p>
+              </div>
+              {onboardingStatus.data.currentStage >= 3 && (
+                <Link href="/partners/business-profile">
+                  <button className="px-6 py-2 bg-indigo-900 text-white text-sm font-medium rounded-lg hover:bg-indigo-800 transition-colors flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4" />
+                    Continue to Business Profile
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </Link>
+              )}
+            </div>
           )}
         </div>
       );
