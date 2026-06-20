@@ -1,4 +1,5 @@
-import { isUserLoggedIn } from './authUtils';
+import { isUserLoggedIn, resolveCheckoutAccess } from './authUtils';
+import { toast } from 'react-toastify';
 
 interface CartItem {
   productId: string;
@@ -1471,25 +1472,38 @@ export async function handlePlaceOrderFlow(
   selectedDeliverySpeed?: DeliverySpeed,
   checkoutSource: "cart" | "buy-now" = checkoutItems ? "buy-now" : "cart"
 ) {
-  const loggedIn = await isUserLoggedIn();
   const paymentPage = "/checkout/payment";
+  const access = await resolveCheckoutAccess();
 
-  if (!loggedIn) {
-    window.location.href = `/login?type=customer`;
+  if (!access.allowed) {
+    if (access.denial.kind === 'redirect_login') {
+      window.location.href = '/login?type=customer';
+      return;
+    }
+
+    if (access.denial.kind === 'toast') {
+      toast.error(access.denial.message);
+      return;
+    }
+
+    if (access.denial.message) {
+      toast.error(access.denial.message);
+    }
+    window.location.href = access.denial.path;
     return;
   }
 
   // Build items from either a product-only checkout or the current cart.
   const cart: CartItemDetailed[] = checkoutItems ?? await getCartDetailed();
   if (!cart.length) {
-    alert("Your cart is empty.");
+    toast.error("Your cart is empty.");
     return;
   }
 
   // (Optional) Quick client-side sanity: ensure each line has variant & size
   for (const it of cart) {
     if (!it.productId || !it.variantId || !it.size) {
-      alert("One or more items are missing variant/size. Please re-add them.");
+      toast.error("One or more items are missing variant/size. Please re-add them.");
       return;
     }
   }
@@ -1512,7 +1526,7 @@ export async function handlePlaceOrderFlow(
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     const msg = err?.message || "Failed to initiate order";
-    alert(msg);
+    toast.error(msg);
     return;
   }
 
