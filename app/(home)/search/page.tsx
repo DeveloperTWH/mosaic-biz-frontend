@@ -460,7 +460,7 @@ const tabItems = [
         {loading ? (
           <MarketLoadingBlock label="Searching results…" minHeight="min-h-[320px]" />
         ) : error ? (
-          <div className="market-card border-red-400/30 p-4 text-red-300">{error}</div>
+          <div className="market-state-error">{error}</div>
         ) : totalResults === 0 && !hasAnyFilter ? (
           <MarketEmptyState
             title="Search the marketplace"

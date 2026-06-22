@@ -139,10 +139,10 @@ function PaymentSuccessPage() {
     return (
       <div className="mx-auto max-w-lg p-8 text-center">
         <h1 className="text-xl font-semibold text-red-700">Payment not completed</h1>
-        <p className="mt-3 text-sm text-gray-600">
+        <p className="mt-3 text-sm text-brand-muted">
           Your payment was cancelled or could not be confirmed. No charge was finalized.
         </p>
-        <a href="/cart" className="mt-6 inline-block bg-[#1A1F71] px-6 py-2 text-sm font-semibold text-white">
+        <a href="/cart" className="mt-6 inline-block rounded bg-brand-navy-light px-6 py-2 text-sm font-semibold text-white hover:bg-brand-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold">
           Return to cart
         </a>
       </div>
@@ -153,7 +153,7 @@ function PaymentSuccessPage() {
     return (
       <div className="mx-auto max-w-lg p-8 text-center">
         <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-[#C7A040] border-t-transparent" />
-        <p className="mt-4 text-sm text-gray-600">Confirming your payment...</p>
+        <p className="mt-4 commerce-state-loading">Confirming your payment...</p>
       </div>
     );
   }
@@ -162,10 +162,10 @@ function PaymentSuccessPage() {
     return (
       <div className="mx-auto max-w-lg p-8 text-center">
         <h1 className="text-xl font-semibold text-red-700">Unable to load receipt</h1>
-        <p className="mt-3 text-sm text-gray-600">
+        <p className="mt-3 text-sm text-brand-muted">
           Payment may have succeeded but receipt details are unavailable. Check your email or order history.
         </p>
-        <a href="/customer/order" className="mt-6 inline-block bg-[#1A1F71] px-6 py-2 text-sm font-semibold text-white">
+        <a href="/customer/order" className="mt-6 inline-block rounded bg-brand-navy-light px-6 py-2 text-sm font-semibold text-white hover:bg-brand-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold">
           View my orders
         </a>
       </div>
@@ -179,7 +179,7 @@ function PaymentSuccessPage() {
     <div className="max-w-4xl p-8 mx-auto mt-10 bg-white border rounded shadow-md print:text-sm print:mt-0">
       <h1 className="mb-6 text-3xl font-bold text-green-700">🧾 Payment Receipt</h1>
 
-      <div className="mb-6 space-y-1 text-gray-800">
+      <div className="mb-6 space-y-1 text-brand-navy">
         {/* <p><strong>Payment ID:</strong> {paymentData.id}</p> */}
         {/* <p><strong>Status:</strong> {paymentData.status}</p> */}
         <p><strong>Date:</strong> {date}</p>
@@ -212,32 +212,32 @@ function PaymentSuccessPage() {
                   )}
                   <div>
                     <p className="font-semibold">{item.productId.title}</p>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-brand-muted">
                       Variant ID: {item.variantId}
                     </p>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-brand-muted">
                       Size: {item.size}, Color: {item.color}
                     </p>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-brand-muted">
                       Quantity: {item.quantity}
                     </p>
                   </div>
                 </div>
-                <div className="w-full font-semibold text-right text-gray-700 sm:w-1/3">
+                <div className="w-full font-semibold text-right text-brand-navy sm:w-1/3">
                   ${(item.price * item.quantity).toFixed(2)}
                 </div>
               </div>
             ))}
           </div>
 
-          <div className="flex justify-end mt-4 font-semibold text-gray-900">
+          <div className="flex justify-end mt-4 font-semibold text-brand-navy">
             <span>Total: ${order.totalAmount.toFixed(2)}</span>
           </div>
         </div>
       ))}
 
       <div className="mt-6 text-center print:hidden">
-        <a href="/" className="inline-block px-6 py-2 text-white bg-blue-600 rounded hover:bg-blue-700">
+        <a href="/" className="inline-block rounded bg-brand-navy-light px-6 py-2 text-white hover:bg-brand-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold">
           Back to Home
         </a>
       </div>

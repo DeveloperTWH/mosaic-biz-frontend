@@ -5,14 +5,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 import { logoutUser } from "@/utils/logoutUser";
-import { LOGIN_LINKS, getStoredUserRole } from "./navConfig";
+import { DEFAULT_PROFILE_AVATAR, LOGIN_LINKS, getStoredUserRole } from "./navConfig";
 import CartButton from "./CartButton";
 
 type HeaderActionsProps = {
   variant: "desktop" | "compact";
   isLoggedIn: boolean | null;
   isCustomer: boolean | null;
-  gender: string | null;
   cartCount: number;
   mounted: boolean;
   bump: boolean;
@@ -22,7 +21,6 @@ export default function HeaderActions({
   variant,
   isLoggedIn,
   isCustomer,
-  gender,
   cartCount,
   mounted,
   bump,
@@ -56,7 +54,7 @@ export default function HeaderActions({
             className="market-nav-link flex min-h-11 min-w-11 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-market-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-market-header"
           >
             <Image
-              src={gender === "female" ? "/female-avatar.png" : "/male-avatar.png"}
+              src={DEFAULT_PROFILE_AVATAR}
               width={40}
               height={40}
               alt=""

@@ -662,7 +662,7 @@ export default function CartPage() {
                 <button
                   type="button"
                   onClick={() => dec(item)}
-                  className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-brand-navy"
+                  className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-300 bg-white text-brand-navy transition hover:border-brand-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold disabled:cursor-not-allowed disabled:border-gray-200 disabled:bg-gray-100 disabled:text-brand-muted disabled:opacity-80"
                   disabled={item.quantity <= 1}
                 >
                   -
@@ -675,7 +675,7 @@ export default function CartPage() {
                 <button
                   type="button"
                   onClick={() => inc(item)}
-                  className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-brand-navy"
+                  className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-300 bg-white text-brand-navy transition hover:border-brand-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold disabled:cursor-not-allowed disabled:border-gray-200 disabled:bg-gray-100 disabled:text-brand-muted disabled:opacity-80"
                 >
                   +
                 </button>
@@ -751,11 +751,7 @@ export default function CartPage() {
                                                 handleDeliverySpeedChange(speed as DeliverySpeed)
                                             }
                                             disabled={deliverySpeedLoading}
-                                            className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
-                                                isActive
-                                                    ? "border-blue-900 bg-blue-900 text-white"
-                                                    : "border-gray-300 bg-white text-gray-700 hover:border-blue-400"
-                                            } disabled:cursor-not-allowed disabled:opacity-60`}
+                                            className={`commerce-chip ${isActive ? "commerce-chip-selected" : ""}`}
                                         >
                                             {getShippingLabel(speed as DeliverySpeed)}
                                         </button>

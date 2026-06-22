@@ -12,6 +12,7 @@ import {
   DRAWER_EXPLORE_LINKS,
   BECOME_VENDOR_LINK,
   LOGIN_LINKS,
+  DEFAULT_PROFILE_AVATAR,
   getStoredUserRole,
 } from "./navConfig";
 
@@ -20,7 +21,6 @@ type MobileNavDrawerProps = {
   onClose: () => void;
   isLoggedIn: boolean | null;
   isCustomer: boolean | null;
-  gender: string | null;
 };
 
 function DrawerSection({
@@ -67,7 +67,6 @@ export default function MobileNavDrawer({
   onClose,
   isLoggedIn,
   isCustomer,
-  gender,
 }: MobileNavDrawerProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const [portalReady, setPortalReady] = useState(false);
@@ -176,11 +175,11 @@ export default function MobileNavDrawer({
               <div className="space-y-1">
                 <div className="flex items-center space-x-3 py-3">
                   <Image
-                    src={gender === "female" ? "/female-avatar.png" : "/male-avatar.png"}
+                    src={DEFAULT_PROFILE_AVATAR}
                     width={44}
                     height={44}
                     alt=""
-                    className="rounded-full border border-gray-300"
+                    className="rounded-full border border-market-gold/40 ring-1 ring-white/10"
                   />
                   <span className="font-medium text-market-text">My Account</span>
                 </div>

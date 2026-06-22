@@ -584,7 +584,7 @@ setMainImage(firstImage);
         <div className="fixed inset-0 z-[1000] bg-black/30 backdrop-blur-[1px] flex items-center justify-center">
           <div className="flex items-center gap-3 px-4 py-3 bg-white rounded-lg shadow">
             <span className="w-5 h-5 border-2 border-[#c79b44] rounded-full border-t-transparent animate-spin" />
-            <span className="text-sm font-medium text-gray-700">Loading…</span>
+            <span className="text-sm font-medium text-brand-navy">Loading…</span>
           </div>
         </div>
       )}
@@ -592,16 +592,16 @@ setMainImage(firstImage);
       {showVendorSwitchDialog && (
         <div className="fixed inset-0 z-[1100] flex items-center justify-center bg-black/45 px-4">
           <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
-            <h2 className="text-xl font-semibold text-gray-900">You&apos;re adding a product from a different vendor.</h2>
-            <p className="mt-4 text-sm leading-6 text-gray-600">
+            <h2 className="text-xl font-semibold text-brand-navy">You&apos;re adding a product from a different vendor.</h2>
+            <p className="mt-4 text-sm leading-6 text-brand-muted">
               Your current cart contains items from another vendor and will be cleared if you continue.
             </p>
-            <p className="mt-2 text-sm font-medium text-gray-800">Do you want to proceed?</p>
+            <p className="mt-2 text-sm font-medium text-brand-navy">Do you want to proceed?</p>
             <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-center">
               <button
                 type="button"
                 onClick={() => setShowVendorSwitchDialog(false)}
-                className="min-w-[140px] rounded-md border border-gray-300 px-6 py-3 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50"
+                className="min-w-[140px] rounded-md border border-gray-300 px-6 py-3 text-sm font-semibold text-brand-navy transition-colors hover:bg-gray-50"
               >
                 Cancel
               </button>
@@ -644,7 +644,7 @@ setMainImage(firstImage);
                   }
                 }}
               >
-                <Heart className={`w-4 h-4 ${liked ? 'text-red-500 fill-red-500' : 'text-gray-400'}`} fill={liked ? 'currentColor' : 'none'} />
+                <Heart className={`w-4 h-4 ${liked ? 'text-red-500 fill-red-500' : 'text-brand-muted'}`} fill={liked ? 'currentColor' : 'none'} />
               </button>
             </div>
 
@@ -692,7 +692,7 @@ setMainImage(firstImage);
             <div className="flex flex-wrap items-center gap-3">
               <TrustBadge tier={productBadge} size="sm" linkToExplainer />
               <p className="text-xs text-[#c79b44]">
-                <span className="text-gray-400">Seller: </span>
+                <span className="text-brand-muted">Seller: </span>
                 {sellerBusinessId ? (
                   <Link
                     href={`/vendor-profile/product-vendor/${sellerBusinessId}`}
@@ -708,7 +708,7 @@ setMainImage(firstImage);
 
             {/* Product Title */}
 <h1
-  className="text-[22px] leading-snug text-gray-900"
+  className="text-[22px] leading-snug text-brand-navy"
   style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600 , fontSize: '36px' }}
 >
   {product.title}
@@ -719,7 +719,7 @@ setMainImage(firstImage);
               <div className="flex items-center gap-0.5">
                 {renderStarIcons(averageRating, 'w-3.5 h-3.5')}
               </div>
-              <span className="text-xs text-gray-500 underline cursor-pointer">
+              <span className="text-xs text-brand-muted underline cursor-pointer">
                 {averageRating > 0 ? averageRating.toFixed(1) : '0.0'} Ratings & {totalReviews} Reviews
               </span>
             </div>
@@ -730,7 +730,7 @@ setMainImage(firstImage);
   <div className="flex items-baseline gap-3 pb-3 border-b border-gray-200">
     {/* Current price (sale price) */}
     <span
-      className="text-3xl text-gray-900"
+      className="commerce-price-primary"
       style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600 }}
     >
       ${price.current.toFixed(2)}
@@ -739,7 +739,7 @@ setMainImage(firstImage);
     {/* Slashed/original price */}
     {price.onSale && price.original > price.current && (
       <>
-        <span className="text-base text-gray-400 line-through">
+        <span className="commerce-price-compare">
           ${price.original.toFixed(2)}
         </span>
         {price.discount > 0 && (
@@ -759,7 +759,7 @@ setMainImage(firstImage);
 )}
 
             {(selectedVariant?.taxIncluded ?? product.taxIncluded) && (
-              <p className="text-xs text-gray-500 -mt-1">
+              <p className="text-xs text-brand-muted -mt-1">
                 Price shown includes tax. Detailed tax breakdown appears in cart
               </p>
             )}
@@ -775,13 +775,13 @@ setMainImage(firstImage);
                   return (
                     <div key={attributeKey} className="border-b border-gray-100 pb-3">
                       <div className="flex items-center justify-between mb-2">
-                        <p className="text-sm font-semibold text-gray-800">
+                        <p className="text-sm font-semibold text-brand-navy">
                           {formatAttributeName(attributeKey)}
                           {currentValue && !colorAttr && (
-                            <span className="font-normal text-gray-500 ml-2">{currentValue}</span>
+                            <span className="font-normal text-brand-muted ml-2">{currentValue}</span>
                           )}
                         </p>
-                        {/* <ChevronDown className="w-4 h-4 text-gray-400" /> */}
+                        {/* <ChevronDown className="w-4 h-4 text-brand-muted" /> */}
                       </div>
 
                       <div className="flex flex-wrap gap-2">
@@ -796,7 +796,7 @@ setMainImage(firstImage);
                                 onClick={() => isAvailable && setSelectedAttributes(prev => ({ ...prev, [attributeKey]: value }))}
                                 disabled={!isAvailable}
                                 title={value}
-                                className={`w-7 h-7 rounded-full border-2 transition-all ${isSelected ? 'border-black ring-2 ring-offset-1 ring-gray-400' : 'border-gray-300'} ${!isAvailable ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer hover:scale-110'}`}
+                                className={`w-7 h-7 rounded-full border-2 transition-all ${isSelected ? 'border-brand-navy ring-2 ring-offset-1 ring-brand-gold' : 'border-gray-300'} ${!isAvailable ? 'opacity-60 cursor-not-allowed ring-1 ring-gray-200' : 'cursor-pointer hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold'}`}
                                 style={{ backgroundColor: value }}
                               />
                             );
@@ -807,11 +807,11 @@ setMainImage(firstImage);
                               key={value}
                               onClick={() => isAvailable && setSelectedAttributes(prev => ({ ...prev, [attributeKey]: value }))}
                               disabled={!isAvailable}
-                              className={`min-w-[38px] px-3 py-1.5 border rounded text-sm font-medium transition-all ${isSelected
-                                ? 'bg-[#1e3a5f] text-white border-[#1e3a5f]'
+                              className={`min-w-[38px] px-3 py-1.5 border rounded text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold focus-visible:ring-offset-2 ${isSelected
+                                ? 'commerce-option-selected'
                                 : !isAvailable
-                                ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200'
-                                : 'bg-white text-gray-700 border-gray-300 hover:border-[#1e3a5f] cursor-pointer'
+                                ? 'commerce-option-disabled'
+                                : 'commerce-option'
                               }`}
                             >
                               {value}
@@ -827,8 +827,8 @@ setMainImage(firstImage);
 
             {/* Choose Your Shipping */}
 {/* <div className="pt-2">
-  <p className="text-sm font-semibold text-gray-800">Choose Your Shipping</p>
-  <p className="text-xs text-gray-500">Select one shipping option</p>
+  <p className="text-sm font-semibold text-brand-navy">Choose Your Shipping</p>
+  <p className="text-xs text-brand-muted">Select one shipping option</p>
 
   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-2">
     {(['standard', 'overnight', 'local'] as const).map((type) => {
@@ -842,10 +842,10 @@ setMainImage(firstImage);
             ${isSelected ? 'bg-[#c9a227] border-[#c9a227] text-white' : 'bg-white border-gray-300 hover:bg-gray-50'}
           `}
         >
-          <p className={`text-xs ${isSelected ? 'text-white/80' : 'text-gray-500'} capitalize`}>
+          <p className={`text-xs ${isSelected ? 'text-white/80' : 'text-brand-muted'} capitalize`}>
             {type}
           </p>
-          <p className={`text-sm font-semibold ${isSelected ? 'text-white' : 'text-gray-900'}`}>
+          <p className={`text-sm font-semibold ${isSelected ? 'text-white' : 'text-brand-navy'}`}>
             ${formatMoney(resolvedShipping[type])}
           </p>
         </button>
@@ -1029,7 +1029,7 @@ setMainImage(firstImage);
             {(product.weight || product.netQuantity || product.genericName) && (
               <div className="mt-6 pt-4 border-t border-gray-100">
                 <h3
-                  className="text-sm text-gray-900 uppercase tracking-wider mb-3"
+                  className="text-sm text-brand-navy uppercase tracking-wider mb-3"
                   style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700 }}
                 >
                   Additional Information
@@ -1037,20 +1037,20 @@ setMainImage(firstImage);
                 <div className="space-y-0">
                   {product.weight && (
                     <div className="flex py-1.5 border-b border-gray-100">
-                      <span className="w-44 text-xs text-gray-500 shrink-0" style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700 }}>Item Weight</span>
-                      <span className="text-xs text-gray-800" style={{ fontWeight: 600 }}>{product.weight}</span>
+                      <span className="w-44 text-xs text-brand-muted shrink-0" style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700 }}>Item Weight</span>
+                      <span className="text-xs text-brand-navy" style={{ fontWeight: 600 }}>{product.weight}</span>
                     </div>
                   )}
                   {product.netQuantity && (
                     <div className="flex py-1.5 border-b border-gray-100">
-                      <span className="w-44 text-xs text-gray-500 shrink-0" style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700 }}>Net Quantity</span>
-                      <span className="text-xs text-gray-800" style={{ fontWeight: 600 }}>{product.netQuantity}</span>
+                      <span className="w-44 text-xs text-brand-muted shrink-0" style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700 }}>Net Quantity</span>
+                      <span className="text-xs text-brand-navy" style={{ fontWeight: 600 }}>{product.netQuantity}</span>
                     </div>
                   )}
                   {product.genericName && (
                     <div className="flex py-1.5 border-b border-gray-100">
-                      <span className="w-44 text-xs text-gray-500 shrink-0" style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700 }}>Generic Name</span>
-                      <span className="text-xs text-gray-800" style={{ fontWeight: 600 }}>{product.genericName}</span>
+                      <span className="w-44 text-xs text-brand-muted shrink-0" style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700 }}>Generic Name</span>
+                      <span className="text-xs text-brand-navy" style={{ fontWeight: 600 }}>{product.genericName}</span>
                     </div>
                   )}
                 </div>
@@ -1067,19 +1067,19 @@ setMainImage(firstImage);
             {/* Ratings & Reviews — RIGHT COLUMN */}
             <div className="mt-6 pt-4 border-t border-gray-100">
               <h3
-                className="text-sm text-gray-900 uppercase tracking-wider mb-4"
+                className="text-sm text-brand-navy uppercase tracking-wider mb-4"
                 style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700 }}
               >
                 Ratings & Reviews
               </h3>
               <div className="text-center md:text-left">
-                <div className="text-5xl font-bold text-gray-900">
+                <div className="text-5xl font-bold text-brand-navy">
                   {averageRating > 0 ? averageRating.toFixed(1) : '0.0'}
                 </div>
                 <div className="flex items-center justify-center gap-0.5 mt-1 md:justify-start">
                   {renderStarIcons(averageRating)}
                 </div>
-                <p className="mt-1 text-xs text-gray-500">{totalReviews} Ratings & {totalReviews} Reviews</p>
+                <p className="mt-1 text-xs text-brand-muted">{totalReviews} Ratings & {totalReviews} Reviews</p>
               </div>
               <button
                 type="button"
@@ -1093,7 +1093,7 @@ setMainImage(firstImage);
               {reviewFormOpen && (
                 <form onSubmit={handleReviewSubmit} className="mt-5 space-y-4 rounded-xl border border-gray-200 bg-[#faf8f3] p-4">
                   <div>
-                    <label className="mb-2 block text-sm font-semibold text-gray-800">Your Rating</label>
+                    <label className="mb-2 block text-sm font-semibold text-brand-navy">Your Rating</label>
                     <div className="flex items-center gap-1">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <button
@@ -1105,7 +1105,7 @@ setMainImage(firstImage);
                         >
                           <svg
                             className={`h-8 w-8 ${
-                              star <= reviewForm.rating ? 'text-yellow-400' : 'text-gray-300'
+                              star <= reviewForm.rating ? 'text-yellow-400' : 'text-brand-muted'
                             } fill-current`}
                             viewBox="0 0 24 24"
                           >
@@ -1114,11 +1114,11 @@ setMainImage(firstImage);
                         </button>
                       ))}
                     </div>
-                    <p className="mt-2 text-xs text-gray-500">Selected: {reviewForm.rating} / 5</p>
+                    <p className="mt-2 text-xs text-brand-muted">Selected: {reviewForm.rating} / 5</p>
                   </div>
 
                   <div>
-                    <label htmlFor="review-comment" className="mb-2 block text-sm font-semibold text-gray-800">
+                    <label htmlFor="review-comment" className="mb-2 block text-sm font-semibold text-brand-navy">
                       Your Review
                     </label>
                     <textarea
@@ -1126,7 +1126,7 @@ setMainImage(firstImage);
                       value={reviewForm.comment}
                       onChange={(e) => setReviewForm((prev) => ({ ...prev, comment: e.target.value }))}
                       placeholder="Share your experience with this product"
-                      className="min-h-[120px] w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 outline-none transition-colors focus:border-[#c79b44]"
+                      className="min-h-[120px] w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-brand-navy outline-none transition-colors focus:border-[#c79b44]"
                     />
                   </div>
 
@@ -1142,7 +1142,7 @@ setMainImage(firstImage);
 
               <div className="mt-6 space-y-4">
                 {reviewsLoading ? (
-                  <div className="rounded-lg border border-dashed border-gray-200 px-4 py-6 text-sm text-gray-500">
+                  <div className="rounded-lg border border-dashed border-gray-200 px-4 py-6 text-sm text-brand-muted">
                     Loading reviews...
                   </div>
                 ) : visibleReviews.length > 0 ? (
@@ -1151,14 +1151,14 @@ setMainImage(firstImage);
                       <div key={review._id} className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
                         <div className="flex items-start justify-between gap-4">
                           <div>
-                            <p className="text-sm font-semibold text-gray-900">{review.userId?.name || 'Anonymous'}</p>
-                            <p className="mt-1 text-xs text-gray-500">{formatReviewDate(review.createdAt)}</p>
+                            <p className="text-sm font-semibold text-brand-navy">{review.userId?.name || 'Anonymous'}</p>
+                            <p className="mt-1 text-xs text-brand-muted">{formatReviewDate(review.createdAt)}</p>
                           </div>
                           <div className="flex items-center gap-0.5">
                             {renderStarIcons(review.rating, 'w-3.5 h-3.5')}
                           </div>
                         </div>
-                        <p className="mt-3 text-sm leading-6 text-gray-700">{review.comment}</p>
+                        <p className="mt-3 text-sm leading-6 text-brand-navy">{review.comment}</p>
                       </div>
                     ))}
 
@@ -1173,7 +1173,7 @@ setMainImage(firstImage);
                     )}
                   </>
                 ) : (
-                  <div className="rounded-lg border border-dashed border-gray-200 px-4 py-6 text-sm text-gray-500">
+                  <div className="rounded-lg border border-dashed border-gray-200 px-4 py-6 text-sm text-brand-muted">
                     No reviews yet. Be the first to rate this product.
                   </div>
                 )}
