@@ -163,10 +163,58 @@ Capture on preview after backend contract deploy:
 
 Revert branch `fix/frontend-service-publication-visibility-flow` — restores thin child payloads and optimistic publish toasts.
 
+## Runtime evidence (2026-06-22 post-backend smoke)
+
+**PR:** [#186](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/186) (Refs #185)  
+**Evidence pack:** [evidence/service-publication/README.md](evidence/service-publication/README.md)  
+**API log:** [evidence/service-publication/api-smoke-results.json](evidence/service-publication/api-smoke-results.json)
+
+### Backend deployment
+
+| Field | Value |
+|-------|--------|
+| Repository | Techware-Hut/mosaic-backend |
+| Branch | `fix/backend-service-publication-visibility-contract` (merged) |
+| PR | #108 |
+| Merge SHA | `79444917e925c392feec58365bb4e6e1ed115bea` |
+| Deployed | Production API (`NEXT_PUBLIC_API_BASE_URL`) |
+| Merge time | 2026-06-22T12:29:39Z |
+
+### Automated checks (frontend branch)
+
+| Command | Result |
+|---------|--------|
+| `npm run test:unit` | 22 pass |
+| `npm run build` | Pass |
+| `npm run lint` | 756 repo-wide; 4 in touched form files (baseline) |
+
+### Sanitized route evidence (highlights)
+
+| Step | Method | Route | Status | Notes |
+|------|--------|-------|--------|-------|
+| Login | POST | `/api/users/login` | 200 | role `business_owner` |
+| Save draft | PUT | `/api/service/:id` | 200 | `isPublished:false` |
+| Public list (draft) | GET | `/api/services/list?search=…` | 200 | `total:0` |
+| Publish | PUT | `/api/service/:id` | 200 | child DTO persisted |
+| Public detail (published) | GET | `/api/public/services/:id` | 200 | visible |
+| Public list (published) | GET | `/api/services/list?search=…` | 200 | `total:1` |
+| Unpublish | PUT | `/api/service/:id` | 200 | `isPublished:false` |
+| Invalid publish | PUT | `/api/service/:id` | 400 | validation blocked |
+| Unauthenticated owner read | GET | `/api/service/:id` | 401 | — |
+| Preview CORS | OPTIONS | `/api/users/login` | 500 | blocks PR UI smoke |
+
+### Blockers for closing #185
+
+1. **Preview CORS** — PR build cannot call production API from browser (vendor login/inventory blocked).
+2. **Missing `publication` block** on owner mutation responses (frontend helpers ready; backend not emitting).
+3. **Public detail on draft** returns 200 (backend visibility rule gap).
+
+**Recommendation:** Blocked for merge until preview UI smoke passes on an allowlisted origin and backend emits `publication` metadata.
+
 ## Not tested in this PR
 
-- Live API against repaired backend branch (backend proof doc branch not on GitHub at implementation time)
-- Full browser smoke with vendor test credentials on production
+- PR #186 inventory UI on Vercel preview (CORS blocked)
+- Scenario 7 ineligible business fixture
 - Stripe, Connect, bookings, auth changes (out of scope)
 
 ---
