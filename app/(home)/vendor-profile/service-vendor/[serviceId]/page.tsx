@@ -14,6 +14,7 @@ import TrustBadge from "../../../Components/TrustBadge";
 import { buildSearchPageUrl, PublicSearchFilters } from "../../../Components/publicSearch";
 import MarketEmptyState from "../../../Components/MarketEmptyState";
 import MarketLoadingBlock from "../../../Components/MarketLoadingBlock";
+import AccountEmptyState from "@/components/ui/account-empty-state";
 
 /* ─────────────── Types based on actual API response ─────────────── */
 type ServiceContact = {
@@ -818,6 +819,9 @@ export default function ServiceVendorProfilePage() {
   const todayHours = businessHours.find(h => h.day === todayName);
   const heroTitle = businessName || title || "Vendor Profile";
   const heroSection = subcategory || category || "Services";
+  const breadcrumbLabel = title && title !== businessName ? title : heroTitle;
+  const contentHeading =
+    title && title !== businessName ? title : heroTitle;
   const galleryItems = galleryImages.slice(0, 6);
   const bookingToolLink = data.bookingToolLink || "";
   const hasDirectBookingLink = /^https?:\/\//i.test(bookingToolLink);
@@ -967,13 +971,13 @@ export default function ServiceVendorProfilePage() {
 </h1>
 
     <nav className="mt-2 text-sm text-white/85">
-      <Link href="/" className="hover:text-white">Home</Link>
+      <Link href="/" className="hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60">Home</Link>
       <span className="mx-2">//</span>
-      <Link href="/services" className="hover:text-white">
+      <Link href="/services" className="hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60">
         {heroSection}
       </Link>
       <span className="mx-2">//</span>
-      <span className="text-[#c79b44]">{heroTitle}</span>
+      <span className="text-[#c79b44]">{breadcrumbLabel}</span>
     </nav>
   </div>
 
@@ -1025,6 +1029,12 @@ export default function ServiceVendorProfilePage() {
 
       {/* ── Main Content ── */}
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12 py-8">
+        <Link
+          href="/services"
+          className="mb-6 inline-flex min-h-11 items-center font-montserrat text-sm font-medium text-brand-teal transition-colors hover:text-brand-teal-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold"
+        >
+          ← Back to services
+        </Link>
         <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6">
 
           {/* ── LEFT COLUMN ── */}
@@ -1079,8 +1089,13 @@ export default function ServiceVendorProfilePage() {
             <div className="mt-7 border-b border-[#ece6d9] pb-5">
               <div className="flex items-center gap-2.5 flex-wrap">
                <h2 className="text-[32px] font-poppins font-semibold leading-none text-[#1b1b1b]">
-  {heroTitle}
+  {contentHeading}
 </h2>
+                {businessName && title && title !== businessName ? (
+                  <span className="font-montserrat text-sm text-brand-muted">
+                    by {businessName}
+                  </span>
+                ) : null}
                 {amenities?.slice(0, 2).map(a => (
                   <span key={a} className="border border-[#d7cfbb] bg-[#f7f3e7] px-2 py-0.5 text-[10px] uppercase tracking-[0.14em] text-[#8a7b52]">{a}</span>
                 ))}
@@ -1200,7 +1215,13 @@ export default function ServiceVendorProfilePage() {
 </h3>
 
   {sortedServices.length === 0 ? (
-    <p className="text-sm text-brand-muted">No services found.</p>
+    <AccountEmptyState
+      title="No services listed yet"
+      description="This vendor has not published individual services. Check back later or contact them directly."
+      ctaLabel="Browse services"
+      ctaHref="/services"
+      className="py-6"
+    />
   ) : (
     <div className="space-y-2.5">
       {sortedServices.map(svc => (
@@ -1209,11 +1230,17 @@ export default function ServiceVendorProfilePage() {
           className="group flex gap-3 border border-[#ece6d8] bg-[#F5F5F5] p-2.5 transition-shadow hover:shadow-sm"
         >
           <div className="h-16 w-16 shrink-0 overflow-hidden bg-gray-100">
-            <img
-              src={svc.image}
-              alt={svc.name}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            />
+            {svc.image ? (
+              <img
+                src={svc.image}
+                alt={svc.name}
+                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center px-1 text-center font-montserrat text-[10px] text-brand-muted">
+                No image
+              </div>
+            )}
           </div>
           <div className="flex-1 min-w-0">
             <h4 className="text-[15px] font-poppins font-bold text-[#1d1d1d]">

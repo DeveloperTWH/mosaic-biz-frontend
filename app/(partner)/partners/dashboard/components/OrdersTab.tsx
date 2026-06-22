@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
+import DashboardLoadingBlock from "@/components/ui/dashboard-loading-block";
+import DashboardEmptyState from "@/components/ui/dashboard-empty-state";
 
 interface OrdersTabProps {
   businessId?: string;
@@ -189,11 +191,7 @@ export default function OrdersTab({ businessId, isActive }: OrdersTabProps) {
   };
 
   if (loading) {
-    return (
-      <div className="rounded-2xl border border-[#ebe2d3] bg-[#fcfaf6] p-8 text-center">
-        <p className="text-sm font-medium text-gray-600">Loading orders...</p>
-      </div>
-    );
+    return <DashboardLoadingBlock label="Loading orders…" />;
   }
 
   return (

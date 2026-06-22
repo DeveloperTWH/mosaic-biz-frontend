@@ -1,12 +1,11 @@
-// components/LoadingPage.tsx
-import React from 'react';
+import DashboardLoadingBlock from "@/components/ui/dashboard-loading-block";
 
 const LoadingPage = () => {
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
-      <div className="w-32 h-32 mb-4 border-t-4 border-blue-500 rounded-full animate-spin"></div>
-      <p className="text-xl font-semibold text-gray-700">Loading Business Data...</p>
-    </div>
+    <DashboardLoadingBlock
+      label="Loading business data…"
+      minHeight="min-h-[60vh]"
+    />
   );
 };
 

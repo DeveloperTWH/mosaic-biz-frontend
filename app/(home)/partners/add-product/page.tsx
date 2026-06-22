@@ -2,6 +2,8 @@
 
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Save, Loader } from 'lucide-react';
+import VendorApplicationShell from '../components/VendorApplicationShell';
+import DashboardLoadingBlock from '@/components/ui/dashboard-loading-block';
 import { useProductForm } from './hooks/useProductForm';
 import ProductDetails from './components/ProductDetails';
 import VariationAttributes from './components/VariationAttributes';
@@ -54,27 +56,21 @@ export default function AddProductPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <Loader className="w-12 h-12 text-[#c9a227] animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
+      <VendorApplicationShell variant="dashboard" title="Add product">
+        <DashboardLoadingBlock label="Loading product form…" minHeight="min-h-[50vh]" />
+      </VendorApplicationShell>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white py-8">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Header */}
-        <div className="mb-8 text-center">
-          <h1 className="text-2xl font-bold text-gray-900 uppercase tracking-wide">LIST PRODUCTS</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Showcase all your products along with all the variations
-          </p>
-        </div>
-
+    <VendorApplicationShell
+      variant="dashboard"
+      title="List products"
+      description="Showcase all your products along with all the variations"
+      backHref="/partners/products"
+      backLabel="Back to products"
+    >
+      <div className="max-w-6xl">
         <form onSubmit={handleSubmit} className="space-y-6">
           
           {/* Two Column Layout */}
@@ -176,6 +172,6 @@ export default function AddProductPage() {
           </div>
         </form>
       </div>
-    </div>
+    </VendorApplicationShell>
   );
 }

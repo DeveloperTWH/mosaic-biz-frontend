@@ -1,67 +1,51 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import { Bell, Globe, Search, Menu } from 'lucide-react';
-import Image from 'next/image';
-import { DEFAULT_PROFILE_AVATAR } from '@/app/(home)/Components/nav/navConfig';
+import React from "react";
+import { Bell, Menu } from "lucide-react";
+import Image from "next/image";
+import { DEFAULT_PROFILE_AVATAR } from "@/app/(home)/Components/nav/navConfig";
 
 const Topbar = ({
   setIsSidebarOpen,
+  businessName,
 }: {
   setIsSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  businessName?: string;
 }) => {
-
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    const session = localStorage.getItem("user_session");
-    setIsLoggedIn(session === 'true');
-  }, []);
-
   return (
-    <header className="flex items-center justify-between w-full px-6 py-4 bg-white shadow">
-      <div className="flex items-center gap-4">
-        {/* ✅ Hamburger for Mobile */}
+    <header className="flex w-full items-center justify-between border-b border-border-warm bg-surface-panel px-4 py-4 shadow-sm md:px-6">
+      <div className="flex min-w-0 items-center gap-4">
         <button
-          className="p-2 bg-gray-100 rounded md:hidden"
-          onClick={() => setIsSidebarOpen((prev: boolean) => !prev)}
+          type="button"
+          className="rounded-md bg-surface-cream p-2 md:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dashboard-gold"
+          onClick={() => setIsSidebarOpen((prev) => !prev)}
+          aria-label="Open menu"
         >
-          <Menu className="w-6 h-6 text-gray-700" />
+          <Menu className="h-6 w-6 text-dashboard-text" />
         </button>
 
-        <h2 className="text-lg font-semibold">Welcome !</h2>
+        <div className="min-w-0">
+          <p className="font-montserrat text-xs uppercase tracking-wide text-dashboard-muted">
+            Partner dashboard
+          </p>
+          <h2 className="truncate font-poppins text-lg font-semibold text-dashboard-text">
+            {businessName ? `Welcome, ${businessName}` : "Welcome"}
+          </h2>
+        </div>
       </div>
 
       <div className="flex items-center gap-4">
-        {/* Search Bar */}
-        <div className="relative hidden sm:block">
-          <input
-            type="text"
-            placeholder="Search here ..."
-            className="py-1 pl-10 pr-4 text-sm border rounded-full focus:outline-none"
-          />
-          <Search className="absolute left-3 top-1.5 w-4 h-4 text-gray-400" />
-        </div>
-
-        {/* Language and Country */}
-        {/* <div className="flex items-center gap-2">
-          <Globe className="w-5 h-5 text-gray-500" />
-          <span className="hidden text-sm sm:block">English</span>
-        </div> */}
-
-        {/* Notifications */}
-        <button className="relative">
-          <Bell className="w-5 h-5 text-gray-600" />
-          <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+        <button type="button" className="relative" aria-label="Notifications">
+          <Bell className="h-5 w-5 text-dashboard-muted" />
+          <span className="absolute right-0 top-0 h-2 w-2 rounded-full bg-red-500" />
         </button>
 
-        {/* Profile */}
         <Image
           src={DEFAULT_PROFILE_AVATAR}
           width={40}
           height={40}
           alt="Profile"
-          className="rounded-full border border-gray-300"
+          className="rounded-full border border-border-warm"
         />
       </div>
     </header>

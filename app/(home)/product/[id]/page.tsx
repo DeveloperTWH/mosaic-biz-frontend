@@ -568,11 +568,11 @@ setMainImage(firstImage);
   return (
     <div className="min-h-screen bg-market-bg">
       <PublicPageHero
-        title="Product"
+        title={product.title || "Product"}
         breadcrumbs={[
           { label: "Home", href: "/" },
           { label: "Shop", href: "/products" },
-          { label: "Product" },
+          { label: product.title || "Product" },
         ]}
         imageUrl="/bgdetailpage.png"
       />
@@ -622,17 +622,28 @@ setMainImage(firstImage);
 
       {/* Main Content */}
       <div className="container-page py-8">
+        <Link
+          href="/products"
+          className="mb-6 inline-flex min-h-11 items-center font-montserrat text-sm font-medium text-market-teal transition-colors hover:text-brand-teal-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-market-gold"
+        >
+          ← Back to products
+        </Link>
         <div className="market-card-light flex flex-col gap-8 p-4 sm:p-6 lg:flex-row lg:gap-10">
 
           {/* LEFT: Images */}
           <div className="lg:w-[45%]">
             <div className="relative w-full aspect-square bg-gray-50 rounded overflow-hidden border border-gray-100">
-              <img
-                // src={mainImage || product.coverImage}
-                src={mainImage || productImages[0] || product.coverImage}
-                alt={product.title}
-                className="absolute inset-0 object-cover w-full h-full"
-              />
+              {mainImage || productImages[0] || product.coverImage ? (
+                <img
+                  src={mainImage || productImages[0] || product.coverImage}
+                  alt={product.title}
+                  className="absolute inset-0 object-cover w-full h-full"
+                />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center font-montserrat text-sm text-brand-muted">
+                  No image available
+                </div>
+              )}
               <button
                 className="absolute z-10 p-2 rounded-full top-3 right-3 bg-white/90 hover:bg-white shadow"
                 onClick={async () => {

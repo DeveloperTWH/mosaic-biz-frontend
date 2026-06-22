@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
+import DashboardLoadingBlock from "@/components/ui/dashboard-loading-block";
 import Navbar from "@/app/(home)/Components/Navbar";
 import BusinessProfilePage from "@/app/(home)/partners/business-profile/page";
 import ProductsPage from "@/app/(home)/partners/products/page";
@@ -360,11 +361,7 @@ function PartnerDashboardContent() {
 
     if (activeTab === "inquiries") {
       if (inquiriesLoading) {
-        return (
-          <div className="rounded-2xl border border-[#ebe2d3] bg-[#fcfaf6] p-8 text-center">
-            <p className="text-sm font-medium text-gray-600">Loading inquiries...</p>
-          </div>
-        );
+        return <DashboardLoadingBlock label="Loading inquiries…" />;
       }
 
       if (inquiriesError) {
@@ -439,10 +436,8 @@ function PartnerDashboardContent() {
 
   if (authStatus !== "allowed") {
     return (
-      <main className="min-h-screen bg-[#f7f2eb] pt-[110px]">
-        <div className="mx-auto max-w-6xl px-4 py-10 text-center text-sm text-gray-600">
-          Loading dashboard...
-        </div>
+      <main className="min-h-screen bg-surface-cream pt-[110px]">
+        <DashboardLoadingBlock label="Loading dashboard…" minHeight="min-h-[40vh]" />
       </main>
     );
   }
@@ -451,9 +446,9 @@ function PartnerDashboardContent() {
     <>
       <Navbar />
 
-      <main className="min-h-screen overflow-x-hidden bg-[#f7f2eb] pt-[110px]">
+      <main className="min-h-screen overflow-x-hidden bg-surface-cream pt-[110px]">
         <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
-          <h1 className="mb-4 text-center text-2xl font-bold uppercase tracking-wide text-gray-800">
+          <h1 className="mb-4 text-center font-poppins text-2xl font-bold uppercase tracking-wide text-dashboard-text">
             Vendor Dashboard
           </h1>
           {!loading && activeBusiness && (

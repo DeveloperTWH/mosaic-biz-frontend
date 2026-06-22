@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { toast } from 'react-toastify';
 import DeleteConfirmationModal from '@/app/components/DeleteConfirmationModal';
+import DashboardEmptyState from '@/components/ui/dashboard-empty-state';
 import { Service } from '@/types/service';
 import { ApiClientError, getUserSafeMessage } from '@/lib/api/errors';
 import {
@@ -240,22 +241,20 @@ const ServiceTable: React.FC<ServiceTableProps> = ({
 
     if (services.length === 0) {
         return (
-            <div className="p-6 text-center bg-white border rounded shadow-sm">
-                <p className="mb-4 text-gray-700 text-md">No services found for this business.</p>
-                <Link href={`/partners/${businessid}/inventory/add-service`}>
-                    <button className="min-h-11 px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700">
-                        + Add Service
-                    </button>
-                </Link>
-            </div>
-        )
+            <DashboardEmptyState
+                title="No services yet"
+                description="Add your first service to start accepting bookings."
+                ctaLabel="Add service"
+                ctaHref={`/partners/${businessid}/inventory/add-service`}
+            />
+        );
     }
 
     return (
-        <div>
-            <div className="hidden overflow-x-auto bg-white border rounded shadow-sm md:block">
+        <div className="dashboard-table-shell">
+            <div className="hidden overflow-x-auto md:block">
                 <table className="min-w-full text-sm">
-                    <thead className="text-left bg-gray-100">
+                    <thead className="text-left text-white">
                         <tr>
                             <th className="px-4 py-3">Service</th>
                             <th className="px-4 py-3">Rating</th>

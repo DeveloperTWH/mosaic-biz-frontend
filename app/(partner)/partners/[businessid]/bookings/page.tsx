@@ -4,8 +4,9 @@ import { useBusinessStore } from '@/app/store/businessStore';
 import { fetchBusinessBySlug } from '../utils/fetchBusiness';
 import { useParams, useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
-import Sidebar from '../components/Sidebar';
-import Topbar from '../components/Topbar';
+import PartnerDashboardShell from '../components/PartnerDashboardShell';
+import DashboardEmptyState from '@/components/ui/dashboard-empty-state';
+import ConfirmDialog from '@/app/(home)/partners/products/components/ConfirmDialog';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import LoadingPage from '../components/LoadingPage';
@@ -113,21 +114,20 @@ const BookingsPage = () => {
   };
 
   return (
-    <div className="flex h-screen bg-[#EBEAE2]">
-      <Sidebar businessName={business?.businessName} isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
-      <div className="flex flex-col flex-1 overflow-hidden">
-        <Topbar setIsSidebarOpen={setIsSidebarOpen} />
-        <main className="flex-1 p-2 space-y-6 overflow-y-auto lg:p-6">
+    <PartnerDashboardShell
+      businessName={business?.businessName}
+      isSidebarOpen={isSidebarOpen}
+      setIsSidebarOpen={setIsSidebarOpen}
+    >
           {isLoading && <LoadingPage />}
           {error && <NotFoundPage />}
 
-          {/* ✅ Filter */}
           <div className="mb-4">
-            <label className="mr-2 text-sm font-semibold">Filter by Status:</label>
+            <label className="mr-2 text-sm font-semibold text-dashboard-text">Filter by Status:</label>
             <select
               value={statusFilter}
               onChange={e => setStatusFilter(e.target.value)}
-              className="px-3 py-1 border rounded"
+              className="min-h-11 rounded border border-dashboard-input-border px-3 py-1"
             >
               <option value="">All</option>
               <option value="Booked">Booked</option>
@@ -137,9 +137,11 @@ const BookingsPage = () => {
             </select>
           </div>
 
-          {/* ✅ Booking List */}
           {bookings.length === 0 ? (
-            <p>No bookings found.</p>
+            <DashboardEmptyState
+              title="No bookings yet"
+              description="Customer booking requests will appear here when they schedule your services."
+            />
           ) : (
             bookings.map(booking => (
               <div
@@ -209,9 +211,7 @@ const BookingsPage = () => {
               </div>
             ))
           )}
-        </main>
-      </div>
-    </div>
+    </PartnerDashboardShell>
   );
 };
 

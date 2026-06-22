@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Camera, Pencil, X } from "lucide-react";
 import {uploadToS3} from "@/utils/s3Uploader"; // must return a public URL string
+import { toast } from "react-toastify";
 import { Business } from '@/types/business';
 
 export default function BrandAssetsLinkedInStyle({
@@ -69,7 +70,7 @@ export default function BrandAssetsLinkedInStyle({
       setShowUploadScreen(false);
     } catch (err) {
       console.error(err);
-      alert("Failed to set default logo");
+      toast.error("Failed to set default logo");
     } finally {
       setIsSaving(false);
     }
@@ -105,7 +106,7 @@ export default function BrandAssetsLinkedInStyle({
       setShowUploadScreen(false);
     } catch (err) {
       console.error(err);
-      alert("Failed to upload and save images");
+      toast.error("Failed to upload and save images");
     } finally {
       setIsSaving(false);
     }

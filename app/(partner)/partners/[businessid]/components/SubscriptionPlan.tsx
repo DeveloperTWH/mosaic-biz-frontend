@@ -15,9 +15,9 @@ const SubscriptionPlan: React.FC<SubscriptionPlanProps> = ({
 }) => {
   if (!subscriptionPlan || !subscription) {
     return (
-      <div className="p-6 bg-white rounded shadow h-fit">
-        <h3 className="text-xl font-bold">Subscription Plan</h3>
-        <p className="mt-2 text-sm text-gray-500">
+      <div className="dashboard-card h-fit">
+        <h3 className="font-poppins text-xl font-bold text-dashboard-text">Subscription Plan</h3>
+        <p className="mt-2 font-montserrat text-sm text-dashboard-muted">
           No active subscription found.
         </p>
       </div>

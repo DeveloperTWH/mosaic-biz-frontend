@@ -472,6 +472,88 @@ body {
   @apply font-montserrat text-sm font-medium text-brand-muted;
 }
 
+/* Customer account surfaces — brand-cream background, light cards */
+.account-card {
+  @apply rounded-xl border border-border-warm bg-white p-4 shadow-sm sm:p-5;
+}
+
+.account-filter-panel {
+  @apply account-card lg:sticky lg:top-24;
+}
+
+.account-empty-state {
+  @apply account-card p-8 text-center;
+}
+
+.account-empty-state-title {
+  @apply font-poppins text-lg font-semibold text-brand-navy;
+}
+
+.account-empty-state-desc {
+  @apply mt-2 font-montserrat text-sm text-brand-muted;
+}
+
+.account-status-badge {
+  @apply inline-flex items-center rounded-full px-3 py-1 font-montserrat text-xs font-semibold capitalize;
+}
+
+.account-status-badge--success {
+  @apply bg-green-100 text-green-800;
+}
+
+.account-status-badge--warning {
+  @apply bg-amber-100 text-amber-800;
+}
+
+.account-status-badge--info {
+  @apply bg-blue-100 text-blue-800;
+}
+
+.account-status-badge--danger {
+  @apply bg-red-100 text-red-800;
+}
+
+.account-status-badge--neutral {
+  @apply bg-gray-100 text-gray-700;
+}
+
+.account-status-badge--purple {
+  @apply bg-purple-100 text-purple-800;
+}
+
+.account-status-badge--indigo {
+  @apply bg-indigo-100 text-indigo-800;
+}
+
+.account-status-badge--orange {
+  @apply bg-orange-100 text-orange-800;
+}
+
+/* Partner dashboard surfaces */
+.dashboard-card {
+  @apply rounded-xl border border-border-warm bg-surface-panel p-4 shadow-sm sm:p-5;
+}
+
+.dashboard-table-shell {
+  @apply dashboard-card overflow-hidden;
+}
+
+.dashboard-table-shell thead {
+  @apply bg-brand-navy text-white;
+}
+
+.dashboard-empty-state {
+  @apply dashboard-card p-8 text-center;
+}
+
+.dashboard-empty-state-title {
+  @apply font-poppins text-lg font-semibold text-dashboard-text;
+}
+
+.dashboard-empty-state-desc {
+  @apply mt-2 font-montserrat text-sm text-dashboard-muted;
+}
+
 .market-result-count {
   @apply font-montserrat text-sm text-market-text/85;
 }

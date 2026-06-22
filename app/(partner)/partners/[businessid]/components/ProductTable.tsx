@@ -9,6 +9,7 @@ import { useBusinessStore } from '@/app/store/businessStore';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import DeleteConfirmationModal from '@/app/components/DeleteConfirmationModal';
+import DashboardEmptyState from '@/components/ui/dashboard-empty-state';
 
 
 
@@ -162,24 +163,22 @@ const ProductTable: React.FC<ProductTableProps> = ({
 
   if (products.length === 0) {
     return (
-      <div className="p-6 text-center bg-white border rounded shadow-sm">
-        <p className="mb-4 text-gray-700 text-md">No products found for this business.</p>
-        <Link href={`/partners/${businessid}/inventory/add-product`}>
-          <button className="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700">
-            + Add Product
-          </button>
-        </Link>
-      </div>
-    )
+      <DashboardEmptyState
+        title="No products yet"
+        description="Add your first product to start selling on Mosaic Biz Hub."
+        ctaLabel="Add product"
+        ctaHref={`/partners/${businessid}/inventory/add-product`}
+      />
+    );
   }
 
   return (
-    <div className="p-4 bg-white rounded shadow md:p-6">
+    <div className="dashboard-table-shell p-4 md:p-6">
       <div className="flex flex-col items-start justify-between gap-3 mb-6 sm:flex-row sm:items-center">
         <h3 className="text-xl font-bold capitalize">{business?.listingType}</h3>
         <Link
           href={`/partners/${businessid}/inventory/add-${business?.listingType}`}
-          className="flex items-center gap-2 px-4 py-2 text-sm text-white rounded bg-custom-orange hover:opacity-90"
+          className="inline-flex min-h-11 items-center gap-2 rounded bg-dashboard-gold px-4 py-2 text-sm font-semibold text-brand-navy hover:bg-brand-gold-light"
         >
           <Plus className="w-4 h-4" /> Add {business?.listingType}
         </Link>
@@ -187,7 +186,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
 
       <div className="hidden overflow-x-auto md:block">
         <table className="w-full min-w-[800px text-sm text-left border-collapse">
-          <thead className="bg-[#333333] text-white">
+          <thead className="text-white">
             <tr>
               <th className="px-4 py-2">Toggle</th>
               <th className="px-4 py-2">Product</th>

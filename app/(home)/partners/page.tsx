@@ -811,46 +811,44 @@ const Page: React.FC = () => {
           </div>
 
           <div className="mb-8 overflow-x-auto">
-            <div className="min-w-[980px] px-2">
-              <div className="relative flex items-start justify-between">
-                <div className="absolute top-6 left-6 right-6 h-[2px] bg-gray-200 -z-10">
-                  <div
-                    className="h-full bg-[#c9a44a] transition-all duration-300"
-                    style={{ width: `${progressWidth}%` }}
-                  />
-                </div>
-
-                {onboardingSteps.map((step) => {
-                  const stripStatus = getStripStatus(step.number);
-                  return (
-                    <button
-                      key={step.number}
-                      type="button"
-                      onClick={() => setSelectedStage(step.number)}
-                      className="w-40 text-center flex flex-col items-center gap-3"
-                    >
-                      <span
-                        className={`w-12 h-12 rounded-full border flex items-center justify-center font-semibold transition-colors ${
-                          stripStatus === "completed"
-                            ? "bg-[#c9a44a] border-[#c9a44a] text-white"
-                            : stripStatus === "active"
-                            ? "bg-[#f7f2df] border-[#c9a44a] text-[#c9a44a]"
-                            : "bg-[#d7d7d7] border-[#d7d7d7] text-white"
-                        }`}
-                      >
-                        {step.number}
-                      </span>
-                      <span
-                        className={`text-sm font-semibold leading-5 ${
-                          stripStatus === "locked" ? "text-gray-400" : "text-[#c9a44a]"
-                        }`}
-                      >
-                        {step.label}
-                      </span>
-                    </button>
-                  );
-                })}
+            <div className="relative flex min-w-max items-start justify-between gap-4 px-2 sm:min-w-full">
+              <div className="absolute left-6 right-6 top-6 -z-10 hidden h-[2px] bg-gray-200 sm:block">
+                <div
+                  className="h-full bg-[#c9a44a] transition-all duration-300"
+                  style={{ width: `${progressWidth}%` }}
+                />
               </div>
+
+              {onboardingSteps.map((step) => {
+                const stripStatus = getStripStatus(step.number);
+                return (
+                  <button
+                    key={step.number}
+                    type="button"
+                    onClick={() => setSelectedStage(step.number)}
+                    className="flex w-32 shrink-0 flex-col items-center gap-3 text-center sm:w-40"
+                  >
+                    <span
+                      className={`flex h-12 w-12 items-center justify-center rounded-full border font-semibold transition-colors ${
+                        stripStatus === "completed"
+                          ? "bg-[#c9a44a] border-[#c9a44a] text-white"
+                          : stripStatus === "active"
+                          ? "bg-[#f7f2df] border-[#c9a44a] text-[#c9a44a]"
+                          : "bg-[#d7d7d7] border-[#d7d7d7] text-white"
+                      }`}
+                    >
+                      {step.number}
+                    </span>
+                    <span
+                      className={`text-sm font-semibold leading-5 ${
+                        stripStatus === "locked" ? "text-gray-400" : "text-[#c9a44a]"
+                      }`}
+                    >
+                      {step.label}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
