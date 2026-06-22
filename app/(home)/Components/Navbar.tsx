@@ -16,7 +16,6 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
   const [isCustomer, setIsCustomer] = useState<boolean | null>(null);
-  const [gender, setGender] = useState<string | null>(null);
   const [bump, setBump] = useState(false);
   const prevCountRef = useRef<number | null>(null);
   const [mounted, setMounted] = useState(false);
@@ -27,7 +26,6 @@ const Navbar = () => {
     const syncAuth = () => {
       const session = localStorage.getItem("user_session");
       setIsLoggedIn(session === "true");
-      setGender(localStorage.getItem("user_gender"));
 
       (async () => {
         const user = await getLoggedInCustomer();
@@ -116,7 +114,6 @@ const Navbar = () => {
           variant="desktop"
           isLoggedIn={isLoggedIn}
           isCustomer={isCustomer}
-          gender={gender}
           cartCount={cartCount}
           mounted={mounted}
           bump={bump}
@@ -154,7 +151,6 @@ const Navbar = () => {
         onClose={closeMenu}
         isLoggedIn={isLoggedIn}
         isCustomer={isCustomer}
-        gender={gender}
       />
     </header>
   );

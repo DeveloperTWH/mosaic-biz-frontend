@@ -10,6 +10,7 @@ import LoadingPage from "../components/LoadingPage";
 import NotFoundPage from "../components/NotFoundPage";
 import { SquarePen } from "lucide-react";
 import Image from "next/image";
+import { DEFAULT_PROFILE_AVATAR } from "@/app/(home)/Components/nav/navConfig";
 import { api } from "@/lib/api";
 import { toast } from "react-toastify";
 
@@ -53,7 +54,6 @@ const Page = () => {
   const [error, setError] = useState<string | null>(null);
 
   const [profile, setProfile] = useState<any>(null);
-  const [gender, setGender] = useState<string | null>(null);
 
   // --- Subscription state
   const [subLoading, setSubLoading] = useState(false);
@@ -63,13 +63,6 @@ const Page = () => {
   const customerId = useMemo(() => business?.stripeCustomerId ?? null, [business?.stripeCustomerId]);
 
   const apiBase = useMemo(() => process.env.NEXT_PUBLIC_API_BASE_URL || "", []);
-
-  useEffect(() => {
-    const session = localStorage.getItem("user_session");
-    const userGender = localStorage.getItem("user_gender");
-    // if you need to check login state, use your real auth; kept minimal here
-    setGender(userGender);
-  }, []);
 
   useEffect(() => {
     setProfile({
@@ -455,11 +448,11 @@ const Page = () => {
               <div className="relative">
                 <div className="p-[2px] rounded-full bg-white border border-custom-blue">
                   <Image
-                    src={gender === "female" ? "/female-avatar.png" : "/male-avatar.png"}
+                    src={DEFAULT_PROFILE_AVATAR}
                     width={80}
                     height={80}
                     alt="Profile"
-                    className="border border-gray-300 rounded-full"
+                    className="rounded-full border border-gray-300"
                   />
                 </div>
               </div>

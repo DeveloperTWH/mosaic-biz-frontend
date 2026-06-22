@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { Bell, Globe, Search, Menu } from 'lucide-react';
 import Image from 'next/image';
+import { DEFAULT_PROFILE_AVATAR } from '@/app/(home)/Components/nav/navConfig';
 
 const Topbar = ({
   setIsSidebarOpen,
@@ -10,15 +11,11 @@ const Topbar = ({
   setIsSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
 
-  const [gender, setGender] = useState<string | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
 
   useEffect(() => {
     const session = localStorage.getItem("user_session");
     setIsLoggedIn(session === 'true');
-
-    const userGender = localStorage.getItem("user_gender");
-    setGender(userGender);
   }, []);
 
   return (
@@ -60,11 +57,11 @@ const Topbar = ({
 
         {/* Profile */}
         <Image
-          src={gender === "female" ? "/female-avatar.png" : "/male-avatar.png"}
+          src={DEFAULT_PROFILE_AVATAR}
           width={40}
           height={40}
           alt="Profile"
-          className="border border-gray-300 rounded-full"
+          className="rounded-full border border-gray-300"
         />
       </div>
     </header>

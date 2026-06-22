@@ -3,6 +3,9 @@ export type NavLink = {
   href: string;
 };
 
+/** Default account avatar when the user has no uploaded profile photo. */
+export const DEFAULT_PROFILE_AVATAR = "/profile-avatar.png";
+
 export const MOBILE_DRAWER_ID = "mobile-nav-drawer";
 
 export const HOME_LINK: NavLink = { label: "HOME", href: "/" };
