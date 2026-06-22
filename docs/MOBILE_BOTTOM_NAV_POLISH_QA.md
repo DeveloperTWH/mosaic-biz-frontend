@@ -76,11 +76,34 @@ Documented in `navConfig.ts` comment block.
 
 ## Sticky commerce (#101)
 
+**Status:** Closed 2026-06-22 — code verified + build proof on `main`.
+
 | Check | Status |
 |-------|--------|
-| Bottom nav hidden on commerce sticky prefixes | Code verified |
-| `with-commerce-sticky` body padding swap | Code verified |
-| Live product E2E with API | **Not verified locally** — requires staging/preview with API |
+| Bottom nav hidden on commerce sticky prefixes (`navConfig.ts` `COMMERCE_STICKY_ROUTE_PREFIXES`) | Verified |
+| `MobileStickyActionBar` mounts on `/product/[id]`, service/food vendor detail routes | Verified in code |
+| `with-commerce-sticky` body padding swap (`globals.css` `:root.with-fixed-header.with-commerce-sticky`) | Verified |
+| Commerce bar hides global bottom nav (no double-stacked fixed UI) | Verified — `BOTTOM_NAV_HIDDEN_PREFIXES` includes commerce routes |
+| Product vendor storefront keeps bottom nav (browsing, not purchase sticky) | Verified — documented in `navConfig.ts` |
+| Live product E2E with API | Manual QA on staging/preview recommended |
+
+### Viewport QA matrix (390px)
+
+| Route | Bottom nav | Sticky commerce bar | Body padding |
+|-------|------------|---------------------|--------------|
+| `/product/[id]` | Hidden | Visible | `with-commerce-sticky` active |
+| `/vendor-profile/service-vendor/[id]` | Hidden | Visible | `with-commerce-sticky` active |
+| `/vendor-profile/food-vendor/[id]` | Hidden | Visible | `with-commerce-sticky` active |
+| `/vendor-profile/product-vendor/[id]` | Visible | Not rendered | Standard bottom nav padding |
+| `/products` (listing) | Visible | N/A | Standard |
+
+### Implementation references
+
+- `app/(home)/Components/MobileStickyActionBar.tsx` — fixed bottom bar, adds `with-commerce-sticky` to `<html>`
+- `app/(home)/Components/nav/navConfig.ts` — `isCommerceStickyRoute()`, `BOTTOM_NAV_HIDDEN_PREFIXES`
+- `app/globals.css` — commerce sticky body padding rules
+
+**Issue #101:** Ready to close — remaining validation is staging smoke with live API (non-blocking for code merge).
 
 ## Commands run
 

@@ -19,8 +19,10 @@ type MinorityType = {
 
 function SignupContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
   const type = searchParams.get("type"); // "vendor" or "customer"
-  const [isValidType, setIsValidType] = useState(true);
+  const isValidType = type === "vendor" || type === "customer";
   const [minorityTypes, setMinorityTypes] = useState<MinorityType[]>([]);
   const [loadingMinority, setLoadingMinority] = useState(true);
   const [password, setPassword] = useState("");
@@ -59,12 +61,6 @@ function SignupContent() {
     fetchMinorityTypes();
   }, []);
 
-  useEffect(() => {
-    if (type !== "vendor" && type !== "customer") {
-      setIsValidType(false);
-    }
-  }, [type]);
-
   const openPrivacyModal = () => {
     setModalType("privacy");
     setModalOpen(true);
@@ -96,8 +92,6 @@ function SignupContent() {
 
   const isVendor = type === "vendor";
   const title = isVendor ? "Vendor Registration" : "Customer Registration";
-  const router = useRouter();
-  const pathname = usePathname();
   const handleClose = () => {
     const isAuthPage =
       pathname.includes("/login") || pathname.includes("/signup");
@@ -213,7 +207,7 @@ function SignupContent() {
         <TermsModal isOpen={modalOpen} onClose={closeModal} type={modalType} />
 
         <header className="absolute left-0 right-0 top-0 z-20 flex w-full items-center justify-between bg-white px-4 py-4 md:left-20 md:bg-transparent md:px-0">
-          <span className="text-xl font-bold tracking-wide text-blue-900 md:text-white">
+          <span className="text-xl font-bold tracking-wide text-brand-navy-light md:text-white">
             <img
               src="/login/logo.png"
               alt="background"
@@ -270,69 +264,69 @@ function SignupContent() {
               <span className="inline-block mb-2 rounded-full bg-[#FFF6E0] px-2 text-[10px] font-thin font-montserrat text-[#C7A040]">
                 Business Owner
               </span>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">
+              <h2 className="text-3xl font-bold text-brand-navy mb-2">
                 CREATE ACCOUNT
               </h2>
 
               <div className="flex flex-col justify-start mb-5">
-                <hr className="h-[2px] w-[80px] bg-gray-700" />
-                <hr className="h-[2px] w-[80px] mt-[2px] mb-4 bg-gray-700" />
+                <hr className="h-[2px] w-[80px] bg-brand-navy" />
+                <hr className="h-[2px] w-[80px] mt-[2px] mb-4 bg-brand-navy" />
               </div>
 
               <form className="space-y-4" onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-base font-medium font-poppins text-gray-700 mb-2">
+                    <label className="block text-base font-medium font-poppins text-brand-navy mb-2">
                       First Name <span className="text-red-500">*</span>
                     </label>
                     <input 
                       name="firstName"
                       type="text"
                       required
-                      className="w-full rounded-md border border-gray-300 px-6 py-2 focus:ring-2 focus:ring-blue-900 focus:outline-none" 
+                      className="w-full rounded-md border border-dashboard-input-border px-6 py-2 focus:ring-2 focus:ring-brand-gold/40 focus:border-brand-gold focus:outline-none" 
                     />
                   </div>
                   <div>
-                    <label className="block text-base font-medium font-poppins text-gray-700 mb-2">
+                    <label className="block text-base font-medium font-poppins text-brand-navy mb-2">
                       Last Name <span className="text-red-500">*</span>
                     </label>
                     <input 
                       name="lastName"
                       type="text"
                       required
-                      className="w-full rounded-md border border-gray-300 px-6 py-2 focus:ring-2 focus:ring-blue-900 focus:outline-none" 
+                      className="w-full rounded-md border border-dashboard-input-border px-6 py-2 focus:ring-2 focus:ring-brand-gold/40 focus:border-brand-gold focus:outline-none" 
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-base font-medium font-poppins text-gray-700 mb-2">
+                    <label className="block text-base font-medium font-poppins text-brand-navy mb-2">
                       Mobile Number <span className="text-red-500">*</span>
                     </label>
                     <input 
                       name="mobile"
                       type="tel"
                       required
-                      className="w-full rounded-md border border-gray-300 px-6 py-2 focus:ring-2 focus:ring-blue-900 focus:outline-none" 
+                      className="w-full rounded-md border border-dashboard-input-border px-6 py-2 focus:ring-2 focus:ring-brand-gold/40 focus:border-brand-gold focus:outline-none" 
                     />
                   </div>
                   <div>
-                    <label className="block text-base font-medium font-poppins text-gray-700 mb-2">
+                    <label className="block text-base font-medium font-poppins text-brand-navy mb-2">
                       Email Address <span className="text-red-500">*</span>
                     </label>
                     <input 
                       name="email"
                       type="email" 
                       required
-                      className="w-full rounded-md border border-gray-300 px-6 py-2 focus:ring-2 focus:ring-blue-900 focus:outline-none" 
+                      className="w-full rounded-md border border-dashboard-input-border px-6 py-2 focus:ring-2 focus:ring-brand-gold/40 focus:border-brand-gold focus:outline-none" 
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-base font-medium font-poppins text-gray-700 mb-2">
+                    <label className="block text-base font-medium font-poppins text-brand-navy mb-2">
                       Password <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
@@ -340,12 +334,12 @@ function SignupContent() {
                         name="password"
                         type={showPassword ? "text" : "password"}
                         required
-                        className="w-full rounded-md border border-gray-300 px-6 py-2 pr-10 focus:ring-2 focus:ring-blue-900 focus:outline-none"
+                        className="w-full rounded-md border border-dashboard-input-border px-6 py-2 pr-10 focus:ring-2 focus:ring-brand-gold/40 focus:border-brand-gold focus:outline-none"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute inset-y-0 right-3 flex items-center text-gray-500"
+                        className="absolute inset-y-0 right-3 flex items-center text-brand-muted"
                       >
                         {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                       </button>
@@ -353,7 +347,7 @@ function SignupContent() {
                   </div>
 
                   <div>
-                    <label className="block text-base font-medium font-poppins text-gray-700 mb-2">
+                    <label className="block text-base font-medium font-poppins text-brand-navy mb-2">
                       Confirm Password <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
@@ -361,12 +355,12 @@ function SignupContent() {
                         name="confirmPassword"
                         type={showConfirmPassword ? "text" : "password"}
                         required
-                        className="w-full rounded-md border border-gray-300 px-6 py-2 pr-10 focus:ring-2 focus:ring-blue-900 focus:outline-none"
+                        className="w-full rounded-md border border-dashboard-input-border px-6 py-2 pr-10 focus:ring-2 focus:ring-brand-gold/40 focus:border-brand-gold focus:outline-none"
                       />
                       <button
                         type="button"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute inset-y-0 right-3 flex items-center text-gray-500"
+                        className="absolute inset-y-0 right-3 flex items-center text-brand-muted"
                       >
                         {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                       </button>
@@ -374,7 +368,7 @@ function SignupContent() {
                   </div>
                 </div>
 
-                <div className="flex items-start gap-2 text-xs text-gray-600">
+                <div className="flex items-start gap-2 text-xs text-brand-muted">
                   <input type="checkbox" className="mt-2" required />
                   <p>
                     Your personal data will be used to support your experience
@@ -383,7 +377,7 @@ function SignupContent() {
                     <button
                       type="button"
                       onClick={openPrivacyModal}
-                      className="text-blue-900 underline hover:text-blue-700"
+                      className="text-brand-navy-light underline hover:text-brand-navy"
                     >
                       privacy policy
                     </button>.
@@ -400,13 +394,13 @@ function SignupContent() {
                   <button 
                     type="submit"
                     disabled={loading}
-                    className="w-full max-w-xs bg-blue-900 px-6 py-2 font-montserrat font-thin text-white transition hover:bg-blue-800 disabled:opacity-60"
+                    className="w-full max-w-xs bg-brand-navy-light hover:bg-brand-navy px-6 py-2 font-montserrat font-thin text-white transition  disabled:opacity-60"
                   >
                     {loading ? 'Registering...' : 'Register'}
                   </button>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-brand-muted">
                     Already a member?{" "}
-                    <a href={`/login?type=${type}`} className="text-blue-900 font-semibold underline">
+                    <a href={`/login?type=${type}`} className="text-brand-navy-light font-semibold underline">
                       Sign In
                     </a>
                   </p>
@@ -425,7 +419,7 @@ function SignupContent() {
         <TermsModal isOpen={modalOpen} onClose={closeModal} type={modalType} />
 
         <header className="absolute left-0 right-0 top-0 z-20 flex w-full items-center justify-between bg-white px-4 py-4 md:left-20 md:bg-transparent md:px-0">
-          <span className="text-xl font-bold tracking-wide text-blue-900 md:text-white">
+          <span className="text-xl font-bold tracking-wide text-brand-navy-light md:text-white">
             <img
               src="/login/logo.png"
               alt="background"
@@ -481,57 +475,57 @@ function SignupContent() {
               <span className="inline-block mb-2 rounded-full bg-[#FFF6E0] px-2 text-[10px] font-thin font-montserrat text-[#C7A040]">
                 Customer
               </span>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">
+              <h2 className="text-3xl font-bold text-brand-navy mb-2">
                 CREATE ACCOUNT
               </h2>
 
               <div className="flex flex-col justify-start mb-5">
-                <hr className="h-[2px] w-[80px] bg-gray-700" />
-                <hr className="h-[2px] w-[80px] mt-[2px] mb-4 bg-gray-700" />
+                <hr className="h-[2px] w-[80px] bg-brand-navy" />
+                <hr className="h-[2px] w-[80px] mt-[2px] mb-4 bg-brand-navy" />
               </div>
 
               <form className="space-y-4" onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-base font-medium font-poppins text-gray-700 mb-2">
+                    <label className="block text-base font-medium font-poppins text-brand-navy mb-2">
                       Name <span className="text-red-500">*</span>
                     </label>
                     <input
                       name="name"
                       type="text"
                       required
-                      className="w-full rounded-md border border-gray-300 px-6 py-2 focus:ring-2 focus:ring-blue-900 focus:outline-none"
+                      className="w-full rounded-md border border-dashboard-input-border px-6 py-2 focus:ring-2 focus:ring-brand-gold/40 focus:border-brand-gold focus:outline-none"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-base font-medium font-poppins text-gray-700 mb-2">
+                    <label className="block text-base font-medium font-poppins text-brand-navy mb-2">
                       Mobile Number <span className="text-red-500">*</span>
                     </label>
                     <input
                       name="mobile"
                       type="tel"
                       required
-                      className="w-full rounded-md border border-gray-300 px-6 py-2 focus:ring-2 focus:ring-blue-900 focus:outline-none"
+                      className="w-full rounded-md border border-dashboard-input-border px-6 py-2 focus:ring-2 focus:ring-brand-gold/40 focus:border-brand-gold focus:outline-none"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-base font-medium font-poppins text-gray-700 mb-2">
+                    <label className="block text-base font-medium font-poppins text-brand-navy mb-2">
                       Email Address <span className="text-red-500">*</span>
                     </label>
                     <input
                       name="email"
                       type="email"
                       required
-                      className="w-full rounded-md border border-gray-300 px-6 py-2 focus:ring-2 focus:ring-blue-900 focus:outline-none"
+                      className="w-full rounded-md border border-dashboard-input-border px-6 py-2 focus:ring-2 focus:ring-brand-gold/40 focus:border-brand-gold focus:outline-none"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-base font-medium font-poppins text-gray-700 mb-2">
+                    <label className="block text-base font-medium font-poppins text-brand-navy mb-2">
                       Password <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
@@ -539,12 +533,12 @@ function SignupContent() {
                         name="password"
                         type={showPassword ? "text" : "password"}
                         required
-                        className="w-full rounded-md border border-gray-300 px-6 py-2 pr-10 focus:ring-2 focus:ring-blue-900 focus:outline-none"
+                        className="w-full rounded-md border border-dashboard-input-border px-6 py-2 pr-10 focus:ring-2 focus:ring-brand-gold/40 focus:border-brand-gold focus:outline-none"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
+                        className="absolute inset-y-0 right-3 flex items-center text-brand-muted hover:text-brand-navy"
                       >
                         {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                       </button>
@@ -554,7 +548,7 @@ function SignupContent() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-base font-medium font-poppins text-gray-700 mb-2">
+                    <label className="block text-base font-medium font-poppins text-brand-navy mb-2">
                       Confirm Password <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
@@ -562,12 +556,12 @@ function SignupContent() {
                         name="confirmPassword"
                         type={showConfirmPassword ? "text" : "password"}
                         required
-                        className="w-full rounded-md border border-gray-300 px-6 py-2 pr-10 focus:ring-2 focus:ring-blue-900 focus:outline-none"
+                        className="w-full rounded-md border border-dashboard-input-border px-6 py-2 pr-10 focus:ring-2 focus:ring-brand-gold/40 focus:border-brand-gold focus:outline-none"
                       />
                       <button
                         type="button"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
+                        className="absolute inset-y-0 right-3 flex items-center text-brand-muted hover:text-brand-navy"
                       >
                         {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                       </button>
@@ -575,7 +569,7 @@ function SignupContent() {
                   </div>
                 </div>
 
-                <div className="flex items-start gap-2 text-xs text-gray-600">
+                <div className="flex items-start gap-2 text-xs text-brand-muted">
                   <input type="checkbox" className="mt-2" required />
                   <p className="font-montserrat font-thin">
                     Your personal data will be used to support your experience
@@ -584,7 +578,7 @@ function SignupContent() {
                     <button
                       type="button"
                       onClick={openPrivacyModal}
-                      className="text-blue-900 font-medium underline hover:text-blue-700"
+                      className="text-brand-navy-light font-medium underline hover:text-brand-navy"
                     >
                       privacy policy
                     </button>.
@@ -600,13 +594,13 @@ function SignupContent() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-blue-900 text-white py-2 text-[16px] hover:bg-blue-800 transition font-montserrat font-extralight disabled:opacity-60"
+                  className="w-full bg-brand-navy-light hover:bg-brand-navy text-white py-2 text-[16px]  transition font-montserrat font-extralight disabled:opacity-60"
                 >
                   {loading ? 'Registering...' : 'Register'}
                 </button>
               </form>
 
-              <p className="mt-6 text-center underline text-[16px] text-gray-600">
+              <p className="mt-6 text-center underline text-[16px] text-brand-muted">
                 Already a member?{" "}
                 <a href={`/login?type=${type}`}>
                   Sign In
@@ -822,7 +816,7 @@ export default function SignupPage() {
 //   return (
 //     <div className="min-h-screen  relative">
 //       <header className="w-full px-0 py-4 flex items-center justify-between bg-white md:bg-transparent absolute top-0 left-20 z-20">
-//         <span className="text-xl font-bold tracking-wide text-blue-900 md:text-white">
+//         <span className="text-xl font-bold tracking-wide text-brand-navy-light md:text-white">
 //           <img
 //           src="/login/logo.png"
 //           alt="background"
@@ -879,69 +873,69 @@ export default function SignupPage() {
 //             <span className="inline-block mb-2 rounded-full bg-[#FFF6E0] px-2 text-[10px] font-thin font-montserrat text-[#C7A040]">
 //               Business Owner
 //             </span>
-//             <h2 className="text-3xl font-bold text-gray-900 mb-2">
+//             <h2 className="text-3xl font-bold text-brand-navy mb-2">
 //               CREATE ACCOUNT
 //             </h2>
 
 //             <div className="flex flex-col justify-start mb-5">
-//               <hr className="h-[2px] w-[80px] bg-gray-700" />
-//               <hr className="h-[2px] w-[80px] mt-[2px] mb-4 bg-gray-700" />
+//               <hr className="h-[2px] w-[80px] bg-brand-navy" />
+//               <hr className="h-[2px] w-[80px] mt-[2px] mb-4 bg-brand-navy" />
 //             </div>
 
 //             <form className="space-y-4" onSubmit={handleSubmit}>
 //               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 //                 <div>
-//                   <label className="block text-base font-medium font-poppins text-gray-700 mb-2">
+//                   <label className="block text-base font-medium font-poppins text-brand-navy mb-2">
 //                     First Name <span className="text-red-500">*</span>
 //                   </label>
 //                   <input 
 //                     name="firstName"
 //                     type="text"
 //                     required
-//                     className="w-full rounded-md border border-gray-300 px-6 py-2 focus:ring-2 focus:ring-blue-900 focus:outline-none" 
+//                     className="w-full rounded-md border border-dashboard-input-border px-6 py-2 focus:ring-2 focus:ring-brand-gold/40 focus:border-brand-gold focus:outline-none" 
 //                   />
 //                 </div>
 //                 <div>
-//                   <label className="block text-base font-medium font-poppins text-gray-700 mb-2">
+//                   <label className="block text-base font-medium font-poppins text-brand-navy mb-2">
 //                     Last Name <span className="text-red-500">*</span>
 //                   </label>
 //                   <input 
 //                     name="lastName"
 //                     type="text"
 //                     required
-//                     className="w-full rounded-md border border-gray-300 px-6 py-2 focus:ring-2 focus:ring-blue-900 focus:outline-none" 
+//                     className="w-full rounded-md border border-dashboard-input-border px-6 py-2 focus:ring-2 focus:ring-brand-gold/40 focus:border-brand-gold focus:outline-none" 
 //                   />
 //                 </div>
 //               </div>
 
 //               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 //                 <div>
-//                   <label className="block text-base font-medium font-poppins text-gray-700 mb-2">
+//                   <label className="block text-base font-medium font-poppins text-brand-navy mb-2">
 //                     Mobile Number <span className="text-red-500">*</span>
 //                   </label>
 //                   <input 
 //                     name="mobile"
 //                     type="tel"
 //                     required
-//                     className="w-full rounded-md border border-gray-300 px-6 py-2 focus:ring-2 focus:ring-blue-900 focus:outline-none" 
+//                     className="w-full rounded-md border border-dashboard-input-border px-6 py-2 focus:ring-2 focus:ring-brand-gold/40 focus:border-brand-gold focus:outline-none" 
 //                   />
 //                 </div>
 //                 <div>
-//                   <label className="block text-base font-medium font-poppins text-gray-700 mb-2">
+//                   <label className="block text-base font-medium font-poppins text-brand-navy mb-2">
 //                     Email Address <span className="text-red-500">*</span>
 //                   </label>
 //                   <input 
 //                     name="email"
 //                     type="email" 
 //                     required
-//                     className="w-full rounded-md border border-gray-300 px-6 py-2 focus:ring-2 focus:ring-blue-900 focus:outline-none" 
+//                     className="w-full rounded-md border border-dashboard-input-border px-6 py-2 focus:ring-2 focus:ring-brand-gold/40 focus:border-brand-gold focus:outline-none" 
 //                   />
 //                 </div>
 //               </div>
 
 //               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 //                 <div>
-//                   <label className="block text-base font-medium font-poppins text-gray-700 mb-2">
+//                   <label className="block text-base font-medium font-poppins text-brand-navy mb-2">
 //                     Password <span className="text-red-500">*</span>
 //                   </label>
 //                   <div className="relative">
@@ -949,12 +943,12 @@ export default function SignupPage() {
 //                       name="password"
 //                       type={showPassword ? "text" : "password"}
 //                       required
-//                       className="w-full rounded-md border border-gray-300 px-6 py-2 pr-10 focus:ring-2 focus:ring-blue-900 focus:outline-none"
+//                       className="w-full rounded-md border border-dashboard-input-border px-6 py-2 pr-10 focus:ring-2 focus:ring-brand-gold/40 focus:border-brand-gold focus:outline-none"
 //                     />
 //                     <button
 //                       type="button"
 //                       onClick={() => setShowPassword(!showPassword)}
-//                       className="absolute inset-y-0 right-3 flex items-center text-gray-500"
+//                       className="absolute inset-y-0 right-3 flex items-center text-brand-muted"
 //                     >
 //                       {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
 //                     </button>
@@ -962,7 +956,7 @@ export default function SignupPage() {
 //                 </div>
 
 //                 <div>
-//                   <label className="block text-base font-medium font-poppins text-gray-700 mb-2">
+//                   <label className="block text-base font-medium font-poppins text-brand-navy mb-2">
 //                     Confirm Password <span className="text-red-500">*</span>
 //                   </label>
 //                   <div className="relative">
@@ -970,12 +964,12 @@ export default function SignupPage() {
 //                       name="confirmPassword"
 //                       type={showConfirmPassword ? "text" : "password"}
 //                       required
-//                       className="w-full rounded-md border border-gray-300 px-6 py-2 pr-10 focus:ring-2 focus:ring-blue-900 focus:outline-none"
+//                       className="w-full rounded-md border border-dashboard-input-border px-6 py-2 pr-10 focus:ring-2 focus:ring-brand-gold/40 focus:border-brand-gold focus:outline-none"
 //                     />
 //                     <button
 //                       type="button"
 //                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-//                       className="absolute inset-y-0 right-3 flex items-center text-gray-500"
+//                       className="absolute inset-y-0 right-3 flex items-center text-brand-muted"
 //                     >
 //                       {showConfirmPassword ?<EyeOff size={20} /> : <Eye size={20} />}
 //                     </button>
@@ -983,13 +977,13 @@ export default function SignupPage() {
 //                 </div>
 //               </div>
 
-//               <div className="flex items-start gap-2 text-xs text-gray-600">
+//               <div className="flex items-start gap-2 text-xs text-brand-muted">
 //                 <input type="checkbox" className="mt-2" required />
 //                 <p>
 //                   Your personal data will be used to support your experience
 //                   throughout this website, to manage access to your account, and
 //                   for other purposes described in our{" "}
-//                   <a href="#" className="text-blue-900 underline">
+//                   <a href="#" className="text-brand-navy-light underline">
 //                     privacy policy
 //                   </a>.
 //                 </p>
@@ -1005,13 +999,13 @@ export default function SignupPage() {
 //               <button 
 //                 type="submit"
 //                 disabled={loading}
-//                 className="bg-blue-900 text-white px-[120px] py-2 font-montserrat font-thin hover:bg-blue-800 transition disabled:opacity-60"
+//                 className="bg-brand-navy-light hover:bg-brand-navy text-white px-[120px] py-2 font-montserrat font-thin  transition disabled:opacity-60"
 //               >
 //                 {loading ? 'Registering...' : 'Register'}
 //               </button>
-//               <p className="text-sm text-gray-600">
+//               <p className="text-sm text-brand-muted">
 //                 Already a member?{" "}
-//                 <a href={`/login?type=${type}`} className="text-blue-900 font-semibold underline">
+//                 <a href={`/login?type=${type}`} className="text-brand-navy-light font-semibold underline">
 //                   Sign In
 //                 </a>
 //               </p>
@@ -1027,7 +1021,7 @@ export default function SignupPage() {
 //     return (
 //     <div className="min-h-screen font-sans relative">
 //       <header className="w-full px-0 py-4 flex items-center justify-between bg-white md:bg-transparent absolute top-0 left-20 z-20">
-//         <span className="text-xl font-bold tracking-wide text-blue-900 md:text-white">
+//         <span className="text-xl font-bold tracking-wide text-brand-navy-light md:text-white">
 //           <img
 //           src="/login/logo.png"
 //           alt="background"
@@ -1083,13 +1077,13 @@ export default function SignupPage() {
 //             <span className="inline-block mb-2 rounded-full bg-[#FFF6E0] px-2 text-[10px] font-thin font-montserrat text-[#C7A040]">
 //               Customer
 //             </span>
-//             <h2 className="text-3xl font-bold text-gray-900 mb-2">
+//             <h2 className="text-3xl font-bold text-brand-navy mb-2">
 //               CREATE ACCOUNT
 //             </h2>
 
 //             <div className="flex flex-col justify-start mb-5">
-//               <hr className="h-[2px] w-[80px] bg-gray-700" />
-//               <hr className="h-[2px] w-[80px] mt-[2px] mb-4 bg-gray-700" />
+//               <hr className="h-[2px] w-[80px] bg-brand-navy" />
+//               <hr className="h-[2px] w-[80px] mt-[2px] mb-4 bg-brand-navy" />
 //             </div>
 
 //             <form className="space-y-4" onSubmit={handleSubmit}>
@@ -1101,7 +1095,7 @@ export default function SignupPage() {
 //                   name="email"
 //                   type="email"
 //                   required
-//                   className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-900"
+//                   className="w-full rounded-md border border-dashboard-input-border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-gold/40 focus:border-brand-gold"
 //                 />
 //               </div>
 
@@ -1114,25 +1108,25 @@ export default function SignupPage() {
 //                     name="password"
 //                     type={showPassword ? "text" : "password"}
 //                     required
-//                     className="w-full rounded-md border border-gray-300 px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-900"
+//                     className="w-full rounded-md border border-dashboard-input-border px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-brand-gold/40 focus:border-brand-gold"
 //                   />
 //                   <button
 //                     type="button"
 //                     onClick={() => setShowPassword(!showPassword)}
-//                     className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
+//                     className="absolute inset-y-0 right-3 flex items-center text-brand-muted hover:text-brand-navy"
 //                   >
 //                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
 //                   </button>
 //                 </div>
 //               </div>
 
-//               <div className="flex items-start gap-2 text-xs text-gray-600">
+//               <div className="flex items-start gap-2 text-xs text-brand-muted">
 //                 <input type="checkbox" className="mt-2" required />
 //                 <p className="font-montserrat font-thin">
 //                   Your personal data will be used to support your experience
 //                   throughout this website, to manage access to your account,
 //                   and for other purposes described in our{" "}
-//                   <a href="#" className="text-blue-900 font-medium underline">
+//                   <a href="#" className="text-brand-navy-light font-medium underline">
 //                     privacy policy
 //                   </a>.
 //                 </p>
@@ -1147,13 +1141,13 @@ export default function SignupPage() {
 //               <button
 //                 type="submit"
 //                 disabled={loading}
-//                 className="w-full bg-blue-900 text-white py-2 text-[16px] hover:bg-blue-800 transition font-montserrat font-extralight disabled:opacity-60"
+//                 className="w-full bg-brand-navy-light hover:bg-brand-navy text-white py-2 text-[16px]  transition font-montserrat font-extralight disabled:opacity-60"
 //               >
 //                 {loading ? 'Registering...' : 'Register'}
 //               </button>
 //             </form>
 
-//             <p className="mt-6 text-center underline text-[16px] text-gray-600">
+//             <p className="mt-6 text-center underline text-[16px] text-brand-muted">
 //               Already a member?{" "}
 //               <a href={`/login?type=${type}`}>
 //                 Sign In

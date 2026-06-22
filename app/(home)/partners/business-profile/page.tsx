@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 import TermsModal from "../final-review/components/TermsModal";
+import VendorApplicationShell from "../components/VendorApplicationShell";
 import {
   getOnboardingData,
   updateBusinessProfile
@@ -545,49 +546,36 @@ export default function BusinessProfilePage({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <Loader className="w-12 h-12 text-[#c9a227] animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Loading your business profile...</p>
+      <VendorApplicationShell variant="dashboard" maxWidthClass="max-w-4xl">
+        <div className="flex min-h-[40vh] items-center justify-center">
+          <div className="text-center">
+            <Loader className="mx-auto mb-4 h-12 w-12 animate-spin text-dashboard-gold" />
+            <p className="text-dashboard-muted">Loading your business profile...</p>
+          </div>
         </div>
-      </div>
+      </VendorApplicationShell>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-
-        {/* Header */}
-        <div className="mb-6">
-          {!embedded && (
-            <button
-              onClick={() => router.back()}
-              className="flex items-center text-gray-600 hover:text-gray-900 mb-3 transition-colors text-sm"
-            >
-              <ArrowLeft className="w-4 h-4 mr-1" />
-              Back
-            </button>
-          )}
-
-          <h1 className="text-2xl font-bold text-gray-900">Set Up Your Business Profile</h1>
-          {/* <p className="text-sm text-gray-600 mt-1">
-            Create a public profile to showcase your business, products, and services
-          </p> */}
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-6">
+    <VendorApplicationShell
+      variant="dashboard"
+      maxWidthClass="max-w-4xl"
+      title="Set Up Your Business Profile"
+      description="Create a public profile to showcase your business, products, and services."
+    >
+      <form onSubmit={handleSubmit} className="space-y-6">
 
           {/* Personal Information - ALL DISABLED except Language */}
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-2 mb-4">
-              <User className="w-5 h-5 text-[#c9a227]" />
-              <h2 className="text-lg font-semibold text-gray-900">Personal Information</h2>
+              <User className="w-5 h-5 text-dashboard-gold" />
+              <h2 className="text-lg font-semibold text-dashboard-text">Personal Information</h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">First Name</label>
+                <label className="block text-xs font-medium text-dashboard-muted mb-1">First Name</label>
                 <input
                   type="text"
                   value={prefilledData.firstName}
@@ -596,7 +584,7 @@ export default function BusinessProfilePage({
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Last Name</label>
+                <label className="block text-xs font-medium text-dashboard-muted mb-1">Last Name</label>
                 <input
                   type="text"
                   value={prefilledData.lastName}
@@ -605,7 +593,7 @@ export default function BusinessProfilePage({
                 />
               </div>
               <div className="md:col-span-2">
-                <label className="block text-xs font-medium text-gray-500 mb-1">Email Address</label>
+                <label className="block text-xs font-medium text-dashboard-muted mb-1">Email Address</label>
                 <input
                   type="email"
                   value={prefilledData.primaryEmail}
@@ -614,7 +602,7 @@ export default function BusinessProfilePage({
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Phone Number</label>
+                <label className="block text-xs font-medium text-dashboard-muted mb-1">Phone Number</label>
                 <input
                   type="tel"
                   value={prefilledData.primaryPhone}
@@ -623,7 +611,7 @@ export default function BusinessProfilePage({
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">
+                <label className="block text-xs font-medium text-dashboard-muted mb-1">
                   Language
                 </label>
 
@@ -655,7 +643,7 @@ export default function BusinessProfilePage({
               </div>
 
               {/* <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Language</label>
+                <label className="block text-xs font-medium text-dashboard-muted mb-1">Language</label>
                 <select
                   value={formData.language}
                   onChange={(e) => handleInputChange('language', e.target.value)}
@@ -669,7 +657,7 @@ export default function BusinessProfilePage({
                 </select>
               </div> */}
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Minority Type</label>
+                <label className="block text-xs font-medium text-dashboard-muted mb-1">Minority Type</label>
                 <input
                   type="text"
                   value={prefilledData.minorityCategories.join(', ')}
@@ -678,7 +666,7 @@ export default function BusinessProfilePage({
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Established In</label>
+                <label className="block text-xs font-medium text-dashboard-muted mb-1">Established In</label>
                 <input
                   type="text"
                   value={prefilledData.establishedDate}
@@ -692,15 +680,15 @@ export default function BusinessProfilePage({
           {/* Business Information */}
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-2 mb-4">
-              <Building2 className="w-5 h-5 text-[#c9a227]" />
-              <h2 className="text-lg font-semibold text-gray-900">Business Information</h2>
+              <Building2 className="w-5 h-5 text-dashboard-gold" />
+              <h2 className="text-lg font-semibold text-dashboard-text">Business Information</h2>
             </div>
 
             <div className="space-y-4">
               {/* Business Name, License, Type - DISABLED */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">Business Name</label>
+                  <label className="block text-xs font-medium text-dashboard-muted mb-1">Business Name</label>
                   <input
                     type="text"
                     value={prefilledData.businessName}
@@ -709,7 +697,7 @@ export default function BusinessProfilePage({
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">
+                  <label className="block text-xs font-medium text-dashboard-muted mb-1">
                     License Number
                   </label>
                   <input
@@ -721,7 +709,7 @@ export default function BusinessProfilePage({
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">Business Type</label>
+                  <label className="block text-xs font-medium text-dashboard-muted mb-1">Business Type</label>
                   <input
                     type="text"
                     value={prefilledData.ownershipType}
@@ -734,7 +722,7 @@ export default function BusinessProfilePage({
               {/* Business Bio */}
               <div>
                 <div className="flex justify-between items-center mb-1">
-                  <label className="block text-xs font-medium text-gray-500">
+                  <label className="block text-xs font-medium text-dashboard-muted">
                     Business Bio <span className="text-red-500">*</span>
                   </label>
                   <span className={`text-xs ${characterCount > (formData.characterLimit || 225)
@@ -764,7 +752,7 @@ export default function BusinessProfilePage({
               {/* Business Logo - Same as Stage 1 */}
               {/* Business Logo - Required */}
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">
+                <label className="block text-xs font-medium text-dashboard-muted mb-1">
                   Business Logo <span className="text-red-500">*</span>
                 </label>
                 <div className="flex items-center gap-4">
@@ -823,7 +811,7 @@ export default function BusinessProfilePage({
 
               {/* Feature Banner */}
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">
+                <label className="block text-xs font-medium text-dashboard-muted mb-1">
                   Feature Banner
                 </label>
                 <div className="flex items-center gap-4">
@@ -884,15 +872,15 @@ export default function BusinessProfilePage({
           {/* Contact Information */}
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-2 mb-4">
-              <Mail className="w-5 h-5 text-[#c9a227]" />
-              <h2 className="text-lg font-semibold text-gray-900">Contact Information</h2>
+              <Mail className="w-5 h-5 text-dashboard-gold" />
+              <h2 className="text-lg font-semibold text-dashboard-text">Contact Information</h2>
             </div>
 
             <div className="space-y-4">
               {/* Business Email & Phone - DISABLED */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">Business Email Address</label>
+                  <label className="block text-xs font-medium text-dashboard-muted mb-1">Business Email Address</label>
                   <input
                     type="email"
                     value={prefilledData.businessEmail}
@@ -901,7 +889,7 @@ export default function BusinessProfilePage({
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">Business Contact Number</label>
+                  <label className="block text-xs font-medium text-dashboard-muted mb-1">Business Contact Number</label>
                   <input
                     type="tel"
                     value={prefilledData.businessPhone}
@@ -913,7 +901,7 @@ export default function BusinessProfilePage({
 
               {/* Alternate Phone */}
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Alternate Contact Number (Optional)</label>
+                <label className="block text-xs font-medium text-dashboard-muted mb-1">Alternate Contact Number (Optional)</label>
                 <input
                   type="tel"
                   value={formData.alternatePhone}
@@ -925,7 +913,7 @@ export default function BusinessProfilePage({
 
               {/* Country - DISABLED */}
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Country</label>
+                <label className="block text-xs font-medium text-dashboard-muted mb-1">Country</label>
                 <input
                   type="text"
                   value={prefilledData.address.country}
@@ -936,7 +924,7 @@ export default function BusinessProfilePage({
 
               {/* Address - DISABLED */}
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Business Address</label>
+                <label className="block text-xs font-medium text-dashboard-muted mb-1">Business Address</label>
                 <input
                   type="text"
                   value={prefilledData.address.street}
@@ -948,7 +936,7 @@ export default function BusinessProfilePage({
               {/* City, State, Zip - DISABLED */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">City</label>
+                  <label className="block text-xs font-medium text-dashboard-muted mb-1">City</label>
                   <input
                     type="text"
                     value={prefilledData.address.city}
@@ -957,7 +945,7 @@ export default function BusinessProfilePage({
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">State</label>
+                  <label className="block text-xs font-medium text-dashboard-muted mb-1">State</label>
                   <input
                     type="text"
                     value={prefilledData.address.state}
@@ -966,7 +954,7 @@ export default function BusinessProfilePage({
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">Zip Code</label>
+                  <label className="block text-xs font-medium text-dashboard-muted mb-1">Zip Code</label>
                   <input
                     type="text"
                     value={prefilledData.address.zipCode}
@@ -981,13 +969,13 @@ export default function BusinessProfilePage({
           {/* Social Media Links */}
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-2 mb-4">
-              <Globe className="w-5 h-5 text-[#c9a227]" />
-              <h2 className="text-lg font-semibold text-gray-900">Social Media Links</h2>
+              <Globe className="w-5 h-5 text-dashboard-gold" />
+              <h2 className="text-lg font-semibold text-dashboard-text">Social Media Links</h2>
             </div>
 
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Website</label>
+                <label className="block text-xs font-medium text-dashboard-muted mb-1">Website</label>
                 <input
                   type="text"
                   value={formData.website}
@@ -999,7 +987,7 @@ export default function BusinessProfilePage({
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1 flex items-center gap-1">
+                  <label className="block text-xs font-medium text-dashboard-muted mb-1 flex items-center gap-1">
                     <Facebook className="w-3.5 h-3.5 text-blue-600" />
                     Facebook
                   </label>
@@ -1012,7 +1000,7 @@ export default function BusinessProfilePage({
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1 flex items-center gap-1">
+                  <label className="block text-xs font-medium text-dashboard-muted mb-1 flex items-center gap-1">
                     <Instagram className="w-3.5 h-3.5 text-pink-600" />
                     Instagram
                   </label>
@@ -1025,7 +1013,7 @@ export default function BusinessProfilePage({
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1 flex items-center gap-1">
+                  <label className="block text-xs font-medium text-dashboard-muted mb-1 flex items-center gap-1">
                     <Twitter className="w-3.5 h-3.5 text-blue-400" />
                     Twitter/X
                   </label>
@@ -1038,7 +1026,7 @@ export default function BusinessProfilePage({
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1 flex items-center gap-1">
+                  <label className="block text-xs font-medium text-dashboard-muted mb-1 flex items-center gap-1">
                     <Linkedin className="w-3.5 h-3.5 text-blue-700" />
                     LinkedIn
                   </label>
@@ -1051,7 +1039,7 @@ export default function BusinessProfilePage({
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1 flex items-center gap-1">
+                  <label className="block text-xs font-medium text-dashboard-muted mb-1 flex items-center gap-1">
                     <svg className="w-3.5 h-3.5 text-black" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
                     </svg>
@@ -1158,8 +1146,8 @@ export default function BusinessProfilePage({
               />
             </div>
             <div className="flex items-center gap-2 mb-4 mt-4">
-              <FileText className="w-5 h-5 text-[#c9a227]" />
-              <h2 className="text-lg font-semibold text-gray-900">Additional Information</h2>
+              <FileText className="w-5 h-5 text-dashboard-gold" />
+              <h2 className="text-lg font-semibold text-dashboard-text">Additional Information</h2>
             </div>
             <div className="space-y-4">
 
@@ -1168,7 +1156,7 @@ export default function BusinessProfilePage({
                 <>
                   {/* Refund & Return Policy */}
                   <div>
-                    <label className="block text-xs font-medium text-gray-500 mb-1">
+                    <label className="block text-xs font-medium text-dashboard-muted mb-1">
                       Refund & Return Policy Document {hasOwnPolicy && <span className="text-red-500">*</span>}
                     </label>
 
@@ -1231,7 +1219,7 @@ export default function BusinessProfilePage({
 
                   {/* Terms */}
                   <div>
-                    <label className="block text-xs font-medium text-gray-500 mb-1">
+                    <label className="block text-xs font-medium text-dashboard-muted mb-1">
                       Terms & Conditions / Service Agreement Document {hasOwnPolicy && <span className="text-red-500">*</span>}
                     </label>
 
@@ -1296,7 +1284,7 @@ export default function BusinessProfilePage({
               {/* ✅ ALWAYS SHOW */}
               {/* Google Review */}
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">
+                <label className="block text-xs font-medium text-dashboard-muted mb-1">
                   Google Review Link
                 </label>
                 <input
@@ -1310,7 +1298,7 @@ export default function BusinessProfilePage({
 
               {/* Community */}
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">
+                <label className="block text-xs font-medium text-dashboard-muted mb-1">
                   Link To A Community Service/Drive
                 </label>
                 <input
@@ -1354,7 +1342,6 @@ export default function BusinessProfilePage({
             </button>
           </div>
         </form>
-      </div>
-    </div>
+    </VendorApplicationShell>
   );
 }

@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation'; // Add this
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import TermsModal from "../../final-review/components/TermsModal";
+import VendorApplicationShell from "../../components/VendorApplicationShell";
+import { FormField } from "@/components/ui/form-field";
 
 import {
   saveStage1Draft,
@@ -310,32 +312,8 @@ const CONTROL_UNCHECKED = "border-white/20";
 const LINK_CLASS = "text-market-gold hover:underline";
 
 /* ======================================================
-   FORM COMPONENTS
+   FORM COMPONENTS — use shared FormField (#179)
 ====================================================== */
-
-interface InputFieldProps {
-  label: string;
-  required?: boolean;
-  children: React.ReactNode;
-  error?: string;
-  className?: string;
-}
-
-const InputField: React.FC<InputFieldProps> = ({ 
-  label, 
-  required = false, 
-  children, 
-  error, 
-  className = '' 
-}) => (
-  <div className={`mb-6 ${className}`}>
-    <label className="market-label">
-      {label} {required && <span className="text-red-400">*</span>}
-    </label>
-    {children}
-    {error && <p className="mt-1 text-sm text-red-400">{error}</p>}
-  </div>
-);
 
 /* ======================================================
    MAIN COMPONENT
@@ -627,52 +605,20 @@ const handlePayAndSubmit = async () => {
   ====================================================== */
 
   return (
-    <div className="relative min-h-screen bg-market-bg pb-10">
-      <div
-        className="pointer-events-none absolute inset-0 opacity-20"
-        style={{
-          backgroundImage: "url(/become-a-vendor/vendor-registion-bg.png)",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-        aria-hidden
-      />
-      <div className="pointer-events-none absolute inset-0 bg-market-hero" aria-hidden />
-      <div className="pointer-events-none absolute inset-0 bg-market-glow-radial" aria-hidden />
+    <VendorApplicationShell
+      variant="market"
+      backHref="/partners"
+      backLabel="Back to dashboard"
+      eyebrow="Business Owner"
+      title="Vendor Registration Request"
+      description="A non-refundable $24.99 Business Verification Fee is charged at vendor sign-up to conduct a standard background validation of your business (via our contracted screening provider) and activate your Trust Badge upon approval."
+    >
+      <TermsModal isOpen={modalOpen} onClose={closeModal} type={modalType} />
 
-      <div className="relative w-full border-b border-white/10">
-        <div className="mx-auto max-w-4xl px-4">
-          <div className="py-4">
-            <Link
-              href="/partners"
-              className="market-btn-outline inline-flex items-center gap-1 px-4 py-2 text-sm normal-case"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back to dashboard
-            </Link>
-          </div>
-
-          <div className="pb-10 pt-2 text-center">
-            <span className="mb-4 inline-block rounded-full bg-market-gold px-6 py-2 text-sm font-medium text-market-header">
-              Business Owner
-            </span>
-            <h1 className="mb-2 font-poppins text-3xl font-bold uppercase tracking-wide text-market-text sm:text-4xl">
-              Vendor Registration Request
-            </h1>
-            <div className="market-section-divider mx-auto" aria-hidden />
-            <p className="mx-auto mt-4 max-w-3xl font-montserrat text-sm font-medium text-market-muted sm:text-base">
-              A non-refundable $24.99 Business Verification Fee is charged at vendor sign-up to conduct a standard background validation of your business (via our contracted screening provider) and activate your Trust Badge upon approval.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="relative mx-auto max-w-4xl px-4 pt-8">
-        {/* Form Container */}
-        <div className="rounded-2xl border border-white/10 bg-market-elevated p-4 shadow-market-card md:p-8">
+      <div className="rounded-2xl border border-white/10 bg-market-elevated p-4 shadow-market-card md:p-8">
           {/* Business Information Section */}
           <div className="mb-4">
-            <InputField label="Business Name" required error={formErrors.businessName}>
+            <FormField surface="market" label="Business Name" required error={formErrors.businessName}>
               <input
                 type="text"
                 className={FORM_INPUT_CLASS}
@@ -680,7 +626,7 @@ const handlePayAndSubmit = async () => {
                 onChange={e => update('businessName', e.target.value)}
                 placeholder="Enter Your Business Name"
               />
-            </InputField>
+            </FormField>
 
             <div className="mb-6">
               <label className="market-label">Minority Owned Business</label>
@@ -882,7 +828,7 @@ const handlePayAndSubmit = async () => {
 
             {form.hasEIN ? (
               <div className="space-y-3">
-                <InputField label="Employee Identification Number (EIN)" required error={formErrors.einNumber}>
+                <FormField surface="market" label="Employee Identification Number (EIN)" required error={formErrors.einNumber}>
                   <input
                     type="text"
                     className={FORM_INPUT_CLASS}
@@ -890,7 +836,7 @@ const handlePayAndSubmit = async () => {
                     onChange={e => update('einNumber', e.target.value)}
                     placeholder="9 Digit Number"
                   />
-                </InputField>
+                </FormField>
 
                 <div className="mb-4">
                   <label className="market-label">
@@ -937,7 +883,7 @@ const handlePayAndSubmit = async () => {
                 </div>
               </div>
             ) : (
-              <InputField label="Social Security Number" required error={formErrors.ssnLast9}>
+              <FormField surface="market" label="Social Security Number" required error={formErrors.ssnLast9}>
                 <input
                   type="text"
                   className={FORM_INPUT_CLASS}
@@ -945,7 +891,7 @@ const handlePayAndSubmit = async () => {
                   onChange={e => update('ssnLast9', e.target.value)}
                   placeholder="Enter SSN"
                 />
-              </InputField>
+              </FormField>
             )}
           </div>
 
@@ -989,7 +935,7 @@ const handlePayAndSubmit = async () => {
   {form.hasBusinessLicense && (
     <div className="space-y-4">
       {/* License Number Field */}
-<InputField label="Business License Number" required error={formErrors.licenseNumber}>
+<FormField surface="market" label="Business License Number" required error={formErrors.licenseNumber}>
   <input
     type="text"
     className={FORM_INPUT_CLASS}
@@ -997,7 +943,7 @@ const handlePayAndSubmit = async () => {
     onChange={e => update('licenseNumber', e.target.value)}
     placeholder="Enter your business license number"
   />
-</InputField>
+</FormField>
 
       {/* Business License Documents Upload */}
       <div className="mb-4">
@@ -1057,7 +1003,7 @@ const handlePayAndSubmit = async () => {
           {/* Contact Information Section */}
           <div className="mb-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              <InputField label="Primary Contact Name" required error={formErrors.primaryContactName}>
+              <FormField surface="market" label="Primary Contact Name" required error={formErrors.primaryContactName}>
                 <input
                   type="text"
                   className={FORM_INPUT_CLASS}
@@ -1065,9 +1011,9 @@ const handlePayAndSubmit = async () => {
                   onChange={e => update('primaryContactName', e.target.value)}
                   placeholder="Primary Contact Name"
                 />
-              </InputField>
+              </FormField>
 
-              <InputField label="Primary Contact Designation" required error={formErrors.primaryContactDesignation}>
+              <FormField surface="market" label="Primary Contact Designation" required error={formErrors.primaryContactDesignation}>
                 <select 
                   className={FORM_SELECT_CLASS}
                   value={form.primaryContactDesignation}
@@ -1079,9 +1025,9 @@ const handlePayAndSubmit = async () => {
                   <option value="Director">Director</option>
                   <option value="Executive">Executive</option>
                 </select>
-              </InputField>
+              </FormField>
 
-              <InputField label="Contact Email Address" required error={formErrors.contactEmail}>
+              <FormField surface="market" label="Contact Email Address" required error={formErrors.contactEmail}>
                 <input
                   type="email"
                   className={FORM_INPUT_CLASS}
@@ -1089,9 +1035,9 @@ const handlePayAndSubmit = async () => {
                   onChange={e => update('contactEmail', e.target.value)}
                   placeholder="Contact Email Address"
                 />
-              </InputField>
+              </FormField>
 
-              <InputField label="Business Email Address" required error={formErrors.businessEmail}>
+              <FormField surface="market" label="Business Email Address" required error={formErrors.businessEmail}>
                 <input
                   type="email"
                   className={FORM_INPUT_CLASS}
@@ -1099,9 +1045,9 @@ const handlePayAndSubmit = async () => {
                   onChange={e => update('businessEmail', e.target.value)}
                   placeholder="Business Email Address"
                 />
-              </InputField>
+              </FormField>
 
-              <InputField label="Primary Contact Phone Number" required error={formErrors.contactPhone} className="md:col-span-2">
+              <FormField surface="market" label="Primary Contact Phone Number" required error={formErrors.contactPhone} className="md:col-span-2">
                 <input
                   type="tel"
                   className={FORM_INPUT_CLASS}
@@ -1109,7 +1055,7 @@ const handlePayAndSubmit = async () => {
                   onChange={e => update('contactPhone', e.target.value)}
                   placeholder="Primary Contact Phone Number"
                 />
-              </InputField>
+              </FormField>
             </div>
           </div>
 
@@ -1119,7 +1065,7 @@ const handlePayAndSubmit = async () => {
 
           {/* Address Section */}
           <div className="mb-8">
-            <InputField label="Full Address" required error={formErrors.address_street}>
+            <FormField surface="market" label="Full Address" required error={formErrors.address_street}>
               <input
                 type="text"
                 className={FORM_INPUT_CLASS}
@@ -1127,10 +1073,10 @@ const handlePayAndSubmit = async () => {
                 onChange={e => updateAddress('street', e.target.value)}
                 placeholder="Enter Your Full Address"
               />
-            </InputField>
+            </FormField>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <InputField label="City" required error={formErrors.address_city}>
+              <FormField surface="market" label="City" required error={formErrors.address_city}>
                 <input
                   type="text"
                   className={FORM_INPUT_CLASS}
@@ -1138,9 +1084,9 @@ const handlePayAndSubmit = async () => {
                   onChange={e => updateAddress('city', e.target.value)}
                   placeholder="City"
                 />
-              </InputField>
+              </FormField>
 
-<InputField label="State">
+<FormField surface="market" label="State">
   <select
     className={FORM_SELECT_CLASS}
     value={form.address.state}
@@ -1198,9 +1144,9 @@ const handlePayAndSubmit = async () => {
     <option value="Wisconsin">Wisconsin</option>
     <option value="Wyoming">Wyoming</option>
   </select>
-</InputField>
+</FormField>
 
-              <InputField label="Country">
+              <FormField surface="market" label="Country">
                 <select
                   className={FORM_SELECT_CLASS}
                   value={form.address.country}
@@ -1212,9 +1158,9 @@ const handlePayAndSubmit = async () => {
                   <option value="UK">United Kingdom</option>
                   <option value="Australia">Australia</option> */}
                 </select>
-              </InputField>
+              </FormField>
 
-              <InputField label="Zip Code" required error={formErrors.address_zipCode}>
+              <FormField surface="market" label="Zip Code" required error={formErrors.address_zipCode}>
                 <input
                   type="text"
                   className={FORM_INPUT_CLASS}
@@ -1222,7 +1168,7 @@ const handlePayAndSubmit = async () => {
                   onChange={e => updateAddress('zipCode', e.target.value)}
                   placeholder="Zip Code"
                 />
-              </InputField>
+              </FormField>
             </div>
           </div>
 
@@ -1231,7 +1177,7 @@ const handlePayAndSubmit = async () => {
           {/* Business Details Section */}
           <div className="mb-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <InputField label="Ownership Type" required error={formErrors.businessOwnershipType}>
+              <FormField surface="market" label="Ownership Type" required error={formErrors.businessOwnershipType}>
                 <select 
                   className={FORM_SELECT_CLASS}
                   value={form.businessOwnershipType}
@@ -1244,9 +1190,9 @@ const handlePayAndSubmit = async () => {
                   <option value="C-Corporation">C-Corporation</option>
                   <option value="Nonprofit">Nonprofit</option>
                 </select>
-              </InputField>
+              </FormField>
 
-              <InputField label="Years in Business" required error={formErrors.yearsInBusiness}>
+              <FormField surface="market" label="Years in Business" required error={formErrors.yearsInBusiness}>
                 <select 
                   className={FORM_SELECT_CLASS}
                   value={form.yearsInBusiness}
@@ -1257,9 +1203,9 @@ const handlePayAndSubmit = async () => {
                   <option value="1yr-2yr">1 year – 2 years</option>
                   <option value="2yr+">More than 2 years</option>
                 </select>
-              </InputField>
+              </FormField>
 
-              <InputField label="Business Type" required error={formErrors.businessType}>
+              <FormField surface="market" label="Business Type" required error={formErrors.businessType}>
                 <select 
                   className={FORM_SELECT_CLASS}
                   value={form.businessType}
@@ -1270,9 +1216,9 @@ const handlePayAndSubmit = async () => {
                   <option value="service">Service-based</option>
                   <option value="food">Food & Beverage</option>
                 </select>
-              </InputField>
+              </FormField>
 
-              <InputField label="Number Of Employees">
+              <FormField surface="market" label="Number Of Employees">
                 <select 
                   className={FORM_SELECT_CLASS}
                   value={form.numberOfEmployees}
@@ -1284,7 +1230,7 @@ const handlePayAndSubmit = async () => {
                   <option value="6-10">6-10</option>
                   <option value="10+">10+</option>
                 </select>
-              </InputField>
+              </FormField>
             </div>
           </div>
 
@@ -1294,7 +1240,7 @@ const handlePayAndSubmit = async () => {
 <div className="mb-4">
   <h3 className="font-poppins text-lg font-semibold text-market-text mb-3">Online Presence (optional)</h3>
   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <InputField label="Website URL">
+    <FormField surface="market" label="Website URL">
       <input
         type="url"
         className={FORM_INPUT_CLASS}
@@ -1302,9 +1248,9 @@ const handlePayAndSubmit = async () => {
         onChange={e => update('websiteUrl', e.target.value)}
         placeholder="https://www.yourbusiness.com"
       />
-    </InputField>
+    </FormField>
 
-    <InputField label="Facebook URL">
+    <FormField surface="market" label="Facebook URL">
       <input
         type="url"
         className={FORM_INPUT_CLASS}
@@ -1312,9 +1258,9 @@ const handlePayAndSubmit = async () => {
         onChange={e => update('facebookUrl', e.target.value)}
         placeholder="https://facebook.com/yourbusiness"
       />
-    </InputField>
+    </FormField>
 
-    <InputField label="Instagram URL">
+    <FormField surface="market" label="Instagram URL">
       <input
         type="url"
         className={FORM_INPUT_CLASS}
@@ -1322,9 +1268,9 @@ const handlePayAndSubmit = async () => {
         onChange={e => update('instagramUrl', e.target.value)}
         placeholder="https://instagram.com/yourbusiness"
       />
-    </InputField>
+    </FormField>
 
-    <InputField label="LinkedIn URL">
+    <FormField surface="market" label="LinkedIn URL">
       <input
         type="url"
         className={FORM_INPUT_CLASS}
@@ -1332,9 +1278,9 @@ const handlePayAndSubmit = async () => {
         onChange={e => update('linkedinUrl', e.target.value)}
         placeholder="https://linkedin.com/company/yourbusiness"
       />
-    </InputField>
+    </FormField>
 
-    <InputField label="TikTok URL">
+    <FormField surface="market" label="TikTok URL">
       <input
         type="url"
         className={FORM_INPUT_CLASS}
@@ -1342,7 +1288,7 @@ const handlePayAndSubmit = async () => {
         onChange={e => update('tiktokUrl', e.target.value)}
         placeholder="https://tiktok.com/@yourbusiness"
       />
-    </InputField>
+    </FormField>
   </div>
 </div>
 
@@ -1411,7 +1357,7 @@ const handlePayAndSubmit = async () => {
   <div className="flex flex-col md:flex-row justify-center items-center gap-4 mt-12">
     {/* <button
       onClick={() => setForm(initialState)}
-      className="w-full md:w-auto px-8 py-3 bg-gray-400 text-white rounded-lg hover:bg-white/50 transition-colors font-medium min-w-[160px]"
+      className="w-full md:w-auto min-w-[160px] rounded-lg bg-market-pill px-8 py-3 font-medium text-market-muted transition-colors disabled:cursor-not-allowed disabled:opacity-60"
       disabled={loading}
     >
       Clear Response
@@ -1463,7 +1409,7 @@ const handlePayAndSubmit = async () => {
           {/* <div className="flex flex-col md:flex-row justify-center items-center gap-4 mt-12">
             <button
               onClick={() => setForm(initialState)}
-              className="w-full md:w-auto px-8 py-3 bg-gray-400 text-white rounded-lg hover:bg-white/50 transition-colors font-medium min-w-[160px]"
+              className="w-full md:w-auto min-w-[160px] rounded-lg bg-market-pill px-8 py-3 font-medium text-market-muted transition-colors disabled:cursor-not-allowed disabled:opacity-60"
               disabled={loading}
             >
               Clear Response
@@ -1486,7 +1432,6 @@ const handlePayAndSubmit = async () => {
             </button>
           </div> */}
         </div>
-      </div>
-    </div>
+    </VendorApplicationShell>
   );
 }

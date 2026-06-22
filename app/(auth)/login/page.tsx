@@ -1,11 +1,10 @@
 'use client'
 export const dynamic = 'force-dynamic';
 
-import { useSearchParams, usePathname, useRouter } from 'next/navigation'
-import Image from 'next/image'
-import { useEffect, useState, Suspense } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
+import { useState, Suspense } from 'react'
 import Link from 'next/link'
-import { Eye, EyeOff, X } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { logAuthRequest } from '@/utils/authDebug';
 import { parseAuthJsonResponse } from '@/utils/parseAuthErrorResponse';
 import {
@@ -13,25 +12,35 @@ import {
   isBusinessOwner,
   persistClientSession,
 } from '@/utils/authUtils';
+import AuthPageShell from '@/components/auth/AuthPageShell';
+import { FormField } from '@/components/ui/form-field';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 function LoginContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const type = searchParams.get('type');
+  const redirect = searchParams.get('redirect');
+  const resetStatus = searchParams.get('reset');
+  const isValidType = type === 'vendor' || type === 'customer';
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
 
-  const searchParams = useSearchParams()
-  const pathname = usePathname()
-
-  const type = searchParams.get('type')
-  const redirect = searchParams.get('redirect')
-  const resetStatus = searchParams.get('reset')
-  const isValidType = type === 'vendor' || type === 'customer'
+  const successMessage =
+    resetStatus === 'success'
+      ? 'Password reset successful. Please sign in with your new password.'
+      : '';
 
   const role = type === 'vendor' ? 'business_owner' : 'customer';
+  const safeRedirect =
+    redirect && redirect.startsWith('/') && !redirect.startsWith('//')
+      ? redirect
+      : null;
 
   const handleGoogleLoginRedirect = () => {
     const returnTo =
@@ -42,29 +51,6 @@ function LoginContent() {
       `&redirect=${encodeURIComponent(returnTo)}`;
     window.location.href = url;
   };
-
-  if (!isValidType) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-100">
-        <div className="p-8 text-center bg-white rounded shadow">
-          <p className="font-semibold text-red-600">Invalid login type.</p>
-        </div>
-      </div>
-    )
-  }
-
-  const title = type === 'vendor' ? 'Vendor Login' : 'Customer Login'
-  const router = useRouter();
-  const safeRedirect =
-    redirect && redirect.startsWith("/") && !redirect.startsWith("//")
-      ? redirect
-      : null;
-
-  useEffect(() => {
-    if (resetStatus === 'success') {
-      setSuccessMessage('Password reset successful. Please sign in with your new password.');
-    }
-  }, [resetStatus]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -138,184 +124,129 @@ function LoginContent() {
     }
   };
 
-  return (
-    <div className="min-h-screen grid max-w-[100vw] grid-cols-1 overflow-x-hidden md:grid-cols-2">
-      <header className="absolute left-0 right-0 top-0 z-20 flex w-full items-center justify-between bg-white px-4 py-4 md:left-20 md:bg-transparent md:px-0">
-        <span className="text-xl font-bold tracking-wide text-blue-900 md:text-white">
-          <img
-            src="/login/logo.png"
-            alt="background"
-            className=""
-          />
-        </span>
-      </header>
-
-      {/* Left Section */}
-      <div className="relative hidden md:flex items-center justify-center bg-gradient-to-br from-blue-950 via-blue-900 to-teal-800 text-white">
-        <img
-          src="/login/sideImg.png"
-          alt="background"
-          className="absolute inset-0 w-full h-full object-cover opacity-30"
-        />
-        <div className="relative z-10 max-w-md px-10">
-          {type === 'vendor' ? (
-            <>
-              <h1 className="text-4xl font-bold font-poppins mb-3 leading-tight">
-                WELCOME BACK TO YOUR{" "}
-                <span className="text-amber-400 font-bold">STOREFRONT</span>
-              </h1>
-              <p className="text-sm text-gray-200 font-montserrat font-thin leading-relaxed mb-8">
-                Sign in to manage your products, track orders, and grow your business on Mosaic BizHub.
-              </p>
-
-              <div className="space-y-5">
-                <div>
-                  <p className="text-sm font-semibold font-poppins text-white">Your Business, Your Dashboard</p>
-                  <div className="mt-4 h-px w-full bg-white/20" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold font-poppins text-white">Manage Your Storefront</p>
-                  <p className="text-xs font-thin font-montserrat text-gray-300 mt-1">Update listings, pricing, and inventory from a single dashboard.</p>
-                  <div className="mt-4 h-px w-full bg-white/20" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold font-poppins text-white">Track &amp; Fulfil Orders</p>
-                  <p className="text-xs font-thin font-montserrat text-gray-300 mt-1">View incoming orders, manage shipments, and keep customers informed.</p>
-                  <div className="mt-4 h-px w-full bg-white/20" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold font-poppins text-white">Grow Your Reach</p>
-                  <p className="text-xs font-thin font-montserrat text-gray-300 mt-1">Connect with customers who are actively looking to support businesses like yours.</p>
-                </div>
-              </div>
-            </>
-          ) : (
-            <>
-              <h1 className="text-4xl font-bold font-poppins mb-3 leading-tight">
-                WELCOME BACK,{" "}
-                <span className="text-amber-400 font-bold">CHANGEMAKER</span>
-              </h1>
-              <p className="text-sm text-gray-200 font-montserrat font-thin leading-relaxed mb-8">
-                Sign in to continue shopping authentic products and supporting the businesses that matter.
-              </p>
-
-              <div className="space-y-5">
-                <div>
-                  <p className="text-sm font-semibold font-poppins text-white">Pick Up Where You Left Off</p>
-                  <p className="text-xs font-thin font-montserrat text-gray-300 mt-1">Access your cart &amp; browse right where you stopped.</p>
-                  <div className="mt-4 h-px w-full bg-white/20" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold font-poppins text-white">Track Every Order</p>
-                  <p className="text-xs font-thin font-montserrat text-gray-300 mt-1">Stay updated on deliveries and revisit your purchase history anytime.</p>
-                  <div className="mt-4 h-px w-full bg-white/20" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold font-poppins text-white">Keep Making an Impact</p>
-                  <p className="text-xs font-thin font-montserrat text-gray-300 mt-1">Every return visit means more support for minority-owned businesses.</p>
-                </div>
-              </div>
-            </>
-          )}
+  if (!isValidType) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-surface-cream">
+        <div className="rounded-lg bg-white p-8 text-center shadow-glass">
+          <p className="font-semibold text-dashboard-warn-text">Invalid login type.</p>
         </div>
-
       </div>
+    );
+  }
 
-      {/* Right Section */}
-      <div className="flex min-w-0 items-center justify-center bg-white px-6 py-10">
-        <div className="w-full max-w-md min-w-0">
-          <span className="inline-block mb-2 rounded-full bg-[#FFF6E0] px-2 text-[10px] font-thin font-montserrat text-[#C7A040]">
-            {type?.charAt(0).toUpperCase() + type?.slice(1)}
-          </span>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">SIGN IN</h2>
-
-          <div className="flex flex-col justify-start mb-5">
-            <hr className="h-[2px] w-[80px] bg-gray-700" />
-            <hr className="h-[2px] w-[80px] mt-[2px] mb-4 bg-gray-700" />
+  const typeLabel = type === 'vendor' ? 'Vendor' : 'Customer';
+  const hero =
+    type === 'vendor' ? (
+      <>
+        <h1 className="mb-3 font-poppins text-4xl font-bold leading-tight">
+          WELCOME BACK TO YOUR{" "}
+          <span className="font-bold text-brand-gold">STOREFRONT</span>
+        </h1>
+        <p className="mb-8 font-montserrat text-sm font-light leading-relaxed text-white/80">
+          Sign in to manage your products, track orders, and grow your business on Mosaic BizHub.
+        </p>
+        <div className="space-y-5 text-sm">
+          <div>
+            <p className="font-semibold font-poppins text-white">Your Business, Your Dashboard</p>
+            <div className="mt-4 h-px w-full bg-white/20" />
           </div>
-
-          <form className="space-y-4" onSubmit={handleSubmit}>
-            <div>
-              <label className="block text-base font-medium text-gray-700 mb-2 font-poppins">
-                Email <span className="text-red-500">*</span>
-              </label>
-              <input
-                name="email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
-                className="w-full rounded-md border border-gray-300 px-6 py-2 font-medium font-poppins focus:outline-none focus:ring-2 focus:ring-blue-900"
-              />
-            </div>
-            <div>
-              <label className="block text-base font-medium text-gray-700 mb-2 font-poppins">
-                Password <span className="text-red-500">*</span>
-              </label>
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
-                  className="w-full rounded-md border border-gray-300 px-6 py-2 pr-10 font-medium font-poppins focus:outline-none focus:ring-2 focus:ring-blue-900"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
-                >
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                </button>
-              </div>
-            </div>
-            <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center gap-2 text-gray-600 font-montserrat font-thin">
-                <input type="checkbox" className="rounded border-gray-300" />
-                Keep Me Signed In
-              </label>
-              <Link
-                href={`/forgot-password?type=${encodeURIComponent(type)}`}
-                className="text-blue-900 font-medium hover:underline"
-              >
-                Forget Password
-              </Link>
-            </div>
-
-            {successMessage && (
-              <div className="p-2 text-sm text-green-700 bg-green-100 border border-green-300 rounded">
-                {successMessage}
-              </div>
-            )}
-
-            {error && (
-              <div className="p-2 text-sm text-red-600 bg-red-100 border border-red-300 rounded">
-                {error}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              className="w-full bg-blue-900 text-white py-2 text-[16px] hover:bg-blue-800 transition font-montserrat font-extralight"
-            >
-              {loading ? 'Signing In...' : 'Sign In'}
-            </button>
-          </form>
-
-          <div className="my-4" />
-
-          <p className="mt-6 text-center underline text-[16px] text-gray-600">
-            New Here?{" "}
-            <a href={`/signup?type=${type}`}>
-              Create Account
-            </a>
-          </p>
+          <div>
+            <p className="font-semibold font-poppins text-white">Manage Your Storefront</p>
+            <p className="mt-1 font-montserrat text-xs font-light text-white/70">
+              Update listings, pricing, and inventory from a single dashboard.
+            </p>
+          </div>
         </div>
-      </div>
-    </div>
+      </>
+    ) : (
+      <>
+        <h1 className="mb-3 font-poppins text-4xl font-bold leading-tight">
+          WELCOME BACK,{" "}
+          <span className="font-bold text-brand-gold">CHANGEMAKER</span>
+        </h1>
+        <p className="mb-8 font-montserrat text-sm font-light leading-relaxed text-white/80">
+          Sign in to continue shopping authentic products and supporting the businesses that matter.
+        </p>
+      </>
+    );
+
+  return (
+    <AuthPageShell typeLabel={typeLabel} title="SIGN IN" hero={hero}>
+      <form className="space-y-4" onSubmit={handleSubmit}>
+        <FormField label="Email" htmlFor="email" required surface="auth">
+          <Input
+            id="email"
+            name="email"
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Enter your email"
+            surface="auth"
+          />
+        </FormField>
+
+        <FormField label="Password" htmlFor="password" required surface="auth">
+          <div className="relative">
+            <Input
+              id="password"
+              type={showPassword ? 'text' : 'password'}
+              name="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+              surface="auth"
+              className="pr-10"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute inset-y-0 right-3 flex items-center text-brand-muted hover:text-brand-navy"
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+            >
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
+          </div>
+        </FormField>
+
+        <div className="flex items-center justify-between text-sm">
+          <label className="flex items-center gap-2 font-montserrat font-light text-brand-muted">
+            <input type="checkbox" className="rounded border-dashboard-input-border" />
+            Keep Me Signed In
+          </label>
+          <Link
+            href={`/forgot-password?type=${encodeURIComponent(type)}`}
+            className="font-medium text-brand-navy-light hover:underline"
+          >
+            Forget Password
+          </Link>
+        </div>
+
+        {successMessage ? (
+          <div className="rounded border border-green-300 bg-green-50 p-2 text-sm text-green-800">
+            {successMessage}
+          </div>
+        ) : null}
+
+        {error ? (
+          <div className="rounded border border-dashboard-warn-border bg-dashboard-warn-bg p-2 text-sm text-dashboard-warn-text">
+            {error}
+          </div>
+        ) : null}
+
+        <Button type="submit" className="w-full normal-case" disabled={loading}>
+          {loading ? 'Signing In...' : 'Sign In'}
+        </Button>
+      </form>
+
+      <p className="mt-6 text-center text-base text-brand-muted underline">
+        New Here?{" "}
+        <Link href={`/signup?type=${type}`} className="text-brand-navy-light">
+          Create Account
+        </Link>
+      </p>
+    </AuthPageShell>
   );
 }
 

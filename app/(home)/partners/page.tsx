@@ -15,6 +15,7 @@ import {
   Globe,
 } from "lucide-react";
 import Link from "next/link";
+import VendorApplicationShell from "./components/VendorApplicationShell";
 import { useRouter } from "next/navigation";
 import {
   clearStaleClientSession,
@@ -593,7 +594,7 @@ const Page: React.FC = () => {
 
           {onboardingStatus.data.currentStage === 2 && (
             <Link href={`/partners/tier-selection?appId=${onboardingStatus.data.applicationId}`}>
-              <button className="w-full md:w-auto px-5 py-2.5 bg-blue-900 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
+              <button className="w-full md:w-auto px-5 py-2.5 bg-brand-navy-light hover:bg-brand-navy text-white text-sm font-medium rounded-lg hover:bg-brand-navy transition-colors flex items-center justify-center gap-2">
                 <Zap className="w-4 h-4" />
                 Select Plan
                 <ArrowRight className="w-4 h-4" />
@@ -604,7 +605,7 @@ const Page: React.FC = () => {
           {onboardingStatus.data.currentStage < 2 && (
             <div className="p-3 bg-gray-50 rounded flex items-start gap-2">
               <Lock className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
-              <p className="text-sm text-gray-500">Complete Stage 1 first</p>
+              <p className="text-sm text-dashboard-muted">Complete Stage 1 first</p>
             </div>
           )}
         </div>
@@ -625,7 +626,7 @@ const Page: React.FC = () => {
 
           {onboardingStatus.data.currentStage === 3 && (
             <Link href="/partners/business-profile">
-              <button className="w-full md:w-auto px-5 py-2.5 bg-blue-900 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
+              <button className="w-full md:w-auto px-5 py-2.5 bg-brand-navy-light hover:bg-brand-navy text-white text-sm font-medium rounded-lg hover:bg-brand-navy transition-colors flex items-center justify-center gap-2">
                 <CheckCircle className="w-4 h-4" />
                 Complete Profile
                 <ArrowRight className="w-4 h-4" />
@@ -654,7 +655,7 @@ const Page: React.FC = () => {
 
           {onboardingStatus.data.currentStage >= 4 ? (
             <Link href={listingManagement.href}>
-              <button className="w-full md:w-auto px-5 py-2.5 bg-blue-900 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2">
+              <button className="w-full md:w-auto px-5 py-2.5 bg-brand-navy-light hover:bg-brand-navy text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2">
                 <Package className="w-4 h-4" />
                 {listingManagement.label}
                 <ArrowRight className="w-4 h-4" />
@@ -687,7 +688,7 @@ const Page: React.FC = () => {
           </div>
 
           <Link href="/partners/payout-setup">
-            <button className="w-full md:w-auto px-5 py-2.5 bg-blue-900 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center gap-2">
+            <button className="w-full md:w-auto px-5 py-2.5 bg-brand-navy-light hover:bg-brand-navy text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center gap-2">
               <CreditCard className="w-4 h-4" />
               Setup Payout
               <ArrowRight className="w-4 h-4" />
@@ -713,7 +714,7 @@ const Page: React.FC = () => {
         </div>
 
         <Link href="/partners/final-review">
-          <button className="w-full md:w-auto px-5 py-2.5 bg-blue-900 text-white text-sm font-medium rounded-lg hover:bg-amber-700 transition-colors flex items-center justify-center gap-2">
+          <button className="w-full md:w-auto px-5 py-2.5 bg-brand-navy-light hover:bg-brand-navy text-white text-sm font-medium rounded-lg hover:bg-amber-700 transition-colors flex items-center justify-center gap-2">
             <Globe className="w-4 h-4" />
             Launch Business
             <ArrowRight className="w-4 h-4" />
@@ -725,14 +726,16 @@ const Page: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-      </div>
+      <VendorApplicationShell variant="dashboard">
+        <div className="flex h-64 items-center justify-center">
+          <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-dashboard-gold" />
+        </div>
+      </VendorApplicationShell>
     );
   }
 
   return (
-    <div className="container p-6 mx-auto max-w-6xl">
+    <VendorApplicationShell variant="dashboard">
       {showRegistrationModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
           <div className="relative w-full max-w-2xl overflow-hidden rounded-3xl bg-white shadow-2xl">
@@ -801,21 +804,21 @@ const Page: React.FC = () => {
       )}
 
       {!onboardingLoading && hasApplication && onboardingStatus && (
-        <h1 className="mb-8 text-2xl font-bold text-center text-gray-800 uppercase tracking-wide">
+        <h1 className="mb-8 text-center text-2xl font-bold uppercase tracking-wide text-dashboard-text">
           Business Profile Status
         </h1>
       )}
 
       {!onboardingLoading && hasApplication && onboardingStatus && (
         <div className="mb-8">
-          <div className="bg-gray-100 rounded-lg p-4 mb-6 flex justify-between items-center">
+          <div className="mb-6 flex items-center justify-between rounded-lg border border-border-warm bg-surface-panel p-4">
             <div>
-              <h2 className="text-lg font-semibold text-gray-800">Onboarding Status</h2>
-              <p className="text-sm text-gray-600">
+              <h2 className="text-lg font-semibold text-dashboard-text">Onboarding Status</h2>
+              <p className="text-sm text-dashboard-muted">
                 Step {onboardingStatus.data.currentStage} of {onboardingSteps.length}: complete each stage to launch your storefront.
               </p>
-              <p className="text-sm text-gray-600">{onboardingStatus.data.businessName}</p>
-              <p className="text-xs text-gray-500">Application ID: {onboardingStatus.data.applicationId}</p>
+              <p className="text-sm text-dashboard-muted">{onboardingStatus.data.businessName}</p>
+              <p className="text-xs text-dashboard-muted">Application ID: {onboardingStatus.data.applicationId}</p>
             </div>
             <span className="px-4 py-1.5 bg-red-100 text-red-600 text-sm font-medium rounded-full">
               {onboardingStatus.data.status}
@@ -881,15 +884,15 @@ const Page: React.FC = () => {
             {/* <div className="w-20 h-20 mx-auto mb-6 bg-blue-100 rounded-full flex items-center justify-center">
               <Plus className="w-10 h-10 text-blue-600" />
             </div> */}
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Start Your Vendor Journey</h2>
-            <p className="text-gray-600 mb-6">
+            <h2 className="mb-4 text-2xl font-bold text-dashboard-text">Start Your Vendor Journey</h2>
+            <p className="mb-6 text-dashboard-muted">
               List your business on our platform and start reaching new customers.
               Complete our simple 6-step verification process to get started.
             </p>
             <button
               type="button"
               onClick={() => setShowRegistrationModal(true)}
-              className="px-8 py-3 text-lg font-bold text-white bg-yellow-600 rounded-lg hover:bg-yellow-700 transition-colors duration-300 shadow-lg hover:shadow-xl"
+              className="rounded-lg bg-dashboard-gold px-8 py-3 text-lg font-bold text-white shadow-lg transition-colors duration-300 hover:bg-brand-gold"
             >
               Start Vendor Onboarding
             </button>
@@ -899,27 +902,27 @@ const Page: React.FC = () => {
                   <span className="font-bold text-blue-600">1-3</span>
                 </div>
                 <h4 className="font-semibold mb-2">Setup & Verification</h4>
-                <p className="text-sm text-gray-500">Business verification, profile, and products</p>
+                <p className="text-sm text-dashboard-muted">Business verification, profile, and products</p>
               </div>
               <div className="p-4 bg-white rounded-lg shadow">
                 <div className="w-12 h-12 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
                   <span className="font-bold text-blue-600">4-5</span>
                 </div>
                 <h4 className="font-semibold mb-2">Payments & Payouts</h4>
-                <p className="text-sm text-gray-500">Setup payment methods and bank details</p>
+                <p className="text-sm text-dashboard-muted">Setup payment methods and bank details</p>
               </div>
               <div className="p-4 bg-white rounded-lg shadow">
                 <div className="w-12 h-12 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
                   <span className="font-bold text-blue-600">6</span>
                 </div>
                 <h4 className="font-semibold mb-2">Final Review</h4>
-                <p className="text-sm text-gray-500">Final verification and business launch</p>
+                <p className="text-sm text-dashboard-muted">Final verification and business launch</p>
               </div>
             </div>
           </div>
         </div>
       )}
-    </div>
+    </VendorApplicationShell>
   );
 };
 
