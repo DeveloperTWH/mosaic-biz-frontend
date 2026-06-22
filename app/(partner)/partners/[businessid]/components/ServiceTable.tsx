@@ -1,22 +1,40 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Eye, Pencil, Trash2, Plus, ChevronDown, ChevronUp } from 'lucide-react';
+import { Eye, Pencil, Trash2, Plus, Upload, Download } from 'lucide-react';
 import Image from 'next/image';
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
-import { useBusinessStore } from '@/app/store/businessStore';
-import axios from 'axios';
+import { useParams } from "next/navigation";
 import { toast } from 'react-toastify';
 import DeleteConfirmationModal from '@/app/components/DeleteConfirmationModal';
 import { Service } from '@/types/service';
+import { ApiClientError, getUserSafeMessage } from '@/lib/api/errors';
+import {
+    canShowPublicListingLink,
+    deleteService,
+    extractFieldErrorsFromError,
+    getInventoryStatus,
+    getInventoryStatusClass,
+    getInventoryStatusDetail,
+    getInventoryStatusLabel,
+    getPublicationSuccessMessage,
+    getPublicServiceUrl,
+    getServiceById,
+    mapServiceToFormState,
+    serializeServicePayload,
+    updateService,
+    validateServiceForPublish,
+    verifyPublicListing,
+} from '@/lib/api/services';
 
 
 interface ServiceTableProps {
     services: Service[];
+    businessId: string;
     currentPage: number;
     totalPages: number;
     onPageChange: (page: number) => void;
+    onServicesChanged: () => void;
     isLoading?: boolean;
     error?: string | null;
 }
@@ -24,24 +42,19 @@ interface ServiceTableProps {
 
 const ServiceTable: React.FC<ServiceTableProps> = ({
     services,
+    businessId,
     currentPage,
     totalPages,
     onPageChange,
+    onServicesChanged,
     isLoading,
     error,
 }) => {
     const { businessid } = useParams();
-    const { business } = useBusinessStore();
     const [expanded, setExpanded] = useState<string[]>([]);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [deleteTarget, setDeleteTarget] = useState<string>('');
-
-
-
-
-
-
-    const router = useRouter();;
+    const [actionServiceId, setActionServiceId] = useState<string | null>(null);
 
     const changePage = (page: number) => {
         if (page >= 1 && page <= totalPages) onPageChange(page);
@@ -92,25 +105,145 @@ const ServiceTable: React.FC<ServiceTableProps> = ({
 
     const handleDelete = async () => {
         try {
-            await axios.delete(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/service/delete-service/${deleteTarget}`, {
-                withCredentials: true,
-            });
+            await deleteService(deleteTarget);
             toast.success('Service deleted successfully');
-            changePage(currentPage);
+            onServicesChanged();
         } catch (err) {
-            toast.error('Delete failed');
+            toast.error(getUserSafeMessage(err, 'Delete failed'));
         } finally {
             setShowDeleteModal(false);
         }
     };
 
+    const runPublicationAction = async (serviceId: string, publish: boolean) => {
+        setActionServiceId(serviceId);
+        try {
+            const service = await getServiceById(serviceId);
+            const form = mapServiceToFormState(service);
+
+            if (publish) {
+                const errors = validateServiceForPublish(form);
+                if (Object.keys(errors).length > 0) {
+                    toast.error('Complete service options (name, price, duration) before publishing.');
+                    return;
+                }
+            }
+
+            const payload = serializeServicePayload(form, { businessId, publish });
+            const result = await updateService(serviceId, payload);
+
+            let publicVisible: boolean | undefined;
+            if (publish) {
+                publicVisible = (await verifyPublicListing(serviceId)).visible;
+            }
+
+            const message = getPublicationSuccessMessage(result, { publish, publicVisible });
+            toast.success(message.toast);
+            if (message.detail) toast.info(message.detail);
+            onServicesChanged();
+        } catch (err) {
+            if (err instanceof ApiClientError && err.status === 409) {
+                toast.error(err.message || 'A service already exists for this business.');
+                return;
+            }
+            const fieldErrors = extractFieldErrorsFromError(err);
+            if (Object.keys(fieldErrors).length > 0) {
+                toast.error(Object.values(fieldErrors)[0]);
+                return;
+            }
+            toast.error(getUserSafeMessage(err, publish ? 'Publication failed.' : 'Unpublish failed.'));
+        } finally {
+            setActionServiceId(null);
+        }
+    };
+
+    const renderActions = (service: Service) => {
+        const status = getInventoryStatus(service);
+        const busy = actionServiceId === service._id;
+
+        return (
+            <div className="flex flex-wrap justify-end gap-2">
+                {canShowPublicListingLink(service) ? (
+                    <Link href={getPublicServiceUrl(service._id)} target="_blank" rel="noopener noreferrer">
+                        <button
+                            type="button"
+                            className="inline-flex min-h-11 items-center gap-1 rounded border border-blue-200 px-2 py-1 text-xs text-blue-700"
+                            title="View Public Listing"
+                        >
+                            <Eye size={14} />
+                            View Public
+                        </button>
+                    </Link>
+                ) : null}
+
+                {status === 'draft' ? (
+                    <button
+                        type="button"
+                        disabled={busy}
+                        onClick={() => runPublicationAction(service._id, true)}
+                        className="inline-flex min-h-11 items-center gap-1 rounded bg-green-600 px-2 py-1 text-xs text-white disabled:opacity-50"
+                    >
+                        <Upload size={14} />
+                        Publish
+                    </button>
+                ) : null}
+
+                {service.isPublished ? (
+                    <button
+                        type="button"
+                        disabled={busy}
+                        onClick={() => runPublicationAction(service._id, false)}
+                        className="inline-flex min-h-11 items-center gap-1 rounded bg-red-600 px-2 py-1 text-xs text-white disabled:opacity-50"
+                    >
+                        <Download size={14} />
+                        Unpublish
+                    </button>
+                ) : null}
+
+                <Link href={`/partners/${businessid}/inventory/edit-service/${service._id}`}>
+                    <button type="button" className="inline-flex min-h-11 items-center rounded p-2 text-green-600 hover:text-green-800">
+                        <Pencil size={16} />
+                    </button>
+                </Link>
+
+                <button
+                    type="button"
+                    className="inline-flex min-h-11 items-center rounded p-2 text-red-600 hover:text-red-800"
+                    onClick={() => {
+                        setDeleteTarget(service._id);
+                        setShowDeleteModal(true);
+                    }}
+                >
+                    <Trash2 size={16} />
+                </button>
+            </div>
+        );
+    };
+
+    const renderStatusBadge = (service: Service) => {
+        const status = getInventoryStatus(service);
+        const detail = getInventoryStatusDetail(service);
+
+        return (
+            <div className="space-y-1">
+                <span className={`inline-flex px-2 py-1 text-xs rounded-full ${getInventoryStatusClass(status)}`}>
+                    {getInventoryStatusLabel(status)}
+                </span>
+                {detail ? (
+                    <p className="max-w-xs text-xs text-amber-800" title={detail}>
+                        {detail}
+                    </p>
+                ) : null}
+            </div>
+        );
+    };
 
     if (services.length === 0) {
         return (
             <div className="p-6 text-center bg-white border rounded shadow-sm">
                 <p className="mb-4 text-gray-700 text-md">No services found for this business.</p>
                 <Link href={`/partners/${businessid}/inventory/add-service`}>
-                    <button className="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700">
+                    <button className="min-h-11 px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700">
                         + Add Service
                     </button>
                 </Link>
@@ -119,21 +252,10 @@ const ServiceTable: React.FC<ServiceTableProps> = ({
     }
 
     return (
-        <div className="p-4 bg-white rounded shadow md:p-6">
-            <div className="flex flex-col items-start justify-between gap-3 mb-6 sm:flex-row sm:items-center">
-                <h3 className="text-xl font-bold capitalize">{business?.listingType}</h3>
-                <Link
-                    href={`/partners/${businessid}/inventory/add-${business?.listingType}`}
-                    className="flex items-center gap-2 px-4 py-2 text-sm text-white rounded bg-custom-orange hover:opacity-90"
-                >
-                    <Plus className="w-4 h-4" /> Add {business?.listingType}
-                </Link>
-            </div>
-
-            {/* ✅ Desktop Table */}
-            <div className="hidden w-full overflow-x-auto md:block">
-                <table className="min-w-full text-sm text-left text-gray-700">
-                    <thead className="text-xs uppercase bg-[#333333] text-white">
+        <div>
+            <div className="hidden overflow-x-auto bg-white border rounded shadow-sm md:block">
+                <table className="min-w-full text-sm">
+                    <thead className="text-left bg-gray-100">
                         <tr>
                             <th className="px-4 py-3">Service</th>
                             <th className="px-4 py-3">Rating</th>
@@ -144,75 +266,47 @@ const ServiceTable: React.FC<ServiceTableProps> = ({
                     </thead>
                     <tbody>
                         {services.map(service => (
-                            <tr key={service._id} className="border-b hover:bg-gray-50">
-                                <td className="flex items-center gap-3 px-4 py-3">
-                                    <div className="relative w-16 h-16 sm:w-20 sm:h-20 min-w-[64px] sm:min-w-[80px] overflow-hidden border rounded">
-                                        <Image
-                                            src={service.coverImage}
-                                            alt={service.title}
-                                            fill
-                                            className="object-cover"
-                                            sizes="(max-width: 640px) 64px, 80px"
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <p className="font-medium">{service.title}</p>
-                                        <p className="text-xs text-gray-500">{service.slug}</p>
+                            <tr key={service._id} className="border-t">
+                                <td className="px-4 py-3">
+                                    <div className="flex items-center gap-3">
+                                        <div className="relative w-12 h-12 overflow-hidden border rounded">
+                                            <Image
+                                                src={service.coverImage}
+                                                alt={service.title}
+                                                fill
+                                                className="object-cover"
+                                                sizes="48px"
+                                            />
+                                        </div>
+                                        <div>
+                                            <p className="font-medium">{service.title}</p>
+                                            <p className="text-xs text-gray-500">{service.slug}</p>
+                                        </div>
                                     </div>
                                 </td>
                                 <td className="px-4 py-3">{service.averageRating?.toFixed(1) || 'N/A'}</td>
                                 <td className="px-4 py-3">{service.contact?.address || 'N/A'}</td>
-                                <td className="px-4 py-3">
-                                    <span className={`px-2 py-1 text-xs rounded-full ${service.isPublished ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                                        {service.isPublished ? 'Published' : 'Unpublished'}
-                                    </span>
-                                </td>
-                                <td className="px-4 py-3 space-x-2 text-right">
-                                    {service.isPublished && (
-                                        <Link href={`/service/${service.slug}`}>
-                                            <button className="p-1 text-blue-600 hover:text-blue-800" title="View Public Page">
-                                                <Eye size={16} />
-                                            </button>
-                                        </Link>
-                                    )}
-
-                                    <Link href={`/partners/${businessid}/inventory/edit-service/${service._id}`}>
-                                        <button className="p-1 text-green-600 hover:text-green-800">
-                                            <Pencil size={16} />
-                                        </button>
-                                    </Link>
-                                    <button
-                                        className="p-1 text-red-600 hover:text-red-800"
-                                        onClick={() => {
-                                            setDeleteTarget(service._id);
-                                            setShowDeleteModal(true);
-                                        }}
-                                    >
-                                        <Trash2 size={16} />
-                                    </button>
-                                </td>
+                                <td className="px-4 py-3">{renderStatusBadge(service)}</td>
+                                <td className="px-4 py-3">{renderActions(service)}</td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
             </div>
 
-            {/* ✅ Mobile Card View */}
             <div className="block space-y-4 md:hidden">
                 {services.map(service => (
-                    <div key={service._id} className="p-4 space-y-2 bg-white border rounded shadow-sm">
+                    <div key={service._id} className="p-4 space-y-3 bg-white border rounded shadow-sm">
                         <div className="flex items-center gap-3">
-                            <div className="relative w-16 h-16 sm:w-20 sm:h-20 min-w-[64px] sm:min-w-[80px] overflow-hidden border rounded">
+                            <div className="relative w-16 h-16 min-w-[64px] overflow-hidden border rounded">
                                 <Image
                                     src={service.coverImage}
                                     alt={service.title}
                                     fill
                                     className="object-cover"
-                                    sizes="(max-width: 640px) 64px, 80px"
+                                    sizes="64px"
                                 />
                             </div>
-
                             <div>
                                 <p className="font-medium">{service.title}</p>
                                 <p className="text-xs text-gray-500">{service.slug}</p>
@@ -220,55 +314,23 @@ const ServiceTable: React.FC<ServiceTableProps> = ({
                         </div>
                         <p className="text-sm"><strong>Rating:</strong> {service.averageRating?.toFixed(1) || 'N/A'}</p>
                         <p className="text-sm"><strong>Address:</strong> {service.contact?.address || 'N/A'}</p>
-                        <p className="text-sm">
-                            <strong>Status:</strong>{' '}
-                            <span className={`px-2 py-1 text-xs rounded-full ${service.isPublished ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                                {service.isPublished ? 'Published' : 'Unpublished'}
-                            </span>
-                        </p>
-                        <div className="flex justify-end gap-2 pt-2">
-                            {service.isPublished && (
-                                <Link href={`/service/${service.slug}`}>
-                                    <button className="p-1 text-blue-600 hover:text-blue-800" title="View Public Page">
-                                        <Eye size={16} />
-                                    </button>
-                                </Link>
-                            )}
-                            <Link href={`/partners/${businessid}/inventory/edit-service/${service._id}`}>
-                                <button className="p-1 text-green-600 hover:text-green-800">
-                                    <Pencil size={16} />
-                                </button>
-                            </Link>
-                            <button
-                                className="p-1 text-red-600 hover:text-red-800"
-                                onClick={() => {
-                                    setDeleteTarget(service._id);
-                                    setShowDeleteModal(true);
-                                }}
-                            >
-                                <Trash2 size={16} />
-                            </button>
-                        </div>
+                        <p className="text-sm"><strong>Status:</strong> {renderStatusBadge(service)}</p>
+                        {renderActions(service)}
                     </div>
                 ))}
             </div>
-
-
 
             {renderPagination()}
 
             {showDeleteModal && (
                 <DeleteConfirmationModal
-                    onCancel={() => setShowDeleteModal(false)}
+                    message="Are you sure you want to delete this service? This action cannot be undone."
                     onConfirm={handleDelete}
-                    title="Confirm Delete"
-                    message={'Are you sure you want to delete this Service?'}
+                    onCancel={() => setShowDeleteModal(false)}
                 />
             )}
-
-
         </div>
-    )
-}
+    );
+};
 
-export default ServiceTable
+export default ServiceTable;
