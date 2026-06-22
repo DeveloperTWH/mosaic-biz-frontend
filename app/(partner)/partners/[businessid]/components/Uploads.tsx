@@ -117,7 +117,7 @@ export default function BrandAssetsLinkedInStyle({
       <div className="w-full max-w-4xl bg-white rounded-2xl shadow-lg overflow-hidden border">
         {/* Header */}
         <div className="px-6 pt-6">
-          <h2 className="text-2xl font-bold text-gray-800">Set up your business profile</h2>
+          <h2 className="font-poppins text-2xl font-bold text-brand-navy">Set up your business profile</h2>
           <p className="text-sm text-gray-500 mt-1">
             Add a cover image and a logo. We’ll show them like LinkedIn: banner behind, logo on top.
           </p>

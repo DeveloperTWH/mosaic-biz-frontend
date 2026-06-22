@@ -25,15 +25,14 @@ export default function AboutMinority() {
           className="object-cover w-full md:w-1/2"
         />
         <div className="md:w-[40%]">
-          <h2 className="mb-4 text-2xl font-semibold uppercase sm:text-3xl md:text-4xl heading">
+          <h2 className="market-section-heading mb-4 text-2xl uppercase sm:text-3xl md:text-4xl">
             About Minority Owned Business
           </h2>
-          <hr className="h-[2px] w-[100px] bg-green-900" />
-          <hr className="h-[2px] w-[100px] bg-green-900 mt-[1px]" />
-          <p className="text-gray-700 mb-4 text-[13px] mt-5">
+          <div className="market-section-divider md:mx-0" />
+          <p className="mb-4 mt-5 text-[13px] text-market-text/85">
             Minority-owned businesses are the backbone of diverse, resilient communities. Mosaic Biz Hub is here to amplify their voices by providing a platform that showcases products, services, and stories. From food and fashion to tech and wellness, we empower business owners to thrive in the digital marketplace.
           </p>
-          <p className="text-gray-700 mb-4 text-[13px] mt-5">
+          <p className="mb-4 mt-5 text-[13px] text-market-text/85">
             We believe every entrepreneur deserves visibility and access to opportunity. By listing your business, you join a growing network focused on growth, collaboration, and lasting success — all in one place.
           </p>
           <Link href="/about" className="px-4 py-3 mt-5 text-white bg-custom-orange ">

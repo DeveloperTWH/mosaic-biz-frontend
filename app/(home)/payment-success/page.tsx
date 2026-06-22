@@ -138,37 +138,40 @@ function PaymentSuccessPage() {
 
   if (!paymentIntentId || redirectStatus !== 'succeeded') {
     return (
-      <div className="mx-auto max-w-lg p-8 text-center">
-        <h1 className="text-xl font-semibold text-red-700">Payment not completed</h1>
-        <p className="mt-3 text-sm text-brand-muted">
-          Your payment was cancelled or could not be confirmed. No charge was finalized.
-        </p>
-        <a href="/cart" className="mt-6 inline-block rounded bg-brand-navy-light px-6 py-2 text-sm font-semibold text-white hover:bg-brand-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold">
-          Return to cart
-        </a>
+      <div className="container-page py-12">
+        <div className="market-surface-light mx-auto max-w-lg rounded-2xl border border-white/10 p-8 text-center shadow-market-card">
+          <h1 className="font-poppins text-xl font-semibold text-red-700">Payment not completed</h1>
+          <p className="mt-3 text-sm text-brand-muted">
+            Your payment was cancelled or could not be confirmed. No charge was finalized.
+          </p>
+          <a href="/cart" className="mt-6 inline-block rounded bg-brand-navy-light px-6 py-2 text-sm font-semibold text-white hover:bg-brand-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold">
+            Return to cart
+          </a>
+        </div>
       </div>
     );
   }
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-lg p-8 text-center">
-        <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-[#C7A040] border-t-transparent" />
-        <p className="mt-4 commerce-state-loading">Confirming your payment...</p>
+      <div className="container-page py-12">
+        <AccountLoadingBlock label="Confirming your payment…" minHeight="min-h-[40vh]" />
       </div>
     );
   }
 
   if (!paymentData) {
     return (
-      <div className="mx-auto max-w-lg p-8 text-center">
-        <h1 className="text-xl font-semibold text-red-700">Unable to load receipt</h1>
-        <p className="mt-3 text-sm text-brand-muted">
-          Payment may have succeeded but receipt details are unavailable. Check your email or order history.
-        </p>
-        <a href="/customer/order" className="mt-6 inline-block rounded bg-brand-navy-light px-6 py-2 text-sm font-semibold text-white hover:bg-brand-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold">
-          View my orders
-        </a>
+      <div className="container-page py-12">
+        <div className="market-surface-light mx-auto max-w-lg rounded-2xl border border-white/10 p-8 text-center shadow-market-card">
+          <h1 className="font-poppins text-xl font-semibold text-red-700">Unable to load receipt</h1>
+          <p className="mt-3 text-sm text-brand-muted">
+            Payment may have succeeded but receipt details are unavailable. Check your email or order history.
+          </p>
+          <a href="/customer/order" className="mt-6 inline-block rounded bg-brand-navy-light px-6 py-2 text-sm font-semibold text-white hover:bg-brand-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold">
+            View my orders
+          </a>
+        </div>
       </div>
     );
   }
@@ -177,7 +180,8 @@ function PaymentSuccessPage() {
   const date = new Date(paymentData.created * 1000).toLocaleString();
 
   return (
-    <div className="max-w-4xl p-8 mx-auto mt-10 bg-white border rounded shadow-md print:text-sm print:mt-0">
+    <div className="container-page py-8">
+    <div className="mx-auto mt-4 max-w-4xl rounded-lg border bg-white p-8 shadow-md print:mt-0 print:text-sm">
       <h1 className="mb-6 text-3xl font-bold text-green-700">🧾 Payment Receipt</h1>
 
       <div className="mb-6 space-y-1 text-brand-navy">
@@ -243,10 +247,9 @@ function PaymentSuccessPage() {
         </a>
       </div>
     </div>
+    </div>
   );
 }
-
-
 
 
 

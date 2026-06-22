@@ -8,15 +8,12 @@ export default function HowWeWork() {
         {/* Text Content */}
         <div className="w-full md:w-1/2">
           <div>
-            <h2 className="mb-3 text-3xl font-semibold text-center uppercase sm:text-4xl heading md:text-left">
+            <h2 className="market-section-heading mb-3 text-center uppercase md:text-left">
               How We Work
             </h2>
-            <div className="flex flex-col items-center mb-6 md:items-start">
-              <hr className="h-[2px] w-[100px] bg-black" />
-              <hr className="h-[2px] w-[100px] mt-[1px] bg-black" />
-            </div>
+            <div className="market-section-divider md:mx-0" />
 
-            <div className="mb-8 space-y-6 text-sm text-justify text-gray-700 md:text-left">
+            <div className="mb-8 space-y-6 text-justify text-sm text-market-text/85 md:text-left">
               <p>
                 At Mosaic Biz Hub, we make it easy for minority-owned businesses to connect with customers and grow. Our platform allows you to list your products or services, reach new audiences, and build your brand with confidence. Whether you're selling food, offering services, or promoting events, we give you the tools to shine in the digital space.
               </p>

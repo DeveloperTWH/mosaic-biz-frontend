@@ -55,31 +55,31 @@ const SubscriptionPlan: React.FC<SubscriptionPlanProps> = ({
       <div className="mt-4 space-y-1 text-sm">
         <div className="flex justify-between">
           <span className="text-gray-600">Plan :</span>
-          <span className="font-medium text-gray-800">
+          <span className="font-medium text-brand-navy">
             {subscriptionPlan.name}
           </span>
         </div>
         <div className="flex justify-between">
           <span className="text-gray-600">Billing Amount :</span>
-          <span className="font-medium text-gray-800">
+          <span className="font-medium text-brand-navy">
             ${subscriptionPlan.price} / Year
           </span>
         </div>
         <div className="flex justify-between">
           <span className="text-gray-600">Valid Upto :</span>
-          <span className="font-medium text-gray-800">
+          <span className="font-medium text-brand-navy">
             {formatDate(subscription.endDate)}
           </span>
         </div>
         <div className="flex justify-between">
           <span className="text-gray-600">Payment Status :</span>
-          <span className="font-medium text-gray-800">
+          <span className="font-medium text-brand-navy">
             {subscription.paymentStatus}
           </span>
         </div>
         <div className="flex justify-between">
           <span className="text-gray-600">Joined :</span>
-          <span className="font-medium text-gray-800">
+          <span className="font-medium text-brand-navy">
             {formatDate(subscription.startDate)}
           </span>
         </div>

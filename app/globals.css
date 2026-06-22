@@ -575,14 +575,25 @@ body {
   font-weight: 600;
 }
 
+/* Legacy section title — inherits color; scoped overrides below */
 .heading {
-  @apply font-poppins uppercase tracking-wide font-normal;
+  @apply font-poppins uppercase tracking-wide font-normal text-inherit;
   font-size: 42px;
   line-height: 56px;
   letter-spacing: 2%;
   text-transform: uppercase;
-  --tw-text-opacity: 1;
-  color: rgb(39 39 42 / var(--tw-text-opacity));
+}
+
+.market-page .heading {
+  @apply text-market-text;
+}
+
+.market-surface-light .heading,
+.market-card-light .heading,
+.bg-white .heading,
+.bg-surface-cream .heading,
+.bg-brand-cream .heading {
+  @apply text-brand-navy;
 }
 .menu{
   @apply font-montserrat;

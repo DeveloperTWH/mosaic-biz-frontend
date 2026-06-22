@@ -116,7 +116,7 @@ For headings on dark backgrounds:
 <h2 class="section-heading-inverse">Ready to grow?</h2>
 ```
 
-Legacy `.heading` (42px zinc) is deprecated — use `.section-heading`.
+Legacy `.heading` (42px uppercase) is deprecated — use `.section-heading` or `market-section-heading`. When legacy `.heading` remains, it inherits color via `text-inherit`; scoped overrides in `globals.css` set `text-market-text` inside `.market-page` and `text-brand-navy` on light wrappers (`.market-surface-light`, `.market-card-light`, `.bg-white`, cream backgrounds).
 
 ## Layout
 
@@ -263,6 +263,7 @@ Inspired by stronger Digital Builders projects (ViZb, TOTL) — **Mosaic stays d
 |---------|----------------------|
 | Bold section hierarchy | `market-section-heading` + `market-section-divider` on dusk; centered subcopy `text-market-muted` |
 | Dark-background discipline | `market-page` shell; no pale lavender (`market-text`) on white surfaces |
+| Dark-surface text contrast | On `market-*` / `bg-market-bg`: use `text-market-text`, `text-market-muted`, `market-card-*`. Never `text-brand-navy` or `text-brand-muted` outside light wrappers |
 | Elevated cards | `market-card` (dusk) or `market-card-light` (white on dusk) with `shadow-market-card` |
 | Readable text hierarchy | Titles `font-poppins semibold`; body `font-montserrat` with `leading-relaxed` and `max-w-2xl` subcopy |
 | Premium buttons | `market-btn-primary` for primary path; `market-btn-outline` for secondary on dark bands |
@@ -282,6 +283,7 @@ Inspired by stronger Digital Builders projects (ViZb, TOTL) — **Mosaic stays d
 
 - Hardcode `#hex` in `className` or inline `style`
 - Use `text-market-text` or inherit dusk body color on `bg-white` cards — use `market-card-light-title` / `market-card-light-body`
+- Use `text-brand-navy` or `text-brand-muted` on dark market backgrounds (`market-page`, `bg-market-bg`) — use `market-text` / `market-muted` or `market-card-*` utilities instead
 - Use pale lavender subcopy on white cards (fails WCAG)
 - Use `w-screen ml-[-50vw]` full-bleed bands (causes horizontal overflow) — use `VendorExpandCta` or `w-full`
 - Load fonts from Google CDN in CSS

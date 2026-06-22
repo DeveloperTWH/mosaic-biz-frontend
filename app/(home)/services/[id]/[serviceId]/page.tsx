@@ -129,10 +129,9 @@ const ServiceDetailPage = () => {
     const visibleCount = showAll ? service.reviews.length : 4;
     return (
         <>
-            <main className="max-w-7xl mx-auto px-4 py-8">
-                {/* Breadcrumb */}
-                <nav className="text-sm text-gray-500 mb-4">
-                    Home &gt; Services &gt; <span className="text-black font-semibold">{service.title}</span>
+            <main className="container-page max-w-7xl py-8">
+                <nav className="mb-4 text-sm text-market-muted">
+                    Home &gt; Services &gt; <span className="font-semibold text-market-text">{service.title}</span>
                 </nav>
 
                 {/* Top Split Section: Banner + Booking Form */}
@@ -147,10 +146,10 @@ const ServiceDetailPage = () => {
                         <div>
                             <div>
                                 <p className="text-custom-blue uppercase font-semibold text-xs">{service.category}</p>
-                                <h1 className="text-3xl font-bold heading">{service.title}</h1>
+                                <h1 className="font-poppins text-3xl font-bold text-market-text">{service.title}</h1>
                                 <div className="flex items-center space-x-2">
                                     <span className="text-yellow-500">★★★★☆</span>
-                                    <span className="text-gray-600 text-sm">({service.rating} rating)</span>
+                                    <span className="text-sm text-market-muted">({service.rating} rating)</span>
                                 </div>
                                 <div className="flex flex-wrap gap-2 text-xs my-2">
                                     {service.tags.map((tag, i) => (
@@ -163,7 +162,7 @@ const ServiceDetailPage = () => {
                             </div>
 
                             {/* Description */}
-                            <div className="text-gray-700 leading-relaxed">
+                            <div className="leading-relaxed text-market-text/85">
                                 <p>
                                     {service.description}
                                 </p>
@@ -200,8 +199,8 @@ const ServiceDetailPage = () => {
 
                     {/* Right - Booking Form */}
                     <aside className="space-y-6">
-                        <div className="border rounded-lg p-4 pt-0 shadow-sm">
-                            <h3 className="text-lg font-semibold mb-4 heading">Schedule a Booking</h3>
+                        <div className="market-card-light p-4 pt-0">
+                            <h3 className="market-card-light-title mb-4 text-lg">Schedule a Booking</h3>
                             <form className="space-y-3">
                                 <input type="text" placeholder="Name" className="w-full p-2 border rounded" />
                                 <input type="email" placeholder="Email" className="w-full p-2 border rounded" />
@@ -223,13 +222,13 @@ const ServiceDetailPage = () => {
 
                         </div>
                         {/* Contact Info */}
-                        <div className="border-b-2 border-t-2 border-gray-300 p-4 shadow-sm">
-                            <h3 className="text-lg font-semibold heading">Contact Us</h3>
+                        <div className="market-card-light p-4">
+                            <h3 className="market-card-light-title text-lg">Contact Us</h3>
                             <div className="flex items-center gap-3 mb-5">
                                 <div className="h-full bg-custom-orange p-2">
                                     <PhoneCall size={20} className="text-white" />
                                 </div>
-                                <div className="flex flex-col text-sm text-gray-800">
+                                <div className="flex flex-col text-sm text-brand-navy">
                                     <span className="font-medium text-custom-orange leading-tight m-0 p-0">Call Us:</span>
                                     <span className="m-0 p-0 leading-tight">{service.contact.phone}</span>
                                 </div>
@@ -238,7 +237,7 @@ const ServiceDetailPage = () => {
                                 <div className="h-full bg-custom-orange p-2">
                                     <Mail size={20} className="text-white" />
                                 </div>
-                                <div className="flex flex-col text-sm text-gray-800">
+                                <div className="flex flex-col text-sm text-brand-navy">
                                     <span className="font-medium text-custom-orange leading-tight m-0 p-0">Email Us:</span>
                                     <span className="m-0 p-0 leading-tight">{service.contact.email}</span>
                                 </div>
@@ -247,7 +246,7 @@ const ServiceDetailPage = () => {
                                 <div className="h-full bg-custom-orange p-2">
                                     <MapPin size={20} className="text-white" />
                                 </div>
-                                <div className="flex flex-col text-sm text-gray-800">
+                                <div className="flex flex-col text-sm text-brand-navy">
                                     <span className="font-medium text-custom-orange leading-tight m-0 p-0">Address:</span>
                                     <span className="m-0 p-0 leading-tight">{service.contact.address}</span>
                                 </div>
@@ -256,7 +255,7 @@ const ServiceDetailPage = () => {
                                 <div className="h-full bg-custom-orange p-2">
                                     <Globe size={20} className="text-white" />
                                 </div>
-                                <div className="flex flex-col text-sm text-gray-800">
+                                <div className="flex flex-col text-sm text-brand-navy">
                                     <span className="font-medium text-custom-orange leading-tight m-0 p-0">Website:</span>
                                     <span className="m-0 p-0 leading-tight">{service.contact.website}</span>
                                 </div>
@@ -273,7 +272,7 @@ const ServiceDetailPage = () => {
 
                         {/* Photo Gallery */}
                         <div>
-                            <h2 className="text-xl font-semibold mb-2 heading">Photo Gallery</h2>
+                            <h2 className="mb-2 font-poppins text-xl font-semibold text-market-text">Photo Gallery</h2>
                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
                                 {service.galleryImages.map((img, i) => (
                                     <div key={i} className="relative w-full aspect-square rounded overflow-hidden">
@@ -291,7 +290,7 @@ const ServiceDetailPage = () => {
 
                         {/* Location + Hours */}
                         <div>
-                            <h2 className="text-xl font-semibold mb-4 heading">Location and Hours</h2>
+                            <h2 className="mb-4 font-poppins text-xl font-semibold text-market-text">Location and Hours</h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
                                 {/* Business Hours */}
                                 <div className="bg-gray-50 border rounded-lg p-4 shadow-sm text-sm text-gray-800 space-y-1">
@@ -327,8 +326,8 @@ const ServiceDetailPage = () => {
 
                         {/* Amenities */}
                         <div>
-                            <h2 className="text-xl font-semibold mb-2 heading">Amenities</h2>
-                            <ul className="grid grid-cols-2 gap-2 text-gray-700">
+                            <h2 className="mb-2 font-poppins text-xl font-semibold text-market-text">Amenities</h2>
+                            <ul className="grid grid-cols-2 gap-2 text-market-text/85">
                                 {service.amenities.map(({ label, available }, i) => (
                                     <li key={i}>
                                         {available ? "✔️" : "❌"} {label}
@@ -340,7 +339,7 @@ const ServiceDetailPage = () => {
 
                         {/* FAQ */}
                         <div>
-                            <h2 className="text-xl font-semibold mb-2 heading">FAQ</h2>
+                            <h2 className="mb-2 font-poppins text-xl font-semibold text-market-text">FAQ</h2>
                             {service.faq.map((item, i) => (
                                 <details key={i} className="market-accordion-light mb-2">
                                     <summary>{item.question}</summary>
@@ -352,7 +351,7 @@ const ServiceDetailPage = () => {
 
                         {/* Reviews */}
                         <div>
-                            <h2 className="text-xl font-semibold mb-2 heading">Review Highlights</h2>
+                            <h2 className="mb-2 font-poppins text-xl font-semibold text-market-text">Review Highlights</h2>
                             {service.reviews.slice(0, visibleCount).map((review, i) => (
                                 <div key={i} className="border rounded p-4 mb-3">
                                     <div className="flex gap-3">
@@ -377,7 +376,7 @@ const ServiceDetailPage = () => {
                                             </p>
                                         </div>
                                     </div>
-                                    <p className="text-gray-700 mt-1">{review.comment}</p>
+                                    <p className="mt-1 text-market-text/85">{review.comment}</p>
                                 </div>
                             ))}
 

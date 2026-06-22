@@ -28,7 +28,7 @@ const Product = () => {
     <div className="flex items-center justify-center w-full px-4 mt-20 sm:px-6 md:px-12">
       <div className="w-full max-w-[1400px]">
         <div className="flex flex-col items-center justify-between mb-10 md:flex-row">
-          <h1 className="mb-4 text-2xl font-bold sm:text-3xl md:text-4xl text-zinc-800 heading md:mb-0">
+          <h1 className="market-section-heading mb-4 text-left md:mb-0">
             BROWSE BY CATEGORY
           </h1>
           {/* <div className="flex space-x-3">
@@ -96,7 +96,7 @@ const Product = () => {
                 height={60}
                 className="object-contain grayscale hover:grayscale-0"
               />
-              <div className="px-2 mt-3 text-xs font-medium text-center sm:text-sm text-zinc-700">
+              <div className="mt-3 px-2 text-center text-xs font-medium text-market-text sm:text-sm">
                 {cat.name}
               </div>
             </Link>

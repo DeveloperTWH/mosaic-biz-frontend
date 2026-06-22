@@ -46,16 +46,12 @@ export default function FAQSection() {
 
       {/* Content */}
       <div className="md:w-[60%] mx-auto relative z-10">
-        <h2 className="mt-4 mb-1 text-3xl font-semibold text-center heading">
+        <h2 className="market-section-heading mt-4 mb-1 text-center text-3xl">
           Frequently Asked Questions
         </h2>
-        <div className="flex flex-col items-center justify-center">
-          <hr className="h-[2px] w-[100px] bg-green-900" />
-          <hr className="h-[2px] w-[100px] mt-[2px] mb-4 bg-green-900" />
-        </div>
-        <div className="w-[60%] mx-auto text-center">
-
-          <p className="text-[13px] text-gray-600 mb-5">
+        <div className="market-section-divider" />
+        <div className="mx-auto w-[60%] text-center">
+          <p className="mb-5 text-[13px] text-market-muted">
             Have questions? We’re here to help. Learn more about how Mosaic Biz Hub works, how to list your business, and how to make the most of our platform.
           </p>
         </div>

@@ -197,14 +197,14 @@ const ServiceDetailPage = () => {
                         )}
                         <div>
                             <div>
-                                <h2 className="commerce-text-label text-2xl">{service.title}</h2>
+                                <h2 className="font-poppins text-2xl font-bold text-market-text">{service.title}</h2>
                                 {vendorName ? (
-                                    <p className="mt-1 font-montserrat text-sm text-brand-muted">
+                                    <p className="mt-1 font-montserrat text-sm text-market-muted">
                                         by{" "}
                                         {service.businessId?._id ? (
                                             <Link
                                                 href={`/vendor-profile/service-vendor/${service._id}`}
-                                                className="text-brand-teal hover:text-brand-teal-dark"
+                                                className="text-market-teal hover:text-brand-teal-dark"
                                             >
                                                 {vendorName}
                                             </Link>
@@ -228,7 +228,7 @@ const ServiceDetailPage = () => {
                             </div>
 
                             {/* Description */}
-                            <div className="leading-relaxed text-gray-700">
+                            <div className="leading-relaxed text-market-text/85">
                                 <p>
                                     {service.description}
                                 </p>
@@ -264,8 +264,8 @@ const ServiceDetailPage = () => {
 
                     {/* Right - Booking Form */}
                     <aside className="space-y-6 lg:col-span-1">
-                        <div className="p-4 pt-0 border rounded-lg shadow-sm">
-                            <h3 className="mb-4 text-lg font-semibold heading">Schedule a Booking</h3>
+                        <div className="market-card-light p-4 pt-0">
+                            <h3 className="market-card-light-title mb-4 text-lg">Schedule a Booking</h3>
                             <form className="space-y-3" onSubmit={handleSubmit}>
                                 <input
                                     type="text"
@@ -349,17 +349,17 @@ const ServiceDetailPage = () => {
 
                         </div>
                         {/* Contact Info */}
-                        <div className="p-4 border-t-2 border-b-2 border-gray-300 shadow-sm">
-                            <h3 className="text-lg font-semibold heading">Contact Us</h3>
+                        <div className="market-card-light p-4">
+                            <h3 className="market-card-light-title text-lg">Contact Us</h3>
                             <div className="flex items-center gap-3 mb-5">
                                 <div className="h-full p-2 bg-custom-orange">
                                     <PhoneCall size={20} className="text-white" />
                                 </div>
-                                <div className="flex flex-col text-sm text-gray-800">
+                                <div className="flex flex-col text-sm text-brand-navy">
                                     <span className="p-0 m-0 font-medium leading-tight text-custom-orange">Call Us:</span>
                                     <a
                                         href={`tel:${service.contact.phone}`}
-                                        className="p-0 m-0 leading-tight text-gray-800 hover:underline"
+                                        className="p-0 m-0 leading-tight text-brand-navy hover:underline"
                                     >
                                         {service.contact.phone}
                                     </a>
@@ -370,11 +370,11 @@ const ServiceDetailPage = () => {
                                 <div className="h-full p-2 bg-custom-orange">
                                     <Mail size={20} className="text-white" />
                                 </div>
-                                <div className="flex flex-col text-sm text-gray-800">
+                                <div className="flex flex-col text-sm text-brand-navy">
                                     <span className="p-0 m-0 font-medium leading-tight text-custom-orange">Email Us:</span>
                                     <a
                                         href={`mailto:${service.contact.email}`}
-                                        className="p-0 m-0 leading-tight text-gray-800 hover:underline"
+                                        className="p-0 m-0 leading-tight text-brand-navy hover:underline"
                                     >
                                         {service.contact.email}
                                     </a>
@@ -385,7 +385,7 @@ const ServiceDetailPage = () => {
                                 <div className="h-full p-2 bg-custom-orange">
                                     <MapPin size={20} className="text-white" />
                                 </div>
-                                <div className="flex flex-col text-sm text-gray-800">
+                                <div className="flex flex-col text-sm text-brand-navy">
                                     <span className="p-0 m-0 font-medium leading-tight text-custom-orange">Address:</span>
                                     <span className="p-0 m-0 leading-tight">{service.contact.address}</span>
                                 </div>
@@ -394,13 +394,13 @@ const ServiceDetailPage = () => {
                                 <div className="h-full p-2 bg-custom-orange">
                                     <Globe size={20} className="text-white" />
                                 </div>
-                                <div className="flex flex-col text-sm text-gray-800">
+                                <div className="flex flex-col text-sm text-brand-navy">
                                     <span className="p-0 m-0 font-medium leading-tight text-custom-orange">Website:</span>
                                     <a
                                         href={service.contact.website}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="p-0 m-0 leading-tight text-gray-800 hover:underline"
+                                        className="p-0 m-0 leading-tight text-brand-navy hover:underline"
                                     >
                                         {service.contact.website}
                                     </a>
@@ -418,7 +418,7 @@ const ServiceDetailPage = () => {
 
                         {/* Photo Gallery */}
                         <div>
-                            <h2 className="mb-2 text-xl font-semibold heading">Photo Gallery</h2>
+                            <h2 className="mb-2 font-poppins text-xl font-semibold text-market-text">Photo Gallery</h2>
                             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
                                 {service.images.map((img, i) => (
                                     <div key={i} className="relative w-full overflow-hidden rounded aspect-square">
@@ -436,7 +436,7 @@ const ServiceDetailPage = () => {
 
                         {/* Location + Hours */}
                         <div>
-                            <h2 className="mb-4 text-xl font-semibold heading">Location and Hours</h2>
+                            <h2 className="mb-4 font-poppins text-xl font-semibold text-market-text">Location and Hours</h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
                                 {/* Business Hours */}
                                 <div className="p-4 space-y-1 text-sm text-gray-800 border rounded-lg shadow-sm bg-gray-50">
@@ -484,8 +484,8 @@ const ServiceDetailPage = () => {
 
                         {/* Amenities */}
                         <div>
-                            <h2 className="mb-2 text-xl font-semibold heading">Amenities</h2>
-                            <ul className="grid grid-cols-2 gap-2 text-gray-700">
+                            <h2 className="mb-2 font-poppins text-xl font-semibold text-market-text">Amenities</h2>
+                            <ul className="grid grid-cols-2 gap-2 text-market-text/85">
                                 {service.amenities.map(({ label, available }, i) => (
                                     <li key={i}>
                                         {available ? "✔️" : "❌"} {label}
@@ -497,7 +497,7 @@ const ServiceDetailPage = () => {
 
                         {/* FAQ */}
                         <div>
-                            <h2 className="mb-2 text-xl font-semibold heading">FAQ</h2>
+                            <h2 className="mb-2 font-poppins text-xl font-semibold text-market-text">FAQ</h2>
                             {service.faq.map((item, i) => (
                                 <details key={i} className="market-accordion-light mb-2">
                                     <summary>{item.question}</summary>
@@ -510,7 +510,7 @@ const ServiceDetailPage = () => {
                         {/* Reviews */}
                         {reviews.length > 0 && (
                             <div>
-                                <h2 className="mb-2 text-xl font-semibold heading">Review Highlights</h2>
+                                <h2 className="mb-2 font-poppins text-xl font-semibold text-market-text">Review Highlights</h2>
                                 {reviews.slice(0, visibleCount).map((review, i) => (
                                     <div key={i} className="p-4 mb-3 border rounded">
                                         <div className="flex gap-3">
@@ -535,7 +535,7 @@ const ServiceDetailPage = () => {
                                                 </p>
                                             </div>
                                         </div>
-                                        <p className="mt-1 text-gray-700">{review.comment}</p>
+                                        <p className="mt-1 text-market-text/85">{review.comment}</p>
                                     </div>
                                 ))}
 

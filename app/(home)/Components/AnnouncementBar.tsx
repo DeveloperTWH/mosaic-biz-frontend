@@ -1,29 +1,49 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import Link from "next/link";
 
 const STORAGE_KEY = "mosaic_announcement_dismissed";
+const DISMISS_EVENT = "mosaic-announcement-dismissed";
+const ANNOUNCEMENT_HEIGHT = "2.25rem";
+
+function subscribe(onStoreChange: () => void) {
+  window.addEventListener("storage", onStoreChange);
+  window.addEventListener(DISMISS_EVENT, onStoreChange);
+  return () => {
+    window.removeEventListener("storage", onStoreChange);
+    window.removeEventListener(DISMISS_EVENT, onStoreChange);
+  };
+}
+
+function readVisible(): boolean {
+  return sessionStorage.getItem(STORAGE_KEY) !== "true";
+}
+
+/** Server and hydration must agree; sessionStorage is read only after hydration. */
+function readVisibleOnServer(): boolean {
+  return true;
+}
 
 export default function AnnouncementBar() {
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    setVisible(sessionStorage.getItem(STORAGE_KEY) !== "true");
-  }, []);
-
-  const dismiss = () => {
-    sessionStorage.setItem(STORAGE_KEY, "true");
-    setVisible(false);
-    document.documentElement.style.setProperty("--announcement-h", "0px");
-  };
+  const visible = useSyncExternalStore(
+    subscribe,
+    readVisible,
+    readVisibleOnServer
+  );
 
   useEffect(() => {
     document.documentElement.style.setProperty(
       "--announcement-h",
-      visible ? "2.25rem" : "0px"
+      visible ? ANNOUNCEMENT_HEIGHT : "0px"
     );
   }, [visible]);
+
+  const dismiss = () => {
+    sessionStorage.setItem(STORAGE_KEY, "true");
+    document.documentElement.style.setProperty("--announcement-h", "0px");
+    window.dispatchEvent(new Event(DISMISS_EVENT));
+  };
 
   if (!visible) {
     return null;

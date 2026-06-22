@@ -24,16 +24,16 @@ const items = [
 
 export default function FreshnessSection() {
   return (
-    <section className="px-5 pt-20 text-center bg-white md:px-20">
+    <section className="bg-white px-5 pt-20 text-center text-brand-navy md:px-20">
       <div className="mb-10">
-        <h2 className="mb-2 text-2xl font-semibold text-gray-800 uppercase md:text-3xl heading">
+        <h2 className="mb-2 font-poppins text-2xl font-semibold uppercase md:text-3xl">
           Freshness All Around - Pantry Picks & Nearby Kitchens
         </h2>
         <div className="flex flex-col items-center justify-center">
           <hr className="h-[2px] w-[100px] bg-green-900" />
           <hr className="h-[2px] w-[100px] mt-[2px] mb-4 bg-green-900" />
         </div>
-        <p className="text-[13px] text-gray-600 max-w-xl mx-auto mb-12">
+        <p className="mx-auto mb-12 max-w-xl text-[13px] text-brand-muted">
           Discover flavorful finds and fresh ingredients from our vibrant
           community kitchens and curated pantry partners.
         </p>
@@ -54,15 +54,13 @@ export default function FreshnessSection() {
               className=" absolute bottom-0 z-[0] right-0"
             />
             <div className="p-4 text-left w-4/5 h-[100%] relative z-10">
-              <h3
-                className="text-3xl font-bold leading-10 text-gray-800 heading"
-              >
+              <h3 className="font-poppins text-3xl font-bold leading-10 text-brand-navy">
                 {item.title}
               </h3>
               <hr className="h-[2px] w-[100px] bg-gray-800 mt-5" />
               <hr className="h-[2px] w-[100px] mt-[1px] mb-8 bg-gray-800" />
 
-              <p className="w-2/3 mb-4 text-sm text-gray-700">
+              <p className="mb-4 w-2/3 text-sm text-brand-muted">
                 {item.description}
               </p>
               <Link

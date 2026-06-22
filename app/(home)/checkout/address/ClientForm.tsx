@@ -172,13 +172,12 @@ export default function CheckoutAddressPage() {
     <>
       <BannerSection heading={`Checkout`} imageUrl='/products/product.png' />
       <div className="relative z-10 -mt-[15%]">
-        <div className="max-w-4xl p-8 mx-auto my-10 bg-white rounded-lg shadow-md">
-          <h2 className="text-2xl font-bold tracking-wide uppercase heading">
+        <div className="max-w-4xl p-8 mx-auto my-10 rounded-lg bg-white text-brand-navy shadow-md">
+          <h2 className="market-card-light-title text-2xl uppercase tracking-wide">
             Shipping Address
           </h2>
-          <hr className="h-[2px] w-[120px] bg-green-900" />
-          <hr className="h-[2px] w-[120px] bg-green-900 mt-[1px] mb-5" />
-          <p className="mb-6 text-sm text-gray-600">
+          <hr className="mb-5 mt-2 h-0.5 w-28 bg-brand-gold" />
+          <p className="mb-6 text-sm text-brand-muted">
             Lorem Ipsum Dolor Sit Amet, Consectetur Adipisicing Elit. Praesent Vitae Libero
             Venenatis, Tristique Justo.
           </p>

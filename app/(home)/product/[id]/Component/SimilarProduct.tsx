@@ -69,7 +69,6 @@ function stripHtml(html: string): string {
   return html.replace(/<[^>]*>/g, '');
 }
 
-// Helper to convert number or Mongo $numberDecimal
 function getPriceNumber(v?: number | { $numberDecimal: string } | null) {
   if (v == null) return 0;
   if (typeof v === 'number') return v;
@@ -104,9 +103,10 @@ function useSimilar(productId?: string) {
       const data = (await res.json()) as RankedResponse;
       if (!data || !Array.isArray(data.items)) throw new Error('Bad similar response');
       setItems(data.items.slice(0, 8));
-    } catch (e: any) {
-      if (e?.name === 'AbortError') return;
-      setError(e?.message || 'Failed to load similar products');
+    } catch (e: unknown) {
+      const err = e as { name?: string; message?: string };
+      if (err?.name === 'AbortError') return;
+      setError(err?.message || 'Failed to load similar products');
       setItems((prev) => prev ?? []);
     } finally {
       setLoading(false);
@@ -121,10 +121,104 @@ function useSimilar(productId?: string) {
   return { items, error, loading, reload: load };
 }
 
+function SimilarProductCard({
+  item,
+  onImgLoad,
+}: {
+  item: RankedItem;
+  onImgLoad?: () => void;
+}) {
+  const img = pickImage(item);
+  const href = `/product/${item._id}`;
+  const r = ratingNum(item);
+  const full = Math.floor(r);
+  const hasHalf = r % 1 >= 0.25 && r % 1 < 0.75;
+  const empty = 5 - full - (hasHalf ? 1 : 0);
+  const fe = item.firstEligible;
+  const price = getPriceNumber(fe?.price ?? item.price);
+  const sale = getPriceNumber(fe?.salePrice ?? item.salePrice ?? null);
+  const onSale = !!fe?.onSale && sale > 0;
+  const effective = onSale ? sale : price;
+
+  return (
+    <Link href={href} target="_blank" className="market-card similar-card flex h-full flex-col p-4">
+      <div className="market-card-media relative mx-auto mb-4 flex h-[200px] w-full items-center justify-center">
+        <img
+          src={img}
+          alt={item.title}
+          className="max-h-full max-w-full object-contain p-3"
+          loading="lazy"
+          onLoad={onImgLoad}
+        />
+        {onSale && (
+          <span className="absolute left-2 top-2 rounded bg-red-600 px-2 py-0.5 text-[11px] font-semibold text-white">
+            SALE
+          </span>
+        )}
+      </div>
+
+      <h3 className="market-card-title line-clamp-2 text-sm" title={item.title}>
+        {item.title}
+      </h3>
+
+      {item.description ? (
+        <p className="market-card-desc mb-2 line-clamp-2 text-xs" title={stripHtml(item.description)}>
+          {stripHtml(item.description)}
+        </p>
+      ) : null}
+
+      <div className="mb-2 flex items-center space-x-0.5 text-market-gold">
+        {Array(full)
+          .fill(0)
+          .map((_, idx) => (
+            <Star key={`f-${idx}`} size={12} fill="currentColor" stroke="currentColor" />
+          ))}
+        {hasHalf && <StarHalf size={12} fill="currentColor" stroke="currentColor" />}
+        {Array(empty)
+          .fill(0)
+          .map((_, idx) => (
+            <Star
+              key={`e-${idx}`}
+              size={12}
+              className="text-market-muted/40"
+              fill="transparent"
+              stroke="currentColor"
+            />
+          ))}
+        {ratingCount(item) > 0 && (
+          <span className="ml-2 text-[11px] text-market-muted">({ratingCount(item)})</span>
+        )}
+      </div>
+
+      <div className="mt-auto flex flex-col leading-tight">
+        <span className="text-xs text-market-muted">Starting from</span>
+        {onSale ? (
+          <div className="flex items-baseline gap-2">
+            <span className="market-card-price-sale text-sm sm:text-base">${effective.toFixed(2)}</span>
+            <span className="text-xs text-market-muted line-through">${price.toFixed(2)}</span>
+          </div>
+        ) : (
+          <span className="market-card-price text-sm sm:text-base">${price.toFixed(2)}</span>
+        )}
+      </div>
+    </Link>
+  );
+}
+
+function SkeletonSlide() {
+  return (
+    <div className="market-card animate-pulse p-4">
+      <div className="market-card-media mx-auto mb-4 h-[200px] w-full" />
+      <div className="mb-2 h-4 w-3/4 rounded bg-white/10" />
+      <div className="h-3 w-1/2 rounded bg-white/10" />
+    </div>
+  );
+}
+
 /* ---------- component ---------- */
 export default function SimilarProduct({ productId }: { productId?: string }) {
   const params = useParams();
-  const idFromRoute = (params as any)?.id as string | undefined;
+  const idFromRoute = (params as { id?: string })?.id;
   const effectiveId = productId || idFromRoute;
 
   const { items, error, loading, reload } = useSimilar(effectiveId);
@@ -157,20 +251,24 @@ export default function SimilarProduct({ productId }: { productId?: string }) {
 
   if (!effectiveId || !isValidObjectId(effectiveId)) return null;
 
+  const swiperBreakpoints = {
+    0: { slidesPerView: 1 },
+    640: { slidesPerView: 2 },
+    768: { slidesPerView: 3 },
+    1024: { slidesPerView: 4 },
+  };
+
   return (
     <div className="mt-12">
-      <h3 className="mb-4 text-4xl font-bold text-center uppercase heading">
-        BEST SELLERS
-      </h3>
-      <hr className="h-[2px] w-[100px] bg-green-900 mx-auto" />
-      <hr className="h-[2px] w-[100px] bg-green-900 mx-auto mt-[1px]" />
-      <div className="w-3/5 mx-auto">
-        <p className="mt-4 text-center text-brand-muted">
+      <h3 className="market-section-heading text-center">Best Sellers</h3>
+      <div className="market-section-divider" />
+      <div className="mx-auto mt-4 max-w-2xl">
+        <p className="text-center font-montserrat text-sm text-market-muted">
           You might also like these highly-ranked picks.
         </p>
       </div>
 
-      <div className="mt-10 mb-10">
+      <div className="mb-10 mt-10">
         {items === null || loading ? (
           <Swiper
             modules={[Pagination, Keyboard, A11y]}
@@ -178,30 +276,22 @@ export default function SimilarProduct({ productId }: { productId?: string }) {
             slidesPerView={4}
             pagination={{ clickable: true }}
             keyboard={{ enabled: true }}
-            breakpoints={{
-              0: { slidesPerView: 1 },
-              640: { slidesPerView: 2 },
-              768: { slidesPerView: 3 },
-              1024: { slidesPerView: 4 },
-            }}
-            className="pb-10"
+            breakpoints={swiperBreakpoints}
+            className="similar-swiper pb-10"
           >
             {Array.from({ length: 4 }).map((_, i) => (
               <SwiperSlide key={i}>
-                <div className="p-4 border rounded-lg animate-pulse">
-                  <div className="w-[200px] h-[200px] bg-gray-100 rounded mx-auto" />
-                  <div className="w-3/4 h-4 mx-auto mt-4 bg-gray-200 rounded" />
-                  <div className="w-1/2 h-3 mx-auto mt-2 bg-gray-200 rounded" />
-                </div>
+                <SkeletonSlide />
               </SwiperSlide>
             ))}
           </Swiper>
         ) : error ? (
-          <div className="flex flex-col items-center justify-center gap-2 text-red-600">
+          <div className="flex flex-col items-center justify-center gap-2 text-red-400">
             {error}
             <button
+              type="button"
               onClick={reload}
-              className="inline-flex items-center gap-1 px-3 py-1 text-xs text-white rounded bg-custom-orange"
+              className="market-btn-outline inline-flex items-center gap-1 px-3 py-1 text-xs normal-case"
             >
               <RotateCcw size={14} /> Retry
             </button>
@@ -221,149 +311,21 @@ export default function SimilarProduct({ productId }: { productId?: string }) {
               slidesPerView={4}
               pagination={{ clickable: true }}
               keyboard={{ enabled: true }}
-              breakpoints={{
-                0: { slidesPerView: 1 },
-                640: { slidesPerView: 2 },
-                768: { slidesPerView: 3 },
-                1024: { slidesPerView: 4 },
-              }}
-              className="pb-10 similar-swiper"
+              breakpoints={swiperBreakpoints}
+              className="similar-swiper pb-10"
             >
-              {items.map((p) => {
-                const img = pickImage(p);
-                const href = `/product/${p._id}`;
-
-                const r = ratingNum(p);
-                const full = Math.floor(r);
-                const hasHalf = r % 1 >= 0.25 && r % 1 < 0.75;
-                const empty = 5 - full - (hasHalf ? 1 : 0);
-
-                const fe = p.firstEligible;
-
-                // --- FIXED PRICE HANDLING ---
-                const price = getPriceNumber(fe?.price ?? p.price);
-                const sale = getPriceNumber(fe?.salePrice ?? p.salePrice ?? null);
-                const onSale = !!fe?.onSale && sale > 0;
-                const effective = onSale ? sale : price;
-
-                return (
-                  <SwiperSlide key={p._id}>
-                    <Link
-                      href={href}
-                      target="_blank"
-                      className="flex flex-col p-4 transition border rounded-lg similar-card hover:shadow-md"
-                    >
-                      <div className="relative mx-auto flex h-[200px] w-[200px] items-center justify-center rounded bg-gray-50">
-                        <img
-                          src={img}
-                          alt={p.title}
-                          className="object-contain w-full h-full p-3"
-                          loading="lazy"
-                          onLoad={handleImgLoad}
-                        />
-                        {onSale && (
-                          <span className="absolute left-2 top-2 rounded bg-red-600 px-2 py-0.5 text-[11px] font-semibold text-white">
-                            SALE
-                          </span>
-                        )}
-                      </div>
-
-                      <h3
-                        className="mt-3 mb-1 text-sm font-semibold text-brand-navy"
-                        title={p.title}
-                        style={{
-                          display: '-webkit-box',
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          wordBreak: 'break-word',
-                        }}
-                      >
-                        {p.title}
-                      </h3>
-                      <p
-                        className="mb-2 text-xs text-brand-muted"
-                        title={stripHtml(p.description || '')}
-                        style={{
-                          display: '-webkit-box',
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          wordBreak: 'break-word',
-                        }}
-                      >
-                        {stripHtml(p.description || '')}
-                      </p>
-
-                      <div className="flex items-center mb-2 space-x-0.5 text-yellow-500">
-                        {Array(full)
-                          .fill(0)
-                          .map((_, idx) => (
-                            <Star
-                              key={`f-${idx}`}
-                              size={12}
-                              fill="currentColor"
-                              stroke="currentColor"
-                              className="text-yellow-400"
-                            />
-                          ))}
-                        {hasHalf && (
-                          <StarHalf
-                            size={12}
-                            fill="currentColor"
-                            stroke="currentColor"
-                            className="text-yellow-400"
-                          />
-                        )}
-                        {Array(empty)
-                          .fill(0)
-                          .map((_, idx) => (
-                            <Star
-                              key={`e-${idx}`}
-                              size={12}
-                              fill="none"
-                              stroke="gray"
-                              className="text-brand-muted/70"
-                            />
-                          ))}
-                        {ratingCount(p) > 0 && (
-                          <span className="ml-2 text-[11px] text-brand-muted">({ratingCount(p)})</span>
-                        )}
-                      </div>
-
-<div className="flex flex-col mt-auto leading-tight">
-  <span className="text-xs text-brand-muted">
-    Starting from
-  </span>
-
-  {onSale ? (
-    <div className="flex items-baseline gap-2">
-      <span className="text-sm font-semibold text-[#B12704] sm:text-base">
-        ${effective.toFixed(2)}
-      </span>
-      <span className="text-xs text-brand-muted line-through">
-        ${price.toFixed(2)}
-      </span>
-    </div>
-  ) : (
-    <span className="text-sm font-semibold text-brand-navy sm:text-base">
-      ${price.toFixed(2)}
-    </span>
-  )}
-</div>
-                    </Link>
-                  </SwiperSlide>
-                );
-              })}
+              {items.map((p) => (
+                <SwiperSlide key={p._id}>
+                  <SimilarProductCard item={p} onImgLoad={handleImgLoad} />
+                </SwiperSlide>
+              ))}
             </Swiper>
           </div>
         )}
       </div>
 
       <div className="mx-auto text-center">
-        <Link href="/products" className="inline-block px-8 py-2 text-white rounded bg-blue-900">
+        <Link href="/products" className="market-btn-primary inline-block px-8 py-2 text-sm normal-case">
           Show All Products
         </Link>
       </div>
@@ -375,13 +337,13 @@ export default function SimilarProduct({ productId }: { productId?: string }) {
         .similar-swiper .swiper-pagination-bullet {
           width: 6px;
           height: 6px;
-          background: rgba(0, 0, 0, 0.35);
+          background: rgba(255, 255, 255, 0.35);
           opacity: 1;
           margin: 0 3px !important;
           transition: transform 150ms ease, background 150ms ease;
         }
         .similar-swiper .swiper-pagination-bullet-active {
-          background: rgba(0, 0, 0, 0.75);
+          background: #e2b84b;
           transform: scale(1.1);
         }
       `}</style>

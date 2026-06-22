@@ -96,31 +96,27 @@ const TopSellingProduct = () => {
 
   return (
     <div className="mt-12">
-      <h3 className="text-4xl font-bold mb-4 uppercase text-center heading">
-        Top selling Products
-      </h3>
-      <hr className="h-[2px] w-[100px] bg-green-900 mx-auto" />
-      <hr className="h-[2px] w-[100px] bg-green-900 mx-auto mt-[1px]" />
-      <div className="w-3/5 mx-auto">
-        <p className="text-gray-600 text-center mt-4">
-          Lorem ipsum dolor sit amet consectetur adipisicing elitsed eiusmod tempor enim minim veniam quis notru exercit ation Lorem ipsum dolor sit amet. Veniam quis notru exercit.
+      <h3 className="market-section-heading text-center">Top Selling Products</h3>
+      <div className="market-section-divider" />
+      <div className="mx-auto mt-4 max-w-2xl">
+        <p className="text-center font-montserrat text-sm text-market-muted">
+          Discover top-rated products from trusted minority-owned businesses in our community.
         </p>
       </div>
 
-      {/* Swiper Slider */}
-      <div className="mt-10 mb-10">
+      <div className="mb-10 mt-10">
         <Swiper
           modules={[Pagination]}
           spaceBetween={20}
           slidesPerView={4}
           pagination={{ clickable: true }}
           breakpoints={{
-            0: { slidesPerView: 1 },      // Mobile: 1 card per slide
-            640: { slidesPerView: 2 },    // Small tablets
-            768: { slidesPerView: 3 },    // Tablets
-            1024: { slidesPerView: 4 },   // Laptops & up
+            0: { slidesPerView: 1 },
+            640: { slidesPerView: 2 },
+            768: { slidesPerView: 3 },
+            1024: { slidesPerView: 4 },
           }}
-          className='pb-10'
+          className="top-selling-swiper pb-10"
         >
           {products.map((product) => {
             const fullStars = Math.floor(product.rating);
@@ -129,32 +125,61 @@ const TopSellingProduct = () => {
 
             return (
               <SwiperSlide key={product.id}>
-                <div className="border rounded-lg p-4 ">
-                  <div className="w-[200px] h-[200px] relative mx-auto flex justify-center items-center">
-                    <img src={product.image} alt={product.title} className="w-full mb-10" />
-                    <img src="/ShopProduct/Mask group.png" alt="Cart icon" className="absolute right-0 bottom-0 w-[40px]" />
+                <div className="market-card p-4">
+                  <div className="market-card-media relative mx-auto mb-4 flex h-[200px] w-full items-center justify-center">
+                    <img
+                      src={product.image}
+                      alt={product.title}
+                      className="max-h-full max-w-full object-contain"
+                    />
                   </div>
-                  <h3 className="font-semibold text-sm">{product.title}</h3>
+                  <h3 className="market-card-title line-clamp-1 text-sm">{product.title}</h3>
 
-                  <div className="flex justify- items-center text-yellow-500 mb-1 mt-1">
-                    {Array(fullStars).fill(0).map((_, idx) => (
-                      <Star key={`full-${idx}`} size={12} fill="currentColor" stroke="currentColor" />
-                    ))}
+                  <div className="mb-1 mt-1 flex items-center text-market-gold">
+                    {Array(fullStars)
+                      .fill(0)
+                      .map((_, idx) => (
+                        <Star key={`full-${idx}`} size={12} fill="currentColor" stroke="currentColor" />
+                      ))}
                     {hasHalfStar && (
                       <StarHalf key="half" size={12} fill="currentColor" stroke="currentColor" />
                     )}
-                    {Array(emptyStars).fill(0).map((_, idx) => (
-                      <Star key={`empty-${idx}`} size={12} fill="gray" stroke="gray" />
-                    ))}
+                    {Array(emptyStars)
+                      .fill(0)
+                      .map((_, idx) => (
+                        <Star
+                          key={`empty-${idx}`}
+                          size={12}
+                          className="text-market-muted/40"
+                          fill="transparent"
+                          stroke="currentColor"
+                        />
+                      ))}
                   </div>
 
-                  <p className="text-gray-500 text-sm">${product.price.toFixed(2)}</p>
+                  <p className="market-card-price text-sm">${product.price.toFixed(2)}</p>
                 </div>
               </SwiperSlide>
             );
           })}
         </Swiper>
       </div>
+
+      <style jsx global>{`
+        .top-selling-swiper .swiper-pagination-bullets {
+          bottom: 6px !important;
+        }
+        .top-selling-swiper .swiper-pagination-bullet {
+          width: 6px;
+          height: 6px;
+          background: rgba(255, 255, 255, 0.35);
+          opacity: 1;
+          margin: 0 3px !important;
+        }
+        .top-selling-swiper .swiper-pagination-bullet-active {
+          background: #e2b84b;
+        }
+      `}</style>
     </div>
   );
 };

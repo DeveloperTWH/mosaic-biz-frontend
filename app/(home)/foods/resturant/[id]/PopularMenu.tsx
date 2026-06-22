@@ -13,7 +13,7 @@ type Props = {
 export default function PopularMenu({ menu }: Props) {
     return (
         <div className="mt-5 max-w-[90vw] mx-auto">
-            <h2 className="text-xl font-semibold mb-5 heading">Popular Menu</h2>
+            <h2 className="market-section-heading mb-5 text-xl">Popular Menu</h2>
 
             <Swiper
                 modules={[Navigation]}

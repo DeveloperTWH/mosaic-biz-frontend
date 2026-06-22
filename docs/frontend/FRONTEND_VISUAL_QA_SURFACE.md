@@ -1,7 +1,7 @@
 # Frontend Visual QA Surface — As Built
 
 **Type:** Reference (launch evidence pack)  
-**Last updated:** 2026-06-19  
+**Last updated:** 2026-06-22  
 **Evidence source:** Route map, existing QA docs; **browser QA not run in this documentation task**
 
 This document lists surfaces for human visual QA on Vercel preview. It does not assert pass/fail for visual checks.
@@ -28,7 +28,7 @@ This document lists surfaces for human visual QA on Vercel preview. It does not 
 |----------|-----|--------------|
 | P0 | `/` | Hero, featured/ranked section, nav, mobile bottom nav |
 | P0 | `/products` | Filter bar, product grid, empty/error states |
-| P0 | `/product/[id]` | Detail layout, add-to-cart, images |
+| P0 | `/product/[id]` | Detail layout, add-to-cart, images, **Best Sellers carousel contrast on dusk bg** |
 | P1 | `/services`, `/service/[slug]` | List + detail + booking UI |
 | P1 | `/foods` | Food cards, filters |
 | P1 | `/search` | Results + empty state copy |
@@ -117,9 +117,17 @@ Key mobile chrome: `MobileBottomNav`, `Navbar`, partner dashboard sidebar.
 
 | Surface family | Token prefix | Guide |
 |----------------|--------------|-------|
-| Public marketplace | `market-*` | [../STYLE_GUIDE.md](../STYLE_GUIDE.md) |
-| Auth / checkout | `brand-*` | [../STYLE_GUIDE.md](../STYLE_GUIDE.md) |
+| Public marketplace | `market-*` | [../STYLE_GUIDE.md](../STYLE_GUIDE.md) — **never `text-brand-navy` / `text-brand-muted` on dark `market-*` backgrounds** |
+| Auth / checkout | `brand-*` | [../STYLE_GUIDE.md](../STYLE_GUIDE.md) — light panels only |
 | Partner dashboard | `surface-*`, `dashboard-*` | [../STYLE_GUIDE.md](../STYLE_GUIDE.md) |
+
+### Dark-surface contrast checklist
+
+- [x] Product detail: similar-products carousel uses `market-card-title` / `market-card-price` (not navy on purple)
+- [x] Service detail: section headings use `text-market-text`; sidebars use `market-card-light`
+- [x] Homepage legacy sections: `.heading` inherits `market-text` on dusk; cream/white sections use `brand-navy`
+- [x] Payment success error states: copy inside `market-surface-light` card
+- [x] Checkout buy-now / cart: copy on `#ebecef` / white panels uses `brand-*` tokens
 
 ---
 

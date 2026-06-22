@@ -436,13 +436,13 @@ function BuyNowContent() {
   }
 
   return (
-    <div className="bg-[#ebecef]">
+    <div className="bg-[#ebecef] text-brand-navy">
       <div className="flex flex-wrap gap-5 px-4 py-6 mx-auto max-w-7xl">
         <div className="w-full lg:w-[68%]">
           <div className="flex gap-5 px-5 mb-8 bg-white">
             <button
               className={`sm:p-5 p-2 pt-3 sm:text-lg text-sm font-semibold ${
-                selectedTab === "product" ? "border-b-4 border-blue-500" : "text-gray-800"
+                selectedTab === "product" ? "border-b-4 border-blue-500" : "text-brand-navy"
               }`}
             >
               Items ({totalQtyProduct})
@@ -468,7 +468,7 @@ function BuyNowContent() {
                         />
 
                         <div className="min-w-0">
-                          <div className="font-semibold text-gray-800 truncate">
+                          <div className="font-semibold text-brand-navy truncate">
                             {currentItem.title || "Product"}
                           </div>
 
@@ -500,7 +500,7 @@ function BuyNowContent() {
 
                                 return (
                                   <div className="flex flex-wrap items-center gap-2">
-                                    <span className="text-base text-gray-800">${resolved.current.toFixed(2)}</span>
+                                    <span className="text-base text-brand-navy">${resolved.current.toFixed(2)}</span>
                                     <span className="text-sm text-gray-400 line-through">
                                       ${resolved.original.toFixed(2)}
                                     </span>
@@ -511,7 +511,7 @@ function BuyNowContent() {
 
                               return (
                                 <div className="flex flex-col gap-1">
-                                  <span className="text-base text-gray-800">${resolved.current.toFixed(2)}</span>
+                                  <span className="text-base text-brand-navy">${resolved.current.toFixed(2)}</span>
                                 </div>
                               );
                             })()}
@@ -590,10 +590,10 @@ function BuyNowContent() {
             <div className="mt-6 bg-white border border-gray-200 rounded-md p-4">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-800">Shipping Speed</h3>
+                  <h3 className="text-sm font-semibold text-brand-navy">Shipping Speed</h3>
                   <p className="mt-1 text-xs text-gray-500">Choose shipping Speed for your order</p>
                   {selectedDeliverySpeed ? (
-                    <p className="mt-2 text-sm font-medium text-gray-700">
+                    <p className="mt-2 text-sm font-medium text-brand-muted">
                       Selected: {getShippingLabel(selectedDeliverySpeed)} - ${effectiveShippingTotalProduct.toFixed(2)}
                     </p>
                   ) : null}
@@ -628,7 +628,7 @@ function BuyNowContent() {
                       className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
                         isActive
                           ? "border-blue-900 bg-blue-900 text-white"
-                          : "border-gray-300 bg-white text-gray-700 hover:border-blue-400"
+                          : "border-gray-300 bg-white text-brand-muted hover:border-blue-400"
                       } disabled:cursor-not-allowed disabled:opacity-60`}
                     >
                       {getShippingLabel(speed)}
@@ -654,8 +654,8 @@ function BuyNowContent() {
 
         <div className="w-full lg:w-[30%] lg:mt-0">
           <div className="w-full bg-white border border-gray-200">
-            <div className="p-5 mb-2 text-lg text-gray-800 border-b-2 border-gray-200">
-              <h3 className="pt-2 text-lg text-gray-800">Price Details</h3>
+            <div className="p-5 mb-2 text-lg text-brand-navy border-b-2 border-gray-200">
+              <h3 className="pt-2 text-lg text-brand-navy">Price Details</h3>
             </div>
 
             {selectedTab === "product" ? (
@@ -678,7 +678,7 @@ function BuyNowContent() {
                 </div>
 
                 <div className="mt-5">
-                  <label className="block mb-2 text-sm font-medium text-gray-700">Discount Coupon</label>
+                  <label className="block mb-2 text-sm font-medium text-brand-muted">Discount Coupon</label>
                   <div className="flex gap-2">
                     <input
                       type="text"

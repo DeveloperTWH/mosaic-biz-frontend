@@ -36,16 +36,13 @@ const blogs = [
 export default function FeatureBlogs() {
   return (
 
-    <section className="px-5 py-20 md:px-20 bg-custom-soil">
+    <section className="bg-brand-cream px-5 py-20 text-brand-navy md:px-20">
       <div className="mb-10 text-center">
-        <h2 className="mb-2 text-3xl font-semibold text-gray-800 uppercase heading">
+        <h2 className="mb-2 font-poppins text-3xl font-semibold uppercase">
           FEATURED BLOGS & STORIES
         </h2>
-        <div className="flex flex-col items-center justify-center">
-          <hr className="h-[2px] w-[100px] bg-green-900" />
-          <hr className="h-[2px] w-[100px] mt-[2px] mb-4 bg-green-900" />
-        </div>
-        <p className="text-[13px] text-gray-600 max-w-xl mx-auto">
+        <div className="mx-auto mt-3 h-0.5 w-16 bg-brand-gold" />
+        <p className="mx-auto mt-4 max-w-xl text-[13px] text-brand-muted">
           Dive into powerful narratives, business tips, and local spotlights curated for our vibrant Mosaic Biz Hub community.
         </p>
       </div>
