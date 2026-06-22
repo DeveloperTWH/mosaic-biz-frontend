@@ -29,7 +29,7 @@ Documented in [STYLE_GUIDE.md](STYLE_GUIDE.md).
 |------|-------|---------|
 | Product vendor storefront (#83) | `vendor-profile/product-vendor/[businessId]/page.tsx` | Hero band, detail card, product grid cards, readable labels, brand tokens |
 | Service + food vendor profiles | `vendor-profile/service-vendor/`, `food-vendor/` | Bulk hex → `brand-*` / `surface-*`; 10–11px labels → `text-xs` |
-| Cart + checkout (#118 partial) | `cart/page.tsx`, `checkout/buy-now/page.tsx`, `checkout/address/ClientForm.tsx` | Commerce shell panels, trust note, navy CTAs (no `blue-900`) |
+| Cart + checkout (#118 partial) | `cart/page.tsx`, `checkout/buy-now/page.tsx`, `checkout/address/ClientForm.tsx`, `checkout/page.tsx`, `checkout/payment/page.tsx`, `payment-success/page.tsx` | Commerce shell, trust notes, navy CTAs, fulfillment disclaimer on success |
 | Homepage legacy | `WhyChooseUs.tsx`, `FeatureBlogs.tsx` | Light-surface cards, brand typography, removed inline hex/Roboto Slab |
 | Foods listing cards | `RestaurantCard.tsx`, `ShopProductCard.tsx`, `TabsHeadingSection.tsx` | `market-listing-card` + `market-*` tokens |
 
@@ -40,6 +40,22 @@ Documented in [STYLE_GUIDE.md](STYLE_GUIDE.md).
 - No API, Stripe, auth, or route changes
 - No fake vendor/review/inventory data
 - Build gate: `npm run build`
+
+---
+
+## Placeholder inventory (#84) — 2026-06-22
+
+| Route / surface | Status | Notes |
+|-----------------|--------|-------|
+| `/vendors` Similar Products stub | **Removed** | Fake carousel deleted; vendors page ends at grid |
+| `products/[productid]/[id]/SimilarProduct.tsx` | **Deleted** | Hardcoded "Feature Product" stub removed |
+| `/vendors/[vendor_id]` TopSellingProduct | **Replaced** | Honest empty state → `/vendors` |
+| `/foods/resturant/[id]` | **Replaced** | Lorem mock removed; honest empty state → `/foods` |
+| Homepage VendorSpotlight / VendorStories | Backend-dependent | `MarketEmptyState` + honest copy (keep) |
+| `FeatureBlogs` | Static preview | "Stories coming soon" — no fake articles |
+| `ClientTestimonials` | Curated copy | Placeholder names until CMS/API |
+| `/products/[productid]/[id]` mock catalog | **Redirect** | Sends to canonical `/product/[id]` |
+| Partner onboarding modals | **Open** | Gray/blue legacy — dashboard scope |
 
 ---
 

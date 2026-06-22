@@ -1,9 +1,5 @@
 "use client";
 
-// import "swiper/css";
-// import "swiper/css/navigation";
-// import "swiper/css/pagination";
-
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
@@ -53,11 +49,11 @@ const renderStars = (rating: number) => {
   const stars = [];
   for (let i = 1; i <= 5; i++) {
     if (rating >= i) {
-      stars.push(<Star key={i} className="w-3 h-3 text-custom-blue fill-custom-blue" />);
+      stars.push(<Star key={i} className="h-3 w-3 text-brand-gold fill-brand-gold" />);
     } else if (rating >= i - 0.5) {
-      stars.push(<StarHalf key={i} className="w-3 h-3 text-custom-blue fill-custom-blue" />);
+      stars.push(<StarHalf key={i} className="h-3 w-3 text-brand-gold fill-brand-gold" />);
     } else {
-      stars.push(<StarOff key={i} className="w-3 h-3 text-gray-300" />);
+      stars.push(<StarOff key={i} className="h-3 w-3 text-brand-muted/40" />);
     }
   }
   return stars;
@@ -65,54 +61,40 @@ const renderStars = (rating: number) => {
 
 export default function ClientTestimonials() {
   return (
-    <section className="px-5 py-20 text-brand-navy md:px-20">
+    <section className="bg-surface-panel px-5 py-16 text-brand-navy md:px-20">
       <div className="mb-12 text-center">
-        <h2 className="text-4xl font-bold text-center text-gray-900 uppercase tracking-wide font-poppins">
-          WHAT OUR CLIENTS SAY
-        </h2>
-        <div className="flex flex-col items-center justify-center">
-          <hr className="h-[2px] w-[100px] bg-gray-700" />
-          <hr className="h-[2px] w-[100px] mt-[2px] mb-4 bg-gray-700" />
-        </div>
-        <p className="text-[13px] text-gray-600 max-w-xl mx-auto font-montserrat">
-          <b>Real voices. Real growth. Real impact.</b> <br />
-          At Mosaic Biz Hub, we don't just connect businesses and buyers, we build bridges of trust, visibility, and community. Here's what our vendors and customers are saying:
+        <h2 className="section-heading">What our clients say</h2>
+        <div className="section-divider" />
+        <p className="mx-auto mt-4 max-w-xl font-montserrat text-sm leading-relaxed text-brand-muted">
+          <strong className="font-semibold text-brand-navy">Real voices. Real growth. Real impact.</strong>{" "}
+          At Mosaic Biz Hub, we don&apos;t just connect businesses and buyers — we build bridges of trust,
+          visibility, and community.
         </p>
       </div>
 
-      <div className="w-[90%] mx-auto">
+      <div className="mx-auto w-[90%] max-w-6xl">
         <Swiper
           modules={[Autoplay, Navigation, Pagination]}
-          
           pagination={{ clickable: true }}
           autoplay={{ delay: 3500, disableOnInteraction: false }}
-          loop={true}
+          loop
           spaceBetween={24}
           slidesPerView={1}
           breakpoints={{
-            768: {
-              slidesPerView: 2,
-            },
-            1280: {
-              slidesPerView: 2,
-              spaceBetween: 32,
-            },
+            768: { slidesPerView: 2 },
+            1280: { slidesPerView: 2, spaceBetween: 32 },
           }}
-          className="!pb-14 [&_.swiper-button-next]:text-custom-blue [&_.swiper-button-prev]:text-custom-blue [&_.swiper-button-next:after]:text-2xl [&_.swiper-button-prev:after]:text-2xl [&_.swiper-pagination-bullet-active]:bg-custom-blue"
+          className="!pb-14 [&_.swiper-button-next]:text-brand-navy-light [&_.swiper-button-prev]:text-brand-navy-light [&_.swiper-button-next:after]:text-2xl [&_.swiper-button-prev:after]:text-2xl [&_.swiper-pagination-bullet-active]:bg-brand-gold"
         >
           {testimonials.map((testimonial) => (
             <SwiperSlide key={testimonial.id} className="h-auto">
-              <div className="flex h-full min-h-[330px] flex-col p-6 text-gray-800 transition bg-white shadow-md rounded-xl hover:shadow-xl">
-                <Quote className="mb-4 rotate-180 text-custom-yellow" size={64} />
-                <h3 className="mb-4 text-base font-semibold text-gray-900 font-montserrat">
-                  {testimonial.heading}
-                </h3>
-                <p className="mb-6 text-sm leading-6 font-montserrat">
-                  {testimonial.quote}
-                </p>
+              <article className="market-card-light flex h-full min-h-[330px] flex-col p-6 transition-shadow hover:shadow-market-glow">
+                <Quote className="mb-4 rotate-180 text-brand-gold" size={48} aria-hidden />
+                <h3 className="market-card-light-title mb-4 text-base">{testimonial.heading}</h3>
+                <p className="market-card-light-body mb-6 flex-1">{testimonial.quote}</p>
 
-                <div className="flex items-center gap-3 mt-auto">
-                  <div className="relative flex items-center justify-center w-12 h-12 overflow-hidden bg-gray-100 rounded-full shrink-0">
+                <div className="mt-auto flex items-center gap-3">
+                  <div className="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-surface-cream">
                     {testimonial.image ? (
                       <Image
                         src={testimonial.image}
@@ -121,17 +103,17 @@ export default function ClientTestimonials() {
                         className="object-cover"
                       />
                     ) : (
-                      <CircleUserRound className="w-10 h-10 text-gray-400" />
+                      <CircleUserRound className="h-10 w-10 text-brand-muted" aria-hidden />
                     )}
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-custom-blue font-montserrat">
+                    <p className="font-montserrat text-sm font-semibold text-brand-navy-light">
                       {testimonial.name}
                     </p>
-                    <div className="flex mt-1">{renderStars(testimonial.rating)}</div>
+                    <div className="mt-1 flex">{renderStars(testimonial.rating)}</div>
                   </div>
                 </div>
-              </div>
+              </article>
             </SwiperSlide>
           ))}
         </Swiper>

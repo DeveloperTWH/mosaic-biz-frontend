@@ -6,7 +6,6 @@ import PublicPageHero from '../Components/PublicPageHero';
 import FilterBar from '../services/components/FilterBar';
 import TabsHeadingSection from './components/TabsHeadingSection';
 import FoodsAndRestaurantsPage from './components/FoodsAndRestaurantsPage';
-import SimilarProduct from '../products/[productid]/[id]/Component/SimilarProduct';
 import BookServices from './components/BookYourServices';
 import { Service } from "@/types/service";
 import { Category, SubCategory, SubCategoryResponse } from "@/types/Category";
@@ -130,13 +129,13 @@ const FoodSection = () => {
       }} />
 
       {fetchError ? (
-        <div className="mx-auto max-w-[1400px] px-4 py-6">
-          <div className="rounded border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-            {fetchError}{" "}
+        <div className="container-page py-6">
+          <div className="market-state-error flex flex-wrap items-center justify-between gap-3">
+            <span>{fetchError}</span>
             <button
               type="button"
               onClick={() => fetchFoods(undefined, undefined)}
-              className="font-semibold underline"
+              className="font-semibold text-market-gold underline hover:text-market-gold-hover"
             >
               Retry
             </button>

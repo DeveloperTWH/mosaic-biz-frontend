@@ -20,7 +20,7 @@ export default function MarketEmptyState({
   className = "",
 }: MarketEmptyStateProps) {
   return (
-    <div className={`market-empty-state ${className}`}>
+    <div className={`market-empty-state market-content-safe-bottom ${className}`}>
       <p className="market-empty-state-title">{title}</p>
       {description ? (
         <p className="mt-2 market-empty-state-desc">{description}</p>

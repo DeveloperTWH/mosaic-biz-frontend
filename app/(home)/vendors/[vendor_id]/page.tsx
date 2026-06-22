@@ -1,6 +1,6 @@
 "use client"
 import React, { useState } from "react";
-import TopSellingProduct from "./component/TopSellingProduct";
+import MarketEmptyState from "../../Components/MarketEmptyState";
 import { Forward, Mail, MapPin, MessageSquareMore, Send, Star } from "lucide-react";
 import ShareButton from "./component/ShareButton";
 import TestShare from "./component/ShareButton";
@@ -190,7 +190,13 @@ const VendorDetailPage = () => {
                     <img key={idx} src={promo.image} alt={promo.title} className="" />
                 ))}
             </div>
-            <TopSellingProduct />
+            <MarketEmptyState
+              title="Vendor storefront preview"
+              description="This legacy route uses sample data. Browse live vendor stores from the marketplace directory."
+              ctaLabel="Browse vendors"
+              ctaHref="/vendors"
+              className="mt-10"
+            />
         </div>
     );
 };

@@ -718,8 +718,8 @@ export default function CartPage() {
                                 </div>
 
                                 {deliverySpeedLoading && (
-                                    <div className="text-xs text-blue-600">
-                                        Updating shipping...
+                                    <div className="text-xs text-brand-teal">
+                                        Updating shipping…
                                     </div>
                                 )}
                             </div>

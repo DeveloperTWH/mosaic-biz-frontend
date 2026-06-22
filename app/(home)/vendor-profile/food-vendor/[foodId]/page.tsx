@@ -1171,7 +1171,7 @@ export default function FoodVendorProfilePage() {
                       value={bookForm.name}
                       onChange={(e) => setBookForm((prev) => ({ ...prev, name: e.target.value }))}
                       placeholder="Enter Name"
-                      className="h-9 w-full border border-border-warm bg-brand-cream px-3 text-xs font-montserrat font-medium text-brand-navy placeholder:text-brand-muted focus:outline-none focus:ring-1 focus:ring-[#C7A040]"
+                      className="h-9 w-full border border-border-warm bg-brand-cream px-3 text-xs font-montserrat font-medium text-brand-navy placeholder:text-brand-muted focus:outline-none focus:ring-1 focus:ring-brand-gold"
                     />
                   </div>
 
@@ -1183,7 +1183,7 @@ export default function FoodVendorProfilePage() {
                       value={bookForm.phone}
                       onChange={(e) => setBookForm((prev) => ({ ...prev, phone: e.target.value }))}
                       placeholder="Enter Phone Number"
-                      className="h-9 w-full border border-border-warm bg-brand-cream px-3 text-xs font-montserrat font-medium text-brand-navy placeholder:text-brand-muted focus:outline-none focus:ring-1 focus:ring-[#C7A040]"
+                      className="h-9 w-full border border-border-warm bg-brand-cream px-3 text-xs font-montserrat font-medium text-brand-navy placeholder:text-brand-muted focus:outline-none focus:ring-1 focus:ring-brand-gold"
                     />
                   </div>
                 </div>
@@ -1196,7 +1196,7 @@ export default function FoodVendorProfilePage() {
                     value={bookForm.email}
                     onChange={(e) => setBookForm((prev) => ({ ...prev, email: e.target.value }))}
                     placeholder="Enter Email"
-                    className="h-9 w-full border border-border-warm bg-brand-cream px-3 text-xs font-montserrat font-medium text-brand-navy placeholder:text-brand-muted focus:outline-none focus:ring-1 focus:ring-[#C7A040]"
+                    className="h-9 w-full border border-border-warm bg-brand-cream px-3 text-xs font-montserrat font-medium text-brand-navy placeholder:text-brand-muted focus:outline-none focus:ring-1 focus:ring-brand-gold"
                   />
                 </div>
 
@@ -1306,7 +1306,7 @@ export default function FoodVendorProfilePage() {
                   <select
                     value={bookForm.tableType}
                     onChange={(e) => setBookForm((prev) => ({ ...prev, tableType: e.target.value }))}
-                    className="h-9 w-full border border-border-warm bg-brand-cream px-3 text-xs font-montserrat font-medium text-brand-navy focus:outline-none focus:ring-1 focus:ring-[#C7A040]"
+                    className="h-9 w-full border border-border-warm bg-brand-cream px-3 text-xs font-montserrat font-medium text-brand-navy focus:outline-none focus:ring-1 focus:ring-brand-gold"
                   >
                     <option value="">Select Seat Count</option>
                     {SEAT_OPTIONS.map((option) => (
@@ -1326,7 +1326,7 @@ export default function FoodVendorProfilePage() {
                     onChange={(e) => setBookForm((prev) => ({ ...prev, message: e.target.value }))}
                     placeholder="Add Message"
                     rows={3}
-                    className="w-full resize-none border border-border-warm bg-brand-cream px-3 py-2 text-xs font-montserrat font-medium text-brand-navy placeholder:text-brand-muted focus:outline-none focus:ring-1 focus:ring-[#C7A040]"
+                    className="w-full resize-none border border-border-warm bg-brand-cream px-3 py-2 text-xs font-montserrat font-medium text-brand-navy placeholder:text-brand-muted focus:outline-none focus:ring-1 focus:ring-brand-gold"
                   />
                 </div> */}
 

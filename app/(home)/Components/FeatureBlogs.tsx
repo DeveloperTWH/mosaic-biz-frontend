@@ -52,7 +52,11 @@ export default function FeatureBlogs() {
           return (
             <article
               key={blog.id}
-              className={`market-card-light overflow-hidden p-0 ${isMiddleCard ? "bg-brand-navy text-white" : ""}`}
+              className={`overflow-hidden rounded-2xl border shadow-market-card transition-shadow duration-300 hover:shadow-market-glow ${
+                isMiddleCard
+                  ? "border-brand-gold/30 bg-brand-navy text-white"
+                  : "market-card-light p-0"
+              }`}
             >
               <div className="relative h-[220px] w-full">
                 <Image

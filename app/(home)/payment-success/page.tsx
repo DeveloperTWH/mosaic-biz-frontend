@@ -138,13 +138,16 @@ function PaymentSuccessPage() {
 
   if (!paymentIntentId || redirectStatus !== 'succeeded') {
     return (
-      <div className="container-page py-12">
-        <div className="market-surface-light mx-auto max-w-lg rounded-2xl border border-white/10 p-8 text-center shadow-market-card">
+      <div className="commerce-shell market-content-safe-bottom py-12">
+        <div className="commerce-panel mx-auto max-w-lg p-8 text-center">
           <h1 className="font-poppins text-xl font-semibold text-red-700">Payment not completed</h1>
-          <p className="mt-3 text-sm text-brand-muted">
+          <p className="commerce-text-body mt-3">
             Your payment was cancelled or could not be confirmed. No charge was finalized.
           </p>
-          <a href="/cart" className="mt-6 inline-block rounded bg-brand-navy-light px-6 py-2 text-sm font-semibold text-white hover:bg-brand-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold">
+          <a
+            href="/cart"
+            className="mt-6 inline-block rounded-lg bg-brand-navy-light px-6 py-2 text-sm font-semibold text-white hover:bg-brand-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold"
+          >
             Return to cart
           </a>
         </div>
@@ -154,7 +157,7 @@ function PaymentSuccessPage() {
 
   if (loading) {
     return (
-      <div className="container-page py-12">
+      <div className="commerce-shell py-12">
         <AccountLoadingBlock label="Confirming your payment…" minHeight="min-h-[40vh]" />
       </div>
     );
@@ -162,13 +165,16 @@ function PaymentSuccessPage() {
 
   if (!paymentData) {
     return (
-      <div className="container-page py-12">
-        <div className="market-surface-light mx-auto max-w-lg rounded-2xl border border-white/10 p-8 text-center shadow-market-card">
+      <div className="commerce-shell market-content-safe-bottom py-12">
+        <div className="commerce-panel mx-auto max-w-lg p-8 text-center">
           <h1 className="font-poppins text-xl font-semibold text-red-700">Unable to load receipt</h1>
-          <p className="mt-3 text-sm text-brand-muted">
+          <p className="commerce-text-body mt-3">
             Payment may have succeeded but receipt details are unavailable. Check your email or order history.
           </p>
-          <a href="/customer/order" className="mt-6 inline-block rounded bg-brand-navy-light px-6 py-2 text-sm font-semibold text-white hover:bg-brand-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold">
+          <a
+            href="/customer/order"
+            className="mt-6 inline-block rounded-lg bg-brand-navy-light px-6 py-2 text-sm font-semibold text-white hover:bg-brand-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold"
+          >
             View my orders
           </a>
         </div>
@@ -180,73 +186,88 @@ function PaymentSuccessPage() {
   const date = new Date(paymentData.created * 1000).toLocaleString();
 
   return (
-    <div className="container-page py-8">
-    <div className="mx-auto mt-4 max-w-4xl rounded-lg border bg-white p-8 shadow-md print:mt-0 print:text-sm">
-      <h1 className="mb-6 text-3xl font-bold text-green-700">🧾 Payment Receipt</h1>
+    <div className="commerce-shell market-content-safe-bottom py-8">
+      <div className="commerce-panel mx-auto mt-4 max-w-4xl p-6 sm:p-8 print:mt-0 print:text-sm">
+        <h1 className="font-poppins text-2xl font-semibold text-brand-navy sm:text-3xl">Payment confirmed</h1>
+        <p className="commerce-trust-note mt-2">
+          Your payment was received. Vendors will confirm fulfillment separately — this receipt does not mean your
+          order has shipped yet.
+        </p>
 
-      <div className="mb-6 space-y-1 text-brand-navy">
-        {/* <p><strong>Payment ID:</strong> {paymentData.id}</p> */}
-        {/* <p><strong>Status:</strong> {paymentData.status}</p> */}
-        <p><strong>Date:</strong> {date}</p>
-        <p><strong>Amount Paid:</strong> ${formattedAmount} {paymentData.currency.toUpperCase()}</p>
-        {paymentData.receipt_email && <p><strong>Receipt Email:</strong> {paymentData.receipt_email}</p>}
-      </div>
+        <div className="mt-6 space-y-1 text-brand-navy">
+          <p className="commerce-text-body">
+            <strong className="text-brand-navy">Date:</strong> {date}
+          </p>
+          <p className="commerce-text-body">
+            <strong className="text-brand-navy">Amount paid:</strong> ${formattedAmount}{' '}
+            {paymentData.currency.toUpperCase()}
+          </p>
+          {paymentData.receipt_email ? (
+            <p className="commerce-text-body">
+              <strong className="text-brand-navy">Receipt email:</strong> {paymentData.receipt_email}
+            </p>
+          ) : null}
+        </div>
 
-      <hr className="my-6" />
+        <hr className="my-6 border-dashboard-border-light" />
 
-      {orders.map((order, orderIndex) => (
-        <div key={order._id} className="mb-10">
-          {/* <h2 className="flex items-center gap-2 mb-3 text-xl font-semibold text-gray-800">
-            <ShoppingCart/> Order #{orderIndex + 1} <span className="ml-4 text-sm font-normal text-blue-600">Status: {order.status}</span>
-          </h2> */}
-
-          <div className="border divide-y rounded-md bg-gray-50">
-            {order.items.map((item, i) => (
-              <div key={i} className="flex flex-col items-start justify-between gap-4 px-4 py-4 sm:flex-row sm:items-center">
-                <div className="flex items-center w-full gap-4 sm:w-2/3">
-                  {item.productId?.coverImage && (
-                    <div className="w-20 h-20 overflow-hidden border rounded">
-                      <Image
-                        src={item.productId.coverImage}
-                        alt={item.productId.title}
-                        width={80}
-                        height={80}
-                        className="object-cover w-full h-full"
-                      />
+        {orders.map((order) => (
+          <div key={order._id} className="mb-10">
+            <div className="commerce-panel-muted divide-y overflow-hidden rounded-md">
+              {order.items.map((item, i) => (
+                <div
+                  key={i}
+                  className="flex flex-col items-start justify-between gap-4 px-4 py-4 sm:flex-row sm:items-center"
+                >
+                  <div className="flex w-full items-center gap-4 sm:w-2/3">
+                    {item.productId?.coverImage ? (
+                      <div className="h-20 w-20 shrink-0 overflow-hidden rounded border border-dashboard-input-border bg-surface-panel">
+                        <Image
+                          src={item.productId.coverImage}
+                          alt={item.productId.title}
+                          width={80}
+                          height={80}
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
+                    ) : null}
+                    <div>
+                      <p className="font-semibold text-brand-navy">{item.productId.title}</p>
+                      <p className="commerce-text-meta">
+                        Size: {item.size}
+                        {item.color ? ` · Color: ${item.color}` : ''}
+                      </p>
+                      <p className="commerce-text-meta">Quantity: {item.quantity}</p>
                     </div>
-                  )}
-                  <div>
-                    <p className="font-semibold">{item.productId.title}</p>
-                    <p className="text-sm text-brand-muted">
-                      Variant ID: {item.variantId}
-                    </p>
-                    <p className="text-sm text-brand-muted">
-                      Size: {item.size}, Color: {item.color}
-                    </p>
-                    <p className="text-sm text-brand-muted">
-                      Quantity: {item.quantity}
-                    </p>
+                  </div>
+                  <div className="w-full text-right font-semibold text-brand-navy sm:w-1/3">
+                    ${(item.price * item.quantity).toFixed(2)}
                   </div>
                 </div>
-                <div className="w-full font-semibold text-right text-brand-navy sm:w-1/3">
-                  ${(item.price * item.quantity).toFixed(2)}
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
 
-          <div className="flex justify-end mt-4 font-semibold text-brand-navy">
-            <span>Total: ${order.totalAmount.toFixed(2)}</span>
+            <div className="mt-4 flex justify-end font-semibold text-brand-navy">
+              <span>Order total: ${order.totalAmount.toFixed(2)}</span>
+            </div>
           </div>
+        ))}
+
+        <div className="mt-6 flex flex-col items-center gap-3 print:hidden sm:flex-row sm:justify-center">
+          <a
+            href="/customer/order"
+            className="inline-block rounded-lg bg-brand-navy-light px-6 py-2 text-sm font-semibold text-white hover:bg-brand-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold"
+          >
+            View my orders
+          </a>
+          <a
+            href="/"
+            className="inline-block rounded-lg border border-dashboard-input-border px-6 py-2 text-sm font-semibold text-brand-navy hover:border-brand-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold"
+          >
+            Back to home
+          </a>
         </div>
-      ))}
-
-      <div className="mt-6 text-center print:hidden">
-        <a href="/" className="inline-block rounded bg-brand-navy-light px-6 py-2 text-white hover:bg-brand-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold">
-          Back to Home
-        </a>
       </div>
-    </div>
     </div>
   );
 }

@@ -254,6 +254,18 @@ body {
   @apply font-montserrat text-xs leading-relaxed text-brand-muted sm:text-sm;
 }
 
+.commerce-label {
+  @apply mb-1 block font-montserrat text-sm font-medium text-brand-navy;
+}
+
+.commerce-input {
+  @apply w-full rounded-lg border border-dashboard-input-border bg-white px-4 py-2 text-sm text-brand-navy outline-none placeholder:text-brand-muted focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/40 disabled:cursor-not-allowed disabled:bg-surface-panel disabled:opacity-70;
+}
+
+.commerce-select {
+  @apply commerce-input cursor-pointer;
+}
+
 /* Vendor profile storefront (market-surface-light pages) */
 .vendor-profile-hero-band {
   @apply relative h-[180px] w-full overflow-hidden bg-brand-navy;
@@ -487,6 +499,17 @@ body {
 
 .market-empty-state {
   @apply market-card p-8 text-center;
+}
+
+.market-content-safe-bottom {
+  @apply pb-6 xl:pb-0;
+  padding-bottom: max(1.5rem, calc(var(--bottom-nav-h, 0px) + 1rem));
+}
+
+@media (min-width: 1280px) {
+  .market-content-safe-bottom {
+    padding-bottom: 1.5rem;
+  }
 }
 
 .market-empty-state-title {

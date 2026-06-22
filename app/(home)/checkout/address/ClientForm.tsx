@@ -5,14 +5,13 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { getLoggedInCustomer } from '@/utils/authUtils';
-import BannerSection from '../../products/[productid]/Component/BannerSection';
 import { Minus, Plus } from 'lucide-react';
 
 export default function CheckoutAddressPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const type = searchParams.get('type'); // 'cart' or 'buy'
+  const type = searchParams.get('type');
 
   const [address, setAddress] = useState({
     fullName: '',
@@ -24,7 +23,6 @@ export default function CheckoutAddressPage() {
     country: '',
     pincode: '',
   });
-  const [customerEmail, setCustomerEmail] = useState('');
   const [cartItems, setCartItems] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -33,9 +31,8 @@ export default function CheckoutAddressPage() {
       const loggedIn = await getLoggedInCustomer();
 
       if (!loggedIn) {
-        toast.error('You must be logged as Customer to continue');
-        // router.replace(`/login?type=customer?redirect=/checkout/address${window.location.search}`);
-        router.replace(`/login?type=customer`);
+        toast.error('You must be logged in as a customer to continue');
+        router.replace('/login?type=customer');
         return;
       }
 
@@ -44,11 +41,10 @@ export default function CheckoutAddressPage() {
         fullName: loggedIn.name || '',
         phone: loggedIn.mobile || '',
       }));
-      setCustomerEmail(loggedIn.email || '');
     };
 
     checkLogin();
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     const loadItems = async () => {
@@ -80,18 +76,17 @@ export default function CheckoutAddressPage() {
           const product = res.data?.data;
 
           const variant = product.variants.find((v: any) => v.variantId === variantId);
-          if (!variant) return toast.error("Variant not found");
+          if (!variant) return toast.error('Variant not found');
 
           const sizeObj = variant.sizes.find((s: any) => s.size === size);
-          if (!sizeObj) return toast.error("Selected size not found");
-          
-          const stock = variant.sizes.find((s: any) => s.size===size);
-          console.log(stock);
-          
-          if (stock.stock<=0 && !variant.allowBackorder) return toast.error("Not in Stock");
+          if (!sizeObj) return toast.error('Selected size not found');
+
+          const stock = variant.sizes.find((s: any) => s.size === size);
+          if (stock.stock <= 0 && !variant.allowBackorder) return toast.error('Not in Stock');
 
           const now = new Date();
-          const validDiscount = sizeObj.salePrice && sizeObj.discountEndDate && new Date(sizeObj.discountEndDate) > now;
+          const validDiscount =
+            sizeObj.salePrice && sizeObj.discountEndDate && new Date(sizeObj.discountEndDate) > now;
           const finalPrice = validDiscount ? Number(sizeObj.salePrice) : Number(sizeObj.price);
 
           const img = variant.images?.[0] || product.coverImage;
@@ -102,25 +97,23 @@ export default function CheckoutAddressPage() {
               variantId,
               size,
               quantity,
-              price: finalPrice, // ✅ fetched from DB
+              price: finalPrice,
               image: img,
               title: product.title,
-              color: variant.color, // ✅ optional: show color in summary
-              label: variant.label 
+              color: variant.color,
+              label: variant.label,
             },
           ]);
-        } catch (err) {
+        } catch {
           toast.error('Failed to fetch product for preview');
         }
       }
     };
 
     loadItems();
-  }, [type]);
+  }, [type, searchParams]);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setAddress((prev) => ({
       ...prev,
@@ -133,14 +126,6 @@ export default function CheckoutAddressPage() {
 
     setIsLoading(true);
     try {
-      console.log('[checkout] initiating order', {
-        apiUrl: `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/orders/initiate`,
-        itemCount: cartItems.length,
-        customerEmail,
-        address,
-        items: cartItems,
-      });
-
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/orders/initiate`,
         {
@@ -151,17 +136,10 @@ export default function CheckoutAddressPage() {
         { withCredentials: true }
       );
 
-      console.log('[checkout] initiate response', response.data);
-
       const { clientSecret, groupOrderId } = response.data;
-      toast.success('Proceeding to payment...');
+      toast.success('Proceeding to payment…');
       router.push(`/checkout/payment?clientSecret=${clientSecret}&groupOrderId=${groupOrderId}`);
     } catch (err: any) {
-      console.error('[checkout] initiate failed', {
-        message: err?.message,
-        status: err?.response?.status,
-        response: err?.response?.data,
-      });
       toast.error(err?.response?.data?.message || 'Failed to create order');
     } finally {
       setIsLoading(false);
@@ -169,180 +147,229 @@ export default function CheckoutAddressPage() {
   };
 
   return (
-    <>
-      <BannerSection heading={`Checkout`} imageUrl='/products/product.png' />
-      <div className="relative z-10 -mt-[15%]">
-        <div className="max-w-4xl p-8 mx-auto my-10 rounded-lg bg-white text-brand-navy shadow-md">
-          <h2 className="market-card-light-title text-2xl uppercase tracking-wide">
-            Shipping Address
-          </h2>
-          <hr className="mb-5 mt-2 h-0.5 w-28 bg-brand-gold" />
-          <p className="mb-6 text-sm text-brand-muted">
-            Lorem Ipsum Dolor Sit Amet, Consectetur Adipisicing Elit. Praesent Vitae Libero
-            Venenatis, Tristique Justo.
+    <div className="commerce-shell market-content-safe-bottom">
+      <div className="mx-auto max-w-4xl px-4 py-8">
+        <div className="commerce-panel p-6 sm:p-8">
+          <h1 className="font-poppins text-2xl font-semibold text-brand-navy">Checkout</h1>
+          <p className="commerce-trust-note mt-2">
+            Enter your shipping address, then continue to secure payment. You are not charged until you confirm
+            payment on the next step.
           </p>
 
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <h2 className="commerce-text-label mt-8 text-lg">Shipping address</h2>
+          <div className="mx-auto mt-3 h-0.5 w-16 bg-brand-gold" />
+
+          <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
-              <label className="block mb-1 text-sm font-medium">Full Name</label>
+              <label className="commerce-label" htmlFor="fullName">
+                Full name
+              </label>
               <input
+                id="fullName"
                 type="text"
                 name="fullName"
                 value={address.fullName}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border rounded"
+                className="commerce-input"
+                autoComplete="name"
               />
             </div>
             <div>
-              <label className="block mb-1 text-sm font-medium">Phone Number</label>
+              <label className="commerce-label" htmlFor="phone">
+                Phone number
+              </label>
               <input
-                type="text"
+                id="phone"
+                type="tel"
                 name="phone"
                 value={address.phone}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border rounded"
+                className="commerce-input"
+                autoComplete="tel"
               />
             </div>
 
             <div className="md:col-span-2">
-              <label className="block mb-1 text-sm font-medium">Address Line 1</label>
+              <label className="commerce-label" htmlFor="addressLine1">
+                Address line 1
+              </label>
               <input
+                id="addressLine1"
                 type="text"
                 name="addressLine1"
                 value={address.addressLine1}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border rounded"
+                className="commerce-input"
+                autoComplete="address-line1"
               />
             </div>
 
             <div className="md:col-span-2">
-              <label className="block mb-1 text-sm font-medium">Address Line 2</label>
+              <label className="commerce-label" htmlFor="addressLine2">
+                Address line 2 <span className="font-normal text-brand-muted">(optional)</span>
+              </label>
               <input
+                id="addressLine2"
                 type="text"
                 name="addressLine2"
                 value={address.addressLine2}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border rounded"
+                className="commerce-input"
+                autoComplete="address-line2"
               />
             </div>
 
             <div>
-              <label className="block mb-1 text-sm font-medium">City</label>
-              <select
+              <label className="commerce-label" htmlFor="city">
+                City
+              </label>
+              <input
+                id="city"
+                type="text"
                 name="city"
                 value={address.city}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border rounded"
-              >
-                <option value="">-- Choose City --</option>
-                <option value="Kolkata">-- Kolkata --</option>
-                {/* Your city options here */}
-              </select>
+                className="commerce-input"
+                autoComplete="address-level2"
+              />
             </div>
 
             <div>
-              <label className="block mb-1 text-sm font-medium">State</label>
-              <select
+              <label className="commerce-label" htmlFor="state">
+                State
+              </label>
+              <input
+                id="state"
+                type="text"
                 name="state"
                 value={address.state}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border rounded"
-              >
-                <option value="">-- Choose State --</option>
-                <option value="West Bengal">-- West Bengla --</option>
-                {/* Your state options here */}
-              </select>
+                className="commerce-input"
+                autoComplete="address-level1"
+              />
             </div>
 
             <div>
-              <label className="block mb-1 text-sm font-medium">Country</label>
-              <select
+              <label className="commerce-label" htmlFor="country">
+                Country
+              </label>
+              <input
+                id="country"
+                type="text"
                 name="country"
                 value={address.country}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border rounded"
-              >
-                <option value="">-- Choose Country --</option>
-                <option value="India">India</option>
-                {/* Your country options here */}
-              </select>
+                className="commerce-input"
+                autoComplete="country-name"
+              />
             </div>
 
             <div>
-              <label className="block mb-1 text-sm font-medium">Pincode</label>
+              <label className="commerce-label" htmlFor="pincode">
+                ZIP / postal code
+              </label>
               <input
+                id="pincode"
                 type="text"
                 name="pincode"
                 value={address.pincode}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border rounded"
+                className="commerce-input"
+                autoComplete="postal-code"
               />
             </div>
           </div>
 
-          {/* Order Summary */}
-          <div className="pt-6 mt-10 border-t">
-            <h3 className="mb-4 text-lg font-bold">Order Summery</h3>
+          <div className="mt-10 border-t border-dashboard-border-light pt-6">
+            <h3 className="commerce-text-label text-lg">Order summary</h3>
 
-            {cartItems.map((item, idx) => (
-              <div key={idx} className="flex items-start justify-between gap-4 mb-6">
-                <div className="flex gap-4">
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    className="object-cover w-20 h-24 rounded"
-                  />
-                  <div>
-                    <p className="font-semibold">{item.title || `Product ID: ${item.productId}`}</p>
-                    <p className="flex items-center gap-2 text-sm text-gray-500">Color : 
-                      <span
-                        className="inline-block w-4 h-4 border border-gray-300 rounded-full"
-                        style={{ backgroundColor: item.color }}
-                      ></span> | 
-                      <span>{item.label}: {item.size}</span>
-                    </p>
-                    <div className="flex items-center gap-2 px-2 py-1 mt-2 border rounded w-fit">
-                      <button
-                        onClick={() => {
-                          const updated = [...cartItems];
-                          if (updated[idx].quantity > 1) {
-                            updated[idx].quantity -= 1;
+            {cartItems.length === 0 ? (
+              <p className="commerce-text-body mt-4">No items in this checkout session.</p>
+            ) : (
+              cartItems.map((item, idx) => (
+                <div key={idx} className="commerce-panel-muted mb-4 mt-4 flex items-start justify-between gap-4 p-4">
+                  <div className="flex min-w-0 gap-4">
+                    <img
+                      src={item.image || '/placeholder.png'}
+                      alt={item.title || 'Product'}
+                      className="h-24 w-20 shrink-0 rounded bg-surface-panel object-cover"
+                    />
+                    <div className="min-w-0">
+                      <p className="font-semibold text-brand-navy">{item.title || `Product ${item.productId}`}</p>
+                      {item.color || item.label || item.size ? (
+                        <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-brand-muted">
+                          {item.color ? (
+                            <span
+                              className="inline-block h-4 w-4 rounded-full border border-dashboard-input-border"
+                              style={{ backgroundColor: item.color }}
+                              aria-hidden
+                            />
+                          ) : null}
+                          {[item.label, item.size].filter(Boolean).join(' · ')}
+                        </p>
+                      ) : null}
+                      <div className="mt-2 inline-flex items-center gap-2 rounded-md border border-dashboard-input-border px-2 py-1">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updated = [...cartItems];
+                            if (updated[idx].quantity > 1) {
+                              updated[idx].quantity -= 1;
+                              setCartItems(updated);
+                            }
+                          }}
+                          className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-300 bg-white text-brand-navy hover:border-brand-gold"
+                          aria-label="Decrease quantity"
+                        >
+                          <Minus size={16} />
+                        </button>
+                        <span className="min-w-[1.5rem] text-center text-sm">{item.quantity}</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updated = [...cartItems];
+                            updated[idx].quantity += 1;
                             setCartItems(updated);
-                          }
-                        }}
-                        className="text-lg font-bold"
-                      >
-                        <Minus size={16} className='transition hover:scale-150' />
-                      </button>
-                      <span className="px-2">{item.quantity}</span>
-                      <button
-                        onClick={() => {
-                          const updated = [...cartItems];
-                          updated[idx].quantity += 1;
-                          setCartItems(updated);
-                        }}
-                        className="text-lg font-bold"
-                      >
-                        <Plus size={16} className='hover:scale-150' />
-                      </button>
+                          }}
+                          className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-300 bg-white text-brand-navy hover:border-brand-gold"
+                          aria-label="Increase quantity"
+                        >
+                          <Plus size={16} />
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="text-lg font-semibold">${item.price * item.quantity}</div>
-              </div>
-            ))}
+                  <div className="shrink-0 font-semibold text-brand-navy">
+                    ${(item.price * item.quantity).toFixed(2)}
+                  </div>
+                </div>
+              ))
+            )}
           </div>
 
+          <p className="commerce-trust-note mt-6">
+            Payments are processed securely through Stripe. See our{' '}
+            <a href="/privacy" className="text-brand-navy-light underline hover:text-brand-teal-dark">
+              privacy policy
+            </a>{' '}
+            and{' '}
+            <a href="/refund-return" className="text-brand-navy-light underline hover:text-brand-teal-dark">
+              refunds &amp; returns
+            </a>{' '}
+            for more information.
+          </p>
+
           <button
+            type="button"
             onClick={handleSubmit}
-            disabled={isLoading}
-            className="mt-4 w-full rounded-lg bg-brand-teal px-6 py-3 font-semibold text-white transition-all duration-300 hover:bg-brand-teal-dark"
+            disabled={isLoading || cartItems.length === 0}
+            className="mt-6 w-full rounded-lg bg-brand-navy-light px-6 py-3 font-semibold text-white transition hover:bg-brand-navy disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {isLoading ? 'Submitting...' : 'Continue To Payment'}
+            {isLoading ? 'Submitting…' : 'Continue to payment'}
           </button>
         </div>
       </div>
-    </>
+    </div>
   );
 }

@@ -1444,7 +1444,7 @@ export default function ServiceVendorProfilePage() {
           value={bookForm.name}
           onChange={e => setBookForm(p => ({ ...p, name: e.target.value }))}
           placeholder="Enter Name"
-          className="h-9 w-full border border-border-warm bg-brand-cream px-3 text-xs text-brand-navy focus:outline-none focus:ring-1 focus:ring-[#C7A040] placeholder:text-brand-muted"
+          className="h-9 w-full border border-border-warm bg-brand-cream px-3 text-xs text-brand-navy focus:outline-none focus:ring-1 focus:ring-brand-gold placeholder:text-brand-muted"
         />
       </div>
 
@@ -1455,7 +1455,7 @@ export default function ServiceVendorProfilePage() {
           onChange={e => setBookForm(p => ({ ...p, phone: e.target.value }))}
           placeholder="Enter Phone Number"
           type="tel"
-          className="h-9 w-full border border-border-warm bg-brand-cream px-3 text-xs text-brand-navy focus:outline-none focus:ring-1 focus:ring-[#C7A040] placeholder:text-brand-muted"
+          className="h-9 w-full border border-border-warm bg-brand-cream px-3 text-xs text-brand-navy focus:outline-none focus:ring-1 focus:ring-brand-gold placeholder:text-brand-muted"
         />
       </div>
     </div>
@@ -1467,7 +1467,7 @@ export default function ServiceVendorProfilePage() {
         onChange={e => setBookForm(p => ({ ...p, email: e.target.value }))}
         placeholder="Enter Email"
         type="email"
-        className="h-9 w-full border border-border-warm bg-brand-cream px-3 text-xs text-brand-navy focus:outline-none focus:ring-1 focus:ring-[#C7A040] placeholder:text-brand-muted"
+        className="h-9 w-full border border-border-warm bg-brand-cream px-3 text-xs text-brand-navy focus:outline-none focus:ring-1 focus:ring-brand-gold placeholder:text-brand-muted"
       />
     </div>
 
@@ -1625,7 +1625,7 @@ export default function ServiceVendorProfilePage() {
         onChange={e => setBookForm(p => ({ ...p, note: e.target.value }))}
         placeholder="Tell the vendor anything important before the appointment"
         rows={3}
-        className="w-full resize-none border border-border-warm bg-brand-cream px-3 py-2 text-xs text-brand-navy focus:outline-none focus:ring-1 focus:ring-[#C7A040] placeholder:text-brand-muted"
+        className="w-full resize-none border border-border-warm bg-brand-cream px-3 py-2 text-xs text-brand-navy focus:outline-none focus:ring-1 focus:ring-brand-gold placeholder:text-brand-muted"
       />
     </div> */}
 

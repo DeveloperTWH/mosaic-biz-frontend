@@ -77,21 +77,21 @@ function CheckoutForm({ clientSecret }: { clientSecret: string }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-md mx-auto space-y-4">
+    <form onSubmit={handleSubmit} className="mx-auto max-w-md space-y-4">
       {amount !== null && (
-        <div className="mb-2 text-lg font-semibold text-center">
+        <div className="commerce-price-primary mb-2 text-center">
           Total: ${(amount / 100).toFixed(2)}
         </div>
       )}
       <PaymentElement />
       <button
         type="submit"
-        className="w-full px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700"
+        className="btn-secondary w-full disabled:cursor-not-allowed disabled:opacity-60"
         disabled={!stripe}
       >
         Pay
       </button>
-      <p className="text-sm text-gray-600">{status}</p>
+      <p className="font-montserrat text-sm text-brand-muted">{status}</p>
     </form>
   );
 }
@@ -111,8 +111,8 @@ function CheckoutClient() {
   if (!clientSecret) return <p className="text-center">Missing client secret</p>;
 
   return (
-    <div className="p-8">
-      <h1 className="mb-4 text-xl font-bold">Checkout</h1>
+    <div className="commerce-shell p-8">
+      <h1 className="mb-4 font-poppins text-xl font-bold text-brand-navy">Checkout</h1>
       <Elements stripe={stripePromise} options={{ clientSecret }}>
         <CheckoutForm clientSecret={clientSecret} />
       </Elements>

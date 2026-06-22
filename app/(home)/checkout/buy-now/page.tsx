@@ -426,10 +426,10 @@ function BuyNowContent() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
+      <div className="commerce-shell flex min-h-[60vh] items-center justify-center">
         <div className="flex flex-col items-center gap-4 text-center">
-          <div className="w-12 h-12 border-4 border-yellow-400 rounded-full border-t-transparent animate-spin" />
-          <p className="text-sm font-medium text-brand-muted">Loading your cart...</p>
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-brand-gold border-t-transparent" />
+          <p className="commerce-state-loading">Loading checkout…</p>
         </div>
       </div>
     );
@@ -437,12 +437,13 @@ function BuyNowContent() {
 
   return (
     <div className="commerce-shell">
-      <div className="flex flex-wrap gap-5 px-4 py-6 mx-auto max-w-7xl">
+      <div className="mx-auto flex max-w-7xl flex-wrap gap-5 px-4 py-6">
         <div className="w-full lg:w-[68%]">
-          <div className="flex gap-5 px-5 mb-8 bg-white">
+          <div className="commerce-panel mb-8 flex gap-5 px-5">
             <button
-              className={`sm:p-5 p-2 pt-3 sm:text-lg text-sm font-semibold ${
-                selectedTab === "product" ? "border-b-4 border-blue-500" : "text-brand-navy"
+              type="button"
+              className={`p-2 pt-3 text-sm font-semibold sm:p-5 sm:text-lg ${
+                selectedTab === "product" ? "commerce-tab-active" : "text-brand-muted hover:text-brand-navy"
               }`}
             >
               Items ({totalQtyProduct})
@@ -450,19 +451,21 @@ function BuyNowContent() {
           </div>
 
           {selectedTab === "product" ? (
-            <div className="mt-6 space-y-6 bg-white">
+            <div className="commerce-panel mt-6 space-y-6">
               {itemsProduct.length === 0 ? (
-                <div className="p-8 text-center text-brand-muted">Unable to load this product for checkout.</div>
+                <div className="p-8 text-center font-montserrat text-brand-muted">
+                  Unable to load this product for checkout.
+                </div>
               ) : (
                 itemsProduct.map((currentItem) => (
                   <div
                     key={`${currentItem.productId}-${currentItem.variantId}-${currentItem.size}`}
-                    className="p-4 border border-gray-200 rounded-md"
+                    className="commerce-panel-muted p-4"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex gap-4 min-w-0">
                         <img
-                          className="object-contain flex-shrink-0 w-20 h-20 rounded bg-gray-50"
+                          className="h-20 w-20 shrink-0 rounded bg-surface-panel object-contain"
                           src={currentItem.imageUrl || "/placeholder.png"}
                           alt={currentItem.title || "Product"}
                         />
@@ -562,18 +565,20 @@ function BuyNowContent() {
                       <div className="flex items-center gap-6">
                         <div className="flex items-center gap-2">
                           <button
+                            type="button"
                             onClick={dec}
-                            className="flex items-center justify-center w-8 h-8 bg-gray-200 rounded-full"
+                            className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-300 bg-white text-brand-navy transition hover:border-brand-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold disabled:cursor-not-allowed disabled:border-gray-200 disabled:bg-gray-100 disabled:text-brand-muted disabled:opacity-80"
                             disabled={currentItem.quantity <= 1}
                           >
                             -
                           </button>
 
-                          <div className="w-6 text-sm text-center">{currentItem.quantity}</div>
+                          <div className="w-6 text-center text-sm">{currentItem.quantity}</div>
 
                           <button
+                            type="button"
                             onClick={inc}
-                            className="flex items-center justify-center w-8 h-8 bg-gray-200 rounded-full"
+                            className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-300 bg-white text-brand-navy transition hover:border-brand-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold"
                           >
                             +
                           </button>
@@ -587,22 +592,24 @@ function BuyNowContent() {
           ) : null}
 
           {selectedTab === "product" && itemsProduct.length > 0 && availableDeliverySpeeds.length > 0 ? (
-            <div className="mt-6 bg-white border border-gray-200 rounded-md p-4">
+            <div className="commerce-panel mt-6 p-4">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <h3 className="text-sm font-semibold text-brand-navy">Shipping Speed</h3>
-                  <p className="mt-1 text-xs text-brand-muted">Choose shipping Speed for your order</p>
+                  <p className="mt-1 text-xs text-brand-muted">Choose shipping speed for your order</p>
                   {selectedDeliverySpeed ? (
-                    <p className="mt-2 text-sm font-medium text-brand-muted">
+                    <p className="mt-2 text-sm font-medium text-brand-navy">
                       Selected: {getShippingLabel(selectedDeliverySpeed)} - ${effectiveShippingTotalProduct.toFixed(2)}
                     </p>
                   ) : null}
                 </div>
 
-                {deliverySpeedLoading && <div className="text-xs text-blue-600">Updating shipping...</div>}
+                {deliverySpeedLoading && (
+                  <div className="text-xs text-brand-teal">Updating shipping…</div>
+                )}
               </div>
 
-              <div className="flex flex-wrap gap-3 mt-4">
+              <div className="mt-4 flex flex-wrap gap-3">
                 {availableDeliverySpeeds.map((speed) => {
                   const isActive = selectedDeliverySpeed === speed;
 
@@ -625,11 +632,7 @@ function BuyNowContent() {
                       type="button"
                       onClick={() => handleDeliverySpeedChange(speed)}
                       disabled={deliverySpeedLoading}
-                      className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
-                        isActive
-                          ? "border-blue-900 bg-blue-900 text-white"
-                          : "border-gray-300 bg-white text-brand-muted hover:border-blue-400"
-                      } disabled:cursor-not-allowed disabled:opacity-60`}
+                      className={`commerce-chip ${isActive ? "commerce-chip-selected" : ""}`}
                     >
                       {getShippingLabel(speed)}
                     </button>
@@ -653,9 +656,9 @@ function BuyNowContent() {
         </div>
 
         <div className="w-full lg:w-[30%] lg:mt-0">
-          <div className="w-full bg-white border border-gray-200">
-            <div className="p-5 mb-2 text-lg text-brand-navy border-b-2 border-gray-200">
-              <h3 className="pt-2 text-lg text-brand-navy">Price Details</h3>
+          <div className="commerce-panel w-full">
+            <div className="mb-2 border-b border-dashboard-border-light p-5">
+              <h3 className="pt-2 text-lg font-semibold text-brand-navy">Price Details</h3>
             </div>
 
             {selectedTab === "product" ? (
@@ -685,13 +688,13 @@ function BuyNowContent() {
                       value={couponCode}
                       onChange={(event) => setCouponCode(event.target.value.toUpperCase())}
                       placeholder="Enter coupon code"
-                      className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded outline-none focus:border-blue-500"
+                      className="flex-1 rounded-lg border border-dashboard-input-border px-3 py-2 text-sm text-brand-navy outline-none placeholder:text-brand-muted focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/40"
                     />
                     <button
                       type="button"
                       onClick={applyCoupon}
                       disabled={applyingCoupon || itemsProduct.length === 0}
-                      className="px-4 py-2 text-sm font-medium text-white bg-blue-900 rounded disabled:cursor-not-allowed disabled:opacity-60"
+                      className="rounded-lg bg-brand-navy-light px-4 py-2 text-sm font-medium text-white hover:bg-brand-navy disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {applyingCoupon ? "Applying..." : "Apply"}
                     </button>
@@ -714,7 +717,7 @@ function BuyNowContent() {
                   </div>
                 </div>
 
-                <div className="flex justify-between mt-4 text-lg font-semibold text-gray-900">
+                <div className="mt-4 flex justify-between text-lg font-semibold text-brand-navy">
                   <div>Total</div>
                   <div>${payableTotalProduct.toFixed(2)}</div>
                 </div>
@@ -725,9 +728,15 @@ function BuyNowContent() {
                   </div>
                 )}
 
-                <div className="flex items-center justify-end mt-5 space-x-2">
+                <p className="commerce-trust-note mt-4">
+                  Secure checkout. You will review shipping and payment on the next step. Charges finalize only
+                  after you confirm payment.
+                </p>
+
+                <div className="mt-5 flex items-center justify-end space-x-2">
                   <button
-                    className="px-4 py-2 text-white bg-blue-900 disabled:cursor-not-allowed disabled:opacity-60"
+                    type="button"
+                    className="rounded-lg bg-brand-navy-light px-4 py-2 text-white hover:bg-brand-navy disabled:cursor-not-allowed disabled:opacity-60"
                     disabled={itemsProduct.length === 0}
                     onClick={() => {
                       if (!selectedAddress) {

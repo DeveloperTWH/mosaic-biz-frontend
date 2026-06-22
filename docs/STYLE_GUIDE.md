@@ -125,6 +125,7 @@ For headings on dark backgrounds:
 | `.commerce-panel-muted` | Subtle line-item / nested panels |
 | `.commerce-tab-active` | Active cart tab underline |
 | `.commerce-trust-note` | Reassurance copy under price summary |
+| `.commerce-input` / `.commerce-label` / `.commerce-select` | Form fields on checkout address and payment-adjacent flows |
 
 ### Vendor profile storefront (light surfaces)
 
