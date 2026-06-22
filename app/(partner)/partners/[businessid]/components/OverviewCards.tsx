@@ -36,22 +36,22 @@ const OverviewCards: React.FC<OverviewCardsProps> = ({
           : "Total Food",
       value: total,
       icon: <PackageSearch className="w-5 h-5 text-white" />,
-      bg: "bg-custom-yellow",
-      border: "border-l-4 border-custom-yellow",
+      bg: "bg-brand-gold",
+      border: "border-l-4 border-brand-gold",
     },
     {
       label: "Total Reviews",
       value: totalReviews,
       icon: <Star className="w-5 h-5 text-white" />,
-      bg: "bg-custom-blue",
-      border: "border-l-4 border-custom-blue",
+      bg: "bg-brand-navy-light",
+      border: "border-l-4 border-brand-navy-light",
     },
     {
       label: listingType === "service" ? "Total Bookings" : "Total Orders",
       value: totalOrdersOrBookings,
       icon: <ShoppingBag className="w-5 h-5 text-white" />,
-      bg: "bg-custom-orange",
-      border: "border-l-4 border-custom-orange",
+      bg: "bg-brand-orange",
+      border: "border-l-4 border-brand-orange",
     },
     {
       label:
@@ -60,8 +60,8 @@ const OverviewCards: React.FC<OverviewCardsProps> = ({
           : "Out Of Stock",
       value: outOfStockOrUnpublished,
       icon: <AlertTriangle className="w-5 h-5 text-white" />,
-      bg: "bg-gray-400",
-      border: "border-l-4 border-gray-400",
+      bg: "bg-dashboard-muted",
+      border: "border-l-4 border-dashboard-muted",
     },
   ];
 
@@ -71,7 +71,7 @@ const OverviewCards: React.FC<OverviewCardsProps> = ({
         <h2 className="text-lg font-semibold heading">Overview</h2>
         <Link
           href="business/new"
-          className="flex items-center justify-center w-full gap-2 px-4 py-2 text-sm font-medium text-white rounded bg-custom-orange hover:opacity-90 sm:w-auto"
+          className="flex w-full items-center justify-center gap-2 rounded bg-dashboard-gold px-4 py-2 text-sm font-medium text-brand-navy hover:bg-brand-gold-light sm:w-auto"
         >
           <PlusCircle className="w-4 h-4" /> Add New Business
         </Link>

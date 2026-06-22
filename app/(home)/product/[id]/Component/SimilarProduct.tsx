@@ -8,6 +8,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Keyboard, A11y } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
+import MarketEmptyState from '../../../Components/MarketEmptyState';
 
 /* ---------- types ---------- */
 type RankedItem = {
@@ -206,7 +207,12 @@ export default function SimilarProduct({ productId }: { productId?: string }) {
             </button>
           </div>
         ) : items.length === 0 ? (
-          <div className="text-center text-brand-muted">No similar products found.</div>
+          <MarketEmptyState
+            title="No similar products"
+            description="We couldn't find related products for this item right now."
+            ctaLabel="Browse all products"
+            ctaHref="/products"
+          />
         ) : (
           <div ref={eqRef}>
             <Swiper

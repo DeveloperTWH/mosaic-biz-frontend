@@ -136,6 +136,37 @@ Shared UI lives in `components/ui/`. Prefer these over hand-rolled buttons:
 | `Button` | `default` (gold), `secondary` (navy), `outline`, `ghost`, `destructive` |
 | `Input` | Standard form input with brand focus ring |
 | `Card` | Panel with warm border for dashboard/marketing |
+| `AccountEmptyState` | Light-surface empty state for customer account routes |
+| `AccountLoadingBlock` | Accessible loading spinner for customer account routes |
+
+### Customer account surfaces
+
+Customer account routes (`/customer/order`, `/customer/bookings`) use the **auth/checkout token family** (`brand-*`), not `market-*`.
+
+| Pattern | Class / component |
+|---------|-------------------|
+| Page shell | `CustomerAccountShell` + `PublicPageHero` |
+| Background | `bg-brand-cream` |
+| Cards | `.account-card` |
+| Filter panel | `.account-filter-panel` |
+| Empty state | `AccountEmptyState` from `components/ui/account-empty-state.tsx` |
+| Loading | `AccountLoadingBlock` from `components/ui/account-loading-block.tsx` |
+| Status pills | `.account-status-badge` + variant modifiers |
+| Forms | `FormField` + `Input` / `Select` with `surface="auth"` |
+
+### Partner dashboard surfaces
+
+Operational hub routes (`/partners/[businessid]/*`) and multi-business dashboard use **`surface-*` / `dashboard-*`** tokens.
+
+| Pattern | Class / component |
+|---------|-------------------|
+| Page shell | `PartnerDashboardShell` (sidebar + topbar + cream main) |
+| Onboarding forms | `VendorApplicationShell` with `dashboard` or `market` variant |
+| Background | `bg-surface-cream` |
+| Cards / tables | `.dashboard-card`, `.dashboard-table-shell` |
+| Empty state | `DashboardEmptyState` from `components/ui/dashboard-empty-state.tsx` |
+| Loading | `DashboardLoadingBlock` from `components/ui/dashboard-loading-block.tsx` |
+| Nav chrome | `bg-brand-navy` sidebar, `dashboard-gold` active states |
 
 ### Button utility classes (globals.css)
 

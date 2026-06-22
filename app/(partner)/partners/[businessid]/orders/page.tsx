@@ -4,8 +4,8 @@ import { useBusinessStore } from '@/app/store/businessStore';
 import { fetchBusinessBySlug } from '../utils/fetchBusiness';
 import { useParams, useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
-import Sidebar from '../components/Sidebar';
-import Topbar from '../components/Topbar';
+import PartnerDashboardShell from '../components/PartnerDashboardShell';
+import DashboardEmptyState from '@/components/ui/dashboard-empty-state';
 import axios from 'axios';
 import Image from 'next/image';
 import { toast } from 'react-toastify';
@@ -185,11 +185,11 @@ const page = () => {
     };
 
     return (
-        <div className="flex h-screen bg-[#EBEAE2]">
-            <Sidebar businessName={business?.businessName} isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
-            <div className="flex flex-col flex-1 overflow-hidden">
-                <Topbar setIsSidebarOpen={setIsSidebarOpen} />
-                <main className="flex-1 p-2 space-y-6 overflow-y-auto lg:p-6">
+        <PartnerDashboardShell
+            businessName={business?.businessName}
+            isSidebarOpen={isSidebarOpen}
+            setIsSidebarOpen={setIsSidebarOpen}
+        >
                     {isLoading && <LoadingPage />}
                     {error && <NotFoundPage />}
 
@@ -215,7 +215,10 @@ const page = () => {
 
                     {/* ✅ Order List */}
                     {orders.length === 0 ? (
-                        <p>No orders found.</p>
+                        <DashboardEmptyState
+                            title="No orders yet"
+                            description="Customer orders for your products will appear here."
+                        />
                     ) : (
                         orders.map(order => (
                             <div
@@ -405,9 +408,7 @@ const page = () => {
                             </div>
                         ))
                     )}
-                </main>
-            </div>
-        </div>
+        </PartnerDashboardShell>
     );
 };
 

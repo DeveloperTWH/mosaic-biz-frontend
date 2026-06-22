@@ -1,8 +1,19 @@
-'use client';
+"use client";
 
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import CustomerAccountShell from "../components/CustomerAccountShell";
+import AccountStatusBadge, {
+  formatBookingStatus,
+  getBookingStatusVariant,
+} from "../components/AccountStatusBadge";
+import AccountEmptyState from "@/components/ui/account-empty-state";
+import AccountLoadingBlock from "@/components/ui/account-loading-block";
+import { FormField } from "@/components/ui/form-field";
+import { Select } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 type CustomerBooking = {
   _id: string;
@@ -42,27 +53,6 @@ const getAuthToken = () => {
   return localStorage.getItem("auth_token") || localStorage.getItem("token");
 };
 
-const getStatusClassName = (status?: string) => {
-  switch (status) {
-    case "approved":
-      return "text-green-600";
-    case "pending_vendor_action":
-      return "text-amber-600";
-    case "rejected":
-    case "cancelled":
-      return "text-red-600";
-    case "completed":
-      return "text-blue-600";
-    default:
-      return "text-gray-600";
-  }
-};
-
-const formatStatus = (status?: string) => {
-  if (!status) return "Unknown";
-  return status.replace(/_/g, " ");
-};
-
 const BookingsPage = () => {
   const [bookings, setBookings] = useState<CustomerBooking[]>([]);
   const [loading, setLoading] = useState(false);
@@ -82,17 +72,26 @@ const BookingsPage = () => {
         }
       );
 
-      const allBookings = Array.isArray(response.data?.bookings) ? response.data.bookings : [];
+      const allBookings = Array.isArray(response.data?.bookings)
+        ? response.data.bookings
+        : [];
       const normalizedQuery = searchQuery.trim().toLowerCase();
 
       const filteredBookings = allBookings.filter((booking: CustomerBooking) => {
         const matchesStatus = !statusFilter || booking.status === statusFilter;
         const businessName =
-          typeof booking.businessId === "object" ? booking.businessId?.businessName || "" : "";
+          typeof booking.businessId === "object"
+            ? booking.businessId?.businessName || ""
+            : "";
         const serviceTitle =
           booking.serviceTitle ||
-          (typeof booking.serviceId === "object" ? booking.serviceId?.title || "" : "");
-        const serviceNames = [...(booking.serviceItems || []), ...(booking.services || [])].join(" ");
+          (typeof booking.serviceId === "object"
+            ? booking.serviceId?.title || ""
+            : "");
+        const serviceNames = [
+          ...(booking.serviceItems || []),
+          ...(booking.services || []),
+        ].join(" ");
         const matchesSearch =
           !normalizedQuery ||
           businessName.toLowerCase().includes(normalizedQuery) ||
@@ -104,7 +103,7 @@ const BookingsPage = () => {
       });
 
       setBookings(filteredBookings);
-    } catch (error) {
+    } catch {
       toast.error("Failed to fetch bookings.");
     } finally {
       setLoading(false);
@@ -116,55 +115,71 @@ const BookingsPage = () => {
   }, [statusFilter, searchQuery]);
 
   return (
-    <div className="bg-[#ebeae2]">
-      <div className="container px-4 pt-5 pb-5 mx-auto">
-        <div className="flex flex-col gap-6 mb-8 lg:flex-row">
-          <div className="border rounded-lg lg:w-1/4">
-            <div className="p-4 bg-gray-50">
-              <h3 className="mb-4 text-xl font-semibold">Filters</h3>
+    <CustomerAccountShell title="My Bookings">
+      <div className="flex flex-col gap-6 lg:flex-row">
+        <aside className="account-filter-panel lg:w-1/4">
+          <h2 className="mb-4 font-poppins text-lg font-semibold text-brand-navy">
+            Filters
+          </h2>
+          <FormField
+            label="Booking Status"
+            htmlFor="booking-status-filter"
+            surface="auth"
+          >
+            <Select
+              id="booking-status-filter"
+              surface="auth"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+            >
+              <option value="">All statuses</option>
+              <option value="pending_vendor_action">Pending vendor action</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+            </Select>
+          </FormField>
+        </aside>
 
-              <div className="mb-4">
-                <label className="block text-gray-700">Booking Status</label>
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="w-full p-2 border rounded"
-                >
-                  <option value="">All Statuses</option>
-                  <option value="pending_vendor_action">Pending Vendor Action</option>
-                  <option value="approved">Approved</option>
-                  <option value="rejected">Rejected</option>
-                  <option value="completed">Completed</option>
-                  <option value="cancelled">Cancelled</option>
-                </select>
-              </div>
-            </div>
+        <div className="lg:w-3/4">
+          <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end">
+            <FormField
+              label="Search bookings"
+              htmlFor="booking-search"
+              surface="auth"
+              className="mb-0 flex-1"
+            >
+              <Input
+                id="booking-search"
+                type="text"
+                placeholder="Search by business, service, or booking ID"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                surface="auth"
+              />
+            </FormField>
+            <Button
+              type="button"
+              onClick={fetchBookings}
+              size="sm"
+              className="min-h-11 w-full sm:w-auto"
+            >
+              Search
+            </Button>
           </div>
 
-          <div className="lg:w-3/4">
+          {loading ? (
+            <AccountLoadingBlock label="Loading your bookings…" />
+          ) : bookings.length === 0 ? (
+            <AccountEmptyState
+              title="No bookings yet"
+              description="When you book a service, your appointments will appear here."
+              ctaLabel="Browse services"
+              ctaHref="/services"
+            />
+          ) : (
             <div className="space-y-4">
-              <div className="flex items-center justify-between mb-4">
-                <input
-                  type="text"
-                  placeholder="Search Bookings"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-3/4 p-2 border rounded"
-                />
-                <button
-                  onClick={fetchBookings}
-                  className="px-4 py-2 ml-4 text-white bg-blue-500 rounded-lg"
-                >
-                  Search Bookings
-                </button>
-              </div>
-
-              {loading && <div className="py-6 text-center">Loading...</div>}
-
-              {!loading && bookings.length === 0 && (
-                <div className="py-6 text-center">No bookings found.</div>
-              )}
-
               {bookings.map((booking) => {
                 const businessName =
                   typeof booking.businessId === "object"
@@ -172,52 +187,62 @@ const BookingsPage = () => {
                     : "Business";
                 const serviceTitle =
                   booking.serviceTitle ||
-                  (typeof booking.serviceId === "object" ? booking.serviceId?.title : "") ||
+                  (typeof booking.serviceId === "object"
+                    ? booking.serviceId?.title
+                    : "") ||
                   "Service booking";
                 const selectedServices = booking.serviceItems?.length
                   ? booking.serviceItems
                   : booking.services || [];
 
                 return (
-                  <div
-                    key={booking._id}
-                    className="p-4 mb-4 bg-white border rounded-lg shadow-md"
-                  >
+                  <article key={booking._id} className="account-card">
                     <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                       <div className="space-y-3">
                         <div>
-                          <h3 className="text-lg font-semibold text-gray-900">{businessName}</h3>
-                          {/* <p className="text-sm text-gray-500">Booking ID: {booking._id}</p> */}
+                          <h3 className="font-poppins text-lg font-semibold text-brand-navy">
+                            {businessName}
+                          </h3>
                         </div>
 
                         <div>
-                          <p className="font-medium text-gray-800">{serviceTitle}</p>
+                          <p className="font-poppins text-sm font-medium text-brand-navy">
+                            {serviceTitle}
+                          </p>
                           {selectedServices.length > 0 && (
-                            <p className="text-sm text-gray-600">
+                            <p className="commerce-text-meta">
                               Items: {selectedServices.join(", ")}
                             </p>
                           )}
                         </div>
 
-                        <div className="grid gap-1 text-sm text-gray-600">
-                          <p>Date: {booking.date ? new Date(booking.date).toLocaleDateString() : "N/A"}</p>
-                          <p>Time: {booking.time || booking.slot || "N/A"}</p>
-                          {/* <p className="capitalize">Payment: {booking.paymentStatus || "N/A"}</p> */}
+                        <div className="grid gap-1">
+                          <p className="commerce-text-meta">
+                            Date:{" "}
+                            {booking.date
+                              ? new Date(booking.date).toLocaleDateString()
+                              : "Not scheduled"}
+                          </p>
+                          <p className="commerce-text-meta">
+                            Time: {booking.time || booking.slot || "Not set"}
+                          </p>
                         </div>
 
                         {booking.vendorDecisionNote && (
-                          <p className="text-sm text-gray-700">
-                            Vendor Note: {booking.vendorDecisionNote}
+                          <p className="rounded-lg border border-border-warm bg-brand-cream px-3 py-2 font-montserrat text-sm text-brand-navy">
+                            Vendor note: {booking.vendorDecisionNote}
                           </p>
                         )}
                       </div>
 
                       <div className="flex flex-col gap-2 md:items-end">
-                        <p className={`text-base font-medium capitalize ${getStatusClassName(booking.status)}`}>
-                          {formatStatus(booking.status)}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          Booked on {new Date(booking.createdAt).toLocaleDateString()}
+                        <AccountStatusBadge
+                          label={formatBookingStatus(booking.status)}
+                          variant={getBookingStatusVariant(booking.status)}
+                        />
+                        <p className="commerce-text-meta">
+                          Booked on{" "}
+                          {new Date(booking.createdAt).toLocaleDateString()}
                         </p>
 
                         {booking.paymentLink && booking.status === "approved" && (
@@ -225,21 +250,21 @@ const BookingsPage = () => {
                             href={booking.paymentLink}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-sm text-blue-600 hover:underline"
+                            className="inline-flex min-h-11 items-center font-montserrat text-sm font-medium text-brand-teal hover:text-brand-teal-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold"
                           >
-                            Complete Payment
+                            Complete payment
                           </a>
                         )}
                       </div>
                     </div>
-                  </div>
+                  </article>
                 );
               })}
             </div>
-          </div>
+          )}
         </div>
       </div>
-    </div>
+    </CustomerAccountShell>
   );
 };
 

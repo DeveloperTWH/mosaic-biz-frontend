@@ -1,7 +1,9 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Save, Loader } from 'lucide-react';
+import { Save, Loader } from 'lucide-react';
+import VendorApplicationShell from '../components/VendorApplicationShell';
+import DashboardLoadingBlock from '@/components/ui/dashboard-loading-block';
 import { useServiceForm } from './hooks/useServiceForm';
 import ServiceCategory from './components/ServiceCategory';
 import LocationField from './components/locationField';
@@ -40,22 +42,21 @@ export default function AddServicePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Loader className="w-12 h-12 text-[#c9a227] animate-spin" />
-      </div>
+      <VendorApplicationShell variant="dashboard" title="Add service">
+        <DashboardLoadingBlock label="Loading service form…" minHeight="min-h-[50vh]" />
+      </VendorApplicationShell>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white py-8">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-
-        {/* Header */}
-        <div className="mb-8 text-center">
-          <h1 className="text-2xl font-bold text-gray-900 uppercase tracking-wide">LIST SERVICES</h1>
-          <p className="text-sm text-gray-500 mt-1">Showcase all your services</p>
-        </div>
-
+    <VendorApplicationShell
+      variant="dashboard"
+      title="List services"
+      description="Showcase all your services"
+      backHref="/partners/services"
+      backLabel="Back to services"
+    >
+      <div className="max-w-6xl">
         <form
           onSubmit={(event) => {
             event.preventDefault();
@@ -182,6 +183,6 @@ export default function AddServicePage() {
           </div>
         </form>
       </div>
-    </div>
+    </VendorApplicationShell>
   );
 }

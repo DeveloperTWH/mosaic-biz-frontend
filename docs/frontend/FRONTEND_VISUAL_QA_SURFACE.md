@@ -60,8 +60,10 @@ This document lists surfaces for human visual QA on Vercel preview. It does not 
 
 | Priority | URL | Visual focus |
 |----------|-----|--------------|
-| P1 | `/customer/order` | Order list |
-| P1 | `/customer/bookings` | Booking list |
+| P1 | `/customer/order` | `CustomerAccountShell`, brand-cream layout, filter panel, status badges, empty/loading states with browse CTA, cancel confirm dialog |
+| P1 | `/customer/bookings` | Same account shell; booking status pills; empty state links to `/services` |
+
+Storefront continuity (#182): verify back navigation and empty states on `/product/[id]`, `/service/[slug]`, `/vendor-profile/product-vendor/[id]`, `/vendor-profile/service-vendor/[id]`.
 
 ### Vendor onboarding
 
@@ -78,11 +80,13 @@ This document lists surfaces for human visual QA on Vercel preview. It does not 
 
 | Priority | URL | Visual focus |
 |----------|-----|--------------|
-| P0 | `/partners/dashboard` | Tab navigation, orders/bookings |
-| P1 | `/partners/[businessid]` | Overview charts |
-| P1 | `/partners/[businessid]/inventory` | Product/service/food tables |
+| P0 | `/partners` | Mobile-friendly onboarding stepper (no 980px overflow), stage cards |
+| P0 | `/partners/dashboard` | `surface-cream` layout, tab loading via `DashboardLoadingBlock` |
+| P1 | `/partners/[businessid]` | `PartnerDashboardShell`, overview cards, table empty states |
+| P1 | `/partners/[businessid]/inventory` | Product/service tables with `DashboardEmptyState` + add CTAs |
 | P1 | `/partners/[businessid]/finance` | Stripe embedded components |
-| P2 | `/partners/[businessid]/orders`, `/bookings` | Action buttons, status filters |
+| P2 | `/partners/[businessid]/orders`, `/bookings` | Status filters, empty states, confirm dialogs |
+| P2 | `/partners/add-product`, `/add-service`, `/add-food` | `VendorApplicationShell` + shared loading |
 
 ### Admin
 

@@ -1,8 +1,9 @@
 'use client';
 import PublicPageHero from '../../Components/PublicPageHero';
 import MarketLoadingBlock from '../../Components/MarketLoadingBlock';
+import MarketEmptyState from '../../Components/MarketEmptyState';
 import FeatureBlogs from '@/app/(home)/Components/FeatureBlogs';
-import { Loader2, AlertTriangle, Camera, CircleUserRound, Globe, Import, Mail, MapPin, PenTool, PhoneCall, Share2 } from 'lucide-react';
+import { Loader2, Camera, CircleUserRound, Globe, Import, Mail, MapPin, PenTool, PhoneCall, Share2 } from 'lucide-react';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
@@ -152,12 +153,17 @@ const ServiceDetailPage = () => {
     if (!service) return (
         <div className="bg-market-bg">
             <PublicPageHero title="Service" breadcrumbs={[{ label: "Home", href: "/" }, { label: "Services", href: "/services" }, { label: "Not found" }]} />
-            <div className="container-page py-12 text-center text-market-muted">
-                <AlertTriangle className="mx-auto mb-2 h-10 w-10 text-red-400" />
-                <span>Service not found</span>
+            <div className="container-page py-12">
+                <MarketEmptyState
+                    title="Service not found"
+                    description="This service may have been removed or is no longer available."
+                    ctaLabel="Browse services"
+                    ctaHref="/services"
+                />
             </div>
         </div>
     );
+    const vendorName = service.businessId?.businessName;
     return (
         <>
             <PublicPageHero
@@ -170,20 +176,46 @@ const ServiceDetailPage = () => {
                 imageUrl={service.coverImage || "/bgdetailpage.png"}
             />
             <main className="container-page py-8">
+                <Link
+                    href="/services"
+                    className="mb-6 inline-flex min-h-11 items-center font-montserrat text-sm font-medium text-market-teal transition-colors hover:text-brand-teal-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-market-gold"
+                >
+                    ← Back to services
+                </Link>
                 <section className="mb-10 grid grid-cols-1 gap-8 lg:grid-cols-3">
                     <div className="space-y-6 lg:col-span-2">
-                        <img
-                            src={service.coverImage}
-                            alt={service.title || "Service"}
-                            className="h-auto w-full rounded-lg object-cover"
-                        />
+                        {service.coverImage ? (
+                            <img
+                                src={service.coverImage}
+                                alt={service.title || "Service"}
+                                className="h-auto w-full rounded-lg object-cover"
+                            />
+                        ) : (
+                            <div className="flex aspect-video w-full items-center justify-center rounded-lg border border-white/10 bg-market-surface font-montserrat text-sm text-market-muted">
+                                No image available
+                            </div>
+                        )}
                         <div>
                             <div>
-                                {/* <p className="text-xs font-semibold uppercase text-custom-blue">{service.category}</p> */}
-                                <h1 className="text-3xl font-bold heading">{service.title}</h1>
-                                <div className="flex items-center space-x-2">
+                                <h2 className="commerce-text-label text-2xl">{service.title}</h2>
+                                {vendorName ? (
+                                    <p className="mt-1 font-montserrat text-sm text-brand-muted">
+                                        by{" "}
+                                        {service.businessId?._id ? (
+                                            <Link
+                                                href={`/vendor-profile/service-vendor/${service._id}`}
+                                                className="text-brand-teal hover:text-brand-teal-dark"
+                                            >
+                                                {vendorName}
+                                            </Link>
+                                        ) : (
+                                            vendorName
+                                        )}
+                                    </p>
+                                ) : null}
+                                <div className="mt-2 flex items-center space-x-2">
                                     <span className="text-yellow-500">★★★★☆</span>
-                                    <span className="text-sm text-gray-600">({service.averageRating} rating)</span>
+                                    <span className="commerce-text-meta">({service.averageRating} rating)</span>
                                 </div>
                                 <div className="flex flex-wrap gap-2 my-2 text-xs">
                                     {service.services.map((tag, i) => (

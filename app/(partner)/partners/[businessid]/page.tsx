@@ -3,8 +3,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useParams } from 'next/navigation';  // Get `params` from Next.js
 import { useBusinessStore } from '@/app/store/businessStore'; // ✅ Import store
-import Sidebar from './components/Sidebar';
-import Topbar from './components/Topbar';
+import PartnerDashboardShell from './components/PartnerDashboardShell';
 import OverviewCards from './components/OverviewCards';
 import SalesSection from './components/SalesSection';
 import SubscriptionPlan from './components/SubscriptionPlan';
@@ -21,6 +20,7 @@ import { Business } from '@/types/business';
 import { ProductListingItem } from "@/types/product";
 import { Subscription, SubscriptionPlantype } from '@/types/subscription';
 import ServiceTable from './components/ServiceTable';
+import DashboardLoadingBlock from '@/components/ui/dashboard-loading-block';
 
 const DashboardPage = () => {
   const { business, setBusiness, clearBusiness } = useBusinessStore();
@@ -170,11 +170,12 @@ const DashboardPage = () => {
 
 
   return (
-    <div className="flex h-screen bg-[#EBEAE2]">
-      <Sidebar businessName={businessData?.businessName} isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
-      <div className="flex flex-col flex-1 overflow-hidden">
-        <Topbar setIsSidebarOpen={setIsSidebarOpen} />
-        <main className="flex-1 p-2 space-y-6 overflow-y-auto lg:p-6">
+    <PartnerDashboardShell
+      businessName={businessData?.businessName}
+      isSidebarOpen={isSidebarOpen}
+      setIsSidebarOpen={setIsSidebarOpen}
+    >
+      <div className="space-y-6">
           {
             loading && (
               <LoadingPage />
@@ -185,7 +186,7 @@ const DashboardPage = () => {
               <NotFoundPage />
             )
           }
-          <Suspense fallback={<div>Loading Business Data...</div>}>
+          <Suspense fallback={<DashboardLoadingBlock label="Loading business data…" />}>
             {businessData && (
               <>
                 <OverviewCards listingType={businessData.listingType} total={total} totalReviews={0} totalOrdersOrBookings={0} outOfStockOrUnpublished={outOfStockOrUnpublished} />
@@ -232,9 +233,8 @@ const DashboardPage = () => {
               </>
             )}
           </Suspense>
-        </main>
       </div>
-    </div>
+    </PartnerDashboardShell>
   );
 };
 

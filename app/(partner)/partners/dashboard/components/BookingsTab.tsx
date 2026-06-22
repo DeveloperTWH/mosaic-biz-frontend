@@ -10,6 +10,8 @@ import {
   VendorBooking,
   VendorListingType,
 } from "@/lib/api/vendorBookings";
+import DashboardLoadingBlock from "@/components/ui/dashboard-loading-block";
+import DashboardEmptyState from "@/components/ui/dashboard-empty-state";
 
 interface BookingsTabProps {
   businessId?: string;
@@ -157,11 +159,7 @@ export default function BookingsTab({
   };
 
   if (loading) {
-    return (
-      <div className="rounded-2xl border border-[#ebe2d3] bg-[#fcfaf6] p-8 text-center">
-        <p className="text-sm font-medium text-gray-600">Loading bookings...</p>
-      </div>
-    );
+    return <DashboardLoadingBlock label="Loading bookings…" />;
   }
 
   return (
@@ -180,10 +178,10 @@ export default function BookingsTab({
       )}
 
       {!error && bookings.length === 0 && (
-        <div className="rounded-2xl border border-dashed border-[#d9d0c2] bg-white p-8 text-center">
-          <h2 className="text-xl font-semibold text-[#1c1c1c]">Bookings</h2>
-          <p className="mt-3 text-sm text-gray-600">No bookings found.</p>
-        </div>
+        <DashboardEmptyState
+          title="No bookings yet"
+          description="Incoming customer bookings will appear here for review and approval."
+        />
       )}
 
       {bookings.map((booking) => {

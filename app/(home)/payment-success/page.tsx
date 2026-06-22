@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Suspense } from 'react';
 import { removeFromCart } from '@/utils/cartUtils';
+import AccountLoadingBlock from '@/components/ui/account-loading-block';
 
 interface PaymentData {
   amount: number;
@@ -251,7 +252,7 @@ function PaymentSuccessPage() {
 
 export default function Page() {
   return (
-    <Suspense fallback={<div className="p-8 text-center">Loading...</div>}>
+    <Suspense fallback={<AccountLoadingBlock label="Loading confirmation…" minHeight="min-h-[40vh]" />}>
       <PaymentSuccessPage />
     </Suspense>
   );

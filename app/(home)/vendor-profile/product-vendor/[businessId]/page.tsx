@@ -445,6 +445,12 @@ export default function ProductVendorProfilePage() {
         </div>
       ) : (
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12 py-8">
+          <Link
+            href="/vendors"
+            className="mb-6 inline-flex min-h-11 items-center font-montserrat text-sm font-medium text-brand-teal transition-colors hover:text-brand-teal-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold"
+          >
+            ← Back to vendors
+          </Link>
           <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6">
             <div className="relative min-h-[400px] rounded border border-gray-200 bg-gradient-to-br from-[#d6ece1] via-[#f0e5d4] to-[#dce5ef] overflow-visible">
               <div className="absolute inset-0 rounded overflow-hidden">
@@ -715,7 +721,12 @@ export default function ProductVendorProfilePage() {
           </div>
 
           {filteredProducts.length === 0 ? (
-            <p className="py-10 text-center text-gray-600">No products found for this vendor.</p>
+            <MarketEmptyState
+              title="No products listed yet"
+              description="This vendor has not published products matching your filters."
+              ctaLabel="Browse products"
+              ctaHref="/products"
+            />
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mt-4">
               {filteredProducts.map((item) => {

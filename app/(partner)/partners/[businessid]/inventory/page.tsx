@@ -6,8 +6,7 @@ import { useParams, useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { listPrivateServices } from '@/lib/api/services';
 import { getUserSafeMessage } from '@/lib/api/errors';
-import Sidebar from '../components/Sidebar';
-import Topbar from '../components/Topbar';
+import PartnerDashboardShell from '../components/PartnerDashboardShell';
 import ProductTable from '../components/ProductTable';
 import axios from 'axios';
 import { PackageSearch, Star, AlertTriangle } from "lucide-react";
@@ -166,11 +165,11 @@ const Page = () => {
     ];
 
     return (
-        <div className="flex h-screen bg-[#EBEAE2]">
-            <Sidebar businessName={business?.businessName} isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
-            <div className="flex flex-col flex-1 overflow-hidden">
-                <Topbar setIsSidebarOpen={setIsSidebarOpen} />
-                <main className="flex-1 p-2 space-y-6 overflow-y-auto lg:p-6">
+        <PartnerDashboardShell
+            businessName={business?.businessName}
+            isSidebarOpen={isSidebarOpen}
+            setIsSidebarOpen={setIsSidebarOpen}
+        >
                     {isLoading && (
                         <LoadingPage />
                     )}
@@ -235,9 +234,7 @@ const Page = () => {
                             )}
                         </>
                     )}
-                </main>
-            </div>
-        </div>
+        </PartnerDashboardShell>
     );
 };
 

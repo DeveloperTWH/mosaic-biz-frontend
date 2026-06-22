@@ -2,6 +2,8 @@
 
 import { useRouter } from 'next/navigation';
 import { Loader } from 'lucide-react';
+import VendorApplicationShell from '../components/VendorApplicationShell';
+import DashboardLoadingBlock from '@/components/ui/dashboard-loading-block';
 import { useFoodForm } from './hooks/useServiceForm';
 import ServiceCategory from './components/ServiceCategory';
 import LocationField from './components/locationField';
@@ -36,20 +38,21 @@ export default function AddFoodPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Loader className="w-12 h-12 text-[#c9a227] animate-spin" />
-      </div>
+      <VendorApplicationShell variant="dashboard" title="Add food">
+        <DashboardLoadingBlock label="Loading food form…" minHeight="min-h-[50vh]" />
+      </VendorApplicationShell>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white py-8">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8 text-center">
-          <h1 className="text-2xl font-bold text-gray-900 uppercase tracking-wide">LIST FOODS / Restaurants</h1>
-          <p className="text-sm text-gray-500 mt-1">Showcase your food offerings</p>
-        </div>
-
+    <VendorApplicationShell
+      variant="dashboard"
+      title="List foods"
+      description="Showcase your food offerings"
+      backHref="/partners/foods"
+      backLabel="Back to foods"
+    >
+      <div className="max-w-6xl">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
@@ -142,6 +145,6 @@ export default function AddFoodPage() {
           </div>
         </form>
       </div>
-    </div>
+    </VendorApplicationShell>
   );
 }

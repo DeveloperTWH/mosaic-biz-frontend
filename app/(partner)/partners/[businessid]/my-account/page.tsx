@@ -4,8 +4,8 @@ import { useBusinessStore } from "@/app/store/businessStore";
 import { fetchBusinessBySlug } from "../utils/fetchBusiness";
 import { useParams } from "next/navigation";
 import React, { useEffect, useState, useCallback, useMemo } from "react";
-import Sidebar from "../components/Sidebar";
-import Topbar from "../components/Topbar";
+import PartnerDashboardShell from "../components/PartnerDashboardShell";
+import ConfirmDialog from "@/app/(home)/partners/products/components/ConfirmDialog";
 import LoadingPage from "../components/LoadingPage";
 import NotFoundPage from "../components/NotFoundPage";
 import { SquarePen } from "lucide-react";
@@ -59,6 +59,7 @@ const Page = () => {
   const [subLoading, setSubLoading] = useState(false);
   const [subActioning, setSubActioning] = useState(false);
   const [sub, setSub] = useState<SubscriptionSummary | null>(null);
+  const [cancelDialog, setCancelDialog] = useState<"end" | "now" | null>(null);
 
   const customerId = useMemo(() => business?.stripeCustomerId ?? null, [business?.stripeCustomerId]);
 
@@ -151,7 +152,6 @@ const Page = () => {
 
   const cancelAtEnd = async () => {
     if (!business?._id || !sub) return;
-    if (!confirm("Cancel at the end of the current period? You will retain access until it ends.")) return;
     setSubActioning(true);
     try {
       await api.post(`${apiBase}/api/subscriptions/${sub.id}/cancel`, {
@@ -164,12 +164,12 @@ const Page = () => {
       toast.error(e?.response?.data?.message || "Could not schedule cancellation");
     } finally {
       setSubActioning(false);
+      setCancelDialog(null);
     }
   };
 
   const cancelNow = async () => {
     if (!business?._id || !sub) return;
-    if (!confirm("Cancel immediately? You may lose access right away.")) return;
     setSubActioning(true);
     try {
       await api.post(`${apiBase}/api/subscriptions/${sub.id}/cancel`, {
@@ -182,6 +182,7 @@ const Page = () => {
       toast.error(e?.response?.data?.message || "Could not cancel subscription");
     } finally {
       setSubActioning(false);
+      setCancelDialog(null);
     }
   };
 
@@ -249,17 +250,11 @@ const Page = () => {
   if (error) return <NotFoundPage />;
 
   return (
-    <div className="flex h-screen bg-[#EBEAE2]">
-      <Sidebar
-        businessName={business?.businessName}
-        isOpen={isSidebarOpen}
-        setIsOpen={setIsSidebarOpen}
-      />
-
-      <div className="flex flex-col flex-1 overflow-hidden">
-        <Topbar setIsSidebarOpen={setIsSidebarOpen} />
-
-        <main className="flex-1 p-4 space-y-6 overflow-y-auto lg:p-6">
+    <PartnerDashboardShell
+      businessName={business?.businessName}
+      isSidebarOpen={isSidebarOpen}
+      setIsSidebarOpen={setIsSidebarOpen}
+    >
           <div className="grid items-start grid-cols-1 gap-6 lg:grid-cols-3">
             {/* Left Side */}
             <div className="space-y-6 lg:col-span-2">
@@ -409,7 +404,7 @@ const Page = () => {
                       {!sub.cancelAtPeriodEnd && sub.status !== "canceled" && (
                         <>
                           <button
-                            onClick={cancelAtEnd}
+                            onClick={() => setCancelDialog("end")}
                             disabled={subActioning}
                             className="px-4 py-2 border rounded hover:bg-gray-50 disabled:opacity-50"
                           >
@@ -465,9 +460,26 @@ const Page = () => {
               </p>
             </div>
           </div>
-        </main>
-      </div>
-    </div>
+
+      <ConfirmDialog
+        isOpen={cancelDialog === "end"}
+        title="Cancel at period end"
+        message="Cancel at the end of the current period? You will retain access until it ends."
+        confirmText="Schedule cancellation"
+        cancelText="Keep subscription"
+        onConfirm={cancelAtEnd}
+        onCancel={() => setCancelDialog(null)}
+      />
+      <ConfirmDialog
+        isOpen={cancelDialog === "now"}
+        title="Cancel immediately"
+        message="Cancel immediately? You may lose access right away."
+        confirmText="Cancel now"
+        cancelText="Keep subscription"
+        onConfirm={cancelNow}
+        onCancel={() => setCancelDialog(null)}
+      />
+    </PartnerDashboardShell>
   );
 };
 
