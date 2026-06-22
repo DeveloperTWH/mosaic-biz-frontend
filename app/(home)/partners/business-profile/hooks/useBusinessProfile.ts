@@ -80,18 +80,21 @@ export const useBusinessProfile = () => {
     try {
       setLoading(true);
       const data = await getOnboardingData();
+      if (!data) {
+        return;
+      }
       
       // Set prefilled non-editable data
       setPrefilledData({
         businessName: data.businessName || '',
         businessEmail: data.secondaryBusinessEmail || data.businessEmail || '',
         businessPhone: data.businessPhone || data.primaryPhone || '',
-        address: data.address || {
-          street: '',
-          city: '',
-          state: '',
-          country: '',
-          zipCode: ''
+        address: {
+          street: data.address?.street || '',
+          city: data.address?.city || '',
+          state: data.address?.state || '',
+          country: data.address?.country || '',
+          zipCode: data.address?.zipCode || '',
         },
         ownershipType: data.ownershipType || '',
         businessType: data.businessType || '',

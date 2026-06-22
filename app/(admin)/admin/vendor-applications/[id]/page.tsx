@@ -3,7 +3,12 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { toast } from "react-toastify";
-import axios from "axios";
+import {
+  finalizeVendorApplication,
+  getVendorApplicationDetail,
+  verifyVendorApplicationItem,
+} from "@/lib/api/vendorOnboardingAdmin";
+import { ApiClientError } from "@/lib/api/errors";
 import Sidebar from "../../components/Sidebar";
 import Topbar from "../../components/Topbar";
 import { 
@@ -283,31 +288,17 @@ const normalizeUrl = (url?: string) => {
   const fetchApplicationDetails = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/vendor-onboarding/${applicationId}`,
-        { 
-          withCredentials: true
-        }
-      );
-      
-      if (res.data.success) {
-        setApplication(res.data.data);
-      } else {
-        toast.error(res.data.message || "Failed to load application");
-        router.push("/admin/vendor-applications");
-      }
+      const data = await getVendorApplicationDetail(applicationId);
+      setApplication(data as typeof application);
     } catch (err: unknown) {
       console.error("Error fetching application:", err);
-      const axiosErr = err as {
-        response?: { status?: number; data?: { message?: string } };
-      };
-      const status = axiosErr.response?.status;
       const message =
-        axiosErr.response?.data?.message || "Failed to fetch application details";
-
+        err instanceof ApiClientError
+          ? err.message
+          : "Failed to fetch application details";
       toast.error(message);
 
-      if (status === 401) {
+      if (err instanceof ApiClientError && err.kind === "unauthenticated") {
         router.push(
           `/signin?redirect=${encodeURIComponent(
             `/admin/vendor-applications/${applicationId}`
@@ -328,30 +319,17 @@ const normalizeUrl = (url?: string) => {
     try {
       setVerifying(prev => ({ ...prev, [verificationType]: true }));
       
-      const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/vendor-onboarding/${applicationId}/verify`,
-        {
-          verificationType,
-          isVerified
-        },
-        { 
-          withCredentials: true,
-          headers: {
-            'Content-Type': 'application/json',
-          }
-        }
-      );
-
-      if (res.data.success) {
-        toast.success(isVerified ? 'Document verified' : 'Document unverified');
-        // toast.success(`${verificationType.replace('-', ' ')} ${isVerified ? 'verified' : 'rejected'}`);
-        fetchApplicationDetails(); // Refresh data
-      } else {
-        toast.error(res.data.message || "Verification failed");
-      }
-    } catch (err: any) {
+      await verifyVendorApplicationItem(applicationId, {
+        verificationType,
+        isVerified,
+      });
+      toast.success(isVerified ? "Document verified" : "Document unverified");
+      fetchApplicationDetails();
+    } catch (err: unknown) {
       console.error("Verification error:", err);
-      toast.error(err.response?.data?.message || "Verification failed");
+      toast.error(
+        err instanceof ApiClientError ? err.message : "Verification failed"
+      );
     } finally {
       setVerifying(prev => ({ ...prev, [verificationType]: false }));
     }
@@ -364,30 +342,18 @@ const normalizeUrl = (url?: string) => {
       const key = `${verificationType}_${documentIndex}`;
       setVerifying(prev => ({ ...prev, [key]: true }));
       
-      const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/vendor-onboarding/${applicationId}/verify`,
-        {
-          verificationType,
-          documentIndex,
-          isVerified
-        },
-        { 
-          withCredentials: true,
-          headers: {
-            'Content-Type': 'application/json',
-          }
-        }
-      );
-
-      if (res.data.success) {
-        toast.success(`Document ${isVerified ? 'verified' : 'rejected'}`);
-        fetchApplicationDetails(); // Refresh data
-      } else {
-        toast.error(res.data.message || "Document verification failed");
-      }
-    } catch (err: any) {
+      await verifyVendorApplicationItem(applicationId, {
+        verificationType,
+        documentIndex,
+        isVerified,
+      });
+      toast.success(`Document ${isVerified ? "verified" : "rejected"}`);
+      fetchApplicationDetails();
+    } catch (err: unknown) {
       console.error("Document verification error:", err);
-      toast.error(err.response?.data?.message || "Document verification failed");
+      toast.error(
+        err instanceof ApiClientError ? err.message : "Document verification failed"
+      );
     } finally {
       setVerifying(prev => ({ ...prev, [`${verificationType}_${documentIndex}`]: false }));
     }
@@ -398,28 +364,13 @@ const normalizeUrl = (url?: string) => {
     
     try {
       setFinalizing(true);
-      
-      const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/vendor-onboarding/${applicationId}/finalize`,
-        {},
-        { 
-          withCredentials: true,
-          headers: {
-            'Content-Type': 'application/json',
-          }
-        }
-      );
-
-      if (res.data.success) {
-        toast.success("Application finalized successfully");
-        setShowFinalizeModal(false);
-        router.push("/admin/vendor-applications");
-      } else {
-        toast.error(res.data.message || "Finalization failed");
-      }
-    } catch (err: any) {
+      await finalizeVendorApplication(applicationId);
+      toast.success("Application finalized successfully");
+      setShowFinalizeModal(false);
+      router.push("/admin/vendor-applications");
+    } catch (err: unknown) {
       console.error("Finalization error:", err);
-      toast.error(err.response?.data?.message || "Finalization failed");
+      toast.error(err instanceof ApiClientError ? err.message : "Finalization failed");
     } finally {
       setFinalizing(false);
     }

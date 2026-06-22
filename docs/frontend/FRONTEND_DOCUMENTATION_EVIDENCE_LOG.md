@@ -1,8 +1,21 @@
 # Frontend Documentation Evidence Log
 
 **Type:** Launch evidence (control pack index)  
-**Last updated:** 2026-06-19  
+**Last updated:** 2026-06-21  
 **Pack:** Frontend as-built documentation — Mosaic Biz Hub launch readiness
+
+---
+
+## E2E automation evidence (#163)
+
+| Item | Value |
+|------|-------|
+| Branch | `test/frontend-critical-journey-playwright` |
+| Base commit (launch `main`) | `df3b1b198262ef298c52d503ece6702e3c9662dc` |
+| Runbook | [FRONTEND_E2E_TEST_RUNBOOK.md](FRONTEND_E2E_TEST_RUNBOOK.md) |
+| Test root | `e2e/` + [playwright.config.ts](../../playwright.config.ts) |
+| Default mode | Mocked API via Playwright `page.route()` |
+| Issues | #163, related #162 |
 
 ---
 
@@ -131,3 +144,42 @@ Build warnings noted (non-blocking):
 ## Stop conditions respected
 
 No production deploy, auth architecture changes, Next.js API routes, checkout changes, route contract edits, route deletions, or new features were made.
+
+---
+
+## Issue #164 — API client phase 1
+
+| Item | Value |
+|------|-------|
+| Branch | `refactor/frontend-api-client-phase1` |
+| Base commit (`main`) | `df3b1b198262ef298c52d503ece6702e3c9662dc` |
+| Doc | [FRONTEND_API_CLIENT_PHASE1.md](FRONTEND_API_CLIENT_PHASE1.md) |
+| Unit tests | `npm run test:unit` (`lib/api/httpClient.test.ts`) |
+
+Migrated: auth session/logout, vendor onboarding, admin vendor review, order initiation, Stripe Connect status/account-link.
+
+## Issue #114 — Quality scan harness
+
+| Item | Value |
+|------|-------|
+| Branch | `test/frontend-quality-scan-harness` |
+| Base commit (`main`) | `df3b1b198262ef298c52d503ece6702e3c9662dc` |
+| Runbook | [FRONTEND_QUALITY_SCAN_RUNBOOK.md](FRONTEND_QUALITY_SCAN_RUNBOOK.md) |
+| Entry script | `npm run quality:scan` |
+| Reports | `quality-reports/summary.{json,md}` |
+
+Added: `@playwright/test`, `@axe-core/playwright`, `@lhci/cli`, `lighthouse`, `quality/*`, `playwright.quality.config.ts`, `lighthouserc.cjs`, `lighthouserc.mobile.cjs`, `scripts/run-quality-scan.mjs`.
+
+**Initial scan baselines (local, mocked API, 2026-06-22):**
+
+| Target | Performance | Accessibility | Best practices | SEO |
+|--------|-------------|---------------|----------------|-----|
+| Desktop (avg) | ~0.75 | ~0.94 | ~0.96 | ~0.99 |
+| Mobile (avg) | ~0.75 | ~0.94 | ~0.96 | ~0.99 |
+
+**Blocking findings (documented debt, not fixed in harness PR):**
+
+- axe critical/serious on marketplace filters (`button-name`, `select-name`, `label`) and legal pages (`color-contrast`)
+- Fixed in harness PR: broken `/support` link on `/dispute` → `/contact`
+
+**Playwright counts (first full run):** 17 passed, 26 failed (14 axe + 1 link + 11 mobile webkit missing — corrected to `mobile-chrome`/Chromium in config).

@@ -1,0 +1,23 @@
+{
+  "success": true,
+  "totals": {
+    "all": 1,
+    "products": 1,
+    "services": 0,
+    "foods": 0
+  },
+  "data": {
+    "products": [
+      {
+        "_id": "prod-e2e-001",
+        "title": "E2E Search Product",
+        "description": "Search result product",
+        "slug": "e2e-search-product",
+        "coverImage": "/ShopProduct/Aria-SK6-Helmet 1.png",
+        "price": 29.99
+      }
+    ],
+    "services": [],
+    "foods": []
+  }
+}

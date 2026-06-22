@@ -12,10 +12,12 @@
 
 # testing
 /coverage
-quality-reports/
-playwright-report/
-test-results/
-.lighthouseci/
+/quality-reports/
+/playwright-report/
+/test-results/
+/blob-report/
+/.playwright/
+/.lighthouseci/
 
 # next.js
 /out/

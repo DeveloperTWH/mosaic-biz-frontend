@@ -1,27 +1,8 @@
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+import { ApiClientError } from "./errors";
+import { apiRequest, apiRequestEnvelope } from "./httpClient";
 
-const jsonHeaders = {
-  "Content-Type": "application/json",
-};
-
-const isObject = (value: unknown): value is Record<string, any> =>
+const isObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null;
-
-const getAuthHeaders = () => {
-  if (typeof window === "undefined") {
-    return jsonHeaders;
-  }
-
-  const token = localStorage.getItem("auth_token") || localStorage.getItem("token");
-  if (!token) {
-    return jsonHeaders;
-  }
-
-  return {
-    ...jsonHeaders,
-    Authorization: `Bearer ${token}`,
-  };
-};
 
 const pickFirstString = (...values: unknown[]) =>
   values.find((value) => typeof value === "string" && value.trim().length > 0) as string | undefined;
@@ -44,48 +25,51 @@ export type StripeConnectStatus = {
   currentlyDue: string[];
   eventuallyDue: string[];
   disabledReason: string | null;
-  raw: any;
+  raw: unknown;
 };
 
-export const normalizeStripeConnectStatus = (payload: any): StripeConnectStatus => {
-  const source = isObject(payload?.data) ? payload.data : payload;
-  const account = isObject(source?.account) ? source.account : {};
-  const requirements = isObject(source?.requirements) ? source.requirements : {};
+export const normalizeStripeConnectStatus = (payload: unknown): StripeConnectStatus => {
+  const root = isObject(payload) ? payload : {};
+  const source = isObject(root.data) ? root.data : root;
+  const account = isObject(source.account) ? source.account : {};
+  const requirements = isObject(source.requirements) ? source.requirements : {};
 
   const accountId =
     pickFirstString(
-      source?.accountId,
-      source?.stripeConnectAccountId,
-      source?.stripeAccountId,
-      account?.id
+      source.accountId,
+      source.stripeConnectAccountId,
+      source.stripeAccountId,
+      account.id
     ) || null;
 
   const accountLinkUrl =
     pickFirstString(
-      source?.url,
-      source?.link,
-      source?.accountLink,
-      source?.accountLinkUrl,
-      account?.url
+      source.url,
+      source.link,
+      source.accountLink,
+      source.accountLinkUrl,
+      account.url
     ) || null;
 
   const chargesEnabled = Boolean(
-    pickFirstBoolean(source?.chargesEnabled, account?.charges_enabled, account?.chargesEnabled)
+    pickFirstBoolean(source.chargesEnabled, account.charges_enabled, account.chargesEnabled)
   );
   const payoutsEnabled = Boolean(
-    pickFirstBoolean(source?.payoutsEnabled, account?.payouts_enabled, account?.payoutsEnabled)
+    pickFirstBoolean(source.payoutsEnabled, account.payouts_enabled, account.payoutsEnabled)
   );
   const detailsSubmitted = Boolean(
     pickFirstBoolean(
-      source?.detailsSubmitted,
-      account?.details_submitted,
-      account?.detailsSubmitted,
-      source?.onboardingStatus === "completed"
+      source.detailsSubmitted,
+      account.details_submitted,
+      account.detailsSubmitted,
+      source.onboardingStatus === "completed"
     )
   );
-  const explicitlyConnected = pickFirstBoolean(source?.isConnected, source?.connected, source?.active);
-  const onboardingStatus = pickFirstString(source?.onboardingStatus, source?.status) || null;
-  const capabilities = isObject(source?.capabilities) ? source.capabilities : {};
+  const explicitlyConnected = pickFirstBoolean(source.isConnected, source.connected, source.active);
+  const onboardingStatus = pickFirstString(source.onboardingStatus, source.status) || null;
+  const capabilities = isObject(source.capabilities)
+    ? (source.capabilities as Record<string, string>)
+    : {};
 
   return {
     accountId,
@@ -93,92 +77,118 @@ export const normalizeStripeConnectStatus = (payload: any): StripeConnectStatus 
     chargesEnabled,
     payoutsEnabled,
     detailsSubmitted,
-    isConnected: explicitlyConnected ?? onboardingStatus === "completed" ?? (Boolean(accountId) && payoutsEnabled),
+    isConnected:
+      explicitlyConnected ??
+      (onboardingStatus === "completed" || (Boolean(accountId) && payoutsEnabled)),
     onboardingStatus,
     capabilities,
-    currentlyDue: toStringArray(source?.currentlyDue ?? requirements?.currently_due ?? requirements?.currentlyDue),
-    eventuallyDue: toStringArray(source?.eventuallyDue ?? requirements?.eventually_due ?? requirements?.eventuallyDue),
+    currentlyDue: toStringArray(
+      source.currentlyDue ?? requirements.currently_due ?? requirements.currentlyDue
+    ),
+    eventuallyDue: toStringArray(
+      source.eventuallyDue ?? requirements.eventually_due ?? requirements.eventuallyDue
+    ),
     disabledReason:
       pickFirstString(
-        source?.disabledReason,
-        requirements?.disabled_reason,
-        requirements?.disabledReason
+        source.disabledReason,
+        requirements.disabled_reason,
+        requirements.disabledReason
       ) || null,
     raw: payload,
   };
 };
+
+function wrapConnectError(error: unknown, fallback: string): never {
+  if (error instanceof ApiClientError) {
+    throw error;
+  }
+  throw new ApiClientError({
+    kind: "network",
+    message: error instanceof Error ? error.message : fallback,
+    cause: error,
+    isJson: false,
+  });
+}
 
 export async function loadActiveBusinessId(preferredId?: string | null): Promise<string> {
   if (preferredId?.trim()) {
     return preferredId.trim();
   }
 
-  const response = await fetch(`${BASE_URL}/api/business/my`, {
-    method: "GET",
-    credentials: "include",
-  });
+  try {
+    const body = await apiRequest<{ businesses?: Array<{ _id?: string; isActive?: boolean }> }>(
+      "/api/business/my"
+    );
+    const businesses = Array.isArray(body?.businesses) ? body.businesses : [];
 
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    throw new Error(data?.message || data?.error || "Failed to load your business");
+    const currentBusiness =
+      businesses.find((item) => item.isActive) ?? businesses[0] ?? null;
+
+    if (!currentBusiness?._id) {
+      throw new ApiClientError({
+        kind: "notFound",
+        message: "No business found for this account",
+        status: 404,
+      });
+    }
+
+    return currentBusiness._id;
+  } catch (error) {
+    wrapConnectError(error, "Failed to load your business");
   }
-
-  const businesses = Array.isArray(data?.businesses) ? data.businesses : [];
-  const currentBusiness =
-    businesses.find((item: { isActive?: boolean }) => item.isActive) ?? businesses[0] ?? null;
-
-  if (!currentBusiness?._id) {
-    throw new Error("No business found for this account");
-  }
-
-  return currentBusiness._id as string;
 }
 
-export async function getBusinessConnectStatus(businessId: string) {
-  const response = await fetch(`${BASE_URL}/api/connect/${businessId}/status`, {
-    method: "GET",
-    headers: getAuthHeaders(),
-    credentials: "include",
-  });
-
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    throw new Error(data?.message || data?.error || "Failed to load Stripe Connect status");
+export async function getBusinessConnectStatus(businessId: string): Promise<StripeConnectStatus> {
+  try {
+    const envelope = await apiRequestEnvelope(
+      `/api/connect/${encodeURIComponent(businessId)}/status`,
+      { bearer: true }
+    );
+    return normalizeStripeConnectStatus(envelope);
+  } catch (error) {
+    wrapConnectError(error, "Failed to load Stripe Connect status");
   }
-
-  return normalizeStripeConnectStatus(data);
 }
 
-export async function createBusinessConnectAccountLink(businessId: string) {
-  const response = await fetch(`${BASE_URL}/api/connect/${businessId}/account-link`, {
-    method: "POST",
-    headers: getAuthHeaders(),
-    credentials: "include",
-  });
+export async function createBusinessConnectAccountLink(businessId: string): Promise<{ url: string; raw: unknown }> {
+  try {
+    const envelope = await apiRequestEnvelope(
+      `/api/connect/${encodeURIComponent(businessId)}/account-link`,
+      {
+        method: "POST",
+        bearer: true,
+      }
+    );
 
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    throw new Error(data?.message || data?.error || "Failed to create Stripe Connect account link");
+    if (!envelope) {
+      throw new ApiClientError({
+        kind: "malformed",
+        message: "Stripe onboarding link was not returned by the server",
+      });
+    }
+
+    const url =
+      pickFirstString(
+        (envelope as { url?: string }).url,
+        (envelope as { link?: string }).link,
+        (envelope as { accountLink?: string }).accountLink,
+        (envelope as { accountLinkUrl?: string }).accountLinkUrl,
+        (envelope.data as { url?: string } | undefined)?.url,
+        (envelope.data as { link?: string } | undefined)?.link,
+        (envelope.data as { accountLink?: string } | undefined)?.accountLink,
+        (envelope.data as { accountLinkUrl?: string } | undefined)?.accountLinkUrl
+      ) || null;
+
+    if (!url) {
+      throw new ApiClientError({
+        kind: "malformed",
+        message: "Stripe onboarding link was not returned by the server",
+        payload: envelope,
+      });
+    }
+
+    return { url, raw: envelope };
+  } catch (error) {
+    wrapConnectError(error, "Failed to create Stripe Connect account link");
   }
-
-  const url =
-    pickFirstString(
-      data?.url,
-      data?.link,
-      data?.accountLink,
-      data?.accountLinkUrl,
-      data?.data?.url,
-      data?.data?.link,
-      data?.data?.accountLink,
-      data?.data?.accountLinkUrl
-    ) || null;
-
-  if (!url) {
-    throw new Error("Stripe onboarding link was not returned by the server");
-  }
-
-  return {
-    url,
-    raw: data,
-  };
 }
