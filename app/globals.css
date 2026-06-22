@@ -233,6 +233,80 @@ body {
   @apply font-montserrat text-sm leading-relaxed text-brand-muted;
 }
 
+/* Commerce shell (cart, checkout, buy-now) — light neutral background */
+.commerce-shell {
+  @apply min-h-screen bg-brand-cream text-brand-navy;
+}
+
+.commerce-panel {
+  @apply rounded-lg border border-dashboard-input-border bg-white text-brand-navy shadow-sm;
+}
+
+.commerce-panel-muted {
+  @apply rounded-md border border-dashboard-border-light bg-surface-panel;
+}
+
+.commerce-tab-active {
+  @apply border-b-4 border-brand-navy-light text-brand-navy;
+}
+
+.commerce-trust-note {
+  @apply font-montserrat text-xs leading-relaxed text-brand-muted sm:text-sm;
+}
+
+/* Vendor profile storefront (market-surface-light pages) */
+.vendor-profile-hero-band {
+  @apply relative h-[180px] w-full overflow-hidden bg-brand-navy;
+}
+
+.vendor-profile-hero-title {
+  @apply font-poppins text-3xl font-bold uppercase tracking-wide text-white md:text-4xl;
+}
+
+.vendor-profile-breadcrumb-accent {
+  @apply text-brand-gold;
+}
+
+.vendor-profile-cover-panel {
+  @apply relative min-h-[400px] overflow-visible rounded-xl border border-border-warm bg-gradient-to-br from-brand-teal/10 via-brand-cream to-brand-sky/10;
+}
+
+.vendor-profile-detail-card {
+  @apply rounded-xl border border-border-warm bg-surface-panel p-5 shadow-glass;
+}
+
+.vendor-profile-detail-label {
+  @apply font-montserrat text-xs font-bold text-brand-navy sm:text-sm;
+}
+
+.vendor-profile-detail-value {
+  @apply font-montserrat text-sm font-medium text-brand-muted;
+}
+
+.vendor-profile-reveal-link {
+  @apply text-left text-sm font-medium text-brand-navy-light underline hover:text-brand-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold;
+}
+
+.vendor-profile-section-title {
+  @apply font-poppins text-2xl font-bold text-brand-navy sm:text-3xl;
+}
+
+.vendor-profile-product-card {
+  @apply flex h-full flex-col overflow-hidden rounded-xl border border-border-warm bg-white shadow-market-card transition-shadow hover:shadow-glass;
+}
+
+.vendor-profile-product-card-media {
+  @apply relative aspect-[4/3] w-full shrink-0 overflow-hidden bg-surface-panel;
+}
+
+.vendor-profile-booking-panel {
+  @apply rounded-xl border border-border-warm bg-brand-cream p-4 sm:p-5;
+}
+
+.vendor-profile-booking-label {
+  @apply mb-1 block font-montserrat text-xs font-semibold uppercase tracking-wide text-brand-muted;
+}
+
 .market-surface-light {
   @apply bg-white text-brand-navy;
 }

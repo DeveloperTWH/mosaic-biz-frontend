@@ -9,7 +9,7 @@ const blogs = [
     title: "Breaking Barriers in Business Ownership",
     category: "Success Stories",
     description:
-      "Discover how local entrepreneurs are challenging the status quo and thriving in today’s economy.",
+      "Discover how local entrepreneurs are challenging the status quo and thriving in today's economy.",
     date: "May 12, 2025",
     img: "/hero-image.png",
   },
@@ -35,62 +35,59 @@ const blogs = [
 
 export default function FeatureBlogs() {
   return (
-
     <section className="bg-brand-cream px-5 py-20 text-brand-navy md:px-20">
       <div className="mb-10 text-center">
-        <h2 className="mb-2 font-poppins text-3xl font-semibold uppercase">
-          FEATURED BLOGS & STORIES
+        <h2 className="font-poppins text-2xl font-semibold uppercase tracking-wide text-brand-navy sm:text-3xl">
+          Featured blogs & stories
         </h2>
         <div className="mx-auto mt-3 h-0.5 w-16 bg-brand-gold" />
-        <p className="mx-auto mt-4 max-w-xl text-[13px] text-brand-muted">
-          Dive into powerful narratives, business tips, and local spotlights curated for our vibrant Mosaic Biz Hub community.
+        <p className="mx-auto mt-4 max-w-xl font-montserrat text-sm leading-relaxed text-brand-muted">
+          Dive into powerful narratives, business tips, and local spotlights curated for our Mosaic Biz Hub community.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-[90%] mx-auto">
+      <div className="mx-auto grid w-[90%] grid-cols-1 gap-8 md:grid-cols-3">
         {blogs.map((blog, index) => {
           const isMiddleCard = index === 1;
           return (
-            <div
+            <article
               key={blog.id}
-              className="overflow-hidden "
+              className={`market-card-light overflow-hidden p-0 ${isMiddleCard ? "bg-brand-navy text-white" : ""}`}
             >
-              <div className="relative w-full h-[220px]">
+              <div className="relative h-[220px] w-full">
                 <Image
                   src={blog.img}
                   alt={blog.title}
                   fill
                   className="object-cover"
                 />
-                <div className="absolute flex items-center gap-2 px-3 py-1 text-xs text-black shadow-sm bottom-3 right-3 bg-custom-yellow">
-                  <CalendarCheck className="w-4 h-4" />
+                <div className="absolute bottom-3 right-3 flex items-center gap-2 bg-brand-yellow px-3 py-1 text-xs font-medium text-brand-navy shadow-sm">
+                  <CalendarCheck className="h-4 w-4" aria-hidden />
                   <span>{blog.date}</span>
                 </div>
               </div>
 
-              <div className={`p-5 ${isMiddleCard ? "bg-gray-800 text-white" : ""}`}>
-                <span className={`inline-block bg-custom-blue text-white text-xs px-3 py-1 mb-1`}>
+              <div className={`p-5 ${isMiddleCard ? "bg-brand-navy" : ""}`}>
+                <span className="mb-2 inline-block bg-brand-sky px-3 py-1 text-xs font-semibold text-white">
                   {blog.category}
                 </span>
 
-                <h3 style={{fontFamily:"Roboto Slab", fontWeight:700}} className={`text-lg font-semibold mb-2 ${isMiddleCard ? "text-white" : "text-gray-800"}`}>
+                <h3 className={`market-card-light-title mb-2 text-lg ${isMiddleCard ? "text-white" : ""}`}>
                   {blog.title}
                 </h3>
 
-                <p className={`text-[13px] mb-4 ${isMiddleCard ? "text-gray-200" : "text-gray-600"}`}>
+                <p className={`market-card-light-body mb-4 ${isMiddleCard ? "text-white/85" : ""}`}>
                   {blog.description}
                 </p>
 
                 <span
-                  className={`inline-flex items-center text-sm opacity-70 ${
-                    isMiddleCard ? "text-gray-300" : "text-gray-500"
-                  }`}
+                  className={`inline-flex items-center text-sm ${isMiddleCard ? "text-white/70" : "text-brand-muted"}`}
                   aria-hidden="true"
                 >
                   Stories coming soon
                 </span>
               </div>
-            </div>
+            </article>
           );
         })}
       </div>

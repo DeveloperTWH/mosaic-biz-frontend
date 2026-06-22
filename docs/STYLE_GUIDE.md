@@ -116,6 +116,26 @@ For headings on dark backgrounds:
 <h2 class="section-heading-inverse">Ready to grow?</h2>
 ```
 
+### Commerce shell (cart, checkout, buy-now)
+
+| Class | Use |
+|-------|-----|
+| `.commerce-shell` | Page background + `text-brand-navy` |
+| `.commerce-panel` | White card panels |
+| `.commerce-panel-muted` | Subtle line-item / nested panels |
+| `.commerce-tab-active` | Active cart tab underline |
+| `.commerce-trust-note` | Reassurance copy under price summary |
+
+### Vendor profile storefront (light surfaces)
+
+| Class | Use |
+|-------|-----|
+| `.vendor-profile-hero-band` | Top breadcrumb hero on profile pages |
+| `.vendor-profile-detail-card` | Business details sidebar |
+| `.vendor-profile-detail-label` / `.vendor-profile-detail-value` | Label/value rows |
+| `.vendor-profile-product-card` | Product grid cards on product-vendor pages |
+| `.vendor-profile-booking-panel` | Service/food booking sidebar |
+
 Legacy `.heading` (42px uppercase) is deprecated — use `.section-heading` or `market-section-heading`. When legacy `.heading` remains, it inherits color via `text-inherit`; scoped overrides in `globals.css` set `text-market-text` inside `.market-page` and `text-brand-navy` on light wrappers (`.market-surface-light`, `.market-card-light`, `.bg-white`, cream backgrounds).
 
 ## Layout

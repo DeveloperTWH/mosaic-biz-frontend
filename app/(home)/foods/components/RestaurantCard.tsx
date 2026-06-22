@@ -1,7 +1,5 @@
-// components/RestaurantCard.tsx
-
-import React from 'react';
-import { Star } from 'lucide-react';
+import React from "react";
+import { Star } from "lucide-react";
 
 interface RestaurantCardProps {
   name: string;
@@ -19,21 +17,21 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({
   tagline,
 }) => {
   return (
-    <div className="bg-white rounded-xl shadow hover:shadow-md transition overflow-hidden">
-      <img
-        src={image}
-        alt={name}
-        className="h-40 w-full object-cover"
-      />
-      <div className="p-4 space-y-1">
-        <h3 className="text-lg font-semibold">{name}</h3>
-        {tagline && <p className="text-sm text-gray-500">{tagline}</p>}
-        <div className="flex items-center gap-1 text-sm text-yellow-600">
-          <Star size={14} fill="currentColor" />
-          {rating.toFixed(1)} <span className="text-gray-400">•</span> {location}
+    <article className="market-listing-card overflow-hidden">
+      <div className="market-card-media relative h-40 w-full">
+        <img src={image} alt={name} className="h-full w-full object-cover" />
+      </div>
+      <div className="space-y-1 p-4">
+        <h3 className="market-card-title text-base">{name}</h3>
+        {tagline ? <p className="market-card-desc">{tagline}</p> : null}
+        <div className="market-card-rating-row text-sm text-market-gold">
+          <Star size={14} fill="currentColor" aria-hidden />
+          <span className="market-card-rating-meta">
+            {rating.toFixed(1)} · {location}
+          </span>
         </div>
       </div>
-    </div>
+    </article>
   );
 };
 

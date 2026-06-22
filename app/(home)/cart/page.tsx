@@ -439,7 +439,7 @@ export default function CartPage() {
 
     if (loading) {
         return (
-            <div className="flex min-h-[60vh] items-center justify-center bg-[#ebecef] text-brand-navy">
+            <div className="commerce-shell flex min-h-[60vh] items-center justify-center">
                 <div className="flex flex-col items-center gap-4 text-center">
                     <div className="h-12 w-12 animate-spin rounded-full border-4 border-brand-gold border-t-transparent" />
                     <p className="text-sm font-medium text-brand-muted">Loading your cart...</p>
@@ -449,16 +449,16 @@ export default function CartPage() {
     }
 
     return (
-        <div className="bg-[#ebecef] text-brand-navy">
+        <div className="commerce-shell">
             <div className="mx-auto flex max-w-7xl flex-wrap gap-5 px-4 py-6">
                 {/* Tab Navigation */}
                 <div className="w-full lg:w-[68%]">
-                    <div className="mb-8 flex gap-5 bg-white px-5 text-brand-navy">
+                    <div className="commerce-panel mb-8 flex gap-5 px-5">
                         <button
                             type="button"
                             className={`p-2 pt-3 text-sm font-semibold sm:p-5 sm:text-lg ${
                                 selectedTab === "product"
-                                    ? "border-b-4 border-blue-900 text-brand-navy"
+                                    ? "commerce-tab-active"
                                     : "text-brand-muted hover:text-brand-navy"
                             }`}
                             onClick={() => setSelectedTab("product")}
@@ -476,7 +476,7 @@ export default function CartPage() {
 
                     {/* Cart Items */}
 {selectedTab === "product" ? (
-  <div className="mt-6 space-y-6 bg-white text-brand-navy">
+  <div className="commerce-panel mt-6 space-y-6">
     {itemsProduct.length === 0 ? (
       <div className="p-8 text-center font-montserrat text-brand-muted">
         Your cart is empty.
@@ -485,14 +485,14 @@ export default function CartPage() {
       itemsProduct.map((item) => (
         <div
           key={`${item.productId}-${item.variantId}-${item.size}`}
-          className="rounded-md border border-gray-200 p-4 text-brand-navy"
+          className="commerce-panel-muted p-4"
         >
           {/* TOP ROW */}
           <div className="flex items-start justify-between gap-3">
             <div className="flex gap-4 min-w-0">
               {/* IMAGE */}
               <img
-                className="object-contain w-20 h-20 rounded bg-gray-50 flex-shrink-0"
+                className="h-20 w-20 shrink-0 rounded bg-surface-panel object-contain"
                 src={item.imageUrl || "/placeholder.png"}
                 alt={item.title || "Product"}
               />
@@ -700,7 +700,7 @@ export default function CartPage() {
                     {selectedTab === "product" &&
                     itemsProduct.length > 0 &&
                     availableDeliverySpeeds.length > 0 ? (
-                        <div className="mt-6 rounded-md border border-gray-200 bg-white p-4 text-brand-navy">
+                        <div className="commerce-panel mt-6 p-4">
                             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                                 <div>
                                     <h3 className="text-sm font-semibold text-brand-navy">
@@ -777,8 +777,8 @@ export default function CartPage() {
 
                 {/* Price Details */}
                 <div className="w-full lg:w-[30%] lg:mt-0">
-                    <div className="w-full border border-gray-200 bg-white text-brand-navy">
-                        <div className="mb-2 border-b-2 border-gray-200 p-5">
+                    <div className="commerce-panel w-full">
+                        <div className="mb-2 border-b border-dashboard-border-light p-5">
                             <h3 className="pt-2 text-lg font-semibold text-brand-navy">Price Details</h3>
                         </div>
 
@@ -847,13 +847,13 @@ export default function CartPage() {
                                             value={couponCode}
                                             onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
                                             placeholder="Enter coupon code"
-                                            className="flex-1 rounded border border-gray-300 px-3 py-2 text-sm text-brand-navy outline-none placeholder:text-brand-muted focus:border-blue-500"
+                                            className="flex-1 rounded-lg border border-dashboard-input-border px-3 py-2 text-sm text-brand-navy outline-none placeholder:text-brand-muted focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/40"
                                         />
                                         <button
                                                     type="button"
                                                     onClick={applyCoupon}
                                                     disabled={applyingCoupon || itemsProduct.length === 0}
-                                            className="px-4 py-2 text-sm font-medium text-white bg-blue-900 rounded disabled:cursor-not-allowed disabled:opacity-60"
+                                            className="rounded-lg bg-brand-navy-light px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-60 hover:bg-brand-navy"
                                         >
                                             {applyingCoupon ? "Applying..." : "Apply"}
                                         </button>
@@ -893,10 +893,14 @@ export default function CartPage() {
                                     </div>
                                 )}
 
+                                <p className="commerce-trust-note mt-4">
+                                  Secure checkout. You will review shipping and payment on the next step. Charges
+                                  finalize only after you confirm payment.
+                                </p>
 
-                                <div className="flex items-center justify-end mt-5 space-x-2">
+                                <div className="mt-5 flex items-center justify-end space-x-2">
                                     <button
-                                        className="px-4 py-2 text-white bg-blue-900"
+                                        className="rounded-lg bg-brand-navy-light px-4 py-2 text-white hover:bg-brand-navy"
                                         onClick={() => {
                                             if (!selectedAddress) {
                                                 toast.error("Please add a delivery address before placing your order.");

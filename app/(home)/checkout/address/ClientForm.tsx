@@ -337,7 +337,7 @@ export default function CheckoutAddressPage() {
           <button
             onClick={handleSubmit}
             disabled={isLoading}
-            className="w-full px-6 py-3 mt-4 font-semibold text-white bg-[#03989e] rounded hover:bg-[#027b82] transition-all duration-300"
+            className="mt-4 w-full rounded-lg bg-brand-teal px-6 py-3 font-semibold text-white transition-all duration-300 hover:bg-brand-teal-dark"
           >
             {isLoading ? 'Submitting...' : 'Continue To Payment'}
           </button>

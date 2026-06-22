@@ -429,14 +429,14 @@ function BuyNowContent() {
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="flex flex-col items-center gap-4 text-center">
           <div className="w-12 h-12 border-4 border-yellow-400 rounded-full border-t-transparent animate-spin" />
-          <p className="text-sm font-medium text-gray-600">Loading your cart...</p>
+          <p className="text-sm font-medium text-brand-muted">Loading your cart...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-[#ebecef] text-brand-navy">
+    <div className="commerce-shell">
       <div className="flex flex-wrap gap-5 px-4 py-6 mx-auto max-w-7xl">
         <div className="w-full lg:w-[68%]">
           <div className="flex gap-5 px-5 mb-8 bg-white">
@@ -452,7 +452,7 @@ function BuyNowContent() {
           {selectedTab === "product" ? (
             <div className="mt-6 space-y-6 bg-white">
               {itemsProduct.length === 0 ? (
-                <div className="p-8 text-center text-gray-600">Unable to load this product for checkout.</div>
+                <div className="p-8 text-center text-brand-muted">Unable to load this product for checkout.</div>
               ) : (
                 itemsProduct.map((currentItem) => (
                   <div
@@ -472,7 +472,7 @@ function BuyNowContent() {
                             {currentItem.title || "Product"}
                           </div>
 
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-brand-muted">
                             {currentItem.color ? `${currentItem.color}: ` : ""}
                             {currentItem.size}
                           </div>
@@ -501,7 +501,7 @@ function BuyNowContent() {
                                 return (
                                   <div className="flex flex-wrap items-center gap-2">
                                     <span className="text-base text-brand-navy">${resolved.current.toFixed(2)}</span>
-                                    <span className="text-sm text-gray-400 line-through">
+                                    <span className="text-sm text-brand-muted line-through">
                                       ${resolved.original.toFixed(2)}
                                     </span>
                                     {pct > 0 && <span className="text-sm text-green-600">{pct}% OFF</span>}
@@ -517,7 +517,7 @@ function BuyNowContent() {
                             })()}
                           </div>
 
-                          <div className="flex flex-wrap items-center gap-4 mt-2 text-xs text-gray-500">
+                          <div className="flex flex-wrap items-center gap-4 mt-2 text-xs text-brand-muted">
                             <span>Tax included : ${Number(currentItem.lineTaxAmount ?? 0).toFixed(2)}</span>
                           </div>
                         </div>
@@ -525,7 +525,7 @@ function BuyNowContent() {
                     </div>
 
                     <div className="flex items-center justify-between mt-4">
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-brand-muted">
                         {(() => {
                           const shippingOptions = getShippingOptions(currentItem);
                           const effectiveShippingCost = getShippingCostForSpeed(
@@ -591,7 +591,7 @@ function BuyNowContent() {
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <h3 className="text-sm font-semibold text-brand-navy">Shipping Speed</h3>
-                  <p className="mt-1 text-xs text-gray-500">Choose shipping Speed for your order</p>
+                  <p className="mt-1 text-xs text-brand-muted">Choose shipping Speed for your order</p>
                   {selectedDeliverySpeed ? (
                     <p className="mt-2 text-sm font-medium text-brand-muted">
                       Selected: {getShippingLabel(selectedDeliverySpeed)} - ${effectiveShippingTotalProduct.toFixed(2)}
@@ -660,19 +660,19 @@ function BuyNowContent() {
 
             {selectedTab === "product" ? (
               <div className="p-5">
-                <div className="flex justify-between mt-3 text-sm text-gray-600">
+                <div className="flex justify-between mt-3 text-sm text-brand-muted">
                   <div>Subtotal Excl. Tax</div>
                   <div>${effectiveSubtotalExclTaxProduct.toFixed(2)}</div>
                 </div>
 
-                <div className="flex justify-between mt-3 text-sm text-gray-600">
+                <div className="flex justify-between mt-3 text-sm text-brand-muted">
                   <div>Tax Total</div>
                   <div className={effectiveTaxAmountProduct === 0 ? "text-green-600" : ""}>
                     ${effectiveTaxAmountProduct.toFixed(2)}
                   </div>
                 </div>
 
-                <div className="flex justify-between mt-3 text-sm text-gray-600">
+                <div className="flex justify-between mt-3 text-sm text-brand-muted">
                   <div>Shipping</div>
                   <div>${effectiveShippingTotalProduct.toFixed(2)}</div>
                 </div>
@@ -707,7 +707,7 @@ function BuyNowContent() {
                   )}
                 </div>
 
-                <div className="flex justify-between mt-4 text-sm text-gray-600">
+                <div className="flex justify-between mt-4 text-sm text-brand-muted">
                   <div>Discount</div>
                   <div className={discountAmountProduct > 0 ? "text-green-600" : ""}>
                     ${discountAmountProduct.toFixed(2)}
@@ -759,7 +759,7 @@ function BuyNowContent() {
               </div>
             ) : (
               <div className="p-5">
-                <div className="text-sm text-gray-600">Grocery checkout coming soon.</div>
+                <div className="text-sm text-brand-muted">Grocery checkout coming soon.</div>
               </div>
             )}
           </div>

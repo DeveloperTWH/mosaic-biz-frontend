@@ -1,6 +1,6 @@
-import React from 'react';
-import { ShoppingCart } from 'lucide-react';
-import StarRating from '../../renderStars';
+import React from "react";
+import { ShoppingCart } from "lucide-react";
+import StarRating from "../../renderStars";
 
 interface ShopProductCardProps {
   name: string;
@@ -20,28 +20,30 @@ const ShopProductCard: React.FC<ShopProductCardProps> = ({
   onAddToCart,
 }) => {
   return (
-    <div className="bg-white rounded-xl shadow hover:shadow-md transition overflow-hidden">
-      <div className="relative">
-        <img src={image} alt={name} className="h-48 w-full object-contain" />
+    <article className="market-listing-card overflow-hidden">
+      <div className="market-card-media relative">
+        <img src={image} alt={name} className="h-48 w-full object-contain p-2" />
         <button
+          type="button"
           onClick={onAddToCart}
-          className="absolute bottom-2 right-2 bg-custom-orange p-2 rounded-full text-white hover:bg-orange-600"
+          className="absolute bottom-2 right-2 flex min-h-11 min-w-11 items-center justify-center rounded-full bg-brand-gold text-brand-navy shadow-market-card hover:bg-brand-gold-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold"
+          aria-label={`Add ${name} to cart`}
         >
-          <ShoppingCart size={18} />
+          <ShoppingCart size={18} aria-hidden />
         </button>
       </div>
 
-      <div className="p-4 space-y-1">
-        <div className="flex justify-between items-center text-sm font-medium text-gray-800">
-          <span>{name}</span>
-          {quantity && <span className="text-gray-500">{quantity}</span>}
+      <div className="space-y-1 p-4">
+        <div className="flex items-center justify-between gap-2 text-sm font-medium">
+          <span className="market-card-title line-clamp-1">{name}</span>
+          {quantity ? <span className="market-card-desc shrink-0">{quantity}</span> : null}
         </div>
-        <div className="text-yellow-500 w-[60px]">
-          <StarRating rating={rating}/>
+        <div className="w-[60px] text-market-gold">
+          <StarRating rating={rating} />
         </div>
-        <div className="text-custom-orange font-bold text-sm">{price}</div>
+        <div className="market-card-price text-sm">{price}</div>
       </div>
-    </div>
+    </article>
   );
 };
 

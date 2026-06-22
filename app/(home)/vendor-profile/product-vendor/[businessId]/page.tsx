@@ -179,12 +179,12 @@ function RevealConsentModal({
     <div className="fixed inset-0 z-[1200] flex items-center justify-center bg-black/50 px-4 py-6">
       <div className="w-full max-w-xl border border-[#e3dcc7] bg-white shadow-2xl">
         <div className="border-b border-[#ece6d9] px-6 py-5">
-          <h3 className="text-lg font-poppins font-semibold text-[#1A1F71]">
+          <h3 className="text-lg font-poppins font-semibold text-brand-navy-light">
             {isSignIn ? "Sign in to view contact details." : "Confirm contact permission"}
           </h3>
         </div>
         <div className="space-y-4 px-6 py-5">
-          <p className="text-sm font-montserrat leading-6 text-[#4b5563]">
+          <p className="text-sm font-montserrat leading-6 text-brand-muted">
             {isSignIn
               ? "This helps us keep things transparent and ensures vendors can follow up on your enquiry. By continuing, you agree to be contacted by the vendor."
               : "To view these details, please confirm that the vendor can contact you regarding your enquiry."}
@@ -199,7 +199,7 @@ function RevealConsentModal({
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="h-11 w-full border border-[#d6cfba] px-5 text-sm font-semibold uppercase tracking-wide text-[#4b5563] transition-colors hover:bg-[#f7f4ea] disabled:cursor-not-allowed disabled:opacity-60 sm:min-w-[140px] sm:w-auto"
+              className="h-11 w-full border border-border-warm px-5 text-sm font-semibold uppercase tracking-wide text-brand-muted transition-colors hover:bg-surface-panel disabled:cursor-not-allowed disabled:opacity-60 sm:min-w-[140px] sm:w-auto"
             >
               Cancel
             </button>
@@ -401,26 +401,26 @@ export default function ProductVendorProfilePage() {
 
   return (
     <div className="market-surface-light min-h-screen">
-      <div className="relative w-full h-[180px] bg-gray-800 overflow-hidden">
+      <div className="vendor-profile-hero-band">
         <img
           src="/products/19099 1.png"
-          alt="vendor header"
-          className="absolute inset-0 object-cover w-full h-full opacity-40"
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover opacity-40"
         />
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/30 text-center px-4">
-          <h1 className="text-3xl md:text-4xl font-bold tracking-wide text-white uppercase">
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/30 px-4 text-center">
+          <h1 className="vendor-profile-hero-title">
             {profile?.businessName || "Vendor Profile"}
           </h1>
-          <nav className="mt-2 text-sm text-white/85">
+          <nav className="mt-2 font-montserrat text-sm text-white/90" aria-label="Breadcrumb">
             <Link href="/" className="hover:text-white">
               Home
             </Link>
-            <span className="mx-2">//</span>
+            <span className="mx-2">/</span>
             <Link href="/products" className="hover:text-white">
-              Product
+              Products
             </Link>
-            <span className="mx-2">//</span>
-            <span className="text-[#c79b44]">Vendor Profile</span>
+            <span className="mx-2">/</span>
+            <span className="vendor-profile-breadcrumb-accent">Vendor profile</span>
           </nav>
         </div>
       </div>
@@ -452,16 +452,16 @@ export default function ProductVendorProfilePage() {
             ← Back to vendors
           </Link>
           <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6">
-            <div className="relative min-h-[400px] rounded border border-gray-200 bg-gradient-to-br from-[#d6ece1] via-[#f0e5d4] to-[#dce5ef] overflow-visible">
-              <div className="absolute inset-0 rounded overflow-hidden">
+            <div className="vendor-profile-cover-panel">
+              <div className="absolute inset-0 overflow-hidden rounded-xl">
                 {bannerImage ? (
                   <img
                     src={bannerImage}
                     alt={profile?.businessName || "Vendor cover"}
-                    className="absolute inset-0 w-full h-full object-cover"
+                    className="absolute inset-0 h-full w-full object-cover"
                   />
                 ) : (
-                  <div className="absolute inset-0 flex items-center justify-center text-4xl font-bold text-[#1e3a5f]">
+                  <div className="absolute inset-0 flex items-center justify-center font-poppins text-4xl font-bold text-brand-navy-light">
                     {profile?.businessName?.charAt(0)?.toUpperCase() || "V"}
                   </div>
                 )}
@@ -506,63 +506,53 @@ export default function ProductVendorProfilePage() {
               )}
             </div>
 
-            <div className=" p-5 bg-white">
-              <div className="flex items-center gap-2 pb-3 ">
-                <div className="w-[100px] h-[100px] rounded border bg-gray-50 overflow-hidden shrink-0 flex items-center justify-center">
+            <div className="vendor-profile-detail-card">
+              <div className="flex items-center gap-2 pb-3">
+                <div className="flex h-[100px] w-[100px] shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border-warm bg-surface-panel">
                   {profile?.logo ? (
 <img
   src={profile.logo}
   alt={profile.businessName}
-  className="w-full h-full object-contain p-1"
+  className="h-full w-full object-contain p-1"
 />
                   ) : (
-                    <span className="text-[10px] font-bold text-[#1e3a5f]">
+                    <span className="font-poppins text-sm font-bold text-brand-navy-light">
                       {profile?.businessName?.charAt(0)?.toUpperCase() || "V"}
                     </span>
                   )}
                 </div>
-                {/* <div>
-                  <p className="text-[10px] tracking-[0.12em] font-semibold text-[#b79a4a] uppercase">
-                    {(profile?.listingType || "Business").replace("-", " ")}
-                  </p>
-                  <h2 className="text-sm font-semibold uppercase tracking-wide text-[#1A1F71]">
-                    Business Details
-                  </h2>
-                </div> */}
               </div>
-              <div className="mt-3 space-y-1.5 text-[12px]">
+              <div className="mt-3 space-y-2 text-sm">
                 <div className="grid grid-cols-[96px_1fr] gap-2">
-                  <span className="font-montserrat font-bold text-gray-900">
-  Brand Name
-</span>
-                  <span className="font-montserrat font-medium text-gray-700">
+                  <span className="vendor-profile-detail-label">Brand name</span>
+                  <span className="vendor-profile-detail-value">
   {profile?.businessName || "N/A"}
 </span>
                 </div>
                 <div className="grid grid-cols-[96px_1fr] gap-2">
-                  <span className="font-montserrat font-bold text-gray-900">Category</span>
-                  <span className="font-montserrat font-medium text-gray-700">{profile?.listingType || "N/A"}</span>
+                  <span className="vendor-profile-detail-label">Category</span>
+                  <span className="vendor-profile-detail-value">{profile?.listingType || "N/A"}</span>
                 </div>
                 <div className="grid grid-cols-[96px_1fr] gap-2">
-                  <span className="font-montserrat font-bold text-gray-900">Established In</span>
-                  <span className="font-montserrat font-medium text-gray-700">{vendorDetails?.yearsInBusiness || "N/A"}</span>
+                  <span className="vendor-profile-detail-label">Established</span>
+                  <span className="vendor-profile-detail-value">{vendorDetails?.yearsInBusiness || "N/A"}</span>
                 </div>
                 <div className="grid grid-cols-[96px_1fr] gap-2">
-                  <span className="font-montserrat font-bold text-gray-900">Location</span>
-                  <span className="font-montserrat font-medium text-gray-700">
+                  <span className="vendor-profile-detail-label">Location</span>
+                  <span className="vendor-profile-detail-value">
                     {vendorDetails?.address?.city || vendorDetails?.address?.state || "N/A"}
                   </span>
                 </div>
                 <div className="grid grid-cols-[96px_1fr] gap-2">
-                  <span className="font-montserrat font-bold text-gray-900">Call us</span>
+                  <span className="vendor-profile-detail-label">Call us</span>
                   {profile?.phone ? (
                     revealedFields.call ? (
-                      <span className="font-montserrat font-medium text-gray-700">{profile.phone}</span>
+                      <span className="vendor-profile-detail-value">{profile.phone}</span>
                     ) : (
                       <button
                         type="button"
                         onClick={() => openRevealFlow("call")}
-                        className="text-left text-[#1A1F71] underline hover:text-[#0d1150]"
+                        className="vendor-profile-reveal-link"
                       >
                         Click to reveal
                       </button>
@@ -572,33 +562,33 @@ export default function ProductVendorProfilePage() {
                   )}
                 </div>
                 <div className="grid grid-cols-[96px_1fr] gap-2">
-                  <span className="font-montserrat font-bold text-gray-900">Email us</span>
+                  <span className="vendor-profile-detail-label">Email us</span>
                   {profile?.email ? (
                     revealedFields.email ? (
-                      <span className="font-montserrat font-medium text-gray-700 break-all">{profile.email}</span>
+                      <span className="vendor-profile-detail-value break-all">{profile.email}</span>
                     ) : (
                       <button
                         type="button"
                         onClick={() => openRevealFlow("email")}
-                        className="text-left text-[#1A1F71] underline hover:text-[#0d1150]"
+                        className="vendor-profile-reveal-link"
                       >
                         Click to reveal
                       </button>
                     )
                   ) : (
-                    <span className="font-montserrat font-medium text-brand-muted">N/A</span>
+                    <span className="vendor-profile-detail-value">N/A</span>
                   )}
                 </div>
                 <div className="grid grid-cols-[96px_1fr] gap-2">
-                  <span className="font-montserrat font-bold text-gray-900">Address</span>
+                  <span className="vendor-profile-detail-label">Address</span>
                   {businessAddress !== "Not available" ? (
                     revealedFields.address ? (
-                      <span className="font-montserrat font-medium text-gray-700">{businessAddress}</span>
+                      <span className="vendor-profile-detail-value">{businessAddress}</span>
                     ) : (
                       <button
                         type="button"
                         onClick={() => openRevealFlow("address")}
-                        className="text-left text-[#1A1F71] underline hover:text-[#0d1150]"
+                        className="vendor-profile-reveal-link"
                       >
                         Click to reveal
                       </button>
@@ -608,14 +598,14 @@ export default function ProductVendorProfilePage() {
                   )}
                 </div>
                 <div className="grid grid-cols-[96px_1fr] gap-2">
-                  <span className="font-montserrat font-bold text-gray-900">Website</span>
+                  <span className="vendor-profile-detail-label">Website</span>
                   {websiteValue ? (
                     revealedFields.website ? (
                       <a
                         href={getSafeExternalUrl(websiteValue)}
                         target="_blank"
                         rel="noreferrer"
-                        className="font-montserrat font-medium text-gray-700"
+                        className="vendor-profile-detail-value text-brand-navy-light underline hover:text-brand-teal-dark"
                       >
                         {websiteValue}
                       </a>
@@ -623,7 +613,7 @@ export default function ProductVendorProfilePage() {
                       <button
                         type="button"
                         onClick={() => openRevealFlow("website")}
-                        className="text-left text-[#1A1F71] underline hover:text-[#0d1150]"
+                        className="vendor-profile-reveal-link"
                       >
                         Click to reveal
                       </button>
@@ -634,53 +624,53 @@ export default function ProductVendorProfilePage() {
                 </div>
                 {googleReviewLink ? (
                   <div className="grid grid-cols-[96px_1fr] gap-2">
-                    <span className="font-montserrat font-bold text-gray-900">Reviews</span>
+                    <span className="vendor-profile-detail-label">Reviews</span>
                     <a
                       href={getSafeExternalUrl(googleReviewLink)}
                       target="_blank"
                       rel="noreferrer"
-                      className="font-montserrat font-medium text-[#1A1F71] underline break-all"
+                      className="vendor-profile-detail-value text-brand-navy-light underline break-all"
                     >
-                      Google Review
+                      Google review
                     </a>
                   </div>
                 ) : null}
                 {communityServiceLink ? (
                   <div className="grid grid-cols-[96px_1fr] gap-2">
-                    <span className="font-montserrat font-bold text-gray-900">Community</span>
+                    <span className="vendor-profile-detail-label">Community</span>
                     <a
                       href={getSafeExternalUrl(communityServiceLink)}
                       target="_blank"
                       rel="noreferrer"
-                      className="font-montserrat font-medium text-[#1A1F71] underline break-all"
+                      className="vendor-profile-detail-value text-brand-navy-light underline break-all"
                     >
-                      Community Service
+                      Community service
                     </a>
                   </div>
                 ) : null}
                 {refundPolicyDocumentUrl ? (
-                  <div className="grid grid-cols-[96px_1fr] gap-2 items-center">
-                    <span className="font-montserrat font-bold text-gray-900"> refund policy</span>
+                  <div className="grid grid-cols-[96px_1fr] items-center gap-2">
+                    <span className="vendor-profile-detail-label">Refund policy</span>
                     <a
                       href={refundPolicyDocumentUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex w-fit items-center gap-2 rounded border border-gray-200 px-2.5 py-1.5 text-[#1A1F71] hover:bg-gray-50"
-                      aria-label="refund policy"
-                      title="refund policy"
+                      className="inline-flex w-fit items-center gap-2 rounded-lg border border-dashboard-input-border px-2.5 py-1.5 text-brand-navy-light hover:bg-surface-panel"
+                      aria-label="View refund policy"
+                      title="View refund policy"
                     >
                       <Eye size={16} />
                     </a>
                   </div>
                 ) : null}
                 {termsDocumentUrl ? (
-                  <div className="grid grid-cols-[96px_1fr] gap-2 items-center">
-                    <span className="font-montserrat font-bold text-gray-900">Terms doc</span>
+                  <div className="grid grid-cols-[96px_1fr] items-center gap-2">
+                    <span className="vendor-profile-detail-label">Terms doc</span>
                     <a
                       href={termsDocumentUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex w-fit items-center gap-2 rounded border border-gray-200 px-2.5 py-1.5 text-[#1A1F71] hover:bg-gray-50"
+                      className="inline-flex w-fit items-center gap-2 rounded-lg border border-dashboard-input-border px-2.5 py-1.5 text-brand-navy-light hover:bg-surface-panel"
                       aria-label="View terms document"
                       title="View terms document"
                     >
@@ -693,25 +683,28 @@ export default function ProductVendorProfilePage() {
           </div>
 
           <div className="mt-8">
-          <h2 className="font-poppins text-[40px] font-bold text-gray-900">
+          <h2 className="vendor-profile-section-title">
   {profile?.businessName || "Vendor"}
 </h2>
 
-<p className="mt-2 font-montserrat font-medium text-gray-600">
+<p className="mt-2 font-montserrat text-sm leading-relaxed text-brand-muted">
   {vendorDetails?.businessBio || "No business description available."}
 </p>
           </div>
 
-          <div className="mt-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <p className="text-sm text-gray-600">
-              (Showing {totalProducts > 0 ? 1 : 0} - {totalProducts} Products Of {safeTotalProducts} Products)
+          <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="font-montserrat text-sm text-brand-muted">
+              Showing {totalProducts > 0 ? 1 : 0}–{totalProducts} of {safeTotalProducts} products
             </p>
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-700">Sort By:</span>
+              <label htmlFor="vendor-product-sort" className="font-montserrat text-sm text-brand-navy">
+                Sort by
+              </label>
               <select
+                id="vendor-product-sort"
                 value={sort}
                 onChange={(e) => setSort(e.target.value)}
-                className="px-3 py-1 text-sm border rounded cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                className="market-select min-h-11 cursor-pointer rounded-lg border border-dashboard-input-border bg-white px-3 py-2 text-sm text-brand-navy focus:border-brand-gold focus:outline-none focus:ring-2 focus:ring-brand-gold/40"
               >
                 <option value="price_asc">Price: Low to High</option>
                 <option value="price_desc">Price: High to Low</option>
@@ -739,28 +732,28 @@ export default function ProductVendorProfilePage() {
                   <Link
                     key={item._id}
                     href={`/product/${item._id}`}
-                    className="p-1.5 border border-[#D9D9D9] w-full shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col"
+                    className="vendor-profile-product-card"
                   >
-                    <div className="relative w-full aspect-[4/3] overflow-hidden bg-gray-100 flex-shrink-0">
+                    <div className="vendor-profile-product-card-media">
                       <img
                         src={item.image}
                         alt={item.title}
                         loading="lazy"
-                        className="w-full h-full object-contain transition-transform duration-500 hover:scale-105"
+                        className="h-full w-full object-contain transition-transform duration-500 hover:scale-105"
                       />
                     </div>
 
-                    <div className="p-2 flex flex-col flex-1">
-                      <h3 className="text-sm font-bold text-gray-900 uppercase tracking-tight leading-snug font-poppins line-clamp-2 h-[36px]">
+                    <div className="flex flex-1 flex-col p-3">
+                      <h3 className="market-card-light-title line-clamp-2 text-sm uppercase leading-snug">
                         {item.title}
                       </h3>
 
-                      <p className="mb-1.5 text-[11px] text-gray-600 leading-4 font-montserrat h-[32px] overflow-hidden">
+                      <p className="market-card-light-body mb-2 line-clamp-2 text-xs">
                         {item.description || "\u00a0"}
                       </p>
 
-                      <p className="text-[10px] text-brand-muted mb-1.5">
-                        {item.reviewCount} Ratings & Reviews
+                      <p className="mb-2 text-xs text-brand-muted">
+                        {item.reviewCount} ratings & reviews
                       </p>
 
 <div className="mt-auto flex flex-col leading-tight">
@@ -770,7 +763,7 @@ export default function ProductVendorProfilePage() {
 
   {item.salePrice != null && item.salePrice < item.price ? (
     <div className="flex items-center gap-2">
-      <span className="text-base font-semibold text-[#B12704]">
+      <span className="text-base font-semibold text-brand-orange">
         ${effectivePrice.toFixed(2)}
       </span>
       <span className="text-xs text-brand-muted line-through">
@@ -778,7 +771,7 @@ export default function ProductVendorProfilePage() {
       </span>
     </div>
   ) : (
-    <span className="text-base font-semibold text-gray-900">
+    <span className="text-base font-semibold text-brand-navy">
       ${effectivePrice.toFixed(2)}
     </span>
   )}

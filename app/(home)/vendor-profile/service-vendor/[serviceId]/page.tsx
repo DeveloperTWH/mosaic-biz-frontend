@@ -430,7 +430,7 @@ function StarRating({ rating }: { rating: number }) {
   return (
     <span className="inline-flex gap-0.5">
       {[1, 2, 3, 4, 5].map(i => (
-        <svg key={i} className={`w-4 h-4 ${i <= Math.round(rating) ? "text-[#c79b44]" : "text-gray-300"}`} fill="currentColor" viewBox="0 0 20 20">
+        <svg key={i} className={`w-4 h-4 ${i <= Math.round(rating) ? "text-brand-gold" : "text-brand-muted/40"}`} fill="currentColor" viewBox="0 0 20 20">
           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
         </svg>
       ))}
@@ -477,14 +477,14 @@ function RevealConsentModal({
 
   return (
     <div className="fixed inset-0 z-[1200] flex items-center justify-center bg-black/50 px-4 py-6">
-      <div className="w-full max-w-xl border border-[#e3dcc7] bg-white shadow-2xl">
+      <div className="w-full max-w-xl border border-border-warm bg-white shadow-2xl">
         <div className="border-b border-[#ece6d9] px-6 py-5">
-          <h3 className="text-lg font-poppins font-semibold text-[#1A1F71]">
+          <h3 className="text-lg font-poppins font-semibold text-brand-navy-light">
             {isSignIn ? "Sign in to view contact details." : "Confirm contact permission"}
           </h3>
         </div>
         <div className="space-y-4 px-6 py-5">
-          <p className="text-sm font-montserrat leading-6 text-[#4b5563]">
+          <p className="text-sm font-montserrat leading-6 text-brand-muted">
             {isSignIn
               ? "This helps us keep things transparent and ensures vendors can follow up on your enquiry. By continuing, you agree to be contacted by the vendor."
               : "To view these details, please confirm that the vendor can contact you regarding your enquiry."}
@@ -499,7 +499,7 @@ function RevealConsentModal({
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="h-11 min-w-[140px] border border-[#d6cfba] px-5 text-sm font-semibold uppercase tracking-wide text-[#4b5563] transition-colors hover:bg-[#f7f4ea] disabled:cursor-not-allowed disabled:opacity-60"
+              className="h-11 min-w-[140px] border border-border-warm px-5 text-sm font-semibold uppercase tracking-wide text-brand-muted transition-colors hover:bg-surface-panel disabled:cursor-not-allowed disabled:opacity-60"
             >
               Cancel
             </button>
@@ -507,7 +507,7 @@ function RevealConsentModal({
               type="button"
               onClick={onConfirm}
               disabled={loading}
-              className="h-11 min-w-[180px] bg-[#C7A040] px-5 text-sm font-semibold uppercase tracking-wide text-white transition-colors hover:bg-[#a88432] disabled:cursor-not-allowed disabled:opacity-60"
+              className="h-11 min-w-[180px] bg-brand-gold px-5 text-sm font-semibold uppercase tracking-wide text-white transition-colors hover:bg-brand-gold-light disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? "Please wait..." : isSignIn ? "Sign In & Continue" : "I Agree"}
             </button>
@@ -955,7 +955,7 @@ export default function ServiceVendorProfilePage() {
     <div className="market-surface-light min-h-screen font-sans">
 
       {/* ── Hero Banner ── */}
-<div className="relative w-full h-[180px] bg-gray-800 overflow-hidden">
+<div className="vendor-profile-hero-band">
 
   {/* Background Image */}
   <img
@@ -977,7 +977,7 @@ export default function ServiceVendorProfilePage() {
         {heroSection}
       </Link>
       <span className="mx-2">//</span>
-      <span className="text-[#c79b44]">{breadcrumbLabel}</span>
+      <span className="text-brand-gold">{breadcrumbLabel}</span>
     </nav>
   </div>
 
@@ -996,7 +996,7 @@ export default function ServiceVendorProfilePage() {
 
       {/* Inner Hex */}
       <div
-        className="absolute inset-[8px] bg-[#f8f9fb]"
+        className="absolute inset-[8px] bg-surface-panel"
         style={{
           clipPath: "polygon(25% 6%, 75% 6%, 98% 50%, 75% 94%, 25% 94%, 2% 50%)",
         }}
@@ -1012,7 +1012,7 @@ export default function ServiceVendorProfilePage() {
       </div>
 
       {/* Label */}
-      <span className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[10px] font-semibold text-gray-700 bg-white px-2 py-0.5 rounded shadow">
+      <span className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-xs font-semibold text-brand-muted bg-white px-2 py-0.5 rounded shadow">
         {data?.businessBadge}
       </span>
     </div>
@@ -1043,7 +1043,7 @@ export default function ServiceVendorProfilePage() {
             <div className="relative w-full h-[280px] md:h-[340px] overflow-visible border border-[#e8e1cf] bg-gray-100">
               {coverImage
                 ? <img src={coverImage} alt={title} className="w-full h-full object-cover" />
-                : <div className="w-full h-full flex items-center justify-center text-5xl font-bold text-gray-300">S</div>
+                : <div className="w-full h-full flex items-center justify-center text-5xl font-bold text-brand-muted/40">S</div>
               }
               {badgeSrc && (
                 <div className="absolute right-8 -bottom-10 z-20">
@@ -1055,7 +1055,7 @@ export default function ServiceVendorProfilePage() {
                       }}
                     />
                     <div
-                      className="absolute inset-[10px] bg-[#f8f9fb]"
+                      className="absolute inset-[10px] bg-surface-panel"
                       style={{
                         clipPath: "polygon(25% 6%, 75% 6%, 98% 50%, 75% 94%, 25% 94%, 2% 50%)",
                       }}
@@ -1088,7 +1088,7 @@ export default function ServiceVendorProfilePage() {
             {/* Business Name & Info */}
             <div className="mt-7 border-b border-[#ece6d9] pb-5">
               <div className="flex items-center gap-2.5 flex-wrap">
-               <h2 className="text-[32px] font-poppins font-semibold leading-none text-[#1b1b1b]">
+               <h2 className="text-[32px] font-poppins font-semibold leading-none text-brand-navy">
   {contentHeading}
 </h2>
                 {businessName && title && title !== businessName ? (
@@ -1097,24 +1097,24 @@ export default function ServiceVendorProfilePage() {
                   </span>
                 ) : null}
                 {amenities?.slice(0, 2).map(a => (
-                  <span key={a} className="border border-[#d7cfbb] bg-[#f7f3e7] px-2 py-0.5 text-[10px] uppercase tracking-[0.14em] text-[#8a7b52]">{a}</span>
+                  <span key={a} className="border border-[#d7cfbb] bg-[#f7f3e7] px-2 py-0.5 text-xs uppercase tracking-[0.14em] text-brand-muted">{a}</span>
                 ))}
               </div>
               <div className="flex items-center gap-2 mt-2">
                 <StarRating rating={resolvedAverageRating} />
                 {resolvedTotalReviews > 0 && (
-                  <span className="text-[11px] text-[#8c8c8c]">{resolvedAverageRating.toFixed(1)} Ratings And {resolvedTotalReviews} Reviews</span>
+                  <span className="text-xs text-brand-muted">{resolvedAverageRating.toFixed(1)} Ratings And {resolvedTotalReviews} Reviews</span>
                 )}
               </div>
               {(businessDescription || description) && (
-               <p className="mt-3 max-w-[760px] text-[11px] font-montserrat font-medium leading-5 text-[#7b7b7b]">
+               <p className="mt-3 max-w-[760px] text-xs font-montserrat font-medium leading-5 text-brand-muted">
   {businessDescription || description}
 </p>
               )}
               <button
                 type="button"
                 onClick={openReviewForm}
-                className="mt-4 flex h-8 items-center gap-2 border border-[#c79b44] px-3 text-[11px] font-semibold uppercase tracking-wide text-[#c79b44] hover:bg-[#c79b44] hover:text-white transition-colors"
+                className="mt-4 flex h-8 items-center gap-2 border border-[#c79b44] px-3 text-xs font-semibold uppercase tracking-wide text-brand-gold hover:bg-[#c79b44] hover:text-white transition-colors"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -1123,9 +1123,9 @@ export default function ServiceVendorProfilePage() {
               </button>
 
               {reviewFormOpen && (
-                <form onSubmit={handleReviewSubmit} className="mt-5 space-y-4 border border-[#e6dfcb] bg-[#faf8f3] p-4">
+                <form onSubmit={handleReviewSubmit} className="mt-5 space-y-4 border border-border-warm bg-surface-panel p-4">
                   <div>
-                    <label className="mb-2 block text-sm font-semibold text-[#1b1b1b]">Your Rating</label>
+                    <label className="mb-2 block text-sm font-semibold text-brand-navy">Your Rating</label>
                     <div className="flex items-center gap-1">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <button
@@ -1136,7 +1136,7 @@ export default function ServiceVendorProfilePage() {
                           aria-label={`Rate ${star} star${star > 1 ? "s" : ""}`}
                         >
                           <svg
-                            className={`h-8 w-8 ${star <= reviewForm.rating ? "text-[#c79b44]" : "text-gray-300"} fill-current`}
+                            className={`h-8 w-8 ${star <= reviewForm.rating ? "text-brand-gold" : "text-brand-muted/40"} fill-current`}
                             viewBox="0 0 20 20"
                           >
                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -1144,11 +1144,11 @@ export default function ServiceVendorProfilePage() {
                         </button>
                       ))}
                     </div>
-                    <p className="mt-2 text-xs text-[#8c8c8c]">Selected: {reviewForm.rating} / 5</p>
+                    <p className="mt-2 text-xs text-brand-muted">Selected: {reviewForm.rating} / 5</p>
                   </div>
 
                   <div>
-                    <label htmlFor="service-review-comment" className="mb-2 block text-sm font-semibold text-[#1b1b1b]">
+                    <label htmlFor="service-review-comment" className="mb-2 block text-sm font-semibold text-brand-navy">
                       Your Review
                     </label>
                     <textarea
@@ -1156,14 +1156,14 @@ export default function ServiceVendorProfilePage() {
                       value={reviewForm.comment}
                       onChange={(e) => setReviewForm((prev) => ({ ...prev, comment: e.target.value }))}
                       placeholder="Share your experience with this service"
-                      className="min-h-[120px] w-full border border-[#d8d1bc] bg-white px-3 py-2 text-sm text-[#1b1b1b] outline-none transition-colors focus:border-[#c79b44]"
+                      className="min-h-[120px] w-full border border-[#d8d1bc] bg-white px-3 py-2 text-sm text-brand-navy outline-none transition-colors focus:border-[#c79b44]"
                     />
                   </div>
 
                   <button
                     type="submit"
                     disabled={reviewsSubmitting}
-                    className="bg-[#c79b44] px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#a88432] disabled:cursor-not-allowed disabled:opacity-60"
+                    className="bg-[#c79b44] px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-gold-light disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {reviewsSubmitting ? "Submitting..." : "Submit Review"}
                   </button>
@@ -1172,21 +1172,21 @@ export default function ServiceVendorProfilePage() {
 
               <div className="mt-5 space-y-4">
                 {reviewsLoading ? (
-                  <div className="border border-dashed border-[#e6dfcb] px-4 py-6 text-sm text-[#8c8c8c]">
+                  <div className="border border-dashed border-border-warm px-4 py-6 text-sm text-brand-muted">
                     Loading reviews...
                   </div>
                 ) : visibleReviews.length > 0 ? (
                   <>
                     {visibleReviews.map((review) => (
-                      <div key={review._id} className="border border-[#ece6d8] bg-white p-4 shadow-sm">
+                      <div key={review._id} className="border border-border-warm bg-white p-4 shadow-sm">
                         <div className="flex items-start justify-between gap-4">
                           <div>
-                            <p className="text-sm font-semibold text-[#1b1b1b]">{review.userId?.name || "Anonymous"}</p>
-                            <p className="mt-1 text-xs text-[#8c8c8c]">{formatReviewDate(review.createdAt)}</p>
+                            <p className="text-sm font-semibold text-brand-navy">{review.userId?.name || "Anonymous"}</p>
+                            <p className="mt-1 text-xs text-brand-muted">{formatReviewDate(review.createdAt)}</p>
                           </div>
                           <StarRating rating={review.rating} />
                         </div>
-                        <p className="mt-3 text-sm font-montserrat leading-6 text-[#4b5563]">{review.comment}</p>
+                        <p className="mt-3 text-sm font-montserrat leading-6 text-brand-muted">{review.comment}</p>
                       </div>
                     ))}
 
@@ -1194,14 +1194,14 @@ export default function ServiceVendorProfilePage() {
                       <button
                         type="button"
                         onClick={() => setShowAllReviews((prev) => !prev)}
-                        className="text-sm font-semibold text-[#1A1F71] underline underline-offset-2"
+                        className="text-sm font-semibold text-brand-navy-light underline underline-offset-2"
                       >
                         {showAllReviews ? "Show Less Reviews" : "Show More Reviews"}
                       </button>
                     )}
                   </>
                 ) : (
-                  <div className="border border-dashed border-[#e6dfcb] px-4 py-6 text-sm text-[#8c8c8c]">
+                  <div className="border border-dashed border-border-warm px-4 py-6 text-sm text-brand-muted">
                     No reviews yet. Be the first to review this service.
                   </div>
                 )}
@@ -1210,7 +1210,7 @@ export default function ServiceVendorProfilePage() {
 
             {/* Offered Services */}
 <div className="mt-6">
-<h3 className="mb-3 text-sm font-montserrat font-semibold text-[#c79b44]">
+<h3 className="mb-3 text-sm font-montserrat font-semibold text-brand-gold">
   Offered Services
 </h3>
 
@@ -1227,7 +1227,7 @@ export default function ServiceVendorProfilePage() {
       {sortedServices.map(svc => (
         <div
           key={svc._id}
-          className="group flex gap-3 border border-[#ece6d8] bg-[#F5F5F5] p-2.5 transition-shadow hover:shadow-sm"
+          className="group flex gap-3 border border-border-warm bg-surface-panel p-2.5 transition-shadow hover:shadow-sm"
         >
           <div className="h-16 w-16 shrink-0 overflow-hidden bg-gray-100">
             {svc.image ? (
@@ -1237,26 +1237,26 @@ export default function ServiceVendorProfilePage() {
                 className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center px-1 text-center font-montserrat text-[10px] text-brand-muted">
+              <div className="flex h-full w-full items-center justify-center px-1 text-center font-montserrat text-xs text-brand-muted">
                 No image
               </div>
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <h4 className="text-[15px] font-poppins font-bold text-[#1d1d1d]">
+            <h4 className="text-[15px] font-poppins font-bold text-brand-navy">
   {svc.name}
 </h4>
-<p className="mt-1 line-clamp-2 text-[12px] font-montserrat font-medium leading-4 text-[#7f7f7f]">
+<p className="mt-1 line-clamp-2 text-[12px] font-montserrat font-medium leading-4 text-brand-muted">
   {svc.description || "Professional service offered by our experts."}
 </p>
-<div className="mt-1.5 flex items-center gap-4 text-[10px] text-[#7f7f7f]">
+<div className="mt-1.5 flex items-center gap-4 text-xs text-brand-muted">
   {/* Duration */}
   <span>
-    Duration: <span className="font-medium text-[#1d1d1d]">{formatDuration(svc.durationMinutes)}</span>
+    Duration: <span className="font-medium text-brand-navy">{formatDuration(svc.durationMinutes)}</span>
   </span>
 
   {/* Price */}
-  <span className="text-[11px] font-semibold text-[#1d1d1d]">
+  <span className="text-xs font-semibold text-brand-navy">
     ${svc.price.toFixed(2)}
   </span>
 </div>
@@ -1271,7 +1271,7 @@ export default function ServiceVendorProfilePage() {
 {/* Photo Gallery */}
   {galleryItems.length > 0 && (
   <div className="mt-6">
-    <h3 className="mb-3 text-sm font-semibold text-[#c79b44]">
+    <h3 className="mb-3 text-sm font-semibold text-brand-gold">
       Photo Gallery
     </h3>
 
@@ -1295,7 +1295,7 @@ export default function ServiceVendorProfilePage() {
 
             {/* Testimonials */}
             <div className="mt-8">
-              <h3 className="text-lg font-bold text-gray-900 border-b border-gray-200 pb-2 mb-4">Testimonials</h3>
+              <h3 className="text-lg font-bold text-brand-navy border-b border-gray-200 pb-2 mb-4">Testimonials</h3>
               <ClientTestimonials />
             </div>
           </div>
@@ -1310,7 +1310,7 @@ export default function ServiceVendorProfilePage() {
                 <div className="w-[100px] h-[100px] rounded border bg-gray-50 overflow-hidden shrink-0 flex items-center justify-center">
                   {data.businessLogo
                     ? <img src={data.businessLogo} alt={data.businessName} className="w-full h-full object-contain p-1" />
-                    : <span className="text-[10px] font-bold text-[#1e3a5f]">{data.businessName?.charAt(0) || "S"}</span>}
+                    : <span className="text-xs font-bold text-brand-navy-light">{data.businessName?.charAt(0) || "S"}</span>}
                 </div>
               </div>
 
@@ -1325,27 +1325,27 @@ export default function ServiceVendorProfilePage() {
                   { label: "Website", value: businessWebsite || contact.website, key: "website" },
                 ].map(row => (
                   <div key={row.label} className="grid grid-cols-[96px_1fr] gap-2 items-start">
-                    <span className="font-montserrat font-bold text-gray-900">{row.label}</span>
+                    <span className="font-montserrat font-bold text-brand-navy">{row.label}</span>
                     {row.key === null ? (
-                      <span className="font-montserrat font-medium text-gray-700">{row.value || "N/A"}</span>
+                      <span className="font-montserrat font-medium text-brand-muted">{row.value || "N/A"}</span>
                     ) : row.value ? (
                       revealed[row.key] ? (
                         row.key === "address" ? (
                           <a href={mapExternalUrl || row.value}
-                            target="_blank" rel="noreferrer" className="font-montserrat font-medium text-gray-700 underline break-all">
+                            target="_blank" rel="noreferrer" className="font-montserrat font-medium text-brand-muted underline break-all">
                             View on Maps
                           </a>
                         ) : row.key === "website" ? (
                           <a href={getSafeExternalUrl(row.value)}
-                            target="_blank" rel="noreferrer" className="font-montserrat font-medium text-gray-700 underline break-all">
+                            target="_blank" rel="noreferrer" className="font-montserrat font-medium text-brand-muted underline break-all">
                             {row.value.replace(/^https?:\/\//, '')}
                           </a>
                         ) : (
-                          <span className="font-montserrat font-medium text-gray-700 break-all">{row.value}</span>
+                          <span className="font-montserrat font-medium text-brand-muted break-all">{row.value}</span>
                         )
                       ) : (
                         <button onClick={() => openRevealFlow(row.key as RevealFieldKey)}
-                          className="text-left text-[#1A1F71] underline hover:text-[#0d1150]">
+                          className="text-left text-brand-navy-light underline hover:text-brand-navy">
                           Click to reveal
                         </button>
                       )
@@ -1356,12 +1356,12 @@ export default function ServiceVendorProfilePage() {
                 ))}
                 {googleReviewLink ? (
                   <div className="grid grid-cols-[96px_1fr] gap-2 items-start">
-                    <span className="font-montserrat font-bold text-gray-900">Reviews</span>
+                    <span className="font-montserrat font-bold text-brand-navy">Reviews</span>
                     <a
                       href={getSafeExternalUrl(googleReviewLink)}
                       target="_blank"
                       rel="noreferrer"
-                      className="font-montserrat font-medium text-[#1A1F71] underline break-all"
+                      className="font-montserrat font-medium text-brand-navy-light underline break-all"
                     >
                       Google Review
                     </a>
@@ -1369,12 +1369,12 @@ export default function ServiceVendorProfilePage() {
                 ) : null}
                 {communityServiceLink ? (
                   <div className="grid grid-cols-[96px_1fr] gap-2 items-start">
-                    <span className="font-montserrat font-bold text-gray-900">Community</span>
+                    <span className="font-montserrat font-bold text-brand-navy">Community</span>
                     <a
                       href={getSafeExternalUrl(communityServiceLink)}
                       target="_blank"
                       rel="noreferrer"
-                      className="font-montserrat font-medium text-[#1A1F71] underline break-all"
+                      className="font-montserrat font-medium text-brand-navy-light underline break-all"
                     >
                       Community Service
                     </a>
@@ -1382,12 +1382,12 @@ export default function ServiceVendorProfilePage() {
                 ) : null}
                 {refundPolicyDocumentUrl ? (
                   <div className="grid grid-cols-[96px_1fr] gap-2 items-center">
-                    <span className="font-montserrat font-bold text-gray-900">Refund policy</span>
+                    <span className="font-montserrat font-bold text-brand-navy">Refund policy</span>
                     <a
                       href={refundPolicyDocumentUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex w-fit items-center gap-2 rounded border border-gray-200 px-2.5 py-1.5 text-[#1A1F71] hover:bg-gray-50"
+                      className="inline-flex w-fit items-center gap-2 rounded border border-gray-200 px-2.5 py-1.5 text-brand-navy-light hover:bg-gray-50"
                       aria-label="View refund policy document"
                       title="View refund policy document"
                     >
@@ -1397,12 +1397,12 @@ export default function ServiceVendorProfilePage() {
                 ) : null}
                 {termsDocumentUrl ? (
                   <div className="grid grid-cols-[96px_1fr] gap-2 items-center">
-                    <span className="font-montserrat font-bold text-gray-900">Terms doc</span>
+                    <span className="font-montserrat font-bold text-brand-navy">Terms doc</span>
                     <a
                       href={termsDocumentUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex w-fit items-center gap-2 rounded border border-gray-200 px-2.5 py-1.5 text-[#1A1F71] hover:bg-gray-50"
+                      className="inline-flex w-fit items-center gap-2 rounded border border-gray-200 px-2.5 py-1.5 text-brand-navy-light hover:bg-gray-50"
                       aria-label="View terms document"
                       title="View terms document"
                     >
@@ -1414,11 +1414,11 @@ export default function ServiceVendorProfilePage() {
             </div>
 
             {/* Book Service Form */}
-<div id="booking-section" className="overflow-hidden border border-[#e2c46a] bg-[#fff8e8]">
+<div id="booking-section" className="overflow-hidden border border-[#e2c46a] bg-brand-cream">
   
   {/* Header */}
   <div className="border-b border-[#e6d3a3] px-5 py-4">
-<h3 className="text-[14px] font-poppins font-bold tracking-wide text-[#1A1F71] uppercase">
+<h3 className="text-[14px] font-poppins font-bold tracking-wide text-brand-navy-light uppercase">
   {hasDirectBookingLink ? "Book Now" : "Book Service"}
 </h3>
   </div>
@@ -1426,7 +1426,7 @@ export default function ServiceVendorProfilePage() {
   {hasDirectBookingLink ? (
     <div className="p-5">
       <button
-        className="h-10 w-full bg-[#C7A040] text-[11px] font-semibold uppercase tracking-wide text-white transition-colors hover:bg-[#a88432]"
+        className="h-10 w-full bg-brand-gold text-xs font-semibold uppercase tracking-wide text-white transition-colors hover:bg-brand-gold-light"
         onClick={() => {
           window.open(bookingToolLink, "_blank", "noopener,noreferrer");
         }}
@@ -1439,45 +1439,45 @@ export default function ServiceVendorProfilePage() {
 
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
       <div className="space-y-1">
-        <label className="block text-[10px] font-medium uppercase tracking-wide text-[#6f6f6f]">Name</label>
+        <label className="block text-xs font-medium uppercase tracking-wide text-brand-muted">Name</label>
         <input
           value={bookForm.name}
           onChange={e => setBookForm(p => ({ ...p, name: e.target.value }))}
           placeholder="Enter Name"
-          className="h-9 w-full border border-[#d8d0ba] bg-[#fff8e8] px-3 text-[11px] text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#C7A040] placeholder:text-brand-muted"
+          className="h-9 w-full border border-border-warm bg-brand-cream px-3 text-xs text-brand-navy focus:outline-none focus:ring-1 focus:ring-[#C7A040] placeholder:text-brand-muted"
         />
       </div>
 
       <div className="space-y-1">
-        <label className="block text-[10px] font-medium uppercase tracking-wide text-[#6f6f6f]">Phone Number</label>
+        <label className="block text-xs font-medium uppercase tracking-wide text-brand-muted">Phone Number</label>
         <input
           value={bookForm.phone}
           onChange={e => setBookForm(p => ({ ...p, phone: e.target.value }))}
           placeholder="Enter Phone Number"
           type="tel"
-          className="h-9 w-full border border-[#d8d0ba] bg-[#fff8e8] px-3 text-[11px] text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#C7A040] placeholder:text-brand-muted"
+          className="h-9 w-full border border-border-warm bg-brand-cream px-3 text-xs text-brand-navy focus:outline-none focus:ring-1 focus:ring-[#C7A040] placeholder:text-brand-muted"
         />
       </div>
     </div>
 
     <div className="space-y-1">
-      <label className="block text-[10px] font-medium uppercase tracking-wide text-[#6f6f6f]">Email</label>
+      <label className="block text-xs font-medium uppercase tracking-wide text-brand-muted">Email</label>
       <input
         value={bookForm.email}
         onChange={e => setBookForm(p => ({ ...p, email: e.target.value }))}
         placeholder="Enter Email"
         type="email"
-        className="h-9 w-full border border-[#d8d0ba] bg-[#fff8e8] px-3 text-[11px] text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#C7A040] placeholder:text-brand-muted"
+        className="h-9 w-full border border-border-warm bg-brand-cream px-3 text-xs text-brand-navy focus:outline-none focus:ring-1 focus:ring-[#C7A040] placeholder:text-brand-muted"
       />
     </div>
 
     <div className="space-y-2">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-[10px] font-semibold uppercase tracking-wide text-[#6f6f6f]">
+        <p className="text-xs font-semibold uppercase tracking-wide text-brand-muted">
           Select Services
         </p>
         {selectedServices.length > 0 && (
-          <span className="text-[10px] font-semibold uppercase tracking-wide text-[#1A1F71]">
+          <span className="text-xs font-semibold uppercase tracking-wide text-brand-navy-light">
             {selectedServices.length} Selected
           </span>
         )}
@@ -1492,7 +1492,7 @@ export default function ServiceVendorProfilePage() {
               className={`flex cursor-pointer items-start gap-3 border px-3 py-3 transition-colors ${
                 active
                   ? "border-[#C7A040] bg-[#fff2cc]"
-                  : "border-[#eadcb7] bg-[#fff8e8] hover:border-[#d6b35f]"
+                  : "border-[#eadcb7] bg-brand-cream hover:border-[#d6b35f]"
               }`}
             >
               <input
@@ -1503,14 +1503,14 @@ export default function ServiceVendorProfilePage() {
               />
               <div className="min-w-0 flex-1">
                 <div className="flex items-start justify-between gap-3">
-                  <span className="text-[11px] font-semibold uppercase tracking-wide text-[#1A1F71]">
+                  <span className="text-xs font-semibold uppercase tracking-wide text-brand-navy-light">
                     {svc.name}
                   </span>
-                  <span className="text-[11px] font-semibold text-[#7b5e19]">
+                  <span className="text-xs font-semibold text-brand-navy">
                     ${svc.price.toFixed(2)}
                   </span>
                 </div>
-                <p className="mt-1 text-[10px] font-medium uppercase tracking-wide text-[#8a7b52]">
+                <p className="mt-1 text-xs font-medium uppercase tracking-wide text-brand-muted">
                   {formatDuration(svc.durationMinutes)}
                 </p>
               </div>
@@ -1522,7 +1522,7 @@ export default function ServiceVendorProfilePage() {
 
     <div className="space-y-2">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-[10px] font-semibold uppercase tracking-wide text-[#6f6f6f]">
+        <p className="text-xs font-semibold uppercase tracking-wide text-brand-muted">
           Pick A Date
         </p>
       </div>
@@ -1532,17 +1532,17 @@ export default function ServiceVendorProfilePage() {
           <button
             type="button"
             onClick={() => setCalendarMonth(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1))}
-            className="h-8 w-8 border border-[#d7c796] text-[#7b5e19] transition-colors hover:bg-[#f8edd0]"
+            className="h-8 w-8 border border-border-warm text-brand-navy transition-colors hover:bg-brand-cream"
           >
             ‹
           </button>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#1A1F71]">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-navy-light">
             {formatMonthLabel(calendarMonth)}
           </p>
           <button
             type="button"
             onClick={() => setCalendarMonth(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1))}
-            className="h-8 w-8 border border-[#d7c796] text-[#7b5e19] transition-colors hover:bg-[#f8edd0]"
+            className="h-8 w-8 border border-border-warm text-brand-navy transition-colors hover:bg-brand-cream"
           >
             ›
           </button>
@@ -1550,7 +1550,7 @@ export default function ServiceVendorProfilePage() {
 
         <div className="grid grid-cols-7 gap-1 text-center">
           {DAY_NAMES.map(day => (
-            <span key={day} className="pb-1 text-[10px] font-semibold uppercase tracking-wide text-[#8a7b52]">
+            <span key={day} className="pb-1 text-xs font-semibold uppercase tracking-wide text-brand-muted">
               {day.slice(0, 3)}
             </span>
           ))}
@@ -1566,12 +1566,12 @@ export default function ServiceVendorProfilePage() {
                 type="button"
                 disabled={!available}
                 onClick={() => setBookForm(prev => ({ ...prev, date: dateKey }))}
-                className={`h-10 border text-[11px] transition-colors ${
+                className={`h-10 border text-xs transition-colors ${
                   isSelected
-                    ? "border-[#C7A040] bg-[#C7A040] font-semibold text-white"
+                    ? "border-[#C7A040] bg-brand-gold font-semibold text-white"
                     : available
-                      ? "border-[#eadcb7] bg-white text-[#1d1d1d] hover:border-[#C7A040] hover:bg-[#fff2cc]"
-                      : "border-[#f0e6c8] bg-[#fbf6e8] text-gray-300"
+                      ? "border-[#eadcb7] bg-white text-brand-navy hover:border-[#C7A040] hover:bg-[#fff2cc]"
+                      : "border-[#f0e6c8] bg-brand-cream text-brand-muted/40"
                 } ${!isCurrentMonth ? "opacity-50" : ""}`}
               >
                 {day.getDate()}
@@ -1583,7 +1583,7 @@ export default function ServiceVendorProfilePage() {
     </div>
 
     <div className="space-y-2">
-      <p className="text-[10px] font-semibold uppercase tracking-wide text-[#6f6f6f]">
+      <p className="text-xs font-semibold uppercase tracking-wide text-brand-muted">
         Available Time Slots
       </p>
       {bookForm.date ? (
@@ -1594,10 +1594,10 @@ export default function ServiceVendorProfilePage() {
                 key={slot}
                 type="button"
                 onClick={() => setBookForm(prev => ({ ...prev, timeSlot: slot }))}
-                className={`h-9 border px-2 text-[11px] font-medium transition-colors ${
+                className={`h-9 border px-2 text-xs font-medium transition-colors ${
                   bookForm.timeSlot === slot
-                    ? "border-[#C7A040] bg-[#C7A040] text-white"
-                    : "border-[#d8d0ba] bg-white text-[#1d1d1d] hover:border-[#C7A040] hover:bg-[#fff2cc]"
+                    ? "border-[#C7A040] bg-brand-gold text-white"
+                    : "border-border-warm bg-white text-brand-navy hover:border-[#C7A040] hover:bg-[#fff2cc]"
                 }`}
               >
                 {slot}
@@ -1605,45 +1605,45 @@ export default function ServiceVendorProfilePage() {
             ))}
           </div>
         ) : (
-          <p className="border border-dashed border-[#d8d0ba] bg-[#fffdf4] px-3 py-3 text-[11px] text-brand-muted">
+          <p className="border border-dashed border-border-warm bg-[#fffdf4] px-3 py-3 text-xs text-brand-muted">
             {selectedServices.length === 0
               ? "Select one or more services to calculate valid appointment slots."
               : "No slots fit inside the vendor's working hours for the selected services."}
           </p>
         )
       ) : (
-        <p className="border border-dashed border-[#d8d0ba] bg-[#fffdf4] px-3 py-3 text-[11px] text-brand-muted">
+        <p className="border border-dashed border-border-warm bg-[#fffdf4] px-3 py-3 text-xs text-brand-muted">
           Choose a working day to see time slots.
         </p>
       )}
     </div>
 
     {/* <div className="space-y-1">
-      <label className="block text-[10px] font-medium uppercase tracking-wide text-[#6f6f6f]">Special Notes</label>
+      <label className="block text-xs font-medium uppercase tracking-wide text-brand-muted">Special Notes</label>
       <textarea
         value={bookForm.note}
         onChange={e => setBookForm(p => ({ ...p, note: e.target.value }))}
         placeholder="Tell the vendor anything important before the appointment"
         rows={3}
-        className="w-full resize-none border border-[#d8d0ba] bg-[#fff8e8] px-3 py-2 text-[11px] text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#C7A040] placeholder:text-brand-muted"
+        className="w-full resize-none border border-border-warm bg-brand-cream px-3 py-2 text-xs text-brand-navy focus:outline-none focus:ring-1 focus:ring-[#C7A040] placeholder:text-brand-muted"
       />
     </div> */}
 
     {/* <div className="border border-[#eadcb7] bg-[#fff3d3] p-3">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-[10px] font-semibold uppercase tracking-wide text-[#6f6f6f]">
+        <p className="text-xs font-semibold uppercase tracking-wide text-brand-muted">
           Booking Summary
         </p>
-        <span className="text-[12px] font-bold text-[#1A1F71]">
+        <span className="text-[12px] font-bold text-brand-navy-light">
           ${totalPrice.toFixed(2)}
         </span>
       </div>
-      <p className="mt-2 text-[11px] text-gray-700">
+      <p className="mt-2 text-xs text-brand-muted">
         {selectedServices.length > 0
           ? selectedServices.map(service => service.name).join(", ")
           : "No services selected yet."}
       </p>
-      <div className="mt-2 flex flex-wrap gap-2 text-[10px] uppercase tracking-wide text-[#8a7b52]">
+      <div className="mt-2 flex flex-wrap gap-2 text-xs uppercase tracking-wide text-brand-muted">
         <span>Total Duration: {formatDuration(totalDurationMinutes)}</span>
         <span>{bookForm.date ? formatCalendarDate(selectedDateObject || new Date()) : "Date not selected"}</span>
         <span>{bookForm.timeSlot || "Time not selected"}</span>
@@ -1654,18 +1654,18 @@ export default function ServiceVendorProfilePage() {
       type="button"
       onClick={handleBookingSubmit}
       disabled={!bookingReady || bookingSubmitting}
-      className={`h-10 w-full text-[11px] font-semibold uppercase tracking-wide text-white transition-colors ${
+      className={`h-10 w-full text-xs font-semibold uppercase tracking-wide text-white transition-colors ${
         bookingReady && !bookingSubmitting
-          ? "bg-[#C7A040] hover:bg-[#a88432]"
+          ? "bg-brand-gold hover:bg-brand-gold-light"
           : "bg-[#d7c796] cursor-not-allowed"
       }`}
     >
       {bookingSubmitting ? "Submitting..." : "Request An Appointment"}
     </button>
     <p>A booking fee may be required by the vendor to confirm your booking.</p>
-<p className="border border-dashed border-[#d8d0ba] bg-[#fffdf4] px-3 py-2 text-[11px] text-brand-muted leading-relaxed mt-3">
+<p className="border border-dashed border-border-warm bg-[#fffdf4] px-3 py-2 text-xs text-brand-muted leading-relaxed mt-3">
   On submission of this form, your booking request will be shared with the business. 
-  They will <span className="font-medium text-[#1d1d1d]">confirm or decline</span> it based on availability. 
+  They will <span className="font-medium text-brand-navy">confirm or decline</span> it based on availability. 
   We’ll keep you updated.
 </p>
   </div>
@@ -1675,10 +1675,10 @@ export default function ServiceVendorProfilePage() {
             {/* Locations & Hours */}
             <div className="overflow-hidden bg-white">
               <div className="px-0 py-0">
-                <h3 className="mb-2 text-sm font-semibold text-[#c79b44]">Location And Hours</h3>
+                <h3 className="mb-2 text-sm font-semibold text-brand-gold">Location And Hours</h3>
               </div>
 
-              <div className="h-40 w-full overflow-hidden border border-[#ece6d8] bg-gray-200">
+              <div className="h-40 w-full overflow-hidden border border-border-warm bg-gray-200">
                 {mapEmbedUrl ? (
                   <iframe
                   src={mapEmbedUrl}
@@ -1698,7 +1698,7 @@ export default function ServiceVendorProfilePage() {
                         href={mapExternalUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-xs font-semibold uppercase tracking-wide text-[#1A1F71] underline"
+                        className="text-xs font-semibold uppercase tracking-wide text-brand-navy-light underline"
                       >
                         {usesShortGoogleMapsLink ? "Open Shared Map" : "Open in Google Maps"}
                       </a>
@@ -1714,7 +1714,7 @@ export default function ServiceVendorProfilePage() {
     <div
       key={h._id}
       className={`grid grid-cols-[120px_1fr] gap-x-2 items-center text-[12px] ${
-        h.day === todayName ? "text-[#1d1d1d]" : "text-[#6d6d6d]"
+        h.day === todayName ? "text-brand-navy" : "text-brand-muted"
       }`}
     >
       <span className="uppercase tracking-[0.14em] font-montserrat font-semibold">
