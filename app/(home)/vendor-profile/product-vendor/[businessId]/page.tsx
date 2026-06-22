@@ -411,7 +411,7 @@ export default function ProductVendorProfilePage() {
           <h1 className="text-3xl md:text-4xl font-bold tracking-wide text-white uppercase">
             {profile?.businessName || "Vendor Profile"}
           </h1>
-          <nav className="mt-2 text-sm text-gray-300">
+          <nav className="mt-2 text-sm text-white/85">
             <Link href="/" className="hover:text-white">
               Home
             </Link>
@@ -562,7 +562,7 @@ export default function ProductVendorProfilePage() {
                       </button>
                     )
                   ) : (
-                    <span className="text-gray-500">N/A</span>
+                    <span className="text-brand-muted">N/A</span>
                   )}
                 </div>
                 <div className="grid grid-cols-[96px_1fr] gap-2">
@@ -580,7 +580,7 @@ export default function ProductVendorProfilePage() {
                       </button>
                     )
                   ) : (
-                    <span className="font-montserrat font-medium text-gray-500">N/A</span>
+                    <span className="font-montserrat font-medium text-brand-muted">N/A</span>
                   )}
                 </div>
                 <div className="grid grid-cols-[96px_1fr] gap-2">
@@ -598,7 +598,7 @@ export default function ProductVendorProfilePage() {
                       </button>
                     )
                   ) : (
-                    <span className="text-gray-500">N/A</span>
+                    <span className="text-brand-muted">N/A</span>
                   )}
                 </div>
                 <div className="grid grid-cols-[96px_1fr] gap-2">
@@ -623,7 +623,7 @@ export default function ProductVendorProfilePage() {
                       </button>
                     )
                   ) : (
-                    <span className="text-gray-500">N/A</span>
+                    <span className="text-brand-muted">N/A</span>
                   )}
                 </div>
                 {googleReviewLink ? (
@@ -748,12 +748,12 @@ export default function ProductVendorProfilePage() {
                         {item.description || "\u00a0"}
                       </p>
 
-                      <p className="text-[10px] text-gray-500 mb-1.5">
+                      <p className="text-[10px] text-brand-muted mb-1.5">
                         {item.reviewCount} Ratings & Reviews
                       </p>
 
 <div className="mt-auto flex flex-col leading-tight">
-  <span className="text-xs text-gray-500">
+  <span className="text-xs text-brand-muted">
     Starting from
   </span>
 
@@ -762,7 +762,7 @@ export default function ProductVendorProfilePage() {
       <span className="text-base font-semibold text-[#B12704]">
         ${effectivePrice.toFixed(2)}
       </span>
-      <span className="text-xs text-gray-500 line-through">
+      <span className="text-xs text-brand-muted line-through">
         ${item.price.toFixed(2)}
       </span>
     </div>

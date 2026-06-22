@@ -758,7 +758,7 @@ export default function FoodVendorProfilePage() {
           <h1 className="text-3xl font-poppins font-semibold uppercase tracking-wide text-white md:text-4xl">
             {heroTitle}
           </h1>
-          <nav className="mt-2 text-sm text-gray-300">
+          <nav className="mt-2 text-sm text-white/85">
             <Link href="/" className="hover:text-white">
               Home
             </Link>
@@ -1077,7 +1077,7 @@ export default function FoodVendorProfilePage() {
                         </button>
                       )
                     ) : (
-                      <span className="text-gray-400">N/A</span>
+                      <span className="text-brand-muted">N/A</span>
                     )}
                   </div>
                 ))}
@@ -1171,7 +1171,7 @@ export default function FoodVendorProfilePage() {
                       value={bookForm.name}
                       onChange={(e) => setBookForm((prev) => ({ ...prev, name: e.target.value }))}
                       placeholder="Enter Name"
-                      className="h-9 w-full border border-[#d8d0ba] bg-[#fff8e8] px-3 text-[11px] font-montserrat font-medium text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#C7A040]"
+                      className="h-9 w-full border border-[#d8d0ba] bg-[#fff8e8] px-3 text-[11px] font-montserrat font-medium text-gray-800 placeholder:text-brand-muted focus:outline-none focus:ring-1 focus:ring-[#C7A040]"
                     />
                   </div>
 
@@ -1183,7 +1183,7 @@ export default function FoodVendorProfilePage() {
                       value={bookForm.phone}
                       onChange={(e) => setBookForm((prev) => ({ ...prev, phone: e.target.value }))}
                       placeholder="Enter Phone Number"
-                      className="h-9 w-full border border-[#d8d0ba] bg-[#fff8e8] px-3 text-[11px] font-montserrat font-medium text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#C7A040]"
+                      className="h-9 w-full border border-[#d8d0ba] bg-[#fff8e8] px-3 text-[11px] font-montserrat font-medium text-gray-800 placeholder:text-brand-muted focus:outline-none focus:ring-1 focus:ring-[#C7A040]"
                     />
                   </div>
                 </div>
@@ -1196,7 +1196,7 @@ export default function FoodVendorProfilePage() {
                     value={bookForm.email}
                     onChange={(e) => setBookForm((prev) => ({ ...prev, email: e.target.value }))}
                     placeholder="Enter Email"
-                    className="h-9 w-full border border-[#d8d0ba] bg-[#fff8e8] px-3 text-[11px] font-montserrat font-medium text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#C7A040]"
+                    className="h-9 w-full border border-[#d8d0ba] bg-[#fff8e8] px-3 text-[11px] font-montserrat font-medium text-gray-800 placeholder:text-brand-muted focus:outline-none focus:ring-1 focus:ring-[#C7A040]"
                   />
                 </div>
 
@@ -1288,12 +1288,12 @@ export default function FoodVendorProfilePage() {
                         ))}
                       </div>
                     ) : (
-                      <p className="border border-dashed border-[#d8d0ba] bg-[#fffdf4] px-3 py-3 text-[11px] text-gray-500">
+                      <p className="border border-dashed border-[#d8d0ba] bg-[#fffdf4] px-3 py-3 text-[11px] text-brand-muted">
                         No valid one-hour reservation slots are available for the selected day.
                       </p>
                     )
                   ) : (
-                    <p className="border border-dashed border-[#d8d0ba] bg-[#fffdf4] px-3 py-3 text-[11px] text-gray-500">
+                    <p className="border border-dashed border-[#d8d0ba] bg-[#fffdf4] px-3 py-3 text-[11px] text-brand-muted">
                       Choose a working day to unlock time slots.
                     </p>
                   )}
@@ -1326,7 +1326,7 @@ export default function FoodVendorProfilePage() {
                     onChange={(e) => setBookForm((prev) => ({ ...prev, message: e.target.value }))}
                     placeholder="Add Message"
                     rows={3}
-                    className="w-full resize-none border border-[#d8d0ba] bg-[#fff8e8] px-3 py-2 text-[11px] font-montserrat font-medium text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#C7A040]"
+                    className="w-full resize-none border border-[#d8d0ba] bg-[#fff8e8] px-3 py-2 text-[11px] font-montserrat font-medium text-gray-800 placeholder:text-brand-muted focus:outline-none focus:ring-1 focus:ring-[#C7A040]"
                   />
                 </div> */}
 
@@ -1355,7 +1355,7 @@ export default function FoodVendorProfilePage() {
                 >
                   Book Table
                 </button>
-                <p className="border border-dashed border-[#d8d0ba] bg-[#fffdf4] px-3 py-2 text-[11px] text-gray-500 leading-relaxed mt-3">
+                <p className="border border-dashed border-[#d8d0ba] bg-[#fffdf4] px-3 py-2 text-[11px] text-brand-muted leading-relaxed mt-3">
   Online table booking is coming soon. Contact the business above to reserve a table.
 </p>
               </div>
@@ -1374,7 +1374,7 @@ export default function FoodVendorProfilePage() {
                     referrerPolicy="no-referrer-when-downgrade"
                   />
                 ) : (
-                  <div className="flex h-full w-full items-center justify-center text-sm text-gray-400">
+                  <div className="flex h-full w-full items-center justify-center text-sm text-brand-muted">
                     Map unavailable
                   </div>
                 )}

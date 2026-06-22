@@ -23,7 +23,7 @@ export default function MarketEmptyState({
     <div className={`market-empty-state ${className}`}>
       <p className="market-empty-state-title">{title}</p>
       {description ? (
-        <p className="mt-2 font-montserrat text-sm text-market-muted">{description}</p>
+        <p className="mt-2 market-empty-state-desc">{description}</p>
       ) : null}
       <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
         {onRetry ? (

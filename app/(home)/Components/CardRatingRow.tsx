@@ -26,8 +26,8 @@ export default function CardRatingRow({ rating, reviewCount = 0 }: CardRatingRow
             key={i}
             size={13}
             fill={i < fullStars ? "#E2B84B" : i === fullStars && hasHalfStar ? "#E2B84B" : "transparent"}
-            stroke={i < fullStars || (i === fullStars && hasHalfStar) ? "#E2B84B" : "#A9A2D8"}
-            className={i < fullStars || (i === fullStars && hasHalfStar) ? "text-market-gold" : "text-market-muted/40"}
+            stroke={i < fullStars || (i === fullStars && hasHalfStar) ? "#E2B84B" : "#BDB5E8"}
+            className={i < fullStars || (i === fullStars && hasHalfStar) ? "text-market-gold" : "text-market-muted/70"}
             aria-hidden="true"
           />
         ))}

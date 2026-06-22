@@ -95,7 +95,7 @@ export default function ProductDetailPage() {
             >
               <Heart
                 className={`w-6 h-6 transition-colors ${
-                  liked ? "text-red-500 fill-red-500" : "text-gray-400"
+                  liked ? "text-red-500 fill-red-500" : "text-brand-muted"
                 }`}
                 fill={liked ? "currentColor" : "none"}
               />
@@ -110,11 +110,11 @@ export default function ProductDetailPage() {
 
         {/* Info Section */}
         <div className="flex-1 space-y-4">
-          <h2 className="text-sm text-gray-400 uppercase">{product.brand}</h2>
+          <h2 className="text-sm text-brand-muted uppercase">{product.brand}</h2>
           <h1 className="text-xl font-bold leading-tight">{product.title}</h1>
           <div className="text-2xl font-bold text-[#c79b44]">
             ${product.price}
-            <span className="ml-2 text-base text-gray-400 line-through">
+            <span className="ml-2 text-base text-brand-muted line-through">
               ${product.actualPrice}
             </span>
             <span className="ml-2 text-sm text-green-600">

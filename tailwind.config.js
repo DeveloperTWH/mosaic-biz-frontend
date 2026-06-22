@@ -44,7 +44,7 @@ module.exports = {
         "market-header": "#0A0618",
         "market-pill": "#2D2652",
         "market-text": "#EDE7FF",
-        "market-muted": "#A9A2D8",
+        "market-muted": "#BDB5E8",
         "market-gold": "#E2B84B",
         "market-gold-hover": "#F5D76E",
         "market-teal": "#2DD4BF",

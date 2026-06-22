@@ -966,7 +966,7 @@ export default function ServiceVendorProfilePage() {
   {heroTitle}
 </h1>
 
-    <nav className="mt-2 text-sm text-gray-300">
+    <nav className="mt-2 text-sm text-white/85">
       <Link href="/" className="hover:text-white">Home</Link>
       <span className="mx-2">//</span>
       <Link href="/services" className="hover:text-white">
@@ -1200,7 +1200,7 @@ export default function ServiceVendorProfilePage() {
 </h3>
 
   {sortedServices.length === 0 ? (
-    <p className="text-sm text-gray-500">No services found.</p>
+    <p className="text-sm text-brand-muted">No services found.</p>
   ) : (
     <div className="space-y-2.5">
       {sortedServices.map(svc => (
@@ -1323,7 +1323,7 @@ export default function ServiceVendorProfilePage() {
                         </button>
                       )
                     ) : (
-                      <span className="text-gray-400">N/A</span>
+                      <span className="text-brand-muted">N/A</span>
                     )}
                   </div>
                 ))}
@@ -1417,7 +1417,7 @@ export default function ServiceVendorProfilePage() {
           value={bookForm.name}
           onChange={e => setBookForm(p => ({ ...p, name: e.target.value }))}
           placeholder="Enter Name"
-          className="h-9 w-full border border-[#d8d0ba] bg-[#fff8e8] px-3 text-[11px] text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#C7A040] placeholder:text-gray-400"
+          className="h-9 w-full border border-[#d8d0ba] bg-[#fff8e8] px-3 text-[11px] text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#C7A040] placeholder:text-brand-muted"
         />
       </div>
 
@@ -1428,7 +1428,7 @@ export default function ServiceVendorProfilePage() {
           onChange={e => setBookForm(p => ({ ...p, phone: e.target.value }))}
           placeholder="Enter Phone Number"
           type="tel"
-          className="h-9 w-full border border-[#d8d0ba] bg-[#fff8e8] px-3 text-[11px] text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#C7A040] placeholder:text-gray-400"
+          className="h-9 w-full border border-[#d8d0ba] bg-[#fff8e8] px-3 text-[11px] text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#C7A040] placeholder:text-brand-muted"
         />
       </div>
     </div>
@@ -1440,7 +1440,7 @@ export default function ServiceVendorProfilePage() {
         onChange={e => setBookForm(p => ({ ...p, email: e.target.value }))}
         placeholder="Enter Email"
         type="email"
-        className="h-9 w-full border border-[#d8d0ba] bg-[#fff8e8] px-3 text-[11px] text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#C7A040] placeholder:text-gray-400"
+        className="h-9 w-full border border-[#d8d0ba] bg-[#fff8e8] px-3 text-[11px] text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#C7A040] placeholder:text-brand-muted"
       />
     </div>
 
@@ -1578,14 +1578,14 @@ export default function ServiceVendorProfilePage() {
             ))}
           </div>
         ) : (
-          <p className="border border-dashed border-[#d8d0ba] bg-[#fffdf4] px-3 py-3 text-[11px] text-gray-500">
+          <p className="border border-dashed border-[#d8d0ba] bg-[#fffdf4] px-3 py-3 text-[11px] text-brand-muted">
             {selectedServices.length === 0
               ? "Select one or more services to calculate valid appointment slots."
               : "No slots fit inside the vendor's working hours for the selected services."}
           </p>
         )
       ) : (
-        <p className="border border-dashed border-[#d8d0ba] bg-[#fffdf4] px-3 py-3 text-[11px] text-gray-500">
+        <p className="border border-dashed border-[#d8d0ba] bg-[#fffdf4] px-3 py-3 text-[11px] text-brand-muted">
           Choose a working day to see time slots.
         </p>
       )}
@@ -1598,7 +1598,7 @@ export default function ServiceVendorProfilePage() {
         onChange={e => setBookForm(p => ({ ...p, note: e.target.value }))}
         placeholder="Tell the vendor anything important before the appointment"
         rows={3}
-        className="w-full resize-none border border-[#d8d0ba] bg-[#fff8e8] px-3 py-2 text-[11px] text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#C7A040] placeholder:text-gray-400"
+        className="w-full resize-none border border-[#d8d0ba] bg-[#fff8e8] px-3 py-2 text-[11px] text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#C7A040] placeholder:text-brand-muted"
       />
     </div> */}
 
@@ -1636,7 +1636,7 @@ export default function ServiceVendorProfilePage() {
       {bookingSubmitting ? "Submitting..." : "Request An Appointment"}
     </button>
     <p>A booking fee may be required by the vendor to confirm your booking.</p>
-<p className="border border-dashed border-[#d8d0ba] bg-[#fffdf4] px-3 py-2 text-[11px] text-gray-500 leading-relaxed mt-3">
+<p className="border border-dashed border-[#d8d0ba] bg-[#fffdf4] px-3 py-2 text-[11px] text-brand-muted leading-relaxed mt-3">
   On submission of this form, your booking request will be shared with the business. 
   They will <span className="font-medium text-[#1d1d1d]">confirm or decline</span> it based on availability. 
   We’ll keep you updated.
@@ -1661,7 +1661,7 @@ export default function ServiceVendorProfilePage() {
                   />
                 ) : (
                   <div className="flex h-full w-full flex-col items-center justify-center gap-2 px-4 text-center">
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-brand-muted">
                       {usesShortGoogleMapsLink
                         ? "Preview is not available for Google short links."
                         : "Map preview unavailable"}
@@ -1676,7 +1676,7 @@ export default function ServiceVendorProfilePage() {
                         {usesShortGoogleMapsLink ? "Open Shared Map" : "Open in Google Maps"}
                       </a>
                     ) : (
-                      <span className="text-sm text-gray-400">Map unavailable</span>
+                      <span className="text-sm text-brand-muted">Map unavailable</span>
                     )}
                   </div>
                 )}

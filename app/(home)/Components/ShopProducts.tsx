@@ -348,9 +348,9 @@ function SkeletonCarousel() {
 function ErrorBlock({ error, onRetry }: { error: string; onRetry: () => void }) {
   return (
     <div className="market-card flex flex-col items-center gap-3 rounded-xl py-8 text-center">
-      <div className="text-market-teal">
+      <p className="font-montserrat text-sm text-market-text/90">
         We&apos;re having trouble loading products: {error}
-      </div>
+      </p>
       <button
         onClick={onRetry}
         className="market-btn-primary inline-flex items-center gap-2 px-4 py-2 text-sm normal-case"

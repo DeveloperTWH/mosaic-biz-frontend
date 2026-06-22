@@ -364,7 +364,7 @@ const AddressComponent = ({
                     key={a.id}
                     className="flex items-start justify-between gap-2 p-3 border rounded"
                   >
-                    <span className="flex-1 text-sm text-gray-700">
+                    <span className="flex-1 text-sm text-brand-navy">
                       {displayLine(a)}
                       {a.isDefault ? " • Default" : ""}
                     </span>
@@ -378,7 +378,7 @@ const AddressComponent = ({
                       </button>
                       {/* Edit */}
                       <button
-                        className="p-1 text-gray-500 rounded hover:text-blue-600 hover:bg-blue-50"
+                        className="rounded p-1 text-brand-muted hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold"
                         title="Edit address"
                         onClick={() => openEdit(a)}
                       >
@@ -386,7 +386,7 @@ const AddressComponent = ({
                       </button>
                       {/* Delete */}
                       <button
-                        className="p-1 text-gray-500 rounded hover:text-red-600 hover:bg-red-50"
+                        className="rounded p-1 text-brand-muted hover:bg-red-50 hover:text-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold"
                         title="Delete address"
                         onClick={() => handleDelete(a.id)}
                       >
@@ -399,12 +399,12 @@ const AddressComponent = ({
             )}
 
             {!editingId && addresses.length === 0 && (
-              <div className="mb-4 text-sm text-gray-600">No saved addresses yet.</div>
+              <div className="mb-4 text-sm text-brand-muted">No saved addresses yet.</div>
             )}
 
             {/* Add / Edit Form */}
             <div className="mt-2">
-              <div className="mb-2 text-sm font-medium text-gray-700">
+              <div className="mb-2 text-sm font-medium text-brand-navy">
                 {editingId ? "Update address details" : "Or, add a new address"}
               </div>
 

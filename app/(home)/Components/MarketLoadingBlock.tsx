@@ -16,7 +16,7 @@ export default function MarketLoadingBlock({
       aria-live="polite"
     >
       <div className="inline-block h-10 w-10 animate-spin rounded-full border-2 border-market-gold/30 border-t-market-gold" />
-      <p className="mt-3 font-montserrat text-sm text-market-muted">{label}</p>
+      <p className="mt-3 font-montserrat text-sm text-market-text/85">{label}</p>
     </div>
   );
 }

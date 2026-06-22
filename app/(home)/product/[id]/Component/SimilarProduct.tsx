@@ -164,7 +164,7 @@ export default function SimilarProduct({ productId }: { productId?: string }) {
       <hr className="h-[2px] w-[100px] bg-green-900 mx-auto" />
       <hr className="h-[2px] w-[100px] bg-green-900 mx-auto mt-[1px]" />
       <div className="w-3/5 mx-auto">
-        <p className="mt-4 text-center text-gray-600">
+        <p className="mt-4 text-center text-brand-muted">
           You might also like these highly-ranked picks.
         </p>
       </div>
@@ -206,7 +206,7 @@ export default function SimilarProduct({ productId }: { productId?: string }) {
             </button>
           </div>
         ) : items.length === 0 ? (
-          <div className="text-center text-gray-600">No similar products found.</div>
+          <div className="text-center text-brand-muted">No similar products found.</div>
         ) : (
           <div ref={eqRef}>
             <Swiper
@@ -263,7 +263,7 @@ export default function SimilarProduct({ productId }: { productId?: string }) {
                       </div>
 
                       <h3
-                        className="mt-3 mb-1 text-sm font-semibold text-gray-900"
+                        className="mt-3 mb-1 text-sm font-semibold text-brand-navy"
                         title={p.title}
                         style={{
                           display: '-webkit-box',
@@ -277,7 +277,7 @@ export default function SimilarProduct({ productId }: { productId?: string }) {
                         {p.title}
                       </h3>
                       <p
-                        className="mb-2 text-xs text-gray-600"
+                        className="mb-2 text-xs text-brand-muted"
                         title={stripHtml(p.description || '')}
                         style={{
                           display: '-webkit-box',
@@ -319,16 +319,16 @@ export default function SimilarProduct({ productId }: { productId?: string }) {
                               size={12}
                               fill="none"
                               stroke="gray"
-                              className="text-gray-300"
+                              className="text-brand-muted/70"
                             />
                           ))}
                         {ratingCount(p) > 0 && (
-                          <span className="ml-2 text-[11px] text-gray-500">({ratingCount(p)})</span>
+                          <span className="ml-2 text-[11px] text-brand-muted">({ratingCount(p)})</span>
                         )}
                       </div>
 
 <div className="flex flex-col mt-auto leading-tight">
-  <span className="text-xs text-gray-500">
+  <span className="text-xs text-brand-muted">
     Starting from
   </span>
 
@@ -337,12 +337,12 @@ export default function SimilarProduct({ productId }: { productId?: string }) {
       <span className="text-sm font-semibold text-[#B12704] sm:text-base">
         ${effective.toFixed(2)}
       </span>
-      <span className="text-xs text-gray-500 line-through">
+      <span className="text-xs text-brand-muted line-through">
         ${price.toFixed(2)}
       </span>
     </div>
   ) : (
-    <span className="text-sm font-semibold text-gray-900 sm:text-base">
+    <span className="text-sm font-semibold text-brand-navy sm:text-base">
       ${price.toFixed(2)}
     </span>
   )}
