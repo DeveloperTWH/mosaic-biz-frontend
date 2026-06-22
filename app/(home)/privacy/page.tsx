@@ -11,22 +11,23 @@ const Privacy = () => {
         { label: "Privacy Policy" },
       ]}
       imageUrl="/about.png"
+      proseVariant="legal"
     >
       <h1 className="mb-2 font-poppins text-3xl font-bold text-brand-navy">
         Mosaic Biz Hub Privacy Policy
       </h1>
 
-      <p className="text-gray-500 mb-8 text-sm">
+      <p className="mb-8 text-sm text-brand-muted">
         Effective Date: September 6, 2025
       </p>
 
       {/* Introduction */}
       <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           Introduction
         </h2>
 
-        <p className="text-gray-700">
+        <p >
           Mosaic Biz Hub (“we,” “our,” or “us”) is committed to protecting your
           privacy and ensuring a safe online experience. This Privacy Policy
           explains how we collect, use, disclose, and safeguard your
@@ -41,7 +42,7 @@ const Privacy = () => {
 
       {/* Information We Collect */}
       <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           1. Information We Collect
         </h2>
 
@@ -50,7 +51,7 @@ const Privacy = () => {
           offerings, and maintain a secure platform.
         </p>
 
-        <ul className="pl-5 list-disc text-gray-700">
+        <ul className="list-disc pl-5">
           <li className="mb-3">
             <span className="font-semibold">
               Personal Information:
@@ -87,7 +88,7 @@ const Privacy = () => {
 
       {/* How We Use Information */}
       <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           2. How We Use Your Information
         </h2>
 
@@ -96,7 +97,7 @@ const Privacy = () => {
           experiences.
         </p>
 
-        <ul className="pl-5 list-disc text-gray-700">
+        <ul className="list-disc pl-5">
           <li className="mb-2">
             Operate, maintain, and improve Platform services
           </li>
@@ -121,7 +122,7 @@ const Privacy = () => {
 
       {/* Cookies */}
       <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           3. Cookies and Tracking Technologies
         </h2>
 
@@ -130,7 +131,7 @@ const Privacy = () => {
           to improve user experience and optimize platform performance.
         </p>
 
-        <ul className="pl-5 list-disc text-gray-700">
+        <ul className="list-disc pl-5">
           <li className="mb-2">
             <span className="font-semibold">
               Session Cookies:
@@ -163,7 +164,7 @@ const Privacy = () => {
 
       {/* Sharing Information */}
       <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           4. Sharing Your Information
         </h2>
 
@@ -175,7 +176,7 @@ const Privacy = () => {
           Information may be shared in the following situations:
         </p>
 
-        <ul className="pl-5 list-disc text-gray-700">
+        <ul className="list-disc pl-5">
           <li className="mb-2">
             With trusted service providers and payment processors
           </li>
@@ -196,11 +197,11 @@ const Privacy = () => {
 
       {/* Data Retention */}
       <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           5. Data Retention
         </h2>
 
-        <p className="text-gray-700">
+        <p >
           We retain your information only as long as necessary to fulfill the
           purposes outlined in this policy or as required by law. When data is
           no longer needed, we securely delete or anonymize it.
@@ -209,11 +210,11 @@ const Privacy = () => {
 
       {/* Security */}
       <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           6. Data Security
         </h2>
 
-        <p className="text-gray-700">
+        <p >
           We implement administrative, technical, and physical safeguards to
           protect your information against unauthorized access, disclosure,
           alteration, or destruction.
@@ -222,7 +223,7 @@ const Privacy = () => {
 
       {/* Rights */}
       <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           7. Your Rights
         </h2>
 
@@ -230,7 +231,7 @@ const Privacy = () => {
           Depending on your jurisdiction, you may have the right to:
         </p>
 
-        <ul className="pl-5 list-disc text-gray-700">
+        <ul className="list-disc pl-5">
           <li className="mb-2">
             Access, correct, or delete personal information
           </li>
@@ -255,11 +256,11 @@ const Privacy = () => {
 
       {/* Third Party */}
       <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           8. Third-Party Links and Services
         </h2>
 
-        <p className="text-gray-700">
+        <p >
           Our platform may contain links to third-party websites or services.
           We are not responsible for their privacy practices and encourage you
           to review their policies before sharing information.
@@ -268,11 +269,11 @@ const Privacy = () => {
 
       {/* Children */}
       <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           9. Children’s Privacy
         </h2>
 
-        <p className="text-gray-700">
+        <p >
           Mosaic Biz Hub is not intended for children under 16. We do not
           knowingly collect personal information from users under this age.
         </p>
@@ -280,11 +281,11 @@ const Privacy = () => {
 
       {/* Policy Changes */}
       <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           10. Changes to This Privacy Policy
         </h2>
 
-        <p className="text-gray-700">
+        <p >
           We may update this Privacy Policy periodically to reflect changes in
           our practices or legal requirements. Updated policies will include a
           revised effective date.
@@ -293,11 +294,11 @@ const Privacy = () => {
 
       {/* Contact */}
       <section className="mb-10">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           Contact Us
         </h2>
 
-        <p className="text-gray-700">
+        <p >
           If you have questions or requests regarding this Privacy Policy,
           please contact:
         </p>

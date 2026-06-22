@@ -11,18 +11,19 @@ const ReturnRefundPolicy = () => {
         { label: "Return & Refund Policy" },
       ]}
       imageUrl="/about.png"
+      proseVariant="legal"
     >
       <h1 className="mb-2 font-poppins text-3xl font-bold text-brand-navy">
         Mosaic Biz Hub Return & Refund Policy
       </h1>
 
-      <p className="text-gray-500 mb-8 text-sm">
+      <p className="mb-8 text-sm text-brand-muted">
         Effective upon platform launch — 2026
       </p>
 
       {/* Intro */}
       <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           Introduction
         </h2>
 
@@ -31,7 +32,7 @@ const ReturnRefundPolicy = () => {
           customer-centered marketplace.
         </p>
 
-        <p className="text-gray-700">
+        <p >
           Because purchases are completed directly on each Vendor’s website, all
           returns, exchanges, and refunds are governed first by the Vendor’s own
           posted Return & Refund Policy.
@@ -46,7 +47,7 @@ const ReturnRefundPolicy = () => {
 
       {/* Vendor Policy */}
       <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           1. Vendor-Provided Return & Refund Policies
         </h2>
 
@@ -54,7 +55,7 @@ const ReturnRefundPolicy = () => {
           Vendor policies take precedence when clearly posted and accessible.
         </p>
 
-        <ul className="pl-5 list-disc text-gray-700">
+        <ul className="list-disc pl-5">
           <li className="mb-2">
             Vendors must maintain a clearly visible Return & Refund Policy
           </li>
@@ -80,7 +81,7 @@ const ReturnRefundPolicy = () => {
 
       {/* Default Policy */}
       <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           2. Mosaic Biz Hub Standard Return & Refund Policy
         </h2>
 
@@ -99,7 +100,7 @@ const ReturnRefundPolicy = () => {
             order if there are issues including:
           </p>
 
-          <ul className="pl-5 list-disc text-gray-700">
+          <ul className="list-disc pl-5">
             <li className="mb-2">Missing items</li>
             <li className="mb-2">Incorrect items</li>
             <li className="mb-2">Damaged or defective products</li>
@@ -122,7 +123,7 @@ const ReturnRefundPolicy = () => {
             To qualify for a return or refund, products must be:
           </p>
 
-          <ul className="pl-5 list-disc text-gray-700">
+          <ul className="list-disc pl-5">
             <li className="mb-2">Unused</li>
             <li className="mb-2">In original condition</li>
             <li className="mb-2">In original packaging</li>
@@ -145,7 +146,7 @@ const ReturnRefundPolicy = () => {
             The following items are not eligible for return or refund:
           </p>
 
-          <ul className="pl-5 list-disc text-gray-700">
+          <ul className="list-disc pl-5">
             <li className="mb-2">Services</li>
             <li className="mb-2">Custom or personalized products</li>
             <li className="mb-2">
@@ -171,7 +172,7 @@ const ReturnRefundPolicy = () => {
             information.
           </p>
 
-          <ul className="pl-5 list-disc text-gray-700">
+          <ul className="list-disc pl-5">
             <li className="mb-2">
               Mosaic Biz Hub and Vendors are not liable for incorrect addresses
               entered by Customers
@@ -189,7 +190,7 @@ const ReturnRefundPolicy = () => {
             2.5 Refund Method
           </h3>
 
-          <p className="text-gray-700">
+          <p >
             Approved refunds will be issued to the original form of payment
             within 7 business days of Vendor approval.
           </p>
@@ -198,7 +199,7 @@ const ReturnRefundPolicy = () => {
 
       {/* Dispute */}
       <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           3. Dispute Escalation
         </h2>
 
@@ -206,7 +207,7 @@ const ReturnRefundPolicy = () => {
           If a Customer cannot resolve an issue directly with a Vendor:
         </p>
 
-        <ul className="pl-5 list-disc text-gray-700">
+        <ul className="list-disc pl-5">
           <li className="mb-2">
             Customers may escalate disputes to Mosaic Biz Hub Support
           </li>
@@ -229,11 +230,11 @@ const ReturnRefundPolicy = () => {
 
       {/* Vendor Compliance */}
       <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           4. Vendor Compliance Requirements
         </h2>
 
-        <ul className="pl-5 list-disc text-gray-700">
+        <ul className="list-disc pl-5">
           <li className="mb-2">
             Vendors must maintain an accurate and accessible policy
           </li>
@@ -259,11 +260,11 @@ const ReturnRefundPolicy = () => {
 
       {/* Disclaimer */}
       <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           5. Platform Disclaimer
         </h2>
 
-        <p className="text-gray-700">
+        <p >
           Mosaic Biz Hub does not process payments, store payment information,
           or fulfill orders. All transactions occur directly between Customers
           and Vendors.
@@ -277,11 +278,11 @@ const ReturnRefundPolicy = () => {
 
       {/* Contact */}
       <section className="mb-10">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           6. Contact Information
         </h2>
 
-        <p className="text-gray-700">
+        <p >
           For dispute escalation or questions regarding this policy, contact:
         </p>
 

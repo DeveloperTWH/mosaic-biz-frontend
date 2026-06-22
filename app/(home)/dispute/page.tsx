@@ -11,23 +11,24 @@ const Dispute = () => {
         { label: "Dispute Resolution" },
       ]}
       imageUrl="/about.png"
+      proseVariant="legal"
     >
       <h1 className="mb-2 font-poppins text-3xl font-bold text-brand-navy">
         Dispute Resolution Process
       </h1>
 
-      <p className="text-gray-500 mb-8 text-sm">
+      <p className="mb-8 text-sm text-brand-muted">
         Mosaic Biz Hub — A fair, transparent, and community-centered approach
         to resolving issues.
       </p>
 
       {/* Intro */}
       <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           Introduction
         </h2>
 
-        <p className="text-gray-700">
+        <p >
           Mosaic Biz Hub is committed to maintaining a trusted marketplace where
           Customers and Vendors can resolve concerns quickly, fairly, and
           respectfully.
@@ -42,7 +43,7 @@ const Dispute = () => {
 
       {/* Step 1 */}
       <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           1. Step One — Customer Contacts the Vendor Directly
         </h2>
 
@@ -56,7 +57,7 @@ const Dispute = () => {
             Customer Responsibilities
           </h3>
 
-          <ul className="pl-5 list-disc text-gray-700">
+          <ul className="list-disc pl-5">
             <li className="mb-2">
               Contact the Vendor using the information provided on the Vendor’s
               profile or website
@@ -77,7 +78,7 @@ const Dispute = () => {
             Vendor Responsibilities
           </h3>
 
-          <ul className="pl-5 list-disc text-gray-700">
+          <ul className="list-disc pl-5">
             <li className="mb-2">
               Acknowledge Customer communication within 48 hours
             </li>
@@ -104,7 +105,7 @@ const Dispute = () => {
 
       {/* Step 2 */}
       <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           2. Step Two — Vendor Provides a Resolution
         </h2>
 
@@ -112,7 +113,7 @@ const Dispute = () => {
           Vendors may provide one of the following resolutions:
         </p>
 
-        <ul className="pl-5 list-disc text-gray-700">
+        <ul className="list-disc pl-5">
           <li className="mb-2">Replacement</li>
           <li className="mb-2">Refund</li>
           <li className="mb-2">Exchange</li>
@@ -131,7 +132,7 @@ const Dispute = () => {
 
       {/* Step 3 */}
       <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           3. Step Three — Customer Escalates to Mosaic Biz Hub Support
         </h2>
 
@@ -145,7 +146,7 @@ const Dispute = () => {
           Customer Must Provide
         </h3>
 
-        <ul className="pl-5 list-disc text-gray-700">
+        <ul className="list-disc pl-5">
           <li className="mb-2">Order details</li>
           <li className="mb-2">Proof of purchase</li>
           <li className="mb-2">
@@ -162,7 +163,7 @@ const Dispute = () => {
 
       {/* Step 4 */}
       <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           4. Step Four — Mosaic Biz Hub Review
         </h2>
 
@@ -193,7 +194,7 @@ const Dispute = () => {
           Vendor Responsibilities During Review
         </h3>
 
-        <ul className="pl-5 list-disc text-gray-700">
+        <ul className="list-disc pl-5">
           <li className="mb-2">
             Respond within 48 hours
           </li>
@@ -215,7 +216,7 @@ const Dispute = () => {
 
       {/* Step 5 */}
       <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           5. Step Five — Determination & Guidance
         </h2>
 
@@ -224,7 +225,7 @@ const Dispute = () => {
           following outcomes:
         </p>
 
-        <ul className="pl-5 list-disc text-gray-700">
+        <ul className="list-disc pl-5">
           <li className="mb-2">
             Vendor must issue a refund
           </li>
@@ -254,7 +255,7 @@ const Dispute = () => {
 
       {/* Step 6 */}
       <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           6. Step Six — Enforcement
         </h2>
 
@@ -263,7 +264,7 @@ const Dispute = () => {
           Hub may take corrective action including:
         </p>
 
-        <ul className="pl-5 list-disc text-gray-700">
+        <ul className="list-disc pl-5">
           <li className="mb-2">Badge downgrade</li>
           <li className="mb-2">Temporary suspension</li>
           <li className="mb-2">Permanent termination</li>
@@ -278,7 +279,7 @@ const Dispute = () => {
 
       {/* Step 7 */}
       <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           7. Step Seven — Final Closure
         </h2>
 
@@ -286,7 +287,7 @@ const Dispute = () => {
           A dispute is considered closed when:
         </p>
 
-        <ul className="pl-5 list-disc text-gray-700">
+        <ul className="list-disc pl-5">
           <li className="mb-2">
             The Vendor completes the required action
           </li>
@@ -307,7 +308,7 @@ const Dispute = () => {
 
       {/* Principles */}
       <section className="mb-10">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           8. Guiding Principles
         </h2>
 
@@ -315,7 +316,7 @@ const Dispute = () => {
           Mosaic Biz Hub resolves disputes using the following principles:
         </p>
 
-        <ul className="pl-5 list-disc text-gray-700">
+        <ul className="list-disc pl-5">
           <li className="mb-2">Fairness</li>
           <li className="mb-2">Transparency</li>
           <li className="mb-2">Documentation</li>

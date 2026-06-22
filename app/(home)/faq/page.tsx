@@ -10,6 +10,7 @@ export default function FaqPage() {
         { label: "FAQ" },
       ]}
       imageUrl="/about.png"
+      proseVariant="legal"
     >
       <FaqContent />
     </PublicContentLayout>

@@ -24,6 +24,10 @@ export const PUBLIC_QUALITY_ROUTES: PublicRoute[] = [
   { id: "refund-return", path: "/refund-return", label: "Refund & Return", policy: true },
   { id: "dispute", path: "/dispute", label: "Dispute Resolution", policy: true },
   { id: "consumer-terms", path: "/consumer/terms", label: "Consumer Terms", policy: true },
+  { id: "vendor-terms", path: "/vendor/terms", label: "Vendor Terms", policy: true },
+  { id: "consumer-trustbadge", path: "/consumer/trustbadge", label: "Consumer Trust Badge" },
+  { id: "vendor-trustbadge", path: "/vendor/trustbadge", label: "Vendor Trust Badge" },
+  { id: "how-to-use", path: "/how-to-use-this-app", label: "How to Use This App" },
 ];
 
 export const QUALITY_SCAN_PORT = Number(process.env.QUALITY_SCAN_PORT ?? 3098);

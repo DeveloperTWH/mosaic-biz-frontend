@@ -31,6 +31,10 @@ const PUBLIC_ROUTES = [
   { id: "refund-return", path: "/refund-return" },
   { id: "dispute", path: "/dispute" },
   { id: "consumer-terms", path: "/consumer/terms" },
+  { id: "vendor-terms", path: "/vendor/terms" },
+  { id: "consumer-trustbadge", path: "/consumer/trustbadge" },
+  { id: "vendor-trustbadge", path: "/vendor/trustbadge" },
+  { id: "how-to-use", path: "/how-to-use-this-app" },
 ];
 
 function run(command, args, env = {}) {

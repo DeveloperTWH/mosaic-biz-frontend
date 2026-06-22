@@ -1,28 +1,47 @@
 import React from "react";
 import Link from "next/link";
+import PublicContentLayout from "../../Components/PublicContentLayout";
+import { PolicyPageCta } from "../../Components/PolicyPageCta";
 
 const TermsConditions = () => {
   return (
-    <div className="max-w-[900px] mx-auto p-8 font-sans leading-relaxed">
-      <h1 className="mb-2 text-3xl font-bold">
+    <PublicContentLayout
+      title="Vendor Terms"
+      breadcrumbs={[
+        { label: "Home", href: "/" },
+        { label: "Vendor Terms" },
+      ]}
+      imageUrl="/about.png"
+      proseVariant="legal"
+      footer={
+        <PolicyPageCta
+          headline="GROW WITH CONFIDENCE"
+          subheadline="JOIN MOSAIC BIZ HUB TODAY!"
+          body="Build trust, expand your reach, and connect with customers who value inclusive and community-driven businesses through Mosaic Biz Hub."
+          href="/become-a-vendor"
+          linkLabel="Become A Vendor"
+        />
+      }
+    >
+      <h1 className="mb-2 font-poppins text-3xl font-bold text-brand-navy">
         Terms and Conditions of Service
       </h1>
 
-      <p className="text-gray-500 mb-8 text-sm">
+      <p className="mb-8 text-sm text-brand-muted">
         Last updated: January 2026
       </p>
 
       {/* Introduction */}
       <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-3">Introduction</h2>
+        <h2 className="mb-3">Introduction</h2>
 
-        <p className="text-gray-700 mb-4">
+        <p className="mb-4">
           Mosaic Biz Hub is a digital platform designed to foster inclusive,
           trust-centered commerce between vendors and customers, underpinned by
           transparency, compliance, and user empowerment.
         </p>
 
-        <p className="text-gray-700">
+        <p >
           This website is owned and operated by{" "}
           <span className="font-semibold">Mosaic Biz Hub, LLC</span>, a Virginia
           Limited Liability Company. Throughout this website references to
@@ -36,11 +55,11 @@ const TermsConditions = () => {
 
       {/* Community Standard */}
       <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           1. Community Standard
         </h2>
 
-        <p className="text-gray-700">
+        <p >
           Platform is committed to language and practices that foster an
           accessible, inclusive community for users of all backgrounds and
           abilities. Vendors and Customers are entitled to Platform experiences
@@ -56,18 +75,18 @@ const TermsConditions = () => {
 
       {/* Vendor Accounts */}
       <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           2. Vendor Accounts
         </h2>
 
-        <p className="text-gray-700 mb-4">
+        <p className="mb-4">
           To become an authorized Vendor, an authorized representative of the
           business entity must complete Company’s onboarding process which
           includes providing accurate and complete business identification
           information and undergoing background verification checks.
         </p>
 
-        <p className="text-gray-700">
+        <p >
           Vendors must provide accurate information about the business entity
           and owner(s). Providing false or misleading information or
           impersonating another person or entity is strictly prohibited.
@@ -76,11 +95,11 @@ const TermsConditions = () => {
 
       {/* Vendor Qualification */}
       <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           3. Vendor Qualification
         </h2>
 
-        <p className="text-gray-700">
+        <p >
           Vendor approval is contingent upon successfully completing Company’s
           onboarding process, meeting Platform standards for business operations
           and quality, accepting DEI and accessibility guidelines, and payment
@@ -90,11 +109,11 @@ const TermsConditions = () => {
 
       {/* Vendor Payments */}
       <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           4. Vendor Payments to Company
         </h2>
 
-        <p className="text-gray-700">
+        <p >
           Vendors will be charged fees for using the Platform based on Vendor’s
           account selection. Additional fees may include background checks,
           profile setup, product/service listings, advertising, and premium
@@ -104,7 +123,7 @@ const TermsConditions = () => {
 
       {/* Vendor Profiles */}
       <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           5. Vendor Profiles and Listings
         </h2>
 
@@ -112,7 +131,7 @@ const TermsConditions = () => {
           Vendor listings must include:
         </p>
 
-        <ul className="pl-5 list-disc text-gray-700">
+        <ul className="list-disc pl-5">
           <li className="mb-2">Accurate product or service descriptions</li>
           <li className="mb-2">
             Accurate labels, ingredients, and warnings
@@ -133,7 +152,7 @@ const TermsConditions = () => {
 
       {/* Vendor Performance */}
       <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           6. Vendor Performance, Metrics, and Badges
         </h2>
 
@@ -178,11 +197,11 @@ const TermsConditions = () => {
 
       {/* Privacy */}
       <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           7. Vendor Privacy and Data Processing
         </h2>
 
-        <p className="text-gray-700">
+        <p >
           Vendor acknowledges and agrees to handle and process Customer data in
           accordance with Company’s Privacy Policy.
         </p>
@@ -190,11 +209,11 @@ const TermsConditions = () => {
 
       {/* Prohibited Activities */}
       <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           8. Vendor Prohibited Activities
         </h2>
 
-        <ul className="pl-5 list-disc text-gray-700">
+        <ul className="list-disc pl-5">
           <li className="mb-2">Violating laws or regulations</li>
           <li className="mb-2">Fraudulent activity</li>
           <li className="mb-2">
@@ -214,11 +233,11 @@ const TermsConditions = () => {
 
       {/* Orders */}
       <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           9. Customer Orders and Purchases
         </h2>
 
-        <p className="text-gray-700">
+        <p >
           Purchases initiated on the Platform will be directed to the Vendor’s
           website to complete the purchase. Vendors are responsible for
           processing payments securely and collecting applicable taxes.
@@ -227,9 +246,9 @@ const TermsConditions = () => {
 
       {/* Shipping */}
       <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-3">10. Shipping</h2>
+        <h2 className="mb-3">10. Shipping</h2>
 
-        <p className="text-gray-700">
+        <p >
           Customers are responsible for ensuring shipping information is
           accurate. Vendors must provide clear shipping and processing
           information on their profile.
@@ -238,11 +257,11 @@ const TermsConditions = () => {
 
       {/* Returns */}
       <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           11. Returns or Refund Policy
         </h2>
 
-        <p className="text-gray-700 mb-4">
+        <p className="mb-4">
           Vendors must clearly display their return and refund policy. Approved
           refund requests should be issued to the original payment method within
           seven (7) business days.
@@ -252,7 +271,7 @@ const TermsConditions = () => {
           Certain products may not be eligible for returns or refunds:
         </p>
 
-        <ul className="pl-5 list-disc text-gray-700">
+        <ul className="list-disc pl-5">
           <li className="mb-2">Service purchases</li>
           <li className="mb-2">Custom products</li>
           <li className="mb-2">Personal care products</li>
@@ -263,11 +282,11 @@ const TermsConditions = () => {
 
       {/* Suspension */}
       <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           12. Suspension, Termination, and Remedies
         </h2>
 
-        <p className="text-gray-700">
+        <p >
           Company may suspend or terminate Vendor accounts for breaches of these
           Terms, repeated performance failures, noncompliance with laws, or
           conduct harmful to the Platform’s integrity.
@@ -276,11 +295,11 @@ const TermsConditions = () => {
 
       {/* Warranty */}
       <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           13. Disclaimer of Warranty
         </h2>
 
-        <p className="text-gray-700">
+        <p >
           All Platform services are provided “as is” and “as available” without
           warranties of any kind, either express or implied.
         </p>
@@ -288,11 +307,11 @@ const TermsConditions = () => {
 
       {/* Liability */}
       <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           14. Limitation of Liability
         </h2>
 
-        <p className="text-gray-700">
+        <p >
           Company shall not be liable for any direct, indirect, incidental,
           punitive, special, or consequential damages arising from use of the
           Platform or Vendor transactions.
@@ -301,11 +320,11 @@ const TermsConditions = () => {
 
       {/* Governing Law */}
       <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           15. Governing Law
         </h2>
 
-        <p className="text-gray-700">
+        <p >
           These Terms and Conditions of Service shall be governed and construed
           in accordance with the laws of the Commonwealth of Virginia.
         </p>
@@ -313,56 +332,21 @@ const TermsConditions = () => {
 
       {/* Contact */}
       <section className="mb-10">
-        <h2 className="text-xl font-semibold mb-3">
+        <h2 className="mb-3">
           Contact Information
         </h2>
 
-        <p className="text-gray-700">
+        <p >
           Questions about these Terms and Conditions of Service should be sent
           to:
         </p>
 
-        <p className="text-gray-700 mt-3 font-medium">
+        <p className="mt-3 font-medium">
           info@mosaicbizhub.com
         </p>
       </section>
 
-      {/* CTA Section */}
-      <div className="mt-12 w-full">
-        <div
-          className="w-full bg-cover bg-center"
-          style={{ backgroundImage: "url('/contact/becomeVendor.png')" }}
-        >
-          <div className="bg-[#3333339E] py-24 px-8 text-center text-white">
-            <div className="max-w-[900px] mx-auto">
-              <h2 className="text-white text-3xl font-bold mb-2">
-                GROW WITH CONFIDENCE -
-              </h2>
-
-              <h2 className="text-white text-3xl font-bold mb-4">
-                JOIN MOSAIC BIZ HUB TODAY!
-              </h2>
-
-              <hr className="h-[2px] w-[180px] bg-white border-none mx-auto my-4" />
-              <hr className="h-[2px] w-[180px] bg-white border-none mx-auto mb-8" />
-
-              <p className="text-white text-lg leading-relaxed max-w-[700px] mx-auto mb-10 opacity-95">
-                Build trust, expand your reach, and connect with customers who
-                value inclusive and community-driven businesses through Mosaic
-                Biz Hub.
-              </p>
-
-              <Link
-                href="/become-a-vendor"
-                className="inline-block px-10 py-4 bg-transparent border-2 border-white text-white font-semibold text-lg transition-all duration-300 hover:bg-white hover:text-gray-800"
-              >
-                Become A Vendor
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    </PublicContentLayout>
   );
 };
 
