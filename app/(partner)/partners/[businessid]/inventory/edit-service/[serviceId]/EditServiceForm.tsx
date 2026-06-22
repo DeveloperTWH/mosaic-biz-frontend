@@ -6,6 +6,20 @@ import { Service } from '@/types/service'
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { uploadToS3, GalleryLimitError } from '@/utils/s3Uploader';
+import ChildServiceFields from '../../components/ChildServiceFields';
+import { ApiClientError, getUserSafeMessage } from '@/lib/api/errors';
+import {
+    createEmptyChildService,
+    extractFieldErrorsFromError,
+    getPublicationSuccessMessage,
+    getServiceById,
+    mapServiceToFormState,
+    serializeServicePayload,
+    updateService,
+    validateServiceForPublish,
+    verifyPublicListing,
+    type ServiceChildInput,
+} from '@/lib/api/services';
 
 interface UpdateServiceFormProps {
     businessId: string;
@@ -44,9 +58,6 @@ type FAQ = {
     answer: string;
 };
 
-type NamedService = {
-    name: string;
-};
 
 type GeocodeAddressComponent = { long_name: string; short_name: string; types: string[] };
 type GeocodeLocation = { lat: number | (() => number); lng: number | (() => number) };
@@ -289,7 +300,7 @@ const UpdateServiceForm: React.FC<UpdateServiceFormProps> = ({ businessId, busin
         description: string;
         price: number;
         duration: string;
-        services: NamedService[];
+        services: ServiceChildInput[];
         categories: CategorySelection[];
         coverImage: string;
         images: string[];
@@ -307,7 +318,7 @@ const UpdateServiceForm: React.FC<UpdateServiceFormProps> = ({ businessId, busin
         description: '',
         price: 0,
         duration: '',
-        services: [{ name: '' }],
+        services: [createEmptyChildService()],
         categories: [],
         coverImage: '',
         images: [],
@@ -338,6 +349,9 @@ const UpdateServiceForm: React.FC<UpdateServiceFormProps> = ({ businessId, busin
 
 
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [publishIntent, setPublishIntent] = useState(false);
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+    const [loadedIsPublished, setLoadedIsPublished] = useState(false);
     // State to track structured fields
     const [addressFields, setAddressFields] = useState({
         addressLine1: '',
@@ -455,80 +469,29 @@ const UpdateServiceForm: React.FC<UpdateServiceFormProps> = ({ businessId, busin
 
         const fetchInitialService = async () => {
             try {
-                const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/service/${serviceId}`, {
-                    withCredentials: true,
+                const data = await getServiceById(serviceId);
+                const mapped = {
+                    ...mapServiceToFormState(data),
+                    categories: data.categories?.length ? data.categories : [],
+                    amenities: data.amenities?.length ? data.amenities : defaultAmenities,
+                    businessHours: data.businessHours?.length ? data.businessHours : defaultBusinessHours,
+                    features: data.features?.length ? data.features : [''],
+                } as unknown as typeof serviceData;
+
+                setServiceData(mapped);
+                setOriginalServiceData(mapped);
+                setLoadedIsPublished(Boolean(data.isPublished));
+
+                const parsed = parseStoredAddress(data.contact?.address);
+                setAddressFields({
+                    addressLine1: parsed.addressLine1,
+                    addressLine2: parsed.addressLine2,
+                    city: parsed.city,
+                    state: parsed.state,
+                    zip: parsed.zip,
+                    country: parsed.country,
                 });
-                console.log(res);
-
-                if (res.status === 200 && res?.data) {
-                    const data = res.data.service;
-                    console.log(data.title);
-
-                    // 👇 Safely fill in all expected fields
-                    setServiceData({
-                        title: data.title || '',
-                        description: data.description || '',
-                        price: data.price || 0,
-                        duration: data.duration || '',
-                        services: data.services?.length ? data.services : [{ name: '' }],
-                        categories: data.categories?.length ? data.categories : [],
-                        coverImage: data.coverImage || '',
-                        images: data.images || [],
-                        videos: data.videos || [],
-                        features: data.features?.length ? data.features : [''],
-                        amenities: data.amenities?.length ? data.amenities : defaultAmenities,
-                        businessHours: data.businessHours?.length ? data.businessHours : defaultBusinessHours,
-                        location: data.location || { type: 'Point', coordinates: [0, 0] },
-                        contact: {
-                            phone: data.contact?.phone || '',
-                            email: data.contact?.email || '',
-                            website: data.contact?.website || '',
-                            address: data.contact?.address || '',
-                        },
-                        faq: data.faq?.length ? data.faq : [{ question: '', answer: '' }],
-                        maxBookingsPerSlot: data.maxBookingsPerSlot || 1,
-                        isPublished: data.isPublished || false,
-                    });
-
-                    console.log(data.contact.address);
-
-                    // 👇 Address parsing (safe)
-                    const parsed = parseStoredAddress(data.contact?.address);
-
-                    setAddressFields({
-                        addressLine1: parsed.addressLine1,
-                        addressLine2: parsed.addressLine2,
-                        city: parsed.city,
-                        state: parsed.state,
-                        zip: parsed.zip,
-                        country: parsed.country,
-                    });
-                    setOriginalServiceData({
-                        title: data.title || '',
-                        description: data.description || '',
-                        price: data.price || 0,
-                        duration: data.duration || '',
-                        services: data.services?.length ? data.services : [{ name: '' }],
-                        categories: data.categories?.length ? data.categories : [],
-                        coverImage: data.coverImage || '',
-                        images: data.images || [],
-                        videos: data.videos || [],
-                        features: data.features?.length ? data.features : [''],
-                        amenities: data.amenities?.length ? data.amenities : defaultAmenities,
-                        businessHours: data.businessHours?.length ? data.businessHours : defaultBusinessHours,
-                        location: data.location || { type: 'Point', coordinates: [0, 0] },
-                        contact: {
-                            phone: data.contact?.phone || '',
-                            email: data.contact?.email || '',
-                            website: data.contact?.website || '',
-                            address: data.contact?.address || '',
-                        },
-                        faq: data.faq?.length ? data.faq : [{ question: '', answer: '' }],
-                        maxBookingsPerSlot: data.maxBookingsPerSlot || 1,
-                        isPublished: data.isPublished || false,
-                    })
-                    setDataLoaded(true); // 👈 add this
-                }
+                setDataLoaded(true);
             } catch (err) {
                 console.error('Failed to fetch service:', err);
                 toast.error('Failed to load service details.');
@@ -904,10 +867,7 @@ const UpdateServiceForm: React.FC<UpdateServiceFormProps> = ({ businessId, busin
     };
 
 
-    const submitService = async () => {
-
-        console.log("addressFields", addressFields);
-
+    const submitService = async (publish: boolean) => {
         if (!validateServiceData(serviceData)) return;
 
         if (!businessId) {
@@ -915,12 +875,18 @@ const UpdateServiceForm: React.FC<UpdateServiceFormProps> = ({ businessId, busin
             return;
         }
 
+        const publishErrors = publish ? validateServiceForPublish(serviceData) : {};
+        if (Object.keys(publishErrors).length > 0) {
+            setFieldErrors(publishErrors);
+            toast.error("Fix the highlighted fields before publishing.");
+            return;
+        }
+
+        setPublishIntent(publish);
         setIsSubmitting(true);
+        setFieldErrors({});
 
         try {
-            console.log("Uploading service files to S3...");
-
-            // ✅ 1. Upload Cover Image
             let coverImageUrl = serviceData.coverImage;
             if (coverImageUrl?.startsWith("blob:")) {
                 const blob = await fetch(coverImageUrl).then((r) => r.blob());
@@ -930,8 +896,6 @@ const UpdateServiceForm: React.FC<UpdateServiceFormProps> = ({ businessId, busin
                 coverImageUrl = await uploadToS3(fileObj);
             }
 
-            // ✅ 2. Upload Images (gallery – tier-enforced)
-            // Count already-saved images (non-blob URLs) as the baseline
             const alreadyUploadedImageCount = (serviceData.images || []).filter(
                 (url) => !url.startsWith("blob:")
             ).length;
@@ -952,7 +916,6 @@ const UpdateServiceForm: React.FC<UpdateServiceFormProps> = ({ businessId, busin
                 })
             );
 
-            // ✅ 3. Upload Videos
             const uploadedVideos = await Promise.all(
                 (serviceData.videos || []).map(async (vidUrl, i) => {
                     if (vidUrl.startsWith("blob:")) {
@@ -966,35 +929,55 @@ const UpdateServiceForm: React.FC<UpdateServiceFormProps> = ({ businessId, busin
                 })
             );
 
-            // ✅ 4. Final Payload
-            const payload = {
+            const preparedForm = {
                 ...serviceData,
-                businessId: businessId,
                 coverImage: coverImageUrl,
                 images: uploadedImages,
                 videos: uploadedVideos,
             };
 
+            const payload = serializeServicePayload(preparedForm, { businessId, publish });
+            const result = await updateService(serviceId, payload);
 
-            // ✅ 5. API Call
-            await axios.put(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/service/${serviceId}`,
-                payload,
-                { withCredentials: true }
-            );
+            let publicVisible: boolean | undefined;
+            if (publish && result.service._id) {
+                const verification = await verifyPublicListing(result.service._id);
+                publicVisible = verification.visible;
+            }
 
-            toast.success("✅ Updating Service!");
-            router.push(`/partners/${businessSlug}/inventory`);
+            const successMessage = getPublicationSuccessMessage(result, { publish, publicVisible });
+            toast.success(successMessage.toast);
+            if (successMessage.detail) {
+                toast.info(successMessage.detail);
+            }
+
+            setLoadedIsPublished(Boolean(result.service.isPublished));
+            router.push(`/partners/${businessSlug}/inventory?updated=1`);
         } catch (err) {
             console.error("Submission error:", err);
             if (err instanceof GalleryLimitError) {
                 toast.error(err.message);
-            } else {
-                toast.error("Submission failed. Please try again.");
+                return;
             }
+
+            const apiFieldErrors = extractFieldErrorsFromError(err);
+            if (Object.keys(apiFieldErrors).length > 0) {
+                setFieldErrors(apiFieldErrors);
+            }
+
+            toast.error(
+                getUserSafeMessage(
+                    err,
+                    publish ? "Publication failed. Please try again." : "Draft save failed. Please try again."
+                )
+            );
         } finally {
             setIsSubmitting(false);
         }
+    };
+
+    const handleUnpublish = async () => {
+        await submitService(false);
     };
 
     useEffect(() => {
@@ -1039,75 +1022,34 @@ const UpdateServiceForm: React.FC<UpdateServiceFormProps> = ({ businessId, busin
                 <div className="p-5 space-y-4 bg-white rounded-md shadow">
                     <h2 className="pb-2 text-base font-semibold border-b roboto">Service Details</h2>
 
-                    <div className="flex items-center gap-4 mt-6">
-                        <label className="font-medium">Publish Status:</label>
-                        <label className="inline-flex items-center cursor-pointer">
-                            <input
-                                type="checkbox"
-                                checked={serviceData.isPublished}
-                                onChange={(e) =>
-                                    setServiceData((prev) => ({
-                                        ...prev,
-                                        isPublished: e.target.checked,
-                                    }))
-                                }
-                                className="sr-only peer"
-                            />
-                            <div className="relative h-6 bg-gray-200 rounded-full w-11 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-400 peer peer-checked:bg-green-500">
-                                <div className="absolute w-4 h-4 transition bg-white rounded-full left-1 top-1 peer-checked:translate-x-5" />
-                            </div>
-                            <span className="ml-3 text-sm text-gray-700">
-                                {serviceData.isPublished ? 'Published' : 'Unpublished'}
-                            </span>
-                        </label>
-                    </div>
-
-
                     <input type="text" placeholder="Title" value={serviceData.title} required onChange={(e) => handleChange('title', e.target.value)} className="w-full p-2 border rounded" />
                     <textarea placeholder="Description" value={serviceData.description} required onChange={(e) => handleChange('description', e.target.value)} className="w-full p-2 border rounded" />
                     <input type="number" placeholder="Price" required value={serviceData.price || ''} onChange={(e) => handleChange('price', Number(e.target.value))} className="w-full p-2 border rounded" />
                     <input type="text" placeholder="Duration (e.g., 30 min)" required value={serviceData.duration} onChange={(e) => handleChange('duration', e.target.value)} className="w-full p-2 border rounded" />
 
                     <div className="mb-6">
-                        <h3 className="text-lg font-semibold text-gray-800">Services We Offer</h3>
-                        {serviceData.services.map((service, index) => (
-                            <div key={index} className="flex gap-2 mb-2">
-                                <input
-                                    type="text"
-                                    value={service.name}
-                                    onChange={(e) => {
-                                        const updated = [...serviceData.services];
-                                        updated[index].name = e.target.value;
-                                        setServiceData((prev) => ({ ...prev, services: updated }));
-                                    }}
-                                    placeholder={`Service ${index + 1}`}
-                                    className="flex-1 p-2 border rounded"
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        const updated = serviceData.services.filter((_, i) => i !== index);
-                                        setServiceData((prev) => ({ ...prev, services: updated }));
-                                    }}
-                                    className="px-3 text-red-600 border border-red-300 rounded hover:bg-red-50"
-                                    disabled={serviceData.services.length === 1}
-                                >
-                                    Remove
-                                </button>
-                            </div>
-                        ))}
-                        <button
-                            type="button"
-                            onClick={() =>
+                        <ChildServiceFields
+                            children={serviceData.services}
+                            fieldErrors={fieldErrors}
+                            onAdd={() =>
                                 setServiceData((prev) => ({
                                     ...prev,
-                                    services: [...prev.services, { name: '' }],
+                                    services: [...prev.services, createEmptyChildService()],
                                 }))
                             }
-                            className="px-4 py-2 mt-2 text-sm text-white bg-blue-600 rounded hover:bg-blue-700"
-                        >
-                            + Add Service
-                        </button>
+                            onRemove={(index) => {
+                                if (serviceData.services.length === 1) return;
+                                setServiceData((prev) => ({
+                                    ...prev,
+                                    services: prev.services.filter((_, i) => i !== index),
+                                }));
+                            }}
+                            onUpdate={(index, field, value) => {
+                                const updated = [...serviceData.services];
+                                updated[index] = { ...updated[index], [field]: value };
+                                setServiceData((prev) => ({ ...prev, services: updated }));
+                            }}
+                        />
                     </div>
 
 
@@ -1581,17 +1523,37 @@ const UpdateServiceForm: React.FC<UpdateServiceFormProps> = ({ businessId, busin
 
                 </div>
 
-                <div className="flex gap-4">
+                <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                     <button
                         type="button"
-                        onClick={submitService}
-                        className="px-4 py-2 text-white bg-green-600 rounded hover:bg-green-700"
+                        disabled={isSubmitting}
+                        onClick={() => submitService(false)}
+                        className="min-h-11 rounded px-4 py-2 text-white bg-yellow-600 disabled:opacity-50"
                     >
-                        Update Service
+                        Save Draft
                     </button>
+                    <button
+                        type="button"
+                        disabled={isSubmitting}
+                        onClick={() => submitService(true)}
+                        className="min-h-11 rounded px-4 py-2 text-white bg-green-600 disabled:opacity-50"
+                    >
+                        Publish Service
+                    </button>
+                    {loadedIsPublished ? (
+                        <button
+                            type="button"
+                            disabled={isSubmitting}
+                            onClick={handleUnpublish}
+                            className="min-h-11 rounded px-4 py-2 text-white bg-red-600 disabled:opacity-50"
+                        >
+                            Unpublish
+                        </button>
+                    ) : null}
 
                     <button
                         type="button"
+                        disabled={isSubmitting}
                         onClick={() => {
                             if (originalServiceData) {
                                 setServiceData(originalServiceData);
@@ -1608,11 +1570,10 @@ const UpdateServiceForm: React.FC<UpdateServiceFormProps> = ({ businessId, busin
                                 toast.success('Form reset to original');
                             }
                         }}
-                        className="px-4 py-2 text-white bg-gray-600 rounded hover:bg-gray-700"
+                        className="min-h-11 rounded px-4 py-2 text-white bg-gray-600 disabled:opacity-50"
                     >
                         Reset
                     </button>
-
                 </div>
 
             </div>
@@ -1658,7 +1619,7 @@ const UpdateServiceForm: React.FC<UpdateServiceFormProps> = ({ businessId, busin
                     <div className="p-4 bg-white rounded shadow-md">
                         <div className="w-10 h-10 mx-auto border-4 border-blue-500 rounded-full animate-spin border-t-transparent"></div>
                         <p className="mt-2 text-sm font-medium text-center text-gray-700">
-                            {serviceData.isPublished ? 'Publishing...' : 'Saving Draft...'}
+                            {publishIntent ? 'Publishing...' : 'Saving Draft...'}
                         </p>
                     </div>
                 </div>

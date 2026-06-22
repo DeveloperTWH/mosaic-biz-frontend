@@ -212,15 +212,17 @@ const DashboardPage = () => {
                   />
                 )}
 
-                {business?.listingType === 'service' && (
+                {business?.listingType === 'service' && business._id && (
                   <ServiceTable
                     services={services}
+                    businessId={business._id}
                     currentPage={currentPage}
                     totalPages={totalPages}
                     onPageChange={(page) => {
                       setCurrentPage(page);
-                      fetchServiceData(business._id, page); // call API with new page
+                      fetchServiceData(business._id, page);
                     }}
+                    onServicesChanged={() => fetchServiceData(business._id, currentPage)}
                     isLoading={isLoading}
                     error={error}
                   />

@@ -2,6 +2,10 @@ import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
+import {
+  getPublicationSuccessMessage,
+  verifyPublicListing,
+} from '@/lib/api/services';
 import { 
   ServiceFormData, 
   FormErrors, 
@@ -27,7 +31,7 @@ const initialFormData: ServiceFormData = {
   location: {
     address: ''
   },
-  isPublished: true
+  isPublished: false
 };
 
 const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -430,9 +434,7 @@ export const useServiceForm = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const handleSubmit = async (publish = false) => {
     if (Object.values(uploading).some(Boolean)) {
       toast.error('Please wait until all images finish uploading.');
       return;
@@ -489,7 +491,7 @@ export const useServiceForm = () => {
         location: { address: locationAddress },
         businessHours: formData.businessHours || [],
         bookingToolLink: formData.bookingToolLink || '',
-        isPublished: Boolean(formData.isPublished),
+        isPublished: publish,
       };
 
       const parentUpdatePayloadBase = {
@@ -504,13 +506,12 @@ export const useServiceForm = () => {
           { withCredentials: true }
         );
         parentServiceId = createRes.data?.service?._id || null;
-        // toast.success('Parent service created!');
       } else if (existingParentService?._id) {
         await axios.put(
           `${API_BASE_URL}/api/service/${existingParentService._id}`,
           {
             ...parentUpdatePayloadBase,
-            // Preserve parent-specific fields expected by update route
+            isPublished: publish,
             price: existingParentService.price ?? 0,
             duration: existingParentService.duration ?? '60 minutes',
             services: normalizeServicesForUpdate(existingParentService.services || []),
@@ -552,6 +553,7 @@ export const useServiceForm = () => {
           `${API_BASE_URL}/api/service/${parentServiceId}`,
           {
             ...parentUpdatePayloadBase,
+            isPublished: publish,
             price: latestParent.price ?? existingParentService?.price ?? 0,
             duration: latestParent.duration ?? existingParentService?.duration ?? '60 minutes',
             services: normalizeServicesForUpdate(
@@ -562,8 +564,32 @@ export const useServiceForm = () => {
         );
       }
 
-      toast.success('Service saved successfully!');
-      router.push('/partners/services');
+      let publicVisible: boolean | undefined;
+      if (publish && parentServiceId) {
+        publicVisible = (await verifyPublicListing(parentServiceId)).visible;
+      }
+
+      const successMessage = getPublicationSuccessMessage(
+        {
+          service: {
+            _id: parentServiceId || 'legacy',
+            isPublished: publish,
+          } as never,
+        },
+        { publish, publicVisible }
+      );
+      toast.success(successMessage.toast);
+      if (successMessage.detail) {
+        toast.info(successMessage.detail);
+      }
+
+      const selectedBusiness = businesses.find((entry) => entry._id === formData.businessId);
+      const businessSlug = selectedBusiness?.slug;
+      if (businessSlug) {
+        router.push(`/partners/${businessSlug}/inventory?updated=1`);
+      } else {
+        router.push('/partners/services');
+      }
       
     } catch (error: any) {
       console.error('Error creating service:', error);

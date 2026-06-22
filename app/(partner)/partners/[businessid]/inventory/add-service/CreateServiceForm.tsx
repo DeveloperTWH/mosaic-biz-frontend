@@ -8,6 +8,21 @@ import Image from 'next/image';
 import Link from 'next/link';
 import axios from 'axios';
 import { uploadToS3, GalleryLimitError } from '@/utils/s3Uploader';
+import ChildServiceFields from '../components/ChildServiceFields';
+import {
+    ApiClientError,
+    getUserSafeMessage,
+} from '@/lib/api/errors';
+import {
+    createEmptyChildService,
+    createService,
+    extractFieldErrorsFromError,
+    getPublicationSuccessMessage,
+    serializeServicePayload,
+    validateServiceForPublish,
+    verifyPublicListing,
+    type ServiceChildInput,
+} from '@/lib/api/services';
 
 interface CreateServiceFormProps {
     businessId: string;
@@ -30,11 +45,6 @@ type FAQ = {
     question: string;
     answer: string;
 };
-
-type NamedService = {
-    name: string;
-};
-
 
 
 
@@ -210,7 +220,7 @@ const CreateServiceForm: React.FC<CreateServiceFormProps> = ({ businessId, busin
         description: string;
         price: number;
         duration: string;
-        services: NamedService[];
+        services: ServiceChildInput[];
         categories: CategorySelection[];
         coverImage: string;
         images: string[];
@@ -228,7 +238,7 @@ const CreateServiceForm: React.FC<CreateServiceFormProps> = ({ businessId, busin
         description: '',
         price: 0,
         duration: '',
-        services: [{ name: '' }],
+        services: [createEmptyChildService()],
         categories: [],
         coverImage: '',
         images: [],
@@ -254,6 +264,8 @@ const CreateServiceForm: React.FC<CreateServiceFormProps> = ({ businessId, busin
 
 
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [publishIntent, setPublishIntent] = useState(false);
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
     // State to track structured fields
     const [addressFields, setAddressFields] = useState({
         addressLine1: '',
@@ -776,12 +788,18 @@ const CreateServiceForm: React.FC<CreateServiceFormProps> = ({ businessId, busin
             return;
         }
 
+        const publishErrors = publish ? validateServiceForPublish(serviceData) : {};
+        if (Object.keys(publishErrors).length > 0) {
+            setFieldErrors(publishErrors);
+            toast.error("Fix the highlighted fields before publishing.");
+            return;
+        }
+
+        setPublishIntent(publish);
         setIsSubmitting(true);
+        setFieldErrors({});
 
         try {
-            console.log("Uploading service files to S3...");
-
-            // ✅ 1. Upload Cover Image
             let coverImageUrl = serviceData.coverImage;
             if (coverImageUrl?.startsWith("blob:")) {
                 const blob = await fetch(coverImageUrl).then((r) => r.blob());
@@ -791,8 +809,6 @@ const CreateServiceForm: React.FC<CreateServiceFormProps> = ({ businessId, busin
                 coverImageUrl = await uploadToS3(fileObj);
             }
 
-            // ✅ 2. Upload Images (gallery – tier-enforced)
-            // alreadyUploaded = images already saved (non-blob URLs)
             const alreadyUploadedImageCount = (serviceData.images || []).filter(
                 (url) => !url.startsWith("blob:")
             ).length;
@@ -813,7 +829,6 @@ const CreateServiceForm: React.FC<CreateServiceFormProps> = ({ businessId, busin
                 })
             );
 
-            // ✅ 3. Upload Videos
             const uploadedVideos = await Promise.all(
                 (serviceData.videos || []).map(async (vidUrl, i) => {
                     if (vidUrl.startsWith("blob:")) {
@@ -827,38 +842,52 @@ const CreateServiceForm: React.FC<CreateServiceFormProps> = ({ businessId, busin
                 })
             );
 
-
-            // ✅ 4. Final Payload
-            const payload = {
+            const preparedForm = {
                 ...serviceData,
-                businessId: businessId,
-                isPublished: publish,
                 coverImage: coverImageUrl,
                 images: uploadedImages,
                 videos: uploadedVideos,
             };
 
-            console.log(payload);
+            const payload = serializeServicePayload(preparedForm, { businessId, publish });
+            const result = await createService(payload);
 
+            let publicVisible: boolean | undefined;
+            if (publish && result.service._id) {
+                const verification = await verifyPublicListing(result.service._id);
+                publicVisible = verification.visible;
+            }
 
-            console.log(publish ? "Publishing service..." : "Saving draft...", payload);
+            const successMessage = getPublicationSuccessMessage(result, { publish, publicVisible });
+            toast.success(successMessage.toast);
+            if (successMessage.detail) {
+                toast.info(successMessage.detail);
+            }
 
-            // ✅ 5. API Call
-            await axios.post(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/service`,
-                payload,
-                { withCredentials: true }
-            );
-
-            toast.success(publish ? "✅ Service Published!" : "✅ Draft Saved!");
-            router.push(`/partners/${businessSlug}/inventory`);
+            router.push(`/partners/${businessSlug}/inventory?updated=1`);
         } catch (err) {
             console.error("Submission error:", err);
             if (err instanceof GalleryLimitError) {
                 toast.error(err.message);
-            } else {
-                toast.error("Submission failed. Please try again.");
+                return;
             }
+
+            const apiFieldErrors = extractFieldErrorsFromError(err);
+            if (Object.keys(apiFieldErrors).length > 0) {
+                setFieldErrors(apiFieldErrors);
+            }
+
+            if (err instanceof ApiClientError && err.status === 409) {
+                toast.error(err.message || "A service already exists for this business.");
+                return;
+            }
+
+            toast.error(
+                getUserSafeMessage(
+                    err,
+                    publish ? "Publication failed. Please try again." : "Draft save failed. Please try again."
+                )
+            );
         } finally {
             setIsSubmitting(false);
         }
@@ -900,45 +929,28 @@ const CreateServiceForm: React.FC<CreateServiceFormProps> = ({ businessId, busin
                     <input type="text" placeholder="Duration (e.g., 30 min)" required value={serviceData.duration} onChange={(e) => handleChange('duration', e.target.value)} className="w-full p-2 border rounded" />
 
                     <div className="mb-6">
-                        <h3 className="text-lg font-semibold text-gray-800">Services We Offer</h3>
-                        {serviceData.services.map((service, index) => (
-                            <div key={index} className="flex gap-2 mb-2">
-                                <input
-                                    type="text"
-                                    value={service.name}
-                                    onChange={(e) => {
-                                        const updated = [...serviceData.services];
-                                        updated[index].name = e.target.value;
-                                        setServiceData((prev) => ({ ...prev, services: updated }));
-                                    }}
-                                    placeholder={`Service ${index + 1}`}
-                                    className="flex-1 p-2 border rounded"
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        const updated = serviceData.services.filter((_, i) => i !== index);
-                                        setServiceData((prev) => ({ ...prev, services: updated }));
-                                    }}
-                                    className="px-3 text-red-600 border border-red-300 rounded hover:bg-red-50"
-                                    disabled={serviceData.services.length === 1}
-                                >
-                                    Remove
-                                </button>
-                            </div>
-                        ))}
-                        <button
-                            type="button"
-                            onClick={() =>
+                        <ChildServiceFields
+                            children={serviceData.services}
+                            fieldErrors={fieldErrors}
+                            onAdd={() =>
                                 setServiceData((prev) => ({
                                     ...prev,
-                                    services: [...prev.services, { name: '' }],
+                                    services: [...prev.services, createEmptyChildService()],
                                 }))
                             }
-                            className="px-4 py-2 mt-2 text-sm text-white bg-blue-600 rounded hover:bg-blue-700"
-                        >
-                            + Add Service
-                        </button>
+                            onRemove={(index) => {
+                                if (serviceData.services.length === 1) return;
+                                setServiceData((prev) => ({
+                                    ...prev,
+                                    services: prev.services.filter((_, i) => i !== index),
+                                }));
+                            }}
+                            onUpdate={(index, field, value) => {
+                                const updated = [...serviceData.services];
+                                updated[index] = { ...updated[index], [field]: value };
+                                setServiceData((prev) => ({ ...prev, services: updated }));
+                            }}
+                        />
                     </div>
 
 
@@ -1402,11 +1414,21 @@ const CreateServiceForm: React.FC<CreateServiceFormProps> = ({ businessId, busin
 
                 </div>
 
-                <div className="flex gap-4">
-                    <button type="button" onClick={() => submitService(false)} className="px-4 py-2 text-white bg-yellow-600 rounded">
+                <div className="flex flex-col gap-3 sm:flex-row">
+                    <button
+                        type="button"
+                        disabled={isSubmitting}
+                        onClick={() => submitService(false)}
+                        className="min-h-11 rounded px-4 py-2 text-white bg-yellow-600 disabled:opacity-50"
+                    >
                         Save Draft
                     </button>
-                    <button type="button" onClick={() => submitService(true)} className="px-4 py-2 text-white bg-green-600 rounded">
+                    <button
+                        type="button"
+                        disabled={isSubmitting}
+                        onClick={() => submitService(true)}
+                        className="min-h-11 rounded px-4 py-2 text-white bg-green-600 disabled:opacity-50"
+                    >
                         Publish Service
                     </button>
                 </div>
@@ -1453,7 +1475,7 @@ const CreateServiceForm: React.FC<CreateServiceFormProps> = ({ businessId, busin
                     <div className="p-4 bg-white rounded shadow-md">
                         <div className="w-10 h-10 mx-auto border-4 border-blue-500 rounded-full animate-spin border-t-transparent"></div>
                         <p className="mt-2 text-sm font-medium text-center text-gray-700">
-                            {serviceData.isPublished ? 'Publishing...' : 'Saving Draft...'}
+                            {publishIntent ? 'Publishing...' : 'Saving Draft...'}
                         </p>
                     </div>
                 </div>

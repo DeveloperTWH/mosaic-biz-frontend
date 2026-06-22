@@ -2,8 +2,10 @@
 
 import { useBusinessStore } from '@/app/store/businessStore';
 import { fetchBusinessBySlug } from '../utils/fetchBusiness';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
+import { listPrivateServices } from '@/lib/api/services';
+import { getUserSafeMessage } from '@/lib/api/errors';
 import Sidebar from '../components/Sidebar';
 import Topbar from '../components/Topbar';
 import ProductTable from '../components/ProductTable';
@@ -17,6 +19,8 @@ import ServiceTable from '../components/ServiceTable';
 
 const Page = () => {
     const { businessid } = useParams();
+    const searchParams = useSearchParams();
+    const inventoryRefreshToken = searchParams.get('updated');
     const { business, setBusiness, clearBusiness } = useBusinessStore();
 
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -60,7 +64,7 @@ const Page = () => {
         if (listingType === "product") fetchProducts(_id, currentPage);
         if (listingType === "service") fetchServices(_id, currentPage);
         if (listingType === "food") fetchFood(_id, currentPage);
-    }, [business, currentPage]);
+    }, [business, currentPage, inventoryRefreshToken]);
 
     const fetchProducts = async (businessId: string, page = 1, limit = 10) => {
         try {
@@ -86,26 +90,22 @@ const Page = () => {
     };
 
     const fetchServices = async (businessId: string, page = 1, limit = 10) => {
-        
         try {
             setIsLoading(true);
-            const response = await axios.get(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/private/services/list`,
-                {
-                    withCredentials: true,
-                    params: { businessId, page, limit }
-                }
+            setError(null);
+            const { data, total, totalPages, unpublishedCount } = await listPrivateServices(
+                businessId,
+                page,
+                limit
             );
-            const { data, total, totalPages, unpublishedCount } = response.data;
 
-            
             setServices(data);
             setTotal(total);
             setTotalPages(totalPages || Math.ceil(total / limit));
             setOutofStockOrUnpublised(unpublishedCount);
         } catch (err) {
             console.error("Error fetching services:", err);
-            setError("Error fetching services.");
+            setError(getUserSafeMessage(err, "Error fetching services."));
         } finally {
             setIsLoading(false);
         }
@@ -218,15 +218,17 @@ const Page = () => {
                                 />
                             )}
 
-                            {business.listingType === 'service' && (
+                            {business.listingType === 'service' && business._id && (
                                 <ServiceTable
                                     services={services}
+                                    businessId={business._id}
                                     currentPage={currentPage}
                                     totalPages={totalPages}
                                     onPageChange={(page) => {
                                         setCurrentPage(page);
-                                        fetchServices(business._id, page); // call API with new page
+                                        fetchServices(business._id, page);
                                     }}
+                                    onServicesChanged={() => fetchServices(business._id, currentPage)}
                                     isLoading={isLoading}
                                     error={error}
                                 />

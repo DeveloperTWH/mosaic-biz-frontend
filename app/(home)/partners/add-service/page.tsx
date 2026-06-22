@@ -56,7 +56,13 @@ export default function AddServicePage() {
           <p className="text-sm text-gray-500 mt-1">Showcase all your services</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            handleSubmit(false);
+          }}
+          className="space-y-6"
+        >
           {/* Two Column Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left Column - Main Content */}
@@ -148,19 +154,28 @@ export default function AddServicePage() {
           </div>
 
           {/* Submit Buttons */}
-          <div className="flex items-center justify-start gap-3 pt-4">
+          <div className="flex flex-wrap items-center justify-start gap-3 pt-4">
             <button
               type="submit"
               disabled={saving || isUploading}
-              className="px-8 py-2.5 bg-[#c9a227] text-white rounded text-sm font-medium hover:bg-[#b8921f] flex items-center gap-2 disabled:opacity-50"
+              className="px-8 py-2.5 bg-gray-600 text-white rounded text-sm font-medium hover:bg-gray-700 flex items-center gap-2 disabled:opacity-50 min-h-11"
             >
               {saving ? <Loader className="w-4 h-4 animate-spin" /> : null}
-              {isUploading ? 'Uploading Images...' : formData.title ? 'save profile' : 'Save profile'}
+              {isUploading ? 'Uploading Images...' : 'Save Draft'}
+            </button>
+            <button
+              type="button"
+              disabled={saving || isUploading}
+              onClick={() => handleSubmit(true)}
+              className="px-8 py-2.5 bg-[#c9a227] text-white rounded text-sm font-medium hover:bg-[#b8921f] flex items-center gap-2 disabled:opacity-50 min-h-11"
+            >
+              {saving ? <Loader className="w-4 h-4 animate-spin" /> : null}
+              Publish Service
             </button>
             <button
               type="button"
               onClick={() => router.push('/partners/services')}
-              className="px-8 py-2.5 bg-gray-400 text-white rounded text-sm font-medium hover:bg-gray-500"
+              className="px-8 py-2.5 bg-gray-400 text-white rounded text-sm font-medium hover:bg-gray-500 min-h-11"
             >
               Cancel
             </button>
