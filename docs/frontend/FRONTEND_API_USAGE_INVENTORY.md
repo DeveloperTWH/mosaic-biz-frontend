@@ -1,10 +1,12 @@
 # Frontend API Usage Inventory — As Built
 
 **Type:** Reference (launch evidence pack)  
-**Last updated:** 2026-06-22 (phase 1 client migration #164)  
+**Last updated:** 2026-06-22 (service publication #185, phase 1 client migration #164)  
 **Evidence source:** ripgrep across `*.{ts,tsx}` (excluding docs), full read of `lib/api/*`, `utils/cartUtils.ts`, `utils/authUtils.ts`, `lib/api/routeContract.ts`
 
 **Phase 1 migrated modules:** `lib/api/httpClient.ts`, `authSession.ts`, `vendorOnboarding.ts`, `vendorOnboardingAdmin.ts`, `orders.ts`, `stripeConnect.ts` — see [FRONTEND_API_CLIENT_PHASE1.md](FRONTEND_API_CLIENT_PHASE1.md).
+
+**Service publication module (#185):** `lib/api/services.ts` — see [FRONTEND_SERVICE_PUBLICATION_FLOW.md](FRONTEND_SERVICE_PUBLICATION_FLOW.md).
 
 Base URL for all calls: `NEXT_PUBLIC_API_BASE_URL` (axios default in `lib/api.ts`: `https://api.mosaicbizhub.com/`).
 
@@ -129,6 +131,29 @@ Base URL for all calls: `NEXT_PUBLIC_API_BASE_URL` (axios default in `lib/api.ts
 | `app/(partner)/partners/[businessid]/finance/page.tsx` | FinancePage | GET | `/stripe/last-payout` | include | Legacy mount |
 
 UI routes: `/partners/connect/return` → `/partners/payout-setup?refresh=1`; `/partners/connect/refresh`.
+
+---
+
+## Partner service publication (#185)
+
+Central module: `lib/api/services.ts` — serializers, mutation parsing, publish/unpublish helpers, public visibility probe.
+
+| File | Symbol | Method | Endpoint | Credentials | Response / UI |
+|------|--------|--------|----------|-------------|---------------|
+| `lib/api/services.ts` | createService | POST | `/api/service` | include | `{ success, service, publication?, errors? }` |
+| `lib/api/services.ts` | updateService | PUT | `/api/service/:id` | include | Same as create |
+| `lib/api/services.ts` | getServiceById | GET | `/api/service/:id` | include | Owner service doc |
+| `lib/api/services.ts` | publishService | PUT | `/api/service/:id` | include | `isPublished: true` |
+| `lib/api/services.ts` | unpublishService | PUT | `/api/service/:id` | include | `isPublished: false` |
+| `lib/api/services.ts` | deleteService | DELETE | `/api/service/:id` | include | Evidence Needed |
+| `lib/api/services.ts` | listPrivateServices | GET | `/api/private/services/list?businessId=&page=&limit=` | include | `{ services[], pagination }` |
+| `lib/api/services.ts` | verifyPublicListing | GET | `/api/public/services/:id` | none | 200 = publicly visible |
+| `app/(partner)/.../CreateServiceForm.tsx` | CreateServiceForm | POST | `/api/service` (via `createService`) | include | Draft/publish toasts from response |
+| `app/(partner)/.../EditServiceForm.tsx` | EditServiceForm | PUT | `/api/service/:id` (via `updateService`) | include | Save Draft / Publish / Unpublish |
+| `app/(partner)/.../ServiceTable.tsx` | ServiceTable | PUT/DELETE | `/api/service/:id` | include | Row publish/unpublish + refetch |
+| `app/(home)/partners/add-service/hooks/useServiceForm.ts` | useServiceForm | POST/PUT | `/api/service`, `/api/service/:id` | include | Legacy flow; draft/publish via shared helpers |
+
+Public storefront (unchanged): `/services` → `GET /api/services/list`; `/vendor-profile/service-vendor/:id` → `GET /api/public/services/:id`. Inventory **View Public** links use vendor-profile route, not `/service/:slug`.
 
 ---
 
