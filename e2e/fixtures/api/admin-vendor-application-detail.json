@@ -1,0 +1,67 @@
+{
+  "success": true,
+  "data": {
+    "_id": "app-e2e-001",
+    "applicationId": "e2e-app-001",
+    "businessName": "E2E Vendor Shop",
+    "status": "submitted",
+    "totalVerificationPoints": 10,
+    "isMinorityOwned": false,
+    "minorityCategories": [],
+    "hasEIN": true,
+    "hasBusinessLicense": true,
+    "einNumber": "12-3456789",
+    "licenseNumber": "LIC-001",
+    "ssnLast9": "",
+    "yearsInBusiness": "3-5",
+    "isFranchise": false,
+    "franchiseName": null,
+    "businessType": "product",
+    "hasPhysicalLocation": true,
+    "primaryContactName": "E2E Vendor",
+    "primaryContactDesignation": "Owner",
+    "secondaryBusinessEmail": "e2e-vendor@example.test",
+    "usesThirdPartyBooking": false,
+    "ownershipType": "sole_proprietorship",
+    "employeesCount": "1-5",
+    "website": "https://example.test",
+    "facebook": "",
+    "instagram": "",
+    "linkedin": null,
+    "tiktok": null,
+    "userId": {
+      "_id": "e2e-vendor-id",
+      "name": "E2E Vendor",
+      "email": "e2e-vendor@example.test"
+    },
+    "address": {
+      "street": "123 Test St",
+      "city": "Richmond",
+      "state": "VA",
+      "country": "US",
+      "zipCode": "23220"
+    },
+    "verificationPayment": {
+      "status": "paid"
+    },
+    "verificationChecklist": {
+      "minorityDocs": false,
+      "taxDocs": false,
+      "businessLicense": false,
+      "website": true,
+      "facebook": false,
+      "instagram": false,
+      "linkedin": false,
+      "tiktok": false
+    },
+    "minorityProofDocuments": [],
+    "taxDocuments": [],
+    "businessLicenseDocuments": [],
+    "acceptedTerms": true,
+    "declarationAccepted": true,
+    "createdAt": "2026-06-01T00:00:00.000Z",
+    "updatedAt": "2026-06-02T00:00:00.000Z",
+    "primaryPhone": "5550002000",
+    "businessEmail": "e2e-vendor@example.test"
+  }
+}

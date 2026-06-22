@@ -1,0 +1,16 @@
+{
+  "data": [
+    {
+      "_id": "svc-e2e-001",
+      "title": "E2E Consulting Service",
+      "description": "Mock consulting service",
+      "slug": "e2e-consulting",
+      "coverImage": "/ShopProduct/Aria-SK6-Helmet 1.png",
+      "price": 150,
+      "averageRating": 4.2
+    }
+  ],
+  "total": 1,
+  "page": 1,
+  "limit": 10
+}
