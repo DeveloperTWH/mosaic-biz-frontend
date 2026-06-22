@@ -24,7 +24,7 @@ Visual Pass 3 evidence: [frontend/evidence/visual-pass-3/README.md](frontend/evi
 | Build gate | `npm run build` passes on `main` |
 | Mobile app nav (#95–#103) | **Merged** — PR [#106](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/106); Epic #95 closed; #101 sticky commerce closed 2026-06-22 |
 | Header nav cleanup | **Merged** — PR [#108](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/108) (2026-06-18) |
-| Visual Pass 3 (#177) | **Complete (pending PR merge)** — child #178–#183 closed; evidence #184 on branch `polish/visual-pass-3-contrast-continuity` @ `630d2888` |
+| Visual Pass 3 (#177) | **PR [#190](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/190)** — child #178–#183 closed; evidence #184 @ `1d968f3d` |
 | Batch 6 Lane B (#188) | **Complete (pending PR merge)** — contrast continuity + mobile/a11y QA + screenshot proof pack |
 | Staging promotion readiness | Pending QA sign-off on preview with live API |
 
@@ -44,7 +44,7 @@ Visual Pass 3 evidence: [frontend/evidence/visual-pass-3/README.md](frontend/evi
 | PR / branch | Title | Issues | Status |
 |-------------|-------|--------|--------|
 | [#189](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/189) | Customer account + partner dashboard visual pass | — | Merged |
-| `polish/visual-pass-3-contrast-continuity` | Contrast continuity + QA evidence pack | #177, #183, #184, #188 Lane B | PR pending |
+| `polish/visual-pass-3-contrast-continuity` | Contrast continuity + QA evidence pack | #177, #183, #184, #188 Lane B | PR [#190](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/190) |
 
 Child issues closed: #178 onboarding shell, #179 form controls, #180 payment states, #181 partner hub, #182 storefront continuity.
 

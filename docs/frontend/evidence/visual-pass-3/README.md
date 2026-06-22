@@ -6,8 +6,8 @@
 **Repository:** `Digital-Builders-757/mosaic-biz-frontend-launch`  
 **Branch:** `polish/visual-pass-3-contrast-continuity`  
 **Starting commit:** `533ae5fc` (main before branch)  
-**Evidence commit:** `630d2888` (includes polish `847fd8a2` + docs/screenshots)  
-**PR:** TBD — `polish: Visual Pass 3 contrast, QA evidence, and epic closeout`
+**Evidence commit:** `1d968f3d` (polish + docs/screenshots)  
+**PR:** [#190](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/190)
 
 ---
 

@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-06-22  
 **Branch:** `polish/visual-pass-3-contrast-continuity`  
-**Commit:** `630d2888`
+**Commit:** `1d968f3d`
 
 Legend: **Pass** = no P0/P1 visual/responsive/a11y defect on sampled viewport; **Code** = verified in merged VP3 PRs without live session; **Deferred** = tracked follow-up issue.
 
