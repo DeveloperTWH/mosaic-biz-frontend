@@ -1,12 +1,13 @@
 # Project Status
 
 **Type:** Living document  
-**Last updated:** 2026-06-18  
+**Last updated:** 2026-06-22  
 **Audience:** Internal team
 
 For phased next work see [ROADMAP.md](ROADMAP.md). For architecture and env setup see [ARCHITECTURE.md](ARCHITECTURE.md).
 
-Epic #54 sprint closeout: [EPIC_54_SPRINT_CLOSEOUT.md](EPIC_54_SPRINT_CLOSEOUT.md)
+Epic #54 sprint closeout: [EPIC_54_SPRINT_CLOSEOUT.md](EPIC_54_SPRINT_CLOSEOUT.md)  
+Visual Pass 3 evidence: [frontend/evidence/visual-pass-3/README.md](frontend/evidence/visual-pass-3/README.md)
 
 ---
 
@@ -21,8 +22,10 @@ Epic #54 sprint closeout: [EPIC_54_SPRINT_CLOSEOUT.md](EPIC_54_SPRINT_CLOSEOUT.m
 | Deploy model | Vercel auto-deploy on merge to `main` |
 | Preview access | Vercel deployment protection / SSO (HTTP 401 for unauthenticated automation) |
 | Build gate | `npm run build` passes on `main` |
-| Mobile app nav (#95–#103) | **Merged** — PR [#106](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/106) (2026-06-18); Epic #95 closed; #101 sticky commerce E2E remains open |
+| Mobile app nav (#95–#103) | **Merged** — PR [#106](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/106); Epic #95 closed; #101 sticky commerce closed 2026-06-22 |
 | Header nav cleanup | **Merged** — PR [#108](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/108) (2026-06-18) |
+| Visual Pass 3 (#177) | **Complete (pending PR merge)** — child #178–#183 closed; evidence #184 on branch `polish/visual-pass-3-contrast-continuity` @ `630d2888` |
+| Batch 6 Lane B (#188) | **Complete (pending PR merge)** — contrast continuity + mobile/a11y QA + screenshot proof pack |
 | Staging promotion readiness | Pending QA sign-off on preview with live API |
 
 ### Epic #54 sprint PRs (merged 2026-06-18)
@@ -35,6 +38,17 @@ Epic #54 sprint closeout: [EPIC_54_SPRINT_CLOSEOUT.md](EPIC_54_SPRINT_CLOSEOUT.m
 | [#67](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/67) | Trust, how-to, and public content pages | #56, #57, #61 | Merged |
 | [#68](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/68) | Docs closeout | — | Merged |
 | [#106](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/106) | Mobile app nav reconciliation (#95–#103) | #96–#103 | Merged |
+
+### Visual Pass 3 (#177) — 2026-06-22
+
+| PR / branch | Title | Issues | Status |
+|-------------|-------|--------|--------|
+| [#189](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/189) | Customer account + partner dashboard visual pass | — | Merged |
+| `polish/visual-pass-3-contrast-continuity` | Contrast continuity + QA evidence pack | #177, #183, #184, #188 Lane B | PR pending |
+
+Child issues closed: #178 onboarding shell, #179 form controls, #180 payment states, #181 partner hub, #182 storefront continuity.
+
+Evidence: [VISUAL_PASS_3_MOBILE_A11Y_QA.md](VISUAL_PASS_3_MOBILE_A11Y_QA.md), [frontend/evidence/visual-pass-3/](frontend/evidence/visual-pass-3/).
 
 ### Prior significant merges
 
@@ -94,7 +108,9 @@ Details: [HOMEPAGE_MARKETPLACE_REDESIGN_QA_REPORT.md](HOMEPAGE_MARKETPLACE_REDES
 | Item | Priority | Notes |
 |------|----------|-------|
 | Human preview sign-off on `/products` | P0 | ~2 min with Vercel SSO |
-| Product / food / service **detail** pages | P2 | Deferred from Epic #54 — legacy light UI |
+| Vendor profile storefront hierarchy | P2 | [#83](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/issues/83) — deferred post-VP3 |
+| Placeholder/demo content audit | P2 | [#84](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/issues/84) |
+| Checkout trust UX copy | P2 | [#118](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/issues/118) |
 | Legal pages full copy pass | P2 | Needs legal approval; overflow fixed in #65 |
 | Mock detail routes vs live routes | P2 | Documented; no reroute without approval |
 | `/foods/shop/[id]` stub | P3 | Known gap |
