@@ -1,0 +1,34 @@
+{
+  "cart": {
+    "items": [
+      {
+        "_id": "cart-item-e2e-001",
+        "productId": {
+          "_id": "prod-e2e-001",
+          "title": "E2E Detail Product",
+          "coverImage": "/ShopProduct/Aria-SK6-Helmet 1.png"
+        },
+        "variantId": "var-e2e-001",
+        "size": "M",
+        "quantity": 1,
+        "price": 49.99,
+        "salePrice": null,
+        "selectedSizePrice": 49.99,
+        "shippingType": "standard",
+        "shippingMethod": "standard",
+        "shippingCost": 5,
+        "totalStock": 10,
+        "allowBackorder": false,
+        "title": "E2E Detail Product",
+        "sku": "E2E-SKU-001"
+      }
+    ],
+    "totalItems": 1
+  },
+  "pricing": {
+    "subtotal": 49.99,
+    "shipping": 5,
+    "tax": 0,
+    "total": 54.99
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "products": [
+    {
+      "_id": "prod-e2e-001",
+      "title": "E2E Detail Product",
+      "coverImage": "/ShopProduct/Aria-SK6-Helmet 1.png",
+      "price": 49.99
+    }
+  ]
+}

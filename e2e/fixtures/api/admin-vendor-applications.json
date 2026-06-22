@@ -1,0 +1,35 @@
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "app-e2e-001",
+      "applicationId": "e2e-app-001",
+      "businessName": "E2E Vendor Shop",
+      "status": "submitted",
+      "totalVerificationPoints": 10,
+      "isMinorityOwned": false,
+      "minorityCategories": [],
+      "userId": {
+        "_id": "e2e-vendor-id",
+        "name": "E2E Vendor",
+        "email": "e2e-vendor@example.test"
+      },
+      "verificationPayment": {
+        "status": "paid",
+        "paidAt": "2026-06-01T00:00:00.000Z"
+      },
+      "verificationChecklist": {
+        "minorityDocs": false,
+        "taxDocs": false,
+        "businessLicense": false,
+        "website": false,
+        "facebook": false,
+        "instagram": false,
+        "linkedin": false,
+        "tiktok": false
+      },
+      "createdAt": "2026-06-01T00:00:00.000Z",
+      "submittedAt": "2026-06-02T00:00:00.000Z"
+    }
+  ]
+}

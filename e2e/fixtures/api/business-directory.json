@@ -1,0 +1,15 @@
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "biz-e2e-001",
+      "businessName": "E2E Vendor Shop",
+      "slug": "e2e-vendor-shop",
+      "logo": "/ShopProduct/Aria-SK6-Helmet 1.png",
+      "city": "Richmond",
+      "state": "VA",
+      "listingType": "product"
+    }
+  ],
+  "totalPages": 1
+}

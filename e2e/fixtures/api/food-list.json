@@ -1,0 +1,14 @@
+{
+  "data": [
+    {
+      "_id": "food-e2e-001",
+      "title": "E2E Sample Dish",
+      "slug": "e2e-sample-dish",
+      "coverImage": "/ShopProduct/Aria-SK6-Helmet 1.png",
+      "price": 12.5
+    }
+  ],
+  "total": 1,
+  "page": 1,
+  "limit": 10
+}
