@@ -483,7 +483,7 @@ export default function FinalReviewPage() {
                       : 'border-yellow-400 text-yellow-600 bg-yellow-50'
                     }`}>
                     {step.status === 'completed' ? 'Completed' :
-                      step.status === 'incompleted' ? 'Incompleted' : 'Pending'}
+                      step.status === 'incompleted' ? 'Incomplete' : 'Pending'}
                   </span>
 
                   {/* Expand/Collapse Arrow */}

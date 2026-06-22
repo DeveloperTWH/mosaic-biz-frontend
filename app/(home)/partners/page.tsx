@@ -16,6 +16,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import VendorApplicationShell from "./components/VendorApplicationShell";
+import VendorOnboardingStatusPanel from "./components/VendorOnboardingStatusPanel";
+import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import {
   clearStaleClientSession,
@@ -437,12 +439,11 @@ const Page: React.FC = () => {
       return (
         <div className="space-y-4">
           {stripeReturnProcessing && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-start gap-3">
-              <Clock className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5 animate-pulse" />
-              <p className="text-sm text-blue-800">
-                Payment received. Submitting your application for admin review…
-              </p>
-            </div>
+            <VendorOnboardingStatusPanel
+              variant="info"
+              title="Payment received"
+              description="Submitting your application for admin review…"
+            />
           )}
 
           <div className="grid gap-3 md:grid-cols-3">
@@ -483,58 +484,42 @@ const Page: React.FC = () => {
           </div>
 
           {onboardingStatus.data.details.stage1.status === "rejected" && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-red-700">
-                Your application is rejected due to not meeting verification criteria. Our team will contact you.
-              </p>
-            </div>
+            <VendorOnboardingStatusPanel
+              variant="error"
+              title="Application not approved"
+              description="Your application did not meet verification criteria. Our team will contact you with next steps."
+            />
           )}
 
           {paidNeedsSubmit && (
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 space-y-3">
-              <div className="flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-sm font-medium text-amber-900">
-                    Payment received — one step left
-                  </p>
-                  <p className="text-sm text-amber-800 mt-1">
-                    Submit your application to send it to the admin review queue.
-                    Your application is not under review until submission completes.
-                  </p>
-                </div>
-              </div>
-              {submitError && (
+            <VendorOnboardingStatusPanel
+              variant="correction"
+              title="Payment received — submit your application"
+              description="Your verification fee is paid, but your application is not under review until you submit it."
+              primaryAction={{
+                label: submitLoading ? "Submitting…" : "Submit application",
+                onClick: handleSubmitApplication,
+                disabled: submitLoading || stripeReturnProcessing,
+                loading: submitLoading,
+              }}
+              secondaryAction={{
+                label: "Edit application",
+                onClick: () => router.push("/partners/business/new"),
+                variant: "outline",
+              }}
+            >
+              {submitError ? (
                 <p className="text-sm text-red-700">{submitError}</p>
-              )}
-              <div className="flex flex-wrap justify-end gap-2">
-                <Link href="/partners/business/new">
-                  <button
-                    type="button"
-                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
-                  >
-                    Edit application
-                  </button>
-                </Link>
-                <button
-                  type="button"
-                  onClick={handleSubmitApplication}
-                  disabled={submitLoading || stripeReturnProcessing}
-                  className="px-6 py-2 bg-indigo-900 text-white text-sm font-medium rounded-lg hover:bg-indigo-800 transition-colors disabled:opacity-60"
-                >
-                  {submitLoading ? "Submitting…" : "Submit application"}
-                </button>
-              </div>
-            </div>
+              ) : null}
+            </VendorOnboardingStatusPanel>
           )}
 
           {stage1.status === "draft" && !paidNeedsSubmit && (
             <div className="flex justify-end">
               <Link href="/partners/business/new">
-                <button className="px-6 py-2 bg-indigo-900 text-white text-sm font-medium rounded-lg hover:bg-indigo-800 transition-colors">
+                <Button size="sm" className="normal-case">
                   Continue Draft
-                </button>
+                </Button>
               </Link>
             </div>
           )}
@@ -542,9 +527,9 @@ const Page: React.FC = () => {
           {stage1.status === "pending" && !paidNeedsSubmit && stage1.paymentStatus !== "paid" && (
             <div className="flex justify-end">
               <Link href="/partners/business/new">
-                <button className="px-6 py-2 bg-indigo-900 text-white text-sm font-medium rounded-lg hover:bg-indigo-800 transition-colors">
+                <Button size="sm" className="normal-case">
                   Continue application
-                </button>
+                </Button>
               </Link>
             </div>
           )}
@@ -559,19 +544,19 @@ const Page: React.FC = () => {
 
           {isStage1Complete(onboardingStatus.data.details.stage1.status) && (
             <div className="space-y-3">
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                <p className="text-sm text-green-800">
-                  Verification complete. Continue to the next onboarding step below.
-                </p>
-              </div>
+              <VendorOnboardingStatusPanel
+                variant="success"
+                title="Verification complete"
+                description="Continue to the next onboarding step below."
+                compact
+              />
               {onboardingStatus.data.currentStage >= 3 && (
                 <Link href="/partners/business-profile">
-                  <button className="px-6 py-2 bg-indigo-900 text-white text-sm font-medium rounded-lg hover:bg-indigo-800 transition-colors flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4" />
+                  <Button size="sm" className="normal-case gap-2">
+                    <CheckCircle className="h-4 w-4" />
                     Continue to Business Profile
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
                 </Link>
               )}
             </div>
