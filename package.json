@@ -11,7 +11,11 @@
     "format:check": "prettier --check .",
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",
-    "test:e2e:report": "playwright show-report"
+    "test:e2e:report": "playwright show-report",
+    "quality:scan": "node scripts/run-quality-scan.mjs",
+    "quality:scan:playwright": "playwright test --config=playwright.quality.config.ts",
+    "quality:scan:lighthouse": "lhci autorun --config=lighthouserc.cjs && lhci autorun --config=lighthouserc.mobile.cjs",
+    "quality:scan:report": "node -e \"console.log(require('fs').readFileSync('quality-reports/summary.md','utf8'))\""
   },
   "dependencies": {
     "@babel/runtime": "^7.28.6",
@@ -57,6 +61,8 @@
     "zustand": "^5.0.6"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
+    "@lhci/cli": "^0.14.0",
     "@playwright/test": "^1.61.0",
     "@tailwindcss/postcss": "^4",
     "@types/canvas-confetti": "^1.9.0",
@@ -71,6 +77,7 @@
     "autoprefixer": "^10.4.21",
     "eslint": "^9.39.4",
     "eslint-config-next": "^16.2.9",
+    "lighthouse": "^12.6.1",
     "postcss": "^8.5.3",
     "prettier": "^3.8.4",
     "prettier-plugin-tailwindcss": "^0.8.0",
