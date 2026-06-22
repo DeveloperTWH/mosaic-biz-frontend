@@ -41,7 +41,7 @@ Shell component: `app/(home)/partners/components/VendorApplicationShell.tsx`
 | Stage 1 `business/new` | Uses shared `FormField` | Local `InputField` removed |
 | Partner hub `/partners` | Dashboard shell + tokens | Stage CTAs use `dashboard-gold` |
 | Business profile | Dashboard shell + label contrast | Disabled fields keep readable gray-700 on gray-100 |
-| `/partners/business/payment` | Not touched | Payment-safe guardrail |
+| `/partners/business/payment` | `VendorApplicationShell` + status panels (#180) | See [VISUAL_PASS_3_VENDOR_PAYMENT_QA.md](../VISUAL_PASS_3_VENDOR_PAYMENT_QA.md) |
 | Customer account/checkout | Partial | Cart readability only where faint; no Stripe changes |
 | Admin signin | Legacy | Post-launch |
 
