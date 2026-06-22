@@ -17,6 +17,8 @@ Repeatable, non-destructive quality scans for public Mosaic Biz Hub routes:
 
 No forms are submitted, no accounts created, no cart/checkout/payment routes scanned.
 
+**Generated artifacts (do not commit):** `quality-reports/`, `.lighthouseci/` (Lighthouse CI temp files including `assertion-results.json`), Playwright report dirs — all listed in `.gitignore`. The scan orchestrator removes `.lighthouseci/` after each run; final reports live under `quality-reports/`.
+
 ---
 
 ## Tooling inventory (before this harness)

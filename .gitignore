@@ -17,7 +17,8 @@
 /test-results/
 /blob-report/
 /.playwright/
-/.lighthouseci/
+# Lighthouse CI temp output (assertion-results.json, lhr-*.json/html)
+.lighthouseci/
 
 # next.js
 /out/

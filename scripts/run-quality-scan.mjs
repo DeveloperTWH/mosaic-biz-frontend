@@ -1,5 +1,12 @@
 import { spawn } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  readdirSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
 import path from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
 
@@ -7,6 +14,7 @@ const ROOT = process.cwd();
 const PORT = process.env.QUALITY_SCAN_PORT || "3098";
 const BASE_URL = process.env.QUALITY_SCAN_BASE_URL || `http://127.0.0.1:${PORT}`;
 const REPORT_DIR = path.join(ROOT, "quality-reports");
+const LIGHTHOUSE_CI_DIR = path.join(ROOT, ".lighthouseci");
 
 const PUBLIC_ROUTES = [
   { id: "home", path: "/" },
@@ -140,6 +148,14 @@ function readLighthouseCategoryScores(outputDir) {
   );
 }
 
+function cleanupLighthouseCiArtifacts() {
+  if (!existsSync(LIGHTHOUSE_CI_DIR)) {
+    return;
+  }
+
+  rmSync(LIGHTHOUSE_CI_DIR, { recursive: true, force: true });
+}
+
 function writeQualityReports(summary) {
   mkdirSync(REPORT_DIR, { recursive: true });
   writeFileSync(path.join(REPORT_DIR, "summary.json"), JSON.stringify(summary, null, 2));
@@ -246,6 +262,8 @@ async function main() {
     if (!server.killed) {
       server.kill("SIGTERM");
     }
+
+    cleanupLighthouseCiArtifacts();
 
     findings = [...collectAxeFindings(), ...collectBrokenLinkFindings()];
     const summary = {
