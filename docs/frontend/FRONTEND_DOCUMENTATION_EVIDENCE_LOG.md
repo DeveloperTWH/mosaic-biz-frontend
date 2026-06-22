@@ -147,6 +147,17 @@ No production deploy, auth architecture changes, Next.js API routes, checkout ch
 
 ---
 
+## Issue #164 — API client phase 1
+
+| Item | Value |
+|------|-------|
+| Branch | `refactor/frontend-api-client-phase1` |
+| Base commit (`main`) | `df3b1b198262ef298c52d503ece6702e3c9662dc` |
+| Doc | [FRONTEND_API_CLIENT_PHASE1.md](FRONTEND_API_CLIENT_PHASE1.md) |
+| Unit tests | `npm run test:unit` (`lib/api/httpClient.test.ts`) |
+
+Migrated: auth session/logout, vendor onboarding, admin vendor review, order initiation, Stripe Connect status/account-link.
+
 ## Issue #114 — Quality scan harness
 
 | Item | Value |

@@ -3,7 +3,13 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import axios from "axios";
+import {
+  finalizeVendorApplication,
+  getVendorApplicationDetail,
+  listPendingVendorApplications,
+  mapAdminVendorFetchError,
+  verifyVendorApplicationItem,
+} from "@/lib/api/vendorOnboardingAdmin";
 import Sidebar from "../components/Sidebar";
 import Topbar from "../components/Topbar";
 import { 
@@ -72,56 +78,15 @@ const VendorApplicationsPage = () => {
       setLoading(true);
       setFetchError(null);
 
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/vendor-onboarding/pending`,
-        {
-          withCredentials: true,
-        }
-      );
-
-      if (res.data.success) {
-        const payload = res.data.data;
-        if (!Array.isArray(payload)) {
-          setApplications([]);
-          setFetchError({
-            kind: "api",
-            message: "Unexpected vendor applications response from server.",
-          });
-          return;
-        }
-        setApplications(payload);
-      } else {
-        setApplications([]);
-        setFetchError({
-          kind: "api",
-          message: res.data.message || "Failed to load vendor applications.",
-        });
-      }
+      const payload = await listPendingVendorApplications();
+      setApplications(payload as VendorApplication[]);
     } catch (err: unknown) {
-      const axiosErr = err as {
-        response?: { status?: number; data?: { message?: string } };
-      };
-      const status = axiosErr.response?.status;
-      const message =
-        axiosErr.response?.data?.message || "Failed to fetch applications.";
-
       console.error("Error fetching applications:", err);
-
-      if (status === 401) {
-        setFetchError({
-          kind: "auth",
-          message: "Your admin session expired. Sign in again to view applications.",
-        });
-      } else if (status === 403) {
-        setFetchError({
-          kind: "forbidden",
-          message: "You do not have permission to view vendor applications.",
-        });
-      } else {
-        setFetchError({ kind: "api", message });
-        toast.error(message);
+      const mapped = mapAdminVendorFetchError(err);
+      setFetchError(mapped);
+      if (mapped.kind === "api") {
+        toast.error(mapped.message);
       }
-
       setApplications([]);
     } finally {
       setLoading(false);

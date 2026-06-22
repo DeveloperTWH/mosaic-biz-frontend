@@ -1,8 +1,10 @@
 # Frontend API Usage Inventory — As Built
 
 **Type:** Reference (launch evidence pack)  
-**Last updated:** 2026-06-19  
+**Last updated:** 2026-06-22 (phase 1 client migration #164)  
 **Evidence source:** ripgrep across `*.{ts,tsx}` (excluding docs), full read of `lib/api/*`, `utils/cartUtils.ts`, `utils/authUtils.ts`, `lib/api/routeContract.ts`
+
+**Phase 1 migrated modules:** `lib/api/httpClient.ts`, `authSession.ts`, `vendorOnboarding.ts`, `vendorOnboardingAdmin.ts`, `orders.ts`, `stripeConnect.ts` — see [FRONTEND_API_CLIENT_PHASE1.md](FRONTEND_API_CLIENT_PHASE1.md).
 
 Base URL for all calls: `NEXT_PUBLIC_API_BASE_URL` (axios default in `lib/api.ts`: `https://api.mosaicbizhub.com/`).
 
@@ -191,5 +193,6 @@ UI routes: `/partners/connect/return` → `/partners/payout-setup?refresh=1`; `/
 ## Cross-links
 
 - [FRONTEND_AUTH_AND_CREDENTIALS_BEHAVIOR.md](FRONTEND_AUTH_AND_CREDENTIALS_BEHAVIOR.md)
+- [FRONTEND_API_CLIENT_PHASE1.md](FRONTEND_API_CLIENT_PHASE1.md) — centralized client phase 1 (#164)
 - [../API_CONTRACTS.md](../API_CONTRACTS.md)
 - [../BACKEND_FRONTEND_ROUTE_CONTRACT.md](../BACKEND_FRONTEND_ROUTE_CONTRACT.md)
