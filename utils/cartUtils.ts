@@ -1,4 +1,5 @@
 import { isUserLoggedIn, resolveCheckoutAccess } from './authUtils';
+import { getUserSafeOrderErrorMessage, initiateOrder } from '@/lib/api/orders';
 import { toast } from 'react-toastify';
 
 interface CartItem {
@@ -1510,27 +1511,19 @@ export async function handlePlaceOrderFlow(
 
   const items = cart.map(toLineItem);
 
-  // Call initiateOrder
-  const res = await fetch(`${BASE}/api/orders/initiate`, {
-    method: "POST",
-    credentials: "include",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
+  let data;
+  try {
+    data = await initiateOrder({
       items,
       shippingAddress: address,
       userNote: userNote ?? "",
       selectedDeliverySpeed,
-    }),
-  });
-
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    const msg = err?.message || "Failed to initiate order";
-    toast.error(msg);
+    });
+  } catch (error) {
+    toast.error(getUserSafeOrderErrorMessage(error));
     return;
   }
 
-  const data = await res.json();
   const { orderId, groupOrderId, clientSecret } = data;
 
   if (typeof window !== "undefined" && checkoutSource === "cart") {

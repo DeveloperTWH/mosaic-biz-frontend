@@ -1,3 +1,5 @@
+import { logoutSession } from "@/lib/api/authSession";
+
 const clearBrowserCookies = () => {
   if (typeof document === "undefined") return;
 
@@ -23,33 +25,22 @@ const clearBrowserCookies = () => {
 };
 
 export const logoutUser = async (): Promise<boolean> => {
-  try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/logout`,
-      {
-        method: "POST",
-        credentials: "include", // Important for cookies/session
-      }
-    );
+  const result = await logoutSession();
 
-    if (res.ok) {
-      clearBrowserCookies();
-      localStorage.removeItem("user_session");
-      localStorage.removeItem("user_gender");
-      localStorage.removeItem("user_name");
-      localStorage.removeItem("user_role");
-      localStorage.removeItem("token");
-      sessionStorage.removeItem("cart_sync_checked"); // allow re-prompt next time
-      window.dispatchEvent(new Event("auth:logout"));
+  if (result.ok) {
+    clearBrowserCookies();
+    localStorage.removeItem("user_session");
+    localStorage.removeItem("user_gender");
+    localStorage.removeItem("user_name");
+    localStorage.removeItem("user_role");
+    localStorage.removeItem("token");
+    sessionStorage.removeItem("cart_sync_checked");
+    window.dispatchEvent(new Event("auth:logout"));
 
-      window.location.href = "/";
-      return true;
-    } else {
-      console.error("Logout failed");
-      return false;
-    }
-  } catch (err) {
-    console.error("Logout error", err);
-    return false;
+    window.location.href = "/";
+    return true;
   }
+
+  console.error("Logout failed", result.error);
+  return false;
 };
