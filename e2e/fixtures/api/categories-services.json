@@ -1,0 +1,7 @@
+{
+  "data": {
+    "serviceCategories": [
+      { "_id": "cat-svc-1", "name": "Professional Services", "slug": "professional-services" }
+    ]
+  }
+}

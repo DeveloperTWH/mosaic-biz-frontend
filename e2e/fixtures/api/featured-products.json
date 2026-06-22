@@ -1,0 +1,22 @@
+{
+  "products": [
+    {
+      "_id": "prod-e2e-001",
+      "title": "E2E Featured Product",
+      "description": "Mock featured product for Playwright",
+      "coverImage": "/ShopProduct/Aria-SK6-Helmet 1.png",
+      "slug": "e2e-featured-product",
+      "createdAt": "2026-06-01T00:00:00.000Z",
+      "price": 49.99,
+      "categoryId": { "_id": "cat-1", "name": "Apparel" },
+      "subcategoryId": null,
+      "category": { "_id": "cat-1", "name": "Apparel" },
+      "subcategory": null
+    }
+  ],
+  "pagination": {
+    "currentPage": 1,
+    "totalPages": 1,
+    "totalProducts": 1
+  }
+}

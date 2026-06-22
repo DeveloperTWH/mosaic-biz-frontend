@@ -1,0 +1,12 @@
+{
+  "businesses": [
+    {
+      "_id": "biz-e2e-001",
+      "businessName": "E2E Vendor Shop",
+      "slug": "e2e-vendor-shop",
+      "isApproved": false,
+      "isActive": false,
+      "listingType": "product"
+    }
+  ]
+}

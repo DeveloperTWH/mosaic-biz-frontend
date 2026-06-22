@@ -1,8 +1,21 @@
 # Frontend Documentation Evidence Log
 
 **Type:** Launch evidence (control pack index)  
-**Last updated:** 2026-06-19  
+**Last updated:** 2026-06-21  
 **Pack:** Frontend as-built documentation — Mosaic Biz Hub launch readiness
+
+---
+
+## E2E automation evidence (#163)
+
+| Item | Value |
+|------|-------|
+| Branch | `test/frontend-critical-journey-playwright` |
+| Base commit (launch `main`) | `df3b1b198262ef298c52d503ece6702e3c9662dc` |
+| Runbook | [FRONTEND_E2E_TEST_RUNBOOK.md](FRONTEND_E2E_TEST_RUNBOOK.md) |
+| Test root | `e2e/` + [playwright.config.ts](../../playwright.config.ts) |
+| Default mode | Mocked API via Playwright `page.route()` |
+| Issues | #163, related #162 |
 
 ---
 

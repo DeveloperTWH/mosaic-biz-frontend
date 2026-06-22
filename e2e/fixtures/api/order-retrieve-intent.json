@@ -1,0 +1,28 @@
+{
+  "paymentIntent": {
+    "id": "pi_e2e_mock",
+    "amount": 5499,
+    "currency": "usd",
+    "status": "succeeded",
+    "created": 1719000000,
+    "receipt_email": "e2e-customer@example.test"
+  },
+  "orders": [
+    {
+      "_id": "order-e2e-001",
+      "totalAmount": 54.99,
+      "status": "paid",
+      "vendorId": "biz-e2e-001",
+      "items": [
+        {
+          "productId": { "title": "E2E Detail Product", "coverImage": "/ShopProduct/Aria-SK6-Helmet 1.png" },
+          "variantId": "var-e2e-001",
+          "size": "M",
+          "color": "Blue",
+          "quantity": 1,
+          "price": 49.99
+        }
+      ]
+    }
+  ]
+}

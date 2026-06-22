@@ -1,0 +1,19 @@
+{
+  "success": true,
+  "data": {
+    "applicationId": "e2e-app-001",
+    "businessName": "E2E Vendor Shop",
+    "currentStage": 2,
+    "status": "approved",
+    "nextAction": "select_tier",
+    "details": {
+      "stage1": {
+        "status": "verified",
+        "points": 20,
+        "paymentStatus": "paid"
+      },
+      "stage2": { "status": "pending" },
+      "stage3": { "status": "not_started", "totalPoints": 0 }
+    }
+  }
+}

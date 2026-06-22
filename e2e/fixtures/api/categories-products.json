@@ -1,0 +1,7 @@
+{
+  "data": {
+    "productCategories": [
+      { "_id": "cat-1", "name": "Apparel", "slug": "apparel" }
+    ]
+  }
+}

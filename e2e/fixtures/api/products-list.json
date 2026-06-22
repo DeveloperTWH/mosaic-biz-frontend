@@ -1,0 +1,16 @@
+{
+  "data": [
+    {
+      "_id": "prod-e2e-001",
+      "title": "E2E Catalog Product",
+      "description": "Mock catalog listing product",
+      "coverImage": "/ShopProduct/Aria-SK6-Helmet 1.png",
+      "slug": "e2e-catalog-product",
+      "price": 29.99,
+      "categoryId": { "_id": "cat-1", "name": "Apparel" }
+    }
+  ],
+  "total": 1,
+  "page": 1,
+  "limit": 10
+}

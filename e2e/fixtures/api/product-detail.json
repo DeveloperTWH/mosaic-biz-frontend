@@ -1,0 +1,26 @@
+{
+  "success": true,
+  "data": {
+    "_id": "prod-e2e-001",
+    "title": "E2E Detail Product",
+    "description": "Detailed mock product for cart flow",
+    "coverImage": "/ShopProduct/Aria-SK6-Helmet 1.png",
+    "slug": "e2e-detail-product",
+    "averageRating": 4.5,
+    "totalReviews": 2,
+    "variants": [
+      {
+        "_id": "var-e2e-001",
+        "variantId": "var-e2e-001",
+        "sku": "E2E-SKU-001",
+        "price": 49.99,
+        "salePrice": null,
+        "totalStock": 10,
+        "allowBackorder": false,
+        "attributes": { "size": "M", "color": "Blue" },
+        "images": ["/ShopProduct/Aria-SK6-Helmet 1.png"]
+      }
+    ],
+    "businessId": "biz-e2e-001"
+  }
+}
