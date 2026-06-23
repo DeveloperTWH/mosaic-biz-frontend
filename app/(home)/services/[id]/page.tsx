@@ -150,6 +150,7 @@ export default function ServiceCategoryPage({ params }: PageProps) {
                 {/* Banner */}
                 <PublicPageHero
                     title={`${slugToTitle(id)} Services`}
+                    variant="compact"
                     breadcrumbs={[
                         { label: "Home", href: "/" },
                         { label: "Services", href: "/services" },

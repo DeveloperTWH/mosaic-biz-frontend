@@ -7,7 +7,7 @@ import { Eye } from "lucide-react";
 import { toast } from "react-toastify";
 import { Review } from "@/types/review";
 import ClientTestimonials from "../../../Components/ClientTestimonials";
-import PublicSearchFilterBar from "../../../Components/PublicSearchFilterBar";
+import CommerceMobileSearchBar from "../../../Components/CommerceMobileSearchBar";
 import MobileStickyActionBar from "../../../Components/MobileStickyActionBar";
 import { buildSearchPageUrl, PublicSearchFilters } from "../../../Components/publicSearch";
 import MarketEmptyState from "../../../Components/MarketEmptyState";
@@ -772,7 +772,7 @@ export default function FoodVendorProfilePage() {
         </div>
       </div>
 
-      <PublicSearchFilterBar
+      <CommerceMobileSearchBar
         filters={filters}
         onChange={setFilters}
         onSubmit={() => router.push(buildSearchPageUrl(filters))}

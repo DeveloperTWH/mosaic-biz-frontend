@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 import { logoutUser } from "@/utils/logoutUser";
-import { DEFAULT_PROFILE_AVATAR, LOGIN_LINKS, getStoredUserRole } from "./navConfig";
+import { DEFAULT_PROFILE_AVATAR, LOGIN_LINKS, SHOP_LINKS, getStoredUserRole } from "./navConfig";
 import CartButton from "./CartButton";
 
 type HeaderActionsProps = {
@@ -31,7 +31,7 @@ export default function HeaderActions({
   const showCustomerNav = isCustomer === true || storedRole === "customer";
   const showVendorNav = storedRole === "business_owner";
 
-  const visibilityClass = variant === "desktop" ? "hidden xl:flex" : "flex xl:hidden";
+  const visibilityClass = variant === "desktop" ? "hidden lg:flex" : "flex lg:hidden";
 
   if (isLoggedIn === null) {
     return (
@@ -62,19 +62,39 @@ export default function HeaderActions({
             />
           </button>
           {showDropdown && (
-            <div className="absolute right-0 z-50 mt-2 w-48 rounded-lg border border-white/10 bg-market-elevated shadow-market-card">
+            <div className="absolute right-0 z-50 mt-2 w-56 rounded-lg border border-white/10 bg-market-elevated shadow-market-card">
               {showCustomerNav ? (
                 <>
+                  <div className="border-b border-white/10 px-4 py-2">
+                    <p className="font-montserrat text-[11px] font-semibold uppercase tracking-[0.14em] text-market-muted">
+                      Browse
+                    </p>
+                  </div>
+                  {SHOP_LINKS.filter((link) => link.href !== "/vendors").map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className="market-dropdown-link px-4 py-2.5"
+                      onClick={() => setShowDropdown(false)}
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
+                  <div className="border-t border-white/10 px-4 py-2">
+                    <p className="font-montserrat text-[11px] font-semibold uppercase tracking-[0.14em] text-market-muted">
+                      Account
+                    </p>
+                  </div>
                   <Link
                     href="/customer/order"
-                    className="market-dropdown-link rounded-t-lg px-4 py-3"
+                    className="market-dropdown-link px-4 py-2.5"
                     onClick={() => setShowDropdown(false)}
                   >
                     My Orders
                   </Link>
                   <Link
                     href="/customer/bookings"
-                    className="market-dropdown-link px-4 py-3"
+                    className="market-dropdown-link px-4 py-2.5"
                     onClick={() => setShowDropdown(false)}
                   >
                     My Bookings
@@ -92,7 +112,7 @@ export default function HeaderActions({
               <button
                 type="button"
                 onClick={async () => await logoutUser()}
-                className="w-full rounded-b-lg px-4 py-3 text-left text-sm font-medium text-red-300 hover:bg-red-950/40"
+                className="w-full rounded-b-lg border-t border-white/10 px-4 py-3 text-left text-sm font-medium text-red-300 hover:bg-red-950/40"
               >
                 Logout
               </button>

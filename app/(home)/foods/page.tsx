@@ -113,6 +113,7 @@ const FoodSection = () => {
     <div>
       <PublicPageHero
         title="Food & Grocery"
+        variant="compact"
         breadcrumbs={[
           { label: "Home", href: "/" },
           { label: "Food & Grocery" },

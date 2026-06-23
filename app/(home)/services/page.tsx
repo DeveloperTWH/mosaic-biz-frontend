@@ -201,6 +201,7 @@ const ServicePageContent = () => {
     <main>
       <PublicPageHero
         title="Services"
+        variant="compact"
         breadcrumbs={[
           { label: "Home", href: "/" },
           { label: "Services" },
@@ -267,6 +268,7 @@ function ServicePageFallback() {
     <main>
       <PublicPageHero
         title="Services"
+        variant="compact"
         breadcrumbs={[
           { label: "Home", href: "/" },
           { label: "Services" },

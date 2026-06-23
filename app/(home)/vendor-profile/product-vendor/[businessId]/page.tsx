@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { Eye } from "lucide-react";
 import ClientTestimonials from "../../../Components/ClientTestimonials";
-import PublicSearchFilterBar from "../../../Components/PublicSearchFilterBar";
+import CommerceMobileSearchBar from "../../../Components/CommerceMobileSearchBar";
 import { buildSearchPageUrl, PublicSearchFilters } from "../../../Components/publicSearch";
 import MarketEmptyState from "../../../Components/MarketEmptyState";
 import MarketLoadingBlock from "../../../Components/MarketLoadingBlock";
@@ -425,7 +425,7 @@ export default function ProductVendorProfilePage() {
         </div>
       </div>
 
-      <PublicSearchFilterBar
+      <CommerceMobileSearchBar
         filters={filters}
         onChange={setFilters}
         onSubmit={() => router.push(buildSearchPageUrl(filters))}

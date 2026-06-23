@@ -223,6 +223,7 @@ const ProductsPageInner = () => {
         <div>
             <PublicPageHero
                 title="Shop"
+                variant="compact"
                 breadcrumbs={[
                     { label: "Home", href: "/" },
                     { label: "Shop" },
@@ -260,36 +261,37 @@ const ProductsPageInner = () => {
                 <MarketLoadingBlock label="Searching products…" minHeight="min-h-[120px]" />
             )}
             
-            <div className="relative px-4 py-10 sm:px-6">
-                <div className="absolute top-1/2 left-2 z-10 -translate-y-1/2 sm:left-4">
-                    <button
-                        ref={prevButton}
-                        type="button"
-                        className="market-carousel-btn h-11 w-11 sm:h-12 sm:w-12"
-                    >
-                        <ChevronLeft className="h-6 w-6" />
-                    </button>
-                </div>
-                
-                <div className="absolute top-1/2 right-2 z-10 -translate-y-1/2 sm:right-4">
-                    <button
-                        ref={nextButton}
-                        type="button"
-                        className="market-carousel-btn h-11 w-11 sm:h-12 sm:w-12"
-                    >
-                        <ChevronRight className="h-6 w-6" />
-                    </button>
-                </div>
+            <div className="catalog-featured-section">
+                <div className="catalog-featured-carousel">
+                    <div className="absolute top-[58%] left-2 z-10 -translate-y-1/2 sm:left-0 lg:top-1/2">
+                        <button
+                            ref={prevButton}
+                            type="button"
+                            className="market-carousel-btn h-11 w-11 sm:h-12 sm:w-12"
+                        >
+                            <ChevronLeft className="h-6 w-6" />
+                        </button>
+                    </div>
 
-                <div className="flex flex-col items-center text-center">
-                    <h2 className="font-poppins text-2xl font-semibold text-market-text sm:text-3xl">
-                        What&apos;s Hot. What&apos;s Trusted. What&apos;s Moving
-                    </h2>
-                    <div className="market-section-divider mt-4" />
-                    <p className="mt-4 max-w-2xl font-montserrat text-sm text-market-muted sm:text-base">
-                        Discover top-rated products and services that customers love—updated in real time
-                    </p>
-                </div>
+                    <div className="absolute top-[58%] right-2 z-10 -translate-y-1/2 sm:right-0 lg:top-1/2">
+                        <button
+                            ref={nextButton}
+                            type="button"
+                            className="market-carousel-btn h-11 w-11 sm:h-12 sm:w-12"
+                        >
+                            <ChevronRight className="h-6 w-6" />
+                        </button>
+                    </div>
+
+                    <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
+                        <h2 className="font-poppins text-2xl font-semibold text-market-text sm:text-3xl">
+                            What&apos;s Hot. What&apos;s Trusted. What&apos;s Moving
+                        </h2>
+                        <div className="market-section-divider mt-4 lg:mx-0" />
+                        <p className="mt-4 max-w-2xl font-montserrat text-sm text-market-muted sm:text-base">
+                            Discover top-rated products and services that customers love—updated in real time
+                        </p>
+                    </div>
 
                 {error ? (
                   <div className="mb-6 rounded border border-red-200 bg-red-50 p-4 text-sm text-red-700">
@@ -318,7 +320,7 @@ const ProductsPageInner = () => {
                 <Swiper
                     onSwiper={setSwiperRef}
                     modules={[Navigation]}
-                    spaceBetween={30}
+                    spaceBetween={20}
                     slidesPerView={1}
                     breakpoints={{
                         640: {
@@ -327,11 +329,11 @@ const ProductsPageInner = () => {
                         },
                         1024: {
                             slidesPerView: 3,
-                            spaceBetween: 30,
+                            spaceBetween: 24,
                         },
                         1280: {
                             slidesPerView: 4,
-                            spaceBetween: 0,
+                            spaceBetween: 24,
                         },
                     }}
                     navigation={{
@@ -339,17 +341,18 @@ const ProductsPageInner = () => {
                         nextEl: nextButton.current,
                     }}
                     autoplay={{ delay: 5000, disableOnInteraction: false }}
-                    className="py-4"
+                    className="py-4 lg:py-6"
                 >
                     {items.map((p) => (
-                        <SwiperSlide key={p._id} className="flex h-auto justify-center py-4">
-                            <div className="h-full w-full max-w-[300px]">
+                        <SwiperSlide key={p._id} className="flex h-auto py-2">
+                            <div className="h-full w-full">
                               <PublicProductCard {...mapRankedItemToPublicProductCard(p)} />
                             </div>
                         </SwiperSlide>
                     ))}
                 </Swiper>
                 ) : null}
+                </div>
             </div>
 
             {listFetchError ? (

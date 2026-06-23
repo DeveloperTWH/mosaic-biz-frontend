@@ -408,6 +408,7 @@ function SearchPageContent() {
     <div className="min-h-screen bg-market-bg">
       <PublicPageHero
         title="Search"
+        variant="compact"
         breadcrumbs={[
           { label: "Home", href: "/" },
           { label: "Search" },
@@ -426,7 +427,7 @@ function SearchPageContent() {
 
       <section className="container-page public-section max-w-[1400px]">
         {tabItems.length > 0 ? (
-          <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-center">
+          <div className="catalog-search-tabs">
             {tabItems.map((tab) => {
               const isActive = activeTab === tab.key;
               return (
@@ -442,10 +443,8 @@ function SearchPageContent() {
                       })
                     );
                   }}
-                  className={`relative w-full border px-4 py-3 text-sm font-semibold transition-colors sm:min-w-[180px] sm:w-auto lg:min-w-[220px] ${
-                    isActive
-                      ? "border-market-gold bg-market-gold text-market-header"
-                      : "border-white/15 bg-market-elevated text-market-text hover:border-market-gold/40"
+                  className={`catalog-search-tab ${
+                    isActive ? "catalog-search-tab--active" : "catalog-search-tab--inactive"
                   }`}
                 >
                   {tab.label} ({tab.count})

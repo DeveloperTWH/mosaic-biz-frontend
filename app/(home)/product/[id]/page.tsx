@@ -18,7 +18,7 @@ import {
   resolveDisplayPrice,
 } from '@/utils/cartUtils';
 import { toggleWishlist, isProductWishlisted } from '@/utils/wishlistUtils';
-import PublicSearchFilterBar from "../../Components/PublicSearchFilterBar";
+import CommerceMobileSearchBar from "../../Components/CommerceMobileSearchBar";
 import PublicPageHero from "../../Components/PublicPageHero";
 import MarketLoadingBlock from "../../Components/MarketLoadingBlock";
 import MobileStickyActionBar from "../../Components/MobileStickyActionBar";
@@ -572,6 +572,7 @@ setMainImage(firstImage);
     <div className="min-h-screen bg-market-bg">
       <PublicPageHero
         title={product.title || "Product"}
+        variant="compact"
         breadcrumbs={[
           { label: "Home", href: "/" },
           { label: "Shop", href: "/products" },
@@ -580,7 +581,7 @@ setMainImage(firstImage);
         imageUrl="/bgdetailpage.png"
       />
 
-      <PublicSearchFilterBar filters={filters} onChange={setFilters} onSubmit={handleSearch} />
+      <CommerceMobileSearchBar filters={filters} onChange={setFilters} onSubmit={handleSearch} />
 
       {/* Blocking overlay */}
       {(isBlocking || loadingQty) && (

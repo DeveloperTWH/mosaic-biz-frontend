@@ -120,7 +120,7 @@ export default function MobileBottomNav() {
     <nav
       id="mobile-bottom-nav"
       aria-label="Primary"
-      className="market-bottom-nav fixed inset-x-0 bottom-0 z-[45] xl:hidden"
+      className="market-bottom-nav fixed inset-x-0 bottom-0 z-[45] lg:hidden"
     >
       <ul className="market-bottom-nav-list flex items-stretch justify-around px-1 pt-1">
         {BOTTOM_NAV_ITEMS.map((item) => {

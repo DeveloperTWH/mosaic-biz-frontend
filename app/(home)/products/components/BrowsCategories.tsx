@@ -51,9 +51,9 @@ export default function BrowseCategories({ onCategorySelect }: BrowseCategoriesP
   }
 
   return (
-    <section className="bg-market-bg py-10 sm:py-12">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <div className="mb-10 flex flex-col items-start justify-between gap-4 sm:mb-12 sm:flex-row sm:items-center">
+    <section className="bg-market-bg py-6 sm:py-10 lg:py-12">
+      <div className="container-page">
+        <div className="mb-6 flex flex-col items-start justify-between gap-3 sm:mb-8 sm:flex-row sm:items-center lg:mb-10">
           <h2 className="font-poppins text-2xl font-bold uppercase tracking-wide text-market-text sm:text-3xl">
             Browse Products
           </h2>
