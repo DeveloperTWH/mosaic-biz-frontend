@@ -72,22 +72,25 @@ export default function CheckoutAddressPage() {
         }
 
         try {
-          const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/product/${productId}`);
+          const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/public/product/${productId}`);
           const product = res.data?.data;
 
-          const variant = product.variants.find((v: any) => v.variantId === variantId);
+          const variant = product.variants.find((v: any) => v.variantId === variantId || v._id === variantId);
           if (!variant) return toast.error('Variant not found');
 
-          const sizeObj = variant.sizes.find((s: any) => s.size === size);
-          if (!sizeObj) return toast.error('Selected size not found');
+          const sizeObj = variant.sizes?.find((s: any) => s.size === size);
+          const variantSize = variant.attributes?.Size || variant.attributes?.size || variant.size;
+          if (!sizeObj && variantSize && variantSize !== size) return toast.error('Selected size not found');
 
-          const stock = variant.sizes.find((s: any) => s.size === size);
-          if (stock.stock <= 0 && !variant.allowBackorder) return toast.error('Not in Stock');
+          const stock = sizeObj?.stock ?? variant.stock ?? product.stock;
+          if (stock <= 0 && !variant.allowBackorder) return toast.error('Not in Stock');
 
           const now = new Date();
           const validDiscount =
-            sizeObj.salePrice && sizeObj.discountEndDate && new Date(sizeObj.discountEndDate) > now;
-          const finalPrice = validDiscount ? Number(sizeObj.salePrice) : Number(sizeObj.price);
+            sizeObj?.salePrice && sizeObj.discountEndDate && new Date(sizeObj.discountEndDate) > now;
+          const finalPrice = validDiscount
+            ? Number(sizeObj.salePrice)
+            : Number(sizeObj?.price ?? variant.price ?? product.price);
 
           const img = variant.images?.[0] || product.coverImage;
 
@@ -100,8 +103,8 @@ export default function CheckoutAddressPage() {
               price: finalPrice,
               image: img,
               title: product.title,
-              color: variant.color,
-              label: variant.label,
+              color: variant.color || variant.attributes?.Color || variant.attributes?.color,
+              label: variant.label || variant.sku,
             },
           ]);
         } catch {

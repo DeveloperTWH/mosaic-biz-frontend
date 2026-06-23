@@ -54,7 +54,7 @@ test.describe("@mocked public marketplace", () => {
 
   test("product detail page renders mocked product", async ({ page }) => {
     await page.goto("/product/prod-e2e-001");
-    await expect(page.getByText("E2E Detail Product")).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole("heading", { name: "E2E Detail Product" }).last()).toBeVisible({ timeout: 15_000 });
   });
 
   test("missing product shows unavailable state", async ({ page }) => {
