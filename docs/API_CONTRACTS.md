@@ -38,6 +38,8 @@ Base URL: `NEXT_PUBLIC_API_BASE_URL` (default `https://api.mosaicbizhub.com`).
 | GET | `/api/minority-types` | Search/filter bars | Minority type dropdown |
 | GET | `/api/sub-categories` | Search/detail | Subcategory by slug |
 | GET | `/api/public/product/:id` | Buy-now checkout | Public product payload |
+| GET | `/api/public/product/vendor-profile/:id` | `lib/marketplace/fetchPublicVendorEligibility.ts`, vendor profile pages | Eligibility probe + public vendor profile |
+| GET | `/api/business` | `VendorGrid.tsx` | Public vendor directory — backend should filter `isApproved && isActive` |
 
 ---
 
@@ -45,10 +47,20 @@ Base URL: `NEXT_PUBLIC_API_BASE_URL` (default `https://api.mosaicbizhub.com`).
 
 | Method | Endpoint | Used by | Notes |
 |--------|----------|---------|-------|
-| GET | `/api/product/:id` | Checkout, detail flows | Live product detail |
-| GET | `/api/ranked` | `/search`, product detail search | Ranked listing with filters |
+| GET | `/api/product/:id` | Product detail, checkout | Live product detail |
+| GET | `/api/services/:slug` | `/service/[slug]` | Service detail by slug |
+| GET | `/api/ranked` | `/search`, homepage | Ranked listing with filters |
+| GET | `/api/public/search` | `/search` | Unified public search |
 
-Live UI routes: `/product/[id]`, `/service/[slug]`, `/vendor-profile/*`.
+**Live UI routes:**
+
+| Listing type | Primary commerce URL | Alternate / legacy |
+|--------------|---------------------|-------------------|
+| Product | `/product/[id]` | — |
+| Service | `/vendor-profile/service-vendor/[serviceId]` | `/service/[slug]` still exists; search/cards link to vendor-profile |
+| Vendor store | `/vendor-profile/product-vendor/[businessId]` | `/vendors/:id` redirects here |
+
+Legacy mock paths (`/products/[productid]/[id]`, `/services/[id]/[serviceId]`) redirect via `next.config.ts` — do not use for QA.
 
 ---
 
@@ -56,13 +68,19 @@ Live UI routes: `/product/[id]`, `/service/[slug]`, `/vendor-profile/*`.
 
 | Method | Endpoint | Used by |
 |--------|----------|---------|
-| GET | `/api/users/auth/check` | Nav session state |
+| GET | `/api/users/auth/check` | Nav session, admin layout, guards |
+| POST | `/api/users/login` | `login/page.tsx`, `signin/page.tsx` |
+| POST | `/api/users/logout` | `utils/logoutUser.ts` |
 | POST | `/api/users/register` | Signup |
 | POST | `/api/users/verify-otp` | OTP verification |
 | POST | `/api/users/resend-otp` | OTP resend |
+| POST | `/api/users/forgot-password` | Forgot password |
+| POST | `/api/users/reset-password` | Password reset |
 | GET | `/api/auth/google` | Google OAuth redirect |
 
-Login pages: `/login?type=customer`, `/login?type=vendor`.
+Login pages: `/login?type=customer`, `/login?type=vendor`. Admin: `/signin`.
+
+Session implementation: [`lib/api/authSession.ts`](../lib/api/authSession.ts).
 
 ---
 
@@ -96,12 +114,37 @@ Login pages: `/login?type=customer`, `/login?type=vendor`.
 
 ---
 
+## Cart
+
+Guest cart uses `localStorage` ([`utils/guestCart.ts`](../utils/guestCart.ts)). Authenticated cart uses API + `credentials: 'include'`.
+
+| Method | Endpoint | Used by | Notes |
+|--------|----------|---------|-------|
+| GET | `/api/cart` | `utils/cartUtils.ts` | Full cart; optional query params |
+| POST | `/api/cart/add` | `utils/cartUtils.ts` | Add line item |
+| PUT | `/api/cart/update/:cartItemId` | `utils/cartUtils.ts` | Update quantity by ID |
+| DELETE | `/api/cart/remove/:cartItemId` | `utils/cartUtils.ts` | Remove by ID |
+| PUT | `/api/cart/update-quantity` | `utils/cartUtils.ts` | Bulk quantity update |
+| DELETE | `/api/cart/remove` | `utils/cartUtils.ts` | Remove by body |
+| GET | `/api/cart/count` | `utils/cartApi.ts` | Nav badge count |
+| POST | `/api/cart/merge` | `utils/cartApi.ts` | Merge guest cart after login |
+| GET | `/api/cart/products/mini` | `utils/cartUtils.ts` | Mini product payloads for cart display |
+| POST | `/api/cart/variants/mini` | `utils/cartUtils.ts` | Mini variant payloads |
+
+**Constraints:** Single-vendor cart at checkout — adding a product from another business resets the cart. Frontend preflight checks vendor eligibility before `POST /api/orders/initiate`.
+
+---
+
 ## Commerce / Stripe
 
 | Method | Endpoint | Used by |
 |--------|----------|---------|
-| POST | `/api/orders/initiate` | Checkout |
+| POST | `/api/orders/initiate` | Checkout (`utils/cartUtils.ts`, `lib/api/orders.ts`) |
+| GET | `/api/orders/user` | Customer order history |
+| GET | `/api/orders/vendor` | Partner orders tab |
+| GET | `/api/orders/admin` | Admin orders |
 | GET | `/api/orders/retrieve-intent/:paymentIntentId` | Payment success |
+| POST | `/api/orders/:orderId/cancel` | Customer cancel |
 
 Webhook handling is **backend-only** — not in this repo.
 
@@ -123,6 +166,6 @@ curl "https://api.mosaicbizhub.com/api/products/list?page=1&limit=10&search="
 curl "https://api.mosaicbizhub.com/api/featured-products?page=1&limit=12"
 ```
 
-As of 2026-06-17: list returns `TEST PRODUCT 17 jun`; featured returns `products: []`.
+As of 2026-06-23: verify live responses on preview/production before sign-off. Featured products may return an empty array when no products are flagged — that is a backend/admin data issue, not a frontend route bug.
 
-See [PROJECT_STATUS.md](PROJECT_STATUS.md) and [HOMEPAGE_MARKETPLACE_REDESIGN_QA_REPORT.md](HOMEPAGE_MARKETPLACE_REDESIGN_QA_REPORT.md) for sign-off evidence.
+See [PROJECT_STATUS.md](PROJECT_STATUS.md) for current verification status.

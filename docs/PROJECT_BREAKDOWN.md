@@ -62,7 +62,7 @@ flowchart TB
 | State | Zustand (1 store), localStorage (guest cart, UI hints), URL params (filters) | [`app/store/businessStore.ts`](../app/store/businessStore.ts) |
 | Payments | Stripe Elements + Stripe Connect JS | checkout pages, [`lib/api/stripeConnect.ts`](../lib/api/stripeConnect.ts) |
 | Monitoring | Sentry | [`next.config.ts`](../next.config.ts), `instrumentation*.ts` |
-| Deploy | Vercel (manual production promote) | [ARCHITECTURE.md](ARCHITECTURE.md) |
+| Deploy | Vercel — **auto-deploy on merge to `main`** | [ARCHITECTURE.md](ARCHITECTURE.md), [GIT_WORKFLOW.md](GIT_WORKFLOW.md) |
 
 **No Next.js API routes, no Server Actions, no database in this repo.**
 
@@ -142,7 +142,7 @@ flowchart LR
 1. **Primary — HTTP cookies on API host**
    - Login/register/OTP POST with `credentials: 'include'`
    - Session validated via `GET /api/users/auth/check`
-   - Implemented in [`utils/authUtils.ts`](../utils/authUtils.ts)
+   - Implemented in [`lib/api/authSession.ts`](../lib/api/authSession.ts), used via [`utils/authUtils.ts`](../utils/authUtils.ts)
 
 2. **Secondary — client hints in localStorage**
    - `user_session`, `user_role`, `user_gender` for navbar/UI state
@@ -171,7 +171,7 @@ Matcher: `/admin/*`, `/partners/*`, `/customer/*`, `/login`, `/signup`, `/signin
 
 - **`/verify-otp`:** Allows access if `otpPending` cookie OR `email` query param (cross-origin cookie workaround)
 - **Logged-in on auth pages:** JWT-based role redirect (vendor signup exempt)
-- **`/admin`, `/partners`, `/customer`:** Mostly **pass-through** — real auth enforced client-side + API cookies (cross-origin limitation when API is on a different domain than frontend)
+- **`/admin`, `/partners`, `/customer`:** **Pass-through** — auth enforced client-side + API cookies (cross-origin limitation when API is on a different domain than frontend). Admin guard: `admin/layout.tsx` → `GET /api/users/auth/check`.
 
 ### Route guards (client-side)
 

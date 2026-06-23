@@ -1,5 +1,7 @@
 # Frontend API Usage Inventory — As Built
 
+> **Archive note (2026-06-23):** Canonical endpoint list is [../API_CONTRACTS.md](../API_CONTRACTS.md). This inventory is a grep snapshot for launch evidence — see [../archive/README.md](../archive/README.md).
+
 **Type:** Reference (launch evidence pack)  
 **Last updated:** 2026-06-22 (service publication #185, phase 1 client migration #164)  
 **Evidence source:** ripgrep across `*.{ts,tsx}` (excluding docs), full read of `lib/api/*`, `utils/cartUtils.ts`, `utils/authUtils.ts`, `lib/api/routeContract.ts`

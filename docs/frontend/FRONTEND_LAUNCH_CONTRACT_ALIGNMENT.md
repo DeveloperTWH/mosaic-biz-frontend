@@ -1,5 +1,7 @@
 # Frontend Launch Contract Alignment
 
+> **Archive note (2026-06-23):** Launch evidence from June 2026 contract audit. Canonical rules live in [../API_CONTRACTS.md](../API_CONTRACTS.md). See [../archive/README.md](../archive/README.md).
+
 **Type:** Launch evidence (contract alignment)  
 **Last updated:** 2026-06-19  
 **Branch:** `fix/frontend-launch-contract-env-and-legacy-route-audit`  

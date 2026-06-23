@@ -61,16 +61,21 @@ npm run dev
 
 ## Documentation
 
-All internal docs live under [`docs/`](docs/README.md):
+All internal docs: **[docs/README.md](docs/README.md)**
 
-- **[Project status](docs/PROJECT_STATUS.md)** — where we are today (living)
-- **[Roadmap](docs/ROADMAP.md)** — phased next steps
-- **[Project breakdown](docs/PROJECT_BREAKDOWN.md)** — full end-to-end architecture overview
-- **[Architecture](docs/ARCHITECTURE.md)** — routes, env, deployment, auth
-- **[API contracts](docs/API_CONTRACTS.md)** — canonical endpoints
-- **[Style guide](docs/STYLE_GUIDE.md)** — design tokens
-- **[Git workflow](docs/GIT_WORKFLOW.md)** — feature → `develop` → `main`
-- **[Smoke checklist](docs/FRONTEND_SMOKE_CHECKLIST.md)** — preview QA
+| Doc | Purpose |
+|-----|---------|
+| [Platform operating model](docs/PLATFORM_OPERATING_MODEL.md) | **Source of truth** — how the platform is supposed to work |
+| [Project status](docs/PROJECT_STATUS.md) | Where we are today (living) |
+| [Vendor eligibility](docs/MARKETPLACE_VENDOR_ELIGIBILITY.md) | Admin vs public marketplace visibility |
+| [Project breakdown](docs/PROJECT_BREAKDOWN.md) | Frontend architecture overview |
+| [Architecture](docs/ARCHITECTURE.md) | Routes, env, deployment, auth |
+| [API contracts](docs/API_CONTRACTS.md) | Canonical endpoints |
+| [Roadmap](docs/ROADMAP.md) | Phased next steps |
+| [Style guide](docs/STYLE_GUIDE.md) | Design tokens |
+| [Git workflow](docs/GIT_WORKFLOW.md) | Feature → `develop` → `main` |
+| [Smoke checklist](docs/FRONTEND_SMOKE_CHECKLIST.md) | Preview QA |
+| [Archive index](docs/archive/README.md) | Dated QA proofs — not current behavior |
 
 ---
 

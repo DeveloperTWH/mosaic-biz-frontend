@@ -16,7 +16,8 @@ Consumer-facing surfaces: browse, search, filter, detail, vendor profile, cart, 
 | Aspect | As built |
 |--------|----------|
 | **Renders** | Hero, category browse, featured/ranked products, vendor CTAs |
-| **APIs** | `GET /api/featured-products` via `ShopProducts.tsx`, `FeaturedProducts.tsx`; `GET /api/ranked` (or `NEXT_PUBLIC_RANKED_PATH`) |
+| **APIs** | `GET /api/featured-products` via `ShopProducts.tsx` → `lib/api/featured-products.ts`; `GET /api/ranked` (or `NEXT_PUBLIC_RANKED_PATH`) |
+| **Note** | `Components/FeaturedProducts.tsx` exists but is **not imported** by the homepage — use `ShopProducts.tsx` as the live consumer |
 | **Credentials** | Featured: `withCredentials`; ranked: Evidence Needed |
 | **Empty state** | Featured empty array documented as OK in smoke checklist (backend must flag products) |
 | **Error state** | Evidence Needed per component |
@@ -92,13 +93,14 @@ Consumer-facing surfaces: browse, search, filter, detail, vendor profile, cart, 
 | **File** | `app/(home)/product/[id]/page.tsx` |
 | **Legacy** | `/products/[productid]/[id]` redirects here |
 
-### Service `/service/[slug]` (canonical)
+### Service `/service/[slug]` (detail by slug)
 
 | Aspect | As built |
 |--------|----------|
 | **Renders** | Service detail + booking form |
 | **APIs** | `GET /api/services/:slug`; `POST /api/bookings/create` |
 | **File** | `app/(home)/service/[slug]/page.tsx` |
+| **Public commerce URL** | Search and inventory links use `/vendor-profile/service-vendor/[serviceId]` (`lib/api/services.ts` `getPublicServiceUrl`) |
 
 ### Vendor profiles `/vendor-profile/*`
 
@@ -116,7 +118,7 @@ Consumer-facing surfaces: browse, search, filter, detail, vendor profile, cart, 
 |------|----------|
 | Use `GET /api/featured-products` only | `lib/api/featured-products.ts` |
 | Do **not** use `/api/products/featured` | 0 matches in app `*.{ts,tsx}` |
-| Consumers | `ShopProducts.tsx`, `FeaturedProducts.tsx` |
+| Live homepage consumer | `ShopProducts.tsx` (imports `getFeaturedProducts`) |
 
 Admin featured **toggle** uses legacy `PATCH /admin/api/products/:id/featured` — separate from public featured fetch.
 

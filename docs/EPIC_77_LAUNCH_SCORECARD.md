@@ -1,5 +1,7 @@
 # Epic #77 Launch Readiness Scorecard
 
+> **Historical — 2026-06-17.** Archived — see [archive/README.md](archive/README.md). Current posture: [PROJECT_STATUS.md](PROJECT_STATUS.md).
+
 **Date:** 2026-06-17  
 **Epic:** #77 Marketplace conversion, trust, mobile, and vendor growth  
 **Branch:** implementation on RC track (not merged to `main`)
@@ -40,7 +42,7 @@
 | Product | `/product/[id]` | `/products/:productid/:id` → `/product/:id` |
 | Service detail | `/vendor-profile/service-vendor/[id]` | `/services/:id/:serviceId` |
 | Food listing | `/foods` | `/foods/resturant/*`, `/foods/shop/*` |
-| Vendor directory | `/vendors` | `/vendors/:id` → `/vendors` |
+| Vendor directory | `/vendors` | `/vendors/:id` → `/vendor-profile/product-vendor/:vendor_id` (`next.config.ts`) |
 
 ## API contract confirmation
 
