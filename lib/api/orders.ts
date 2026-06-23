@@ -1,4 +1,9 @@
 import { ApiClientError, getUserSafeMessage } from "./errors";
+import {
+  getCheckoutVendorEligibilityMessage,
+  isVendorEligibilityCheckoutError,
+  logCheckoutEligibilityFailure,
+} from "@/lib/marketplace/businessEligibility";
 import { apiRequest } from "./httpClient";
 
 export type OrderLineItem = {
@@ -50,12 +55,26 @@ export async function initiateOrder(payload: InitiateOrderPayload): Promise<Init
   return body;
 }
 
-export function getUserSafeOrderErrorMessage(error: unknown): string {
+export function getUserSafeOrderErrorMessage(
+  error: unknown,
+  options?: { vendorName?: string }
+): string {
   if (error instanceof ApiClientError) {
-    if (error.kind === "forbidden") {
-      return error.message || "Checkout is not available for this account.";
-    }
-    if (error.kind === "validation") {
+    if (error.kind === "forbidden" || error.kind === "validation") {
+      const raw = error.message || "";
+      if (isVendorEligibilityCheckoutError(raw)) {
+        logCheckoutEligibilityFailure({
+          message: raw,
+          businessName: options?.vendorName ?? null,
+          source: "orders.initiate",
+        });
+        return getCheckoutVendorEligibilityMessage(raw, options?.vendorName);
+      }
+
+      if (error.kind === "forbidden") {
+        return error.message || "Checkout is not available for this account.";
+      }
+
       return error.message || "Please review your cart and shipping details.";
     }
     if (error.kind === "paymentPending") {

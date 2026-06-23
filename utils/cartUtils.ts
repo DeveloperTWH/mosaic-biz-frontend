@@ -1,5 +1,11 @@
 import { isUserLoggedIn, resolveCheckoutAccess } from './authUtils';
 import { getUserSafeOrderErrorMessage, initiateOrder } from '@/lib/api/orders';
+import {
+  getBusinessIdFromUnknown,
+  logCheckoutEligibilityFailure,
+  type MarketplaceEligibility,
+} from '@/lib/marketplace/businessEligibility';
+import { fetchPublicVendorEligibility } from '@/lib/marketplace/fetchPublicVendorEligibility';
 import { toast } from 'react-toastify';
 
 interface CartItem {
@@ -126,6 +132,7 @@ export interface CartDetailedResponse {
   totalItems?: number;
   businessId?: string;
   vendorState?:string;
+  vendorEligibility?: MarketplaceEligibility | null;
 }
 
 type GuestCartItemMeta = {
@@ -1214,6 +1221,7 @@ export const getCartDetailedResponse = async (
   deliverySpeed?: DeliverySpeed
 ): Promise<CartDetailedResponse> => {
   const loggedIn = await isUserLoggedIn();
+  let response: CartDetailedResponse;
 
   if (loggedIn) {
     const params = new URLSearchParams();
@@ -1302,7 +1310,7 @@ export const getCartDetailedResponse = async (
 
     const items = await Promise.all(detailedItems.map(hydrateCartItemFromPublicProduct));
 
-    return {
+    response = {
       items,
       pricing: data?.cart?.pricing
         ? {
@@ -1348,8 +1356,7 @@ export const getCartDetailedResponse = async (
       businessId: toId(data?.cart?.businessId),
 
     };
-  }
-
+  } else {
   // Guest: build detailed items and compute pricing summary
   try {
     const items = await buildGuestCartDetailed(deliverySpeed);
@@ -1412,16 +1419,53 @@ export const getCartDetailedResponse = async (
       currency: 'USD',
     };
 
-    return {
+    response = {
       items,
       pricing,
       totalItems,
       businessId: items[0]?.businessId,
     };
   } catch {
-    return { items: [], pricing: null };
+    response = { items: [], pricing: null };
   }
+  }
+
+  response.vendorEligibility = await resolveCartVendorEligibility(
+    response.items,
+    response.pricing,
+    response.businessId
+  );
+
+  return response;
 };
+
+export async function resolveCartVendorEligibility(
+  items: CartItemDetailed[],
+  pricing?: CartPricingSummary | null,
+  businessId?: string | null
+): Promise<MarketplaceEligibility | null> {
+  if (!items.length) return null;
+
+  const resolvedBusinessId =
+    getBusinessIdFromUnknown(businessId) ??
+    getBusinessIdFromUnknown(pricing?.business?._id) ??
+    getBusinessIdFromUnknown(items[0]?.businessId);
+
+  if (!resolvedBusinessId) return null;
+
+  const eligibility = await fetchPublicVendorEligibility(resolvedBusinessId);
+  const vendorName = pricing?.business?.businessName?.trim();
+
+  if (!vendorName || eligibility.eligible) {
+    return eligibility;
+  }
+
+  return {
+    ...eligibility,
+    message: eligibility.message.replace(/^This vendor/, vendorName),
+    title: eligibility.title,
+  };
+}
 
 
 
@@ -1511,6 +1555,24 @@ export async function handlePlaceOrderFlow(
 
   const items = cart.map(toLineItem);
 
+  const vendorEligibility = await resolveCartVendorEligibility(
+    cart,
+    undefined,
+    cart[0]?.businessId
+  );
+
+  if (vendorEligibility && !vendorEligibility.eligible) {
+    logCheckoutEligibilityFailure({
+      message: vendorEligibility.message,
+      businessId: cart[0]?.businessId ?? null,
+      businessName: vendorEligibility.title,
+      productIds: cart.map((item) => String(item.productId)),
+      source: "cart.checkout.preflight",
+    });
+    toast.error(vendorEligibility.message);
+    return;
+  }
+
   let data;
   try {
     data = await initiateOrder({
@@ -1520,7 +1582,11 @@ export async function handlePlaceOrderFlow(
       selectedDeliverySpeed,
     });
   } catch (error) {
-    toast.error(getUserSafeOrderErrorMessage(error));
+    toast.error(
+      getUserSafeOrderErrorMessage(error, {
+        vendorName: vendorEligibility?.title,
+      })
+    );
     return;
   }
 

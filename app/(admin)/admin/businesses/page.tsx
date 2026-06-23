@@ -6,6 +6,11 @@ import axios from "axios";
 import Sidebar from "../components/Sidebar"; // Import Sidebar component
 import Topbar from "../components/Topbar"; // Import Topbar component
 import BusinessStatusModal from "../components/BusinessStatusModal";
+import {
+    getAdminBusinessRowState,
+    isAdminBusinessActivated,
+    resolveAdminBusinessCounts,
+} from "@/lib/admin/businessStatusDisplay";
 
 const BusinessPage = () => {
     const [isSidebarOpen, setSidebarOpen] = useState(true);
@@ -15,6 +20,7 @@ const BusinessPage = () => {
     const [totalBusiness, settotalBusiness] = useState<number>(0);
     const [activeBusinessCount, setActiveBusinessCount] = useState<number>(0);
     const [inactiveBusinessCount, setInactiveBusinessCount] = useState<number>(0);
+    const [publicBusinessCount, setPublicBusinessCount] = useState<number>(0);
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [totalPages, setTotalPages] = useState<number>(1);
     const [businessFilter, setBusinessFilter] = useState<"all" | "active" | "inactive">("all");
@@ -43,22 +49,15 @@ const BusinessPage = () => {
                 settotalBusiness(0);
                 setActiveBusinessCount(0);
                 setInactiveBusinessCount(0);
+                setPublicBusinessCount(0);
                 setTotalPages(1);
             } else {
                 setBusinesses(data);
                 settotalBusiness(response.data.totalBusinesses ?? data.length);
-                const activeCount =
-                    response.data.activeBusinessCount ??
-                    response.data.activeBusinesses ??
-                    response.data.activeCount ??
-                    data.filter((business: any) => business.isActive ?? business.isApproved).length;
-                const inactiveCount =
-                    response.data.inactiveBusinessCount ??
-                    response.data.inactiveBusinesses ??
-                    response.data.inactiveCount ??
-                    data.filter((business: any) => !(business.isActive ?? business.isApproved)).length;
-                setActiveBusinessCount(activeCount);
-                setInactiveBusinessCount(inactiveCount);
+                const counts = resolveAdminBusinessCounts(data, response.data);
+                setActiveBusinessCount(counts.active);
+                setInactiveBusinessCount(counts.inactive);
+                setPublicBusinessCount(counts.publicListing);
                 setTotalPages(response.data.totalPages || 1);
                 setNoBusinesses(false);
             }
@@ -72,6 +71,7 @@ const BusinessPage = () => {
                 settotalBusiness(0);
                 setActiveBusinessCount(0);
                 setInactiveBusinessCount(0);
+                setPublicBusinessCount(0);
                 setTotalPages(1);
             } else {
                 toast.error("Failed to fetch businesses. Please try again later.");
@@ -166,35 +166,38 @@ const BusinessPage = () => {
 
                 <main className="flex-1 px-8 py-6 overflow-y-auto">
                     {/* Stats Section */}
-                    <div className="grid grid-cols-1 gap-8 mb-8 sm:grid-cols-2 lg:grid-cols-3">
-                        {/* Stats Card 1 */}
+                    <div className="grid grid-cols-1 gap-8 mb-8 sm:grid-cols-2 lg:grid-cols-4">
                         <div className="p-8 transition-all duration-300 transform bg-white rounded-lg shadow-lg hover:shadow-2xl hover:scale-105">
-                            <h3 className="text-lg font-semibold text-gray-800">
-                                Businesses
-                            </h3>
-                            <p className="text-3xl font-bold text-indigo-600">
-                                {noBusinesses ? "N/A" : totalBusiness}
-                            </p>
+                            <h3 className="text-lg font-semibold text-gray-800">Businesses</h3>
+                            <p className="text-3xl font-bold text-indigo-600">{noBusinesses ? "N/A" : totalBusiness}</p>
                         </div>
 
-                        {/* Stats Card 2 */}
                         <div className="p-8 transition-all duration-300 transform bg-white rounded-lg shadow-lg hover:shadow-2xl hover:scale-105">
-                            <h3 className="text-lg font-semibold text-gray-800">Active Businesses</h3>
+                            <h3 className="text-lg font-semibold text-gray-800">Publicly Listed</h3>
+                            <p className="text-3xl font-bold text-indigo-600">{noBusinesses ? "N/A" : publicBusinessCount}</p>
+                            <p className="mt-2 text-xs text-gray-500">Approved + active on /vendors</p>
+                        </div>
+
+                        <div className="p-8 transition-all duration-300 transform bg-white rounded-lg shadow-lg hover:shadow-2xl hover:scale-105">
+                            <h3 className="text-lg font-semibold text-gray-800">Admin Active</h3>
                             <p className="text-3xl font-bold text-green-600">{noBusinesses ? "N/A" : activeBusinessCount}</p>
                         </div>
 
-                        {/* Stats Card 3 */}
                         <div className="p-8 transition-all duration-300 transform bg-white rounded-lg shadow-lg hover:shadow-2xl hover:scale-105">
-                            <h3 className="text-lg font-semibold text-gray-800">
-                                Inactive Businesses
-                            </h3>
+                            <h3 className="text-lg font-semibold text-gray-800">Not Publicly Listed</h3>
                             <p className="text-3xl font-bold text-orange-600">
-                                {noBusinesses ? "N/A" : inactiveBusinessCount}
+                                {noBusinesses ? "N/A" : Math.max(totalBusiness - publicBusinessCount, 0)}
                             </p>
                         </div>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-3 mb-6">
+                    <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+                        <strong>Marketplace visibility:</strong> Customers only see vendors on{" "}
+                        <code className="rounded bg-white px-1 py-0.5">/vendors</code> when a business is both{" "}
+                        <strong>approved</strong> (vendor application finalized) and <strong>active</strong> (admin toggle).
+                    </div>
+
+                    <div className="mb-6 flex flex-wrap items-center gap-3">
                         <span className="text-sm font-semibold uppercase tracking-wide text-gray-500">
                             Filter
                         </span>
@@ -236,12 +239,16 @@ const BusinessPage = () => {
                                         <tr className="text-gray-600 border-b">
                                             <th className="px-6 py-3 text-left">Name</th>
                                             <th className="px-6 py-3 text-left">Description</th>
-                                            <th className="px-6 py-3 text-left">Status</th>
+                                            <th className="px-6 py-3 text-left">Marketplace</th>
                                             <th className="px-6 py-3 text-left">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {businesses.map((business, index) => (
+                                        {businesses.map((business, index) => {
+                                            const rowState = getAdminBusinessRowState(business);
+                                            const isActivated = isAdminBusinessActivated(business);
+
+                                            return (
                                             <tr
                                                 key={business._id}
                                                 className="transition-all duration-300 hover:bg-gray-100"
@@ -251,34 +258,42 @@ const BusinessPage = () => {
                                                     {business.description}
                                                 </td>
                                                 <td className="px-6 py-4">
-                                                    <span
-                                                        className={
-                                                            Boolean(business.isActive ?? business.isApproved)
-                                                                ? "text-green-600"
-                                                                : "text-red-600"
-                                                        }
-                                                    >
-                                                        {Boolean(business.isActive ?? business.isApproved) ? "Active" : "Inactive"}
-                                                    </span>
+                                                    <div className="flex flex-col gap-1 text-sm">
+                                                        <span className={rowState.approved ? "text-green-600" : "text-red-600"}>
+                                                            {rowState.approvedLabel}
+                                                        </span>
+                                                        <span className={rowState.active ? "text-green-600" : "text-red-600"}>
+                                                            Admin {rowState.activeLabel.toLowerCase()}
+                                                        </span>
+                                                        <span className={rowState.publicListing ? "font-semibold text-indigo-600" : "font-semibold text-orange-600"}>
+                                                            {rowState.publicListingLabel} on marketplace
+                                                        </span>
+                                                        {rowState.showApprovalWarning ? (
+                                                            <span className="text-xs text-amber-700">
+                                                                Active but not approved — hidden from customers
+                                                            </span>
+                                                        ) : null}
+                                                    </div>
                                                 </td>
 
                                                 <td className="px-6 py-4">
                                                     <button
-                                                        className={`${Boolean(business.isActive ?? business.isApproved)
+                                                        className={`${isActivated
                                                             ? "bg-red-500 hover:bg-red-600"
                                                             : "bg-green-500 hover:bg-green-600"
                                                             } text-white px-4 py-2 rounded-lg shadow-md transition-all duration-300`}
                                                         onClick={() =>
-                                                            Boolean(business.isActive ?? business.isApproved)
+                                                            isActivated
                                                                 ? openDeactivateModal(index)
                                                                 : activateBusiness(index)
                                                         }
                                                     >
-                                                        {Boolean(business.isActive ?? business.isApproved) ? "Deactivate" : "Activate"}
+                                                        {isActivated ? "Deactivate" : "Activate"}
                                                     </button>
                                                 </td>
                                             </tr>
-                                        ))}
+                                            );
+                                        })}
                                     </tbody>
                                 </table>
                                 {/* Pagination Controls */}

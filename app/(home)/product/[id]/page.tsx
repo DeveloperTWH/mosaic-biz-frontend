@@ -20,6 +20,7 @@ import {
 import { toggleWishlist, isProductWishlisted } from '@/utils/wishlistUtils';
 import CommerceMobileSearchBar from "../../Components/CommerceMobileSearchBar";
 import PublicPageHero from "../../Components/PublicPageHero";
+import MarketplaceEligibilityBanner from "../../Components/MarketplaceEligibilityBanner";
 import MarketLoadingBlock from "../../Components/MarketLoadingBlock";
 import MobileStickyActionBar from "../../Components/MobileStickyActionBar";
 import TrustBadge from "../../Components/TrustBadge";
@@ -29,6 +30,13 @@ import MarketEmptyState from "../../Components/MarketEmptyState";
 import ShopperTrustCallout from "../../Components/ShopperTrustCallout";
 import { SHOPPER_PRODUCT_TRUST_NOTE } from "../../Components/marketTrustProof";
 import { getStockHint } from "../../Components/publicCards/publicProductCardMappers";
+import {
+  extractBusinessFromProduct,
+  getBusinessIdFromUnknown,
+  getMarketplaceEligibility,
+  type MarketplaceEligibility,
+} from "@/lib/marketplace/businessEligibility";
+import { fetchPublicVendorEligibility } from "@/lib/marketplace/fetchPublicVendorEligibility";
 
 const getAttributeGroups = (variants: Variant[]): Map<string, Set<string>> => {
   const attributeMap = new Map<string, Set<string>>();
@@ -155,6 +163,7 @@ export default function ProductDetailPage() {
     rating: 5,
     comment: '',
   });
+  const [vendorEligibility, setVendorEligibility] = useState<MarketplaceEligibility | null>(null);
 
   const fetchReviews = useCallback(async (productId: string) => {
     setReviewsLoading(true);
@@ -185,6 +194,18 @@ export default function ProductDetailPage() {
         const p: ProductDetailItem = res.data.data;
         setProduct(p);
         setLoadState("ready");
+
+        const business = extractBusinessFromProduct(p);
+        let eligibility = getMarketplaceEligibility(business);
+        if (eligibility.code === "unknown") {
+          const businessId =
+            getBusinessIdFromUnknown(p.businessId) ?? getBusinessIdFromUnknown(p.business);
+          if (businessId) {
+            eligibility = await fetchPublicVendorEligibility(businessId);
+          }
+        }
+        setVendorEligibility(eligibility);
+
         setReviewSummary({
           totalReviews: Number(p.totalReviews) || 0,
           averageRating: Number(p.averageRating) || 0,
@@ -346,6 +367,7 @@ setMainImage(firstImage);
 
   const isColor = (key: string) => key.toLowerCase().includes('color');
   const sellerBusinessId = getBusinessId();
+  const purchaseBlocked = Boolean(vendorEligibility && !vendorEligibility.eligible);
   const totalReviews = reviewSummary.totalReviews || Number(product?.totalReviews) || 0;
   const averageRating = reviewSummary.averageRating || Number(product?.averageRating) || 0;
   const visibleReviews = showAllReviews ? reviews : reviews.slice(0, 4);
@@ -376,6 +398,11 @@ setMainImage(firstImage);
   const performAddToCart = useCallback(async () => {
     if (!product || isBlocking || !selectedVariant?.variantId) {
       toast.error('Variant information is missing');
+      return;
+    }
+
+    if (vendorEligibility && !vendorEligibility.eligible) {
+      toast.error(vendorEligibility.message);
       return;
     }
 
@@ -451,7 +478,7 @@ setMainImage(firstImage);
     } finally {
       setIsBlocking(false);
     }
-  }, [isBlocking, product, resolvedShipping, selectedShipping, selectedVariant]);
+  }, [isBlocking, product, resolvedShipping, selectedShipping, selectedVariant, vendorEligibility]);
 
   const handleAddToCartClick = useCallback(async () => {
     if (isBlocking || !selectedVariant?.variantId) {
@@ -582,6 +609,12 @@ setMainImage(firstImage);
       />
 
       <CommerceMobileSearchBar filters={filters} onChange={setFilters} onSubmit={handleSearch} />
+
+      {vendorEligibility ? (
+        <div className="container-page pt-4">
+          <MarketplaceEligibilityBanner eligibility={vendorEligibility} />
+        </div>
+      ) : null}
 
       {/* Blocking overlay */}
       {(isBlocking || loadingQty) && (
@@ -935,7 +968,7 @@ setMainImage(firstImage);
                 <button
                   type="button"
                   className="commerce-action-primary"
-                  disabled={isBlocking || loadingQty || !isVariantSelected() || Boolean(selectedVariant && selectedVariant.stock <= 0 && !selectedVariant.allowBackorder)}
+                  disabled={isBlocking || loadingQty || purchaseBlocked || !isVariantSelected() || Boolean(selectedVariant && selectedVariant.stock <= 0 && !selectedVariant.allowBackorder)}
                   onClick={handleAddToCartClick}
                 >
                   {!isVariantSelected() ? 'Select options' : selectedVariant && selectedVariant.stock <= 0 && !selectedVariant.allowBackorder ? 'Out of stock' : 'Add to cart'}
@@ -945,7 +978,7 @@ setMainImage(firstImage);
               <button
                 type="button"
                 className="commerce-action-secondary"
-                disabled={!isVariantSelected() || Boolean(selectedVariant && selectedVariant.stock <= 0 && !selectedVariant.allowBackorder)}
+                disabled={purchaseBlocked || !isVariantSelected() || Boolean(selectedVariant && selectedVariant.stock <= 0 && !selectedVariant.allowBackorder)}
                 onClick={handleBuyNowClick}
               >
                 Buy now
@@ -1239,13 +1272,16 @@ setMainImage(firstImage);
         primaryDisabled={
           isBlocking ||
           loadingQty ||
+          purchaseBlocked ||
           !isVariantSelected() ||
           Boolean(selectedVariant && selectedVariant.stock <= 0 && !selectedVariant.allowBackorder)
         }
         secondaryLabel="Buy now"
         onSecondaryClick={handleBuyNowClick}
         secondaryDisabled={
-          !isVariantSelected() || Boolean(selectedVariant && selectedVariant.stock <= 0 && !selectedVariant.allowBackorder)
+          purchaseBlocked ||
+          !isVariantSelected() ||
+          Boolean(selectedVariant && selectedVariant.stock <= 0 && !selectedVariant.allowBackorder)
         }
       />
     </div>
