@@ -1,6 +1,6 @@
 # Cross-Repo Launch Readiness Report
 
-> **Historical snapshot — 2026-06-16.** For current status see [PROJECT_STATUS.md](PROJECT_STATUS.md) and [ROADMAP.md](ROADMAP.md). PR #30 (homepage redesign) merged 2026-06-17 — not reflected below.
+> **Historical snapshot — 2026-06-16.** Archived — see [archive/README.md](archive/README.md). For current status see [PROJECT_STATUS.md](PROJECT_STATUS.md) and [ROADMAP.md](ROADMAP.md). PR #30 (homepage redesign) merged 2026-06-17 — not reflected below.
 
 Date: 2026-06-16  
 Scope: Mosaic Biz Hub frontend sprint (launch repo). Backend sprint branches not executed in this session.

@@ -1,5 +1,7 @@
 # Frontend Architecture — As Built
 
+> **Archive note (2026-06-23):** Day-to-day architecture reference is [../ARCHITECTURE.md](../ARCHITECTURE.md) + [../PROJECT_BREAKDOWN.md](../PROJECT_BREAKDOWN.md). This file is kept as a 2026-06 launch evidence snapshot — see [../archive/README.md](../archive/README.md).
+
 **Type:** Reference (launch evidence pack)  
 **Last updated:** 2026-06-19  
 **Evidence source:** Repo file read, `app/` route enumeration, `package.json`, `middleware.ts`, `lib/api.ts`

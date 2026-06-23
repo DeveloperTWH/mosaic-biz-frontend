@@ -1,7 +1,8 @@
 # Frontend Audit — Issue #2
 
 > **Type:** Historical audit (2026-06-16)  
-> **Superseded by:** [ARCHITECTURE.md](ARCHITECTURE.md) + [PROJECT_STATUS.md](PROJECT_STATUS.md)  
+> **Archived:** [archive/README.md](archive/README.md)  
+> **Superseded by:** [ARCHITECTURE.md](ARCHITECTURE.md) + [API_CONTRACTS.md](API_CONTRACTS.md) + [PROJECT_STATUS.md](PROJECT_STATUS.md)  
 > Launch blockers below may be stale after sprint PRs and PR #30 redesign.
 
 Repo: `Digital-Builders-757/mosaic-biz-frontend-launch`  

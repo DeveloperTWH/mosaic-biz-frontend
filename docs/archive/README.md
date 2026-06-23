@@ -1,0 +1,90 @@
+# Documentation archive
+
+**Type:** Index only — these files are QA evidence, sprint snapshots, or superseded audits.  
+**Do not use for current platform behavior.** Start at [../README.md](../README.md).
+
+For how the app is supposed to work today, read [../PLATFORM_OPERATING_MODEL.md](../PLATFORM_OPERATING_MODEL.md) and [../PROJECT_STATUS.md](../PROJECT_STATUS.md).
+
+---
+
+## Superseded launch / audit snapshots
+
+| Document | Date | Superseded by |
+|----------|------|---------------|
+| [CROSS_REPO_LAUNCH_READINESS.md](../CROSS_REPO_LAUNCH_READINESS.md) | 2026-06-16 | [PROJECT_STATUS.md](../PROJECT_STATUS.md) |
+| [FRONTEND_AUDIT_ISSUE_2.md](../FRONTEND_AUDIT_ISSUE_2.md) | 2026-06-16 | [ARCHITECTURE.md](../ARCHITECTURE.md), [API_CONTRACTS.md](../API_CONTRACTS.md) |
+| [HOMEPAGE_REDESIGN_SCOPE_AUDIT.md](../HOMEPAGE_REDESIGN_SCOPE_AUDIT.md) | 2026-06-17 | [PROJECT_STATUS.md](../PROJECT_STATUS.md) — PR #30 merged |
+| [EPIC_54_SPRINT_CLOSEOUT.md](../EPIC_54_SPRINT_CLOSEOUT.md) | 2026-06-18 | [PROJECT_STATUS.md](../PROJECT_STATUS.md) |
+| [EPIC_77_LAUNCH_SCORECARD.md](../EPIC_77_LAUNCH_SCORECARD.md) | 2026-06-22 | [PROJECT_STATUS.md](../PROJECT_STATUS.md) |
+| [EPIC_77_ROUTE_REGRESSION.md](../EPIC_77_ROUTE_REGRESSION.md) | 2026-06-22 | [frontend/FRONTEND_ROUTE_MAP.md](../frontend/FRONTEND_ROUTE_MAP.md) |
+
+---
+
+## QA evidence packs (dated — keep for audit trail)
+
+### Homepage / marketplace
+
+- [HOMEPAGE_MARKETPLACE_REDESIGN_QA_REPORT.md](../HOMEPAGE_MARKETPLACE_REDESIGN_QA_REPORT.md)
+- [HOMEPAGE_REDESIGN_SCOPE_AUDIT.md](../HOMEPAGE_REDESIGN_SCOPE_AUDIT.md)
+- [VISUAL_PASS_4_MARKETPLACE_UNIFORMITY.md](../VISUAL_PASS_4_MARKETPLACE_UNIFORMITY.md)
+- [PUBLIC_READABILITY_QA.md](../PUBLIC_READABILITY_QA.md)
+- [PUBLIC_STATIC_PAGES_QA.md](../PUBLIC_STATIC_PAGES_QA.md)
+
+### Visual passes
+
+- [VISUAL_PASS_2_READABILITY_QA.md](../VISUAL_PASS_2_READABILITY_QA.md)
+- [VISUAL_PASS_3_AUTH_ONBOARDING.md](../VISUAL_PASS_3_AUTH_ONBOARDING.md)
+- [VISUAL_PASS_3_VENDOR_PAYMENT_QA.md](../VISUAL_PASS_3_VENDOR_PAYMENT_QA.md)
+- [VISUAL_PASS_3_MOBILE_A11Y_QA.md](../VISUAL_PASS_3_MOBILE_A11Y_QA.md)
+- [VISUAL_POLISH_QA_REPORT.md](../VISUAL_POLISH_QA_REPORT.md)
+- [frontend/evidence/visual-pass-3/](../frontend/evidence/visual-pass-3/)
+
+### Mobile / navigation
+
+- [MOBILE_APP_NAV_AUDIT.md](../MOBILE_APP_NAV_AUDIT.md)
+- [MOBILE_APP_NAV_QA_PROOF.md](../MOBILE_APP_NAV_QA_PROOF.md)
+- [MOBILE_BOTTOM_NAV_POLISH_QA.md](../MOBILE_BOTTOM_NAV_POLISH_QA.md)
+- [MOBILE_QA_PROOF_PACK.md](../MOBILE_QA_PROOF_PACK.md)
+- [NAVIGATION_CLEANUP_AUDIT.md](../NAVIGATION_CLEANUP_AUDIT.md)
+- [HEADER_NAV_QA.md](../HEADER_NAV_QA.md)
+- [FRONTEND_NAV_LAUNCH_QA.md](../FRONTEND_NAV_LAUNCH_QA.md)
+- [FRONTEND_PARTNER_DASHBOARD_MOBILE_QA.md](../FRONTEND_PARTNER_DASHBOARD_MOBILE_QA.md)
+
+### Smoke / live proofs
+
+- [FRONTEND_LIVE_DOMAIN_SMOKE_PROOF.md](../FRONTEND_LIVE_DOMAIN_SMOKE_PROOF.md)
+- [FRONTEND_FINAL_MVP_UX_SMOKE.md](../FRONTEND_FINAL_MVP_UX_SMOKE.md)
+- [FRONTEND_AUTH_TEST_ACCOUNT_SMOKE.md](../FRONTEND_AUTH_TEST_ACCOUNT_SMOKE.md)
+- [FRONTEND_SENTRY_PRODUCTION_VERIFICATION.md](../FRONTEND_SENTRY_PRODUCTION_VERIFICATION.md)
+- [frontend/FRONTEND_VENDOR_AUTH_E2E_SMOKE.md](../frontend/FRONTEND_VENDOR_AUTH_E2E_SMOKE.md)
+- [frontend/FRONTEND_LAUNCH_CONTRACT_ALIGNMENT.md](../frontend/FRONTEND_LAUNCH_CONTRACT_ALIGNMENT.md)
+
+### Service publication
+
+- [frontend/VENDOR_SERVICE_PUBLICATION_QA.md](../frontend/VENDOR_SERVICE_PUBLICATION_QA.md)
+- [frontend/FRONTEND_SERVICE_PUBLICATION_FLOW.md](../frontend/FRONTEND_SERVICE_PUBLICATION_FLOW.md)
+
+### Other
+
+- [LINK_QA_AUDIT.md](../LINK_QA_AUDIT.md)
+- [FRONTEND_LINT_DEBT_INVENTORY.md](../FRONTEND_LINT_DEBT_INVENTORY.md)
+- [FRONTEND_LAUNCH_WORK_ORDER.md](../FRONTEND_LAUNCH_WORK_ORDER.md)
+
+---
+
+## As-built pack (2026-06) — use canonical refs instead
+
+These were a launch evidence snapshot. For day-to-day work, prefer the root references:
+
+| Archived as-built doc | Use instead |
+|----------------------|-------------|
+| [frontend/FRONTEND_ARCHITECTURE_AS_BUILT.md](../frontend/FRONTEND_ARCHITECTURE_AS_BUILT.md) | [ARCHITECTURE.md](../ARCHITECTURE.md) + [PROJECT_BREAKDOWN.md](../PROJECT_BREAKDOWN.md) |
+| [frontend/FRONTEND_API_USAGE_INVENTORY.md](../frontend/FRONTEND_API_USAGE_INVENTORY.md) | [API_CONTRACTS.md](../API_CONTRACTS.md) |
+| [frontend/FRONTEND_DOCUMENTATION_EVIDENCE_LOG.md](../frontend/FRONTEND_DOCUMENTATION_EVIDENCE_LOG.md) | [PROJECT_STATUS.md](../PROJECT_STATUS.md) |
+
+Still useful as indexes (not duplicated elsewhere):
+
+- [frontend/FRONTEND_ROUTE_MAP.md](../frontend/FRONTEND_ROUTE_MAP.md) — complete page → URL list
+- [frontend/FRONTEND_AUTH_AND_CREDENTIALS_BEHAVIOR.md](../frontend/FRONTEND_AUTH_AND_CREDENTIALS_BEHAVIOR.md) — auth deep dive
+- [frontend/FRONTEND_MARKETPLACE_SURFACE_MAP.md](../frontend/FRONTEND_MARKETPLACE_SURFACE_MAP.md) — consumer surfaces
+- [frontend/FRONTEND_ADMIN_VENDOR_CUSTOMER_SURFACE_MAP.md](../frontend/FRONTEND_ADMIN_VENDOR_CUSTOMER_SURFACE_MAP.md) — role surfaces

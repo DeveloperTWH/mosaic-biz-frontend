@@ -1,5 +1,7 @@
 # Frontend Documentation Evidence Log
 
+> **Archive note (2026-06-23):** Current release posture is [../PROJECT_STATUS.md](../PROJECT_STATUS.md). This log indexes the June 2026 as-built pack — see [../archive/README.md](../archive/README.md).
+
 **Type:** Launch evidence (control pack index)  
 **Last updated:** 2026-06-21  
 **Pack:** Frontend as-built documentation — Mosaic Biz Hub launch readiness

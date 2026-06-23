@@ -17,8 +17,8 @@ Visual Pass 3 evidence: [frontend/evidence/visual-pass-3/README.md](frontend/evi
 |------|--------|
 | Launch repo | `Digital-Builders-757/mosaic-biz-frontend-launch` |
 | Integration branch | `develop` |
-| Production branch | `main` @ `b26cb470` (pending PR for vendor eligibility) |
-| `develop` tip | `671d7f98` — vendor eligibility guardrails + desktop catalog polish |
+| Production branch | `main` — promote via PR [#200](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/200) |
+| `develop` tip | `89832216` — vendor eligibility + platform docs |
 | Branching model | Feature → `develop` → `main` — [GIT_WORKFLOW.md](GIT_WORKFLOW.md) |
 | Production deployed | **Yes** — Vercel auto-deploy on merge to `main` |
 | Production URL | https://mosaic-biz-frontend-launch.vercel.app |
