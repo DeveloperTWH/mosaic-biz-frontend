@@ -1,8 +1,10 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Save, Loader } from 'lucide-react';
 import VendorApplicationShell from '../components/VendorApplicationShell';
+import VendorOnboardingProgress from '../components/VendorOnboardingProgress';
+import VendorFormSection from '../components/VendorFormSection';
+import VendorFormActions from '../components/VendorFormActions';
 import DashboardLoadingBlock from '@/components/ui/dashboard-loading-block';
 import { useServiceForm } from './hooks/useServiceForm';
 import ServiceCategory from './components/ServiceCategory';
@@ -51,11 +53,16 @@ export default function AddServicePage() {
   return (
     <VendorApplicationShell
       variant="dashboard"
-      title="List services"
-      description="Showcase all your services"
+      title="List a service"
+      description="Describe your service, set hours and location, then add individual offerings customers can book."
       backHref="/partners/services"
       backLabel="Back to services"
     >
+      <VendorOnboardingProgress
+        currentStage={4}
+        saveNote="Save a draft anytime, or publish when your service details and images are ready."
+      />
+
       <div className="max-w-6xl">
         <form
           onSubmit={(event) => {
@@ -64,12 +71,8 @@ export default function AddServicePage() {
           }}
           className="space-y-6"
         >
-          {/* Two Column Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left Column - Main Content */}
-            <div className="lg:col-span-2 space-y-6">
-              
-              {/* 1️⃣ Service Details */}
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <div className="space-y-6 lg:col-span-2">
               <ServiceCategory
                 formData={formData}
                 errors={errors}
@@ -79,37 +82,31 @@ export default function AddServicePage() {
                 onInputChange={handleInputChange}
               />
 
-              {/* 2️⃣ Location & Hours Section */}
-              <div className="bg-gray-100 border-2 border-blue-400 rounded-md p-5">
-                <h2 className="text-base font-semibold text-gray-900 mb-4 border-l-4 border-[#c9a227] pl-3">Location & Hours</h2>
-                
-                {/* Map Location */}
+              <VendorFormSection
+                title="Location & hours"
+                description="Help customers find you and know when you're available."
+              >
                 <LocationField
                   location={formData.location}
                   onLocationChange={(location) => handleInputChange('location', location)}
                 />
-
-                {/* Business Hours */}
-                <div className="mt-4">
-                  <h3 className="text-sm font-medium text-gray-700 mb-3">Add Hours</h3>
-                  <BusinessHours
-                    businessHours={businessHours}
-                    onUpdate={updateBusinessHour}
-                  />
+                <div>
+                  <h3 className="mb-3 font-poppins text-sm font-medium text-dashboard-text">Business hours</h3>
+                  <BusinessHours businessHours={businessHours} onUpdate={updateBusinessHour} />
                 </div>
-              </div>
+              </VendorFormSection>
 
-              {/* 3️⃣ Booking Tool */}
-              <div className="bg-gray-100 border border-gray-200 rounded-md p-5">
-                <h2 className="text-base font-semibold text-gray-900 mb-4 border-l-4 border-[#c9a227] pl-3">Booking Tool</h2>
+              <VendorFormSection
+                title="Booking tool"
+                description="Optional link to Calendly, Acuity, or another booking page."
+              >
                 <BookingTool
                   bookingToolLink={formData.bookingToolLink}
                   onBookingLinkChange={(link) => handleInputChange('bookingToolLink', link)}
                 />
-              </div>
+              </VendorFormSection>
             </div>
 
-            {/* Right Column - Images */}
             <div className="lg:col-span-1">
               <ServiceImages
                 coverImage={formData.coverImage}
@@ -130,18 +127,10 @@ export default function AddServicePage() {
             </div>
           </div>
 
-          {/* 5️⃣ Create Service (Child Services) */}
-          <div className="bg-gray-100 border border-gray-200 rounded-md p-5">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-base font-semibold text-gray-900 border-l-4 border-[#c9a227] pl-3">Create Service</h2>
-              {/* <button
-                type="button"
-                onClick={addChildService}
-                className="px-4 py-1.5 bg-blue-900 text-white text-sm rounded hover:bg-blue-800"
-              >
-                + Add Service
-              </button> */}
-            </div>
+          <VendorFormSection
+            title="Service offerings"
+            description="Add one or more bookable services with pricing and descriptions."
+          >
             <ChildServices
               childServices={childServices}
               onAdd={addChildService}
@@ -152,35 +141,30 @@ export default function AddServicePage() {
               uploading={uploading || {}}
               uploadProgress={uploadProgress || {}}
             />
-          </div>
+          </VendorFormSection>
 
-          {/* Submit Buttons */}
-          <div className="flex flex-wrap items-center justify-start gap-3 pt-4">
-            <button
-              type="submit"
-              disabled={saving || isUploading}
-              className="px-8 py-2.5 bg-gray-600 text-white rounded text-sm font-medium hover:bg-gray-700 flex items-center gap-2 disabled:opacity-50 min-h-11"
-            >
-              {saving ? <Loader className="w-4 h-4 animate-spin" /> : null}
-              {isUploading ? 'Uploading Images...' : 'Save Draft'}
-            </button>
-            <button
-              type="button"
-              disabled={saving || isUploading}
-              onClick={() => handleSubmit(true)}
-              className="px-8 py-2.5 bg-[#c9a227] text-white rounded text-sm font-medium hover:bg-[#b8921f] flex items-center gap-2 disabled:opacity-50 min-h-11"
-            >
-              {saving ? <Loader className="w-4 h-4 animate-spin" /> : null}
-              Publish Service
-            </button>
-            <button
-              type="button"
-              onClick={() => router.push('/partners/services')}
-              className="px-8 py-2.5 bg-gray-400 text-white rounded text-sm font-medium hover:bg-gray-500 min-h-11"
-            >
-              Cancel
-            </button>
-          </div>
+          <VendorFormActions
+            hint="Cover image and at least one service offering are needed before publishing."
+            nextStepLabel="Published services appear on your storefront after final review."
+            tertiary={{
+              label: 'Cancel',
+              onClick: () => router.push('/partners/services'),
+            }}
+            secondary={{
+              label: isUploading ? 'Uploading images…' : saving ? 'Saving draft…' : 'Save draft',
+              type: 'submit',
+              disabled: saving || isUploading,
+              loading: saving && !isUploading,
+              loadingLabel: 'Saving draft…',
+            }}
+            primary={{
+              label: saving || isUploading ? 'Working…' : 'Publish service',
+              onClick: () => handleSubmit(true),
+              disabled: saving || isUploading,
+              loading: saving || isUploading,
+              loadingLabel: isUploading ? 'Uploading images…' : 'Publishing…',
+            }}
+          />
         </form>
       </div>
     </VendorApplicationShell>

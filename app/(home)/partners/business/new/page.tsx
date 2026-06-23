@@ -7,6 +7,8 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import TermsModal from "../../final-review/components/TermsModal";
 import VendorApplicationShell from "../../components/VendorApplicationShell";
+import VendorOnboardingProgress from "../../components/VendorOnboardingProgress";
+import VendorFormActions from "../../components/VendorFormActions";
 import { FormField } from "@/components/ui/form-field";
 
 import {
@@ -615,7 +617,16 @@ const handlePayAndSubmit = async () => {
     >
       <TermsModal isOpen={modalOpen} onClose={closeModal} type={modalType} />
 
+      <VendorOnboardingProgress
+        currentStage={1}
+        variant="market"
+        saveNote="Your answers are saved when you click Save data. You can return anytime from your vendor dashboard."
+      />
+
       <div className="rounded-2xl border border-white/10 bg-market-elevated p-4 shadow-market-card md:p-8">
+          <p className="mb-6 font-montserrat text-sm leading-relaxed text-market-muted">
+            Start with business identity and verification documents. Required fields are marked with an asterisk. Optional details can earn trust points later.
+          </p>
           {/* Business Information Section */}
           <div className="mb-4">
             <FormField surface="market" label="Business Name" required error={formErrors.businessName}>
@@ -1354,54 +1365,30 @@ const handlePayAndSubmit = async () => {
 
 {/* actions button updated */}
  {form.isMinorityOwned && (
-  <div className="flex flex-col md:flex-row justify-center items-center gap-4 mt-12">
-    {/* <button
-      onClick={() => setForm(initialState)}
-      className="w-full md:w-auto min-w-[160px] rounded-lg bg-market-pill px-8 py-3 font-medium text-market-muted transition-colors disabled:cursor-not-allowed disabled:opacity-60"
-      disabled={loading}
-    >
-      Clear Response
-    </button> */}
-
-    <button
-      onClick={saveDraft}
-      className="market-btn-secondary w-full min-w-[160px] normal-case md:w-auto"
-      disabled={loading}
-    >
-      {loading ? 'Saving...' : 'Save data'}
-    </button>
-
-    {!shouldHideProceedButton && (
-      <button
-        onClick={handlePayAndSubmit}
-        className="market-btn-primary w-full min-w-[160px] normal-case md:w-auto"
-        disabled={loading}
-      >
-        {loading ? 'Processing...' : 'Proceed To Payment'}
-      </button>
-    )}
-
-    {/* New Submit Button */}
-    {/* <button
-      onClick={async () => {
-        try {
-          setLoading(true);
-          const response = await submitStage1();
-          alert('Submission successful!');
-          console.log(response);
-        } catch (error: any) {
-          console.error(error);
-          alert(error.message || 'Submission failed');
-        } finally {
-          setLoading(false);
+  <VendorFormActions
+    variant="market"
+    className="mt-8 border-white/10 bg-white/5"
+    hint="Save your progress before leaving. Payment is the last step for this stage."
+    nextStepLabel="After payment, you'll choose a subscription tier and build your public profile."
+    secondary={{
+      label: loading ? "Saving…" : "Save data",
+      onClick: saveDraft,
+      disabled: loading,
+      loading,
+      loadingLabel: "Saving…",
+    }}
+    {...(!shouldHideProceedButton
+      ? {
+          primary: {
+            label: loading ? "Processing…" : "Proceed to payment",
+            onClick: handlePayAndSubmit,
+            disabled: loading,
+            loading,
+            loadingLabel: "Processing…",
+          },
         }
-      }}
-      className="w-full md:w-auto px-8 py-3 bg-blue-900 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium min-w-[160px]"
-      disabled={loading}
-    >
-      {loading ? 'Submitting...' : 'Submit'}
-    </button> */}
-  </div>
+      : {})}
+  />
 )}
       
           {/* Action Buttons */}

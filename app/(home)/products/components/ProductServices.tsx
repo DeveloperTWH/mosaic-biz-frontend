@@ -8,6 +8,9 @@ import MarketImage from "../../Components/MarketImage";
 import CardRatingRow from "../../Components/CardRatingRow";
 import MarketLoadingBlock from "../../Components/MarketLoadingBlock";
 import MarketEmptyState from "../../Components/MarketEmptyState";
+import PublicProductCard from "../../Components/publicCards/PublicProductCard";
+import { mapRankedItemToPublicProductCard } from "../../Components/publicCards/publicProductCardMappers";
+import { SHOPPER_LOW_INVENTORY_NOTE } from "../../Components/marketTrustProof";
 import MobileFilterDrawer from "../../Components/MobileFilterDrawer";
 
 
@@ -149,64 +152,14 @@ const handleFilterChange = (filterType: keyof typeof selectedFilters, value: str
             />
           ) : (
             <>
-              <div className="public-grid-listing">
-                {services.map((service, index) => (
-                  // <div key={service._id} className="overflow-hidden border rounded-lg shadow-sm hover:shadow transition-shadow">
-                  //   {/* Compact Image */}
-                  //   <div className="relative h-36">
-                  //     <Image
-                  //       src={service.coverImage || "/Service/19099.png"}
-                  //       alt={service.title}
-                  //       fill
-                  //       className="object-cover"
-                  //     />
-                  //   </div>
-                    
-                  //   {/* Compact Content */}
-                  //   <div className="p-3">
-                  //     {/* Brand Name - Compact */}
-                  //     <h3 className="mb-1 text-sm font-bold line-clamp-1">
-                  //       {service.title || "Feature Brand Name"}
-                  //     </h3>
-                      
-                  //     {/* Description - More Compact */}
-                  //     <p className="mb-1 text-xs text-gray-600 line-clamp-2">
-                  //       {service.description || "Lorem Ipsum Dolor Sit Amet, Consectetur Adipiscing Elit. Praesent Vitae."}
-                  //     </p>
-                      
-                  //     {/* Address - Smaller */}
-                  //     {service.contact?.address && (
-                  //       <p className="mb-1 text-xs text-gray-500 line-clamp-1">
-                  //         {service.contact.address}
-                  //       </p>
-                  //     )}
-                      
-                  //     {/* View Details Link - Compact */}
-                  //     <div className="mb-2">
-                  //       <Link
-                  //         href={`/service/${service.slug}`}
-                  //         className="text-xs text-blue-600 hover:underline"
-                  //       >
-                  //         [View Details]
-                  //       </Link>
-                  //     </div>
-                      
-                  //     {/* Earned Badge Section - Compact */}
-                  //     <div>
-                  //       <p className="text-xs font-medium">Earned Badge:</p>
-                  //       <div className="mt-0.5">
-                  //         <div className="inline-block w-20 h-4 border border-dashed border-gray-300 rounded text-xs text-transparent">
-                  //           Badge
-                  //         </div>
-                  //       </div>
-                  //     </div>
-                  //   </div>
-                  // </div>
-                  <ProductCard key={index} item={service} />
+              {services.length <= 3 ? (
+                <p className="shopper-low-inventory-note">{SHOPPER_LOW_INVENTORY_NOTE}</p>
+              ) : null}
+              <div className={`public-grid-listing ${services.length <= 3 ? "public-grid-listing--low-count" : ""}`}>
+                {services.map((service) => (
+                  <PublicProductCard key={service._id} {...mapRankedItemToPublicProductCard(service as RankedItem)} />
                 ))}
               </div>
-
-
             </>
           )}
         </div>
@@ -313,97 +266,7 @@ function buildBadgeImagePath(badge: string): string {
 }
 
 function ProductCard({ item }: { item: RankedItem }) {
-
-  
-  const href = `/product/${item._id}`;
-  const title = pickTitle(item);
-  const description = item.description ?? "";
-  const strippedDescription = stripHtml(description);
-  const trimmedDescription =
-    strippedDescription.length > 100 ? `${strippedDescription.slice(0, 100).trimEnd()}...` : strippedDescription;
-  const images = gatherImages(item);
-  const { price: variantPrice, effective, onSale } = pickPrice(item);
-  const rating = pickRating(item);
-  const ratingCount = pickRatingCount(item);
-  const reviewCount = item.totalReviews || 0;
-  const badge = pickBadgeValue(item as any);
-  const badgeImagePath = badge ? buildBadgeImagePath(badge) : null;
-
-  // Get price from item.price or fallback to variant price
-  let displayPrice = 0;
-  if ((item as any).price) {
-    const priceData = (item as any).price;
-    if (priceData.$numberDecimal !== undefined) {
-      displayPrice = parseFloat(priceData.$numberDecimal);
-    } else if (typeof priceData === 'number') {
-      displayPrice = priceData;
-    } else if (typeof priceData === 'string') {
-      displayPrice = parseFloat(priceData);
-    }
-  } else {
-    displayPrice = variantPrice;
-  }
-
-  return (
-    <Link href={href} className="market-listing-card-link h-full">
-      <article className="market-listing-card p-2 sm:max-w-none">
-        <div className="market-card-media relative aspect-[4/3] w-full shrink-0 sm:aspect-square">
-          <MarketImage src={images[0]} alt={title} aspect="square" objectFit="contain" />
-
-          {onSale && (
-            <div className="absolute left-3 top-3">
-              <span className="rounded-full bg-red-600 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white sm:text-xs">
-                Sale
-              </span>
-            </div>
-          )}
-        </div>
-
-        <div className="flex flex-1 flex-col gap-2 p-3">
-          <h3 className="market-card-title line-clamp-2">{title}</h3>
-
-          <p className="market-card-desc line-clamp-2">
-            {trimmedDescription || "Explore this product on Mosaic Biz Hub."}
-          </p>
-
-          <CardRatingRow rating={rating} reviewCount={reviewCount} />
-
-          <div className="mt-auto">
-            {onSale ? (
-              <div className="flex flex-col gap-0.5">
-                <span className="text-xs text-market-muted">Starting from</span>
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="market-card-price-sale">${effective.toFixed(2)}</span>
-                  <span className="text-sm text-market-muted line-through">${displayPrice.toFixed(2)}</span>
-                </div>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-0.5">
-                <span className="text-xs text-market-muted">Starting from</span>
-                <span className="market-card-price">${displayPrice.toFixed(2)}</span>
-              </div>
-            )}
-          </div>
-
-          {badge ? (
-            <div className="market-card-footer mt-2 gap-2 py-2">
-              <span className="text-xs font-semibold text-market-muted">Earned badge</span>
-              <img
-                src={badgeImagePath || "/badge.png"}
-                alt={`${badge} badge`}
-                className="h-10 object-contain sm:h-12"
-                onError={(e) => {
-                  const img = e.currentTarget;
-                  if (img.src.endsWith("/badge.png")) return;
-                  img.src = "/badge.png";
-                }}
-              />
-            </div>
-          ) : null}
-        </div>
-      </article>
-    </Link>
-  );
+  return <PublicProductCard {...mapRankedItemToPublicProductCard(item)} />;
 }
 
 export default ProductSevices;

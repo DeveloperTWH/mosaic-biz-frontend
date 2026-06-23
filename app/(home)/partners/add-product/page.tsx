@@ -1,15 +1,15 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Save, Loader } from 'lucide-react';
 import VendorApplicationShell from '../components/VendorApplicationShell';
+import VendorOnboardingProgress from '../components/VendorOnboardingProgress';
+import VendorFormActions from '../components/VendorFormActions';
 import DashboardLoadingBlock from '@/components/ui/dashboard-loading-block';
 import { useProductForm } from './hooks/useProductForm';
 import ProductDetails from './components/ProductDetails';
 import VariationAttributes from './components/VariationAttributes';
 import VariantsTable from './components/VariantsTable';
 import MetaFields from './components/MetaFields';
-import Discounts from './components/Discounts';
 import ImageUpload from './components/ImageUpload';
 
 export default function AddProductPage() {
@@ -47,11 +47,9 @@ export default function AddProductPage() {
     addMetaField,
     updateMetaField,
     removeMetaField,
-    discount,
-    updateDiscount,
     handleFileUpload,
     removeImage,
-   handleVariantImageUpload,
+    handleVariantImageUpload,
   } = useProductForm();
 
   if (loading) {
@@ -65,20 +63,20 @@ export default function AddProductPage() {
   return (
     <VendorApplicationShell
       variant="dashboard"
-      title="List products"
-      description="Showcase all your products along with all the variations"
+      title="List a product"
+      description="Add the essentials first — name, category, and photos. Variants and extra details are optional."
       backHref="/partners/products"
       backLabel="Back to products"
     >
+      <VendorOnboardingProgress
+        currentStage={4}
+        saveNote="Your listing is created when you submit. You can add more products later from the products page."
+      />
+
       <div className="max-w-6xl">
         <form onSubmit={handleSubmit} className="space-y-6">
-          
-          {/* Two Column Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left Column - Main Content */}
-            <div className="lg:col-span-2 space-y-6">
-              
-              {/* Product Details */}
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <div className="space-y-6 lg:col-span-2">
               <ProductDetails
                 formData={formData}
                 errors={errors}
@@ -94,7 +92,6 @@ export default function AddProductPage() {
                 onToggleVariants={toggleHasVariants}
               />
 
-              {/* Variation Attributes */}
               <VariationAttributes
                 attributes={attributes}
                 onAdd={addAttribute}
@@ -106,20 +103,18 @@ export default function AddProductPage() {
                 disabled={!formData.hasVariants}
               />
 
-              {/* Variants Table */}
-{variants.length > 0 && (
-  <VariantsTable
-    variants={variants}
-    hasVariants={formData.hasVariants}
-    onUpdate={updateVariant}
-    onUpdateAllShipping={updateAllShipping}
-    onRemove={removeVariant}
-    onImageUpload={handleVariantImageUpload}
-  />
-)}
+              {variants.length > 0 ? (
+                <VariantsTable
+                  variants={variants}
+                  hasVariants={formData.hasVariants}
+                  onUpdate={updateVariant}
+                  onUpdateAllShipping={updateAllShipping}
+                  onRemove={removeVariant}
+                  onImageUpload={handleVariantImageUpload}
+                />
+              ) : null}
             </div>
 
-            {/* Right Column - Images */}
             <div className="lg:col-span-1">
               <ImageUpload
                 featureImage={formData.featureImage}
@@ -135,41 +130,30 @@ export default function AddProductPage() {
             </div>
           </div>
 
-          {/* Bottom Row - Meta Fields and Discounts */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Meta Fields */}
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             <MetaFields
               metaFields={metaFields}
               onAdd={addMetaField}
               onUpdate={updateMetaField}
               onRemove={removeMetaField}
             />
-
-            {/* Discounts */}
-            {/* <Discounts
-              discount={discount}
-              onUpdate={updateDiscount}
-            /> */}
           </div>
 
-          {/* Submit Buttons */}
-          <div className="flex items-center justify-start gap-3 pt-4">
-            <button
-              type="submit"
-              disabled={saving}
-              className="px-8 py-2.5 bg-[#c9a227] text-white text-sm font-medium rounded hover:bg-[#b8921f] flex items-center gap-2 disabled:opacity-50"
-            >
-              {saving ? <Loader className="w-4 h-4 animate-spin" /> : null}
-              Create Product
-            </button>
-            <button
-              type="button"
-              onClick={() => router.push('/partners/products')}
-              className="px-8 py-2.5 bg-gray-400 text-white text-sm font-medium rounded hover:bg-gray-500"
-            >
-              Clear Response
-            </button>
-          </div>
+          <VendorFormActions
+            hint="Feature image and product name are required for a complete listing."
+            nextStepLabel="After your first listing, connect payouts and complete final review to go live."
+            tertiary={{
+              label: "Cancel",
+              onClick: () => router.push('/partners/products'),
+            }}
+            primary={{
+              type: 'submit',
+              label: saving ? 'Creating product…' : 'Create product',
+              disabled: saving,
+              loading: saving,
+              loadingLabel: 'Creating product…',
+            }}
+          />
         </form>
       </div>
     </VendorApplicationShell>

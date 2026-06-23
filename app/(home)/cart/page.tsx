@@ -3,6 +3,10 @@
 
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { toast } from "react-toastify";
+import MarketEmptyState from "../Components/MarketEmptyState";
+import ShopperTrustCallout from "../Components/ShopperTrustCallout";
+import { SHOPPER_CART_TRUST_NOTE } from "../Components/marketTrustProof";
+import { getStockHint } from "../Components/publicCards/publicProductCardMappers";
 import AddressComponent from "./Component/AddressComponent";
 import {
     getCartDetailedResponse,
@@ -478,9 +482,12 @@ export default function CartPage() {
 {selectedTab === "product" ? (
   <div className="commerce-panel mt-6 space-y-6">
     {itemsProduct.length === 0 ? (
-      <div className="p-8 text-center font-montserrat text-brand-muted">
-        Your cart is empty.
-      </div>
+      <MarketEmptyState
+        title="Your cart is empty"
+        description="Browse verified minority-owned products and add items to test the checkout flow."
+        ctaLabel="Browse products"
+        ctaHref="/products"
+      />
     ) : (
       itemsProduct.map((item) => (
         <div
@@ -574,6 +581,12 @@ export default function CartPage() {
                   })()}
                 </div>
 
+                {item.stock != null && item.stock <= 5 && !item.allowBackorder ? (
+                  <p className="mt-2 text-xs font-medium text-brand-gold">
+                    {getStockHint(item.stock, item.allowBackorder) ?? `Only ${item.stock} left`}
+                  </p>
+                ) : null}
+
                 <div className="mt-2 flex flex-wrap items-center gap-4 text-xs text-brand-muted">
                     <span>
                             Tax included: ${Number(item.lineTaxAmount ?? 0).toFixed(2)}
@@ -658,24 +671,26 @@ export default function CartPage() {
             {/* RIGHT SIDE */}
             <div className="flex items-center gap-6">
               {/* QUANTITY */}
-              <div className="flex items-center gap-2">
+              <div className="commerce-qty-control">
                 <button
                   type="button"
                   onClick={() => dec(item)}
-                  className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-300 bg-white text-brand-navy transition hover:border-brand-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold disabled:cursor-not-allowed disabled:border-gray-200 disabled:bg-gray-100 disabled:text-brand-muted disabled:opacity-80"
+                  className="commerce-qty-btn"
                   disabled={item.quantity <= 1}
+                  aria-label="Decrease quantity"
                 >
-                  -
+                  −
                 </button>
 
-                <div className="w-6 text-center text-sm font-medium text-brand-navy">
+                <span className="min-w-[2rem] text-center text-sm font-semibold text-brand-navy">
                   {item.quantity}
-                </div>
+                </span>
 
                 <button
                   type="button"
                   onClick={() => inc(item)}
-                  className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-300 bg-white text-brand-navy transition hover:border-brand-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold disabled:cursor-not-allowed disabled:border-gray-200 disabled:bg-gray-100 disabled:text-brand-muted disabled:opacity-80"
+                  className="commerce-qty-btn"
+                  aria-label="Increase quantity"
                 >
                   +
                 </button>
@@ -893,14 +908,12 @@ export default function CartPage() {
                                     </div>
                                 )}
 
-                                <p className="commerce-trust-note mt-4">
-                                  Secure checkout. You will review shipping and payment on the next step. Charges
-                                  finalize only after you confirm payment.
-                                </p>
+                                <ShopperTrustCallout className="mt-4">{SHOPPER_CART_TRUST_NOTE}</ShopperTrustCallout>
 
-                                <div className="mt-5 flex items-center justify-end space-x-2">
+                                <div className="mt-5 lg:sticky lg:bottom-4">
                                     <button
-                                        className="rounded-lg bg-brand-navy-light px-4 py-2 text-white hover:bg-brand-navy"
+                                        type="button"
+                                        className="commerce-action-primary w-full"
                                         onClick={() => {
                                             if (!selectedAddress) {
                                                 toast.error("Please add a delivery address before placing your order.");
@@ -924,7 +937,7 @@ export default function CartPage() {
                                             );
                                         }}
                                     >
-                                        Place Order
+                                        Place order
                                     </button>
                                 </div>
                             </div>

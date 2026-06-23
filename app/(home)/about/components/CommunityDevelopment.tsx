@@ -1,55 +1,44 @@
 import Image from "next/image";
+import {
+  MarketingFeatureCard,
+  MarketingSectionHeader,
+} from "../../Components/marketing/MarketingSections";
 
 export default function CommunityDevelopment() {
   return (
-    <section className="w-full py-16 text-center">
-      <div className="container-page mx-auto max-w-7xl">
-      <h2 className="market-section-heading mb-4 text-3xl">COMMUNITY DEVELOPMENT:</h2>
-      <div className="market-section-divider mb-10" />
+    <section className="public-section bg-market-bg">
+      <div className="container-page">
+        <MarketingSectionHeader
+          title="Community development"
+          description="Minority-owned businesses strengthen neighborhoods, create jobs, and demonstrate meaningful social impact."
+        />
 
-      <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-        {/* Card 1 */}
-        <div className="p-8 bg-gray-100 rounded-2xl shadow-md flex flex-col items-center text-center">
-          <Image
-            src="/about/icon1.png"
-            alt="Underserved communities"
-            width={60}
-            height={60}
-            className="mb-10"
-          />
-          <p className="text-base font-medium text-gray-700">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          <MarketingFeatureCard
+            icon={
+              <Image src="/about/icon1.png" alt="" width={48} height={48} className="object-contain" />
+            }
+          >
             Minority businesses often operate in underserved communities and provide much-needed goods and services.
-          </p>
-        </div>
+          </MarketingFeatureCard>
 
-        {/* Card 2 - Highlighted */}
-        <div className="p-8 bg-[#C7A040] text-white rounded-2xl shadow-lg flex flex-col items-center text-center">
-          <Image
-            src="/about/shuttle 1.png"
-            alt="Local economy support"
-            width={50}
-            height={50}
-            className="mb-10"
-          />
-          <p className="text-base font-semibold">
-            Supporting these businesses can help boost the local economy and create jobs in the area.
-          </p>
-        </div>
+          <MarketingFeatureCard
+            featured
+            icon={
+              <Image src="/about/shuttle 1.png" alt="" width={44} height={44} className="object-contain" />
+            }
+          >
+            Supporting these businesses boosts the local economy and creates jobs in the area.
+          </MarketingFeatureCard>
 
-        {/* Card 3 */}
-        <div className="p-8 bg-gray-100 rounded-2xl shadow-md flex flex-col items-center text-center">
-          <Image
-            src="/about/sociology 1.png"
-            alt="Social impact"
-            width={60}
-            height={60}
-            className="mb-10"
-          />
-          <p className="text-base font-medium text-gray-700">
+          <MarketingFeatureCard
+            icon={
+              <Image src="/about/sociology 1.png" alt="" width={48} height={48} className="object-contain" />
+            }
+          >
             Working with women and minority-owned businesses demonstrates a commitment to social impact and corporate responsibility.
-          </p>
+          </MarketingFeatureCard>
         </div>
-      </div>
       </div>
     </section>
   );

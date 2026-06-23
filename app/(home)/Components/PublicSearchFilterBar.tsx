@@ -17,6 +17,8 @@ type PublicSearchFilterBarProps = {
   locationLabel?: string;
   minorityLabel?: string;
   submitLabel?: string;
+  showClearFilters?: boolean;
+  onClearFilters?: () => void;
 };
 
 export default function PublicSearchFilterBar({
@@ -28,9 +30,17 @@ export default function PublicSearchFilterBar({
   locationLabel = "Filter by state",
   minorityLabel = "Filter by minority type",
   submitLabel = "Search marketplace",
+  showClearFilters = false,
+  onClearFilters,
 }: PublicSearchFilterBarProps) {
   const [minorityTypes, setMinorityTypes] = useState<MinorityType[]>([]);
   const [loadingMinorityTypes, setLoadingMinorityTypes] = useState(true);
+  const [minorityTypesError, setMinorityTypesError] = useState(false);
+
+  const hasActiveFilters =
+    Boolean(filters.keyword.trim()) ||
+    Boolean(filters.location.trim()) ||
+    Boolean(filters.minorityType.trim());
 
   useEffect(() => {
     let isMounted = true;
@@ -45,10 +55,12 @@ export default function PublicSearchFilterBar({
         }
 
         setMinorityTypes(Array.isArray(data) ? data : []);
+        setMinorityTypesError(false);
       } catch (error) {
         console.error("Failed to load minority types", error);
         if (isMounted) {
           setMinorityTypes([]);
+          setMinorityTypesError(true);
         }
       } finally {
         if (isMounted) {
@@ -94,7 +106,7 @@ export default function PublicSearchFilterBar({
               onChange={(event) => onChange({ ...filters, location: event.target.value })}
               className="market-select"
             >
-              <option value="">Choose State</option>
+              <option value="">All states</option>
               {US_STATE_OPTIONS.map((state) => (
                 <option key={state} value={state}>
                   {state}
@@ -111,16 +123,16 @@ export default function PublicSearchFilterBar({
 
         <div className="min-w-0 flex-1">
           <label className="market-label">{minorityLabel}</label>
-          <div className="market-select-wrap">
+          <div
+            className={`market-select-wrap ${loadingMinorityTypes ? "market-select-wrap--loading" : ""}`}
+          >
             <select
               value={filters.minorityType}
               onChange={(event) => onChange({ ...filters, minorityType: event.target.value })}
-              disabled={loadingMinorityTypes}
               className="market-select"
+              aria-busy={loadingMinorityTypes}
             >
-              <option value="">
-                {loadingMinorityTypes ? "Loading minority types..." : "Choose Minority"}
-              </option>
+              <option value="">All business types</option>
               {minorityTypes.map((option) => (
                 <option key={option._id} value={option.name}>
                   {option.name}
@@ -133,15 +145,29 @@ export default function PublicSearchFilterBar({
               </svg>
             </div>
           </div>
+          {loadingMinorityTypes ? (
+            <p className="market-filter-loading-hint">Loading business types…</p>
+          ) : minorityTypesError ? (
+            <p className="market-filter-loading-hint">Business types unavailable — search still works.</p>
+          ) : null}
         </div>
 
-        <div className="min-w-0 flex-1">
+        <div className="flex min-w-0 flex-1 flex-col gap-2">
           <button
             type="submit"
             className="market-btn-primary flex h-10 w-full items-center justify-center text-sm normal-case"
           >
             {submitLabel}
           </button>
+          {showClearFilters && hasActiveFilters && onClearFilters ? (
+            <button
+              type="button"
+              onClick={onClearFilters}
+              className="market-btn-outline flex h-10 w-full items-center justify-center text-sm normal-case"
+            >
+              Clear filters
+            </button>
+          ) : null}
         </div>
       </form>
     </div>

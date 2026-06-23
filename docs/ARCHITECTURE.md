@@ -1,7 +1,7 @@
 # Frontend Architecture
 
 **Type:** Reference  
-**Last updated:** 2026-06-17
+**Last updated:** 2026-06-22
 
 Supersedes the operational parts of [FRONTEND_AUDIT_ISSUE_2.md](FRONTEND_AUDIT_ISSUE_2.md) (historical). Current status: [PROJECT_STATUS.md](PROJECT_STATUS.md). API endpoints: [API_CONTRACTS.md](API_CONTRACTS.md).
 
@@ -25,11 +25,13 @@ Supersedes the operational parts of [FRONTEND_AUDIT_ISSUE_2.md](FRONTEND_AUDIT_I
 | Item | Value |
 |------|--------|
 | Launch GitHub repo | `Digital-Builders-757/mosaic-biz-frontend-launch` |
-| Integration branch | `sprint/frontend-release-candidate` |
+| Integration branch | `develop` |
+| Production branch | `main` |
+| Branching model | Feature → `develop` → `main` — [GIT_WORKFLOW.md](GIT_WORKFLOW.md) |
 | Local remote | Often `launch` or `origin` — confirm with `git remote -v` |
-| Production deploy | Manual promote only; **not deployed** as of 2026-06-17 |
+| Production deploy | Vercel auto-deploy on merge to `main` |
 
-Work for launch flows through the **launch repo** and RC branch, not direct pushes to production `main`.
+All feature work merges into **`develop` first**. Production changes ship when **`develop` is merged into `main`**. Do not open routine PRs directly into `main`.
 
 ---
 
@@ -86,16 +88,20 @@ baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.mosaicbizhub.com/"
 
 ```mermaid
 flowchart LR
-  branch[Feature or sprint branch] --> preview[Vercel Preview]
-  rc[sprint/frontend-release-candidate] --> rcPreview[RC Preview]
-  rcPreview --> manual[Manual promote]
-  manual --> prod[Production]
+  feature[Feature branch] --> develop[develop]
+  develop --> devPreview[Develop preview / QA]
+  develop --> main[main]
+  main --> prod[Production]
+  feature --> preview[Feature preview]
 ```
 
-- Every push can produce a **Preview** deployment.
+- Feature branches produce **Preview** deployments on push/PR.
+- **`develop`** is the integration preview — run smoke QA here before production.
+- **`main`** auto-deploys to **production** on merge (Vercel).
 - Previews may require **Vercel SSO** (HTTP 401 for unauthenticated requests).
-- **Production** is not auto-deployed from `main` in the current launch posture.
-- Resolve preview URLs from Vercel dashboard or GitHub deployment API on the launch repo.
+- Resolve preview URLs from the Vercel dashboard or GitHub deployment API on the launch repo.
+
+See [GIT_WORKFLOW.md](GIT_WORKFLOW.md) for the full branching standard.
 
 ---
 

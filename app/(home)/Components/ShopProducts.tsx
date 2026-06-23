@@ -11,6 +11,8 @@ import { getFeaturedProducts, FeaturedProduct } from "@/lib/api/featured-product
 import MarketImage from "./MarketImage";
 import MarketLoadingBlock from "./MarketLoadingBlock";
 import MarketEmptyState from "./MarketEmptyState";
+import MarketTrustBadgeHint from "./MarketTrustBadgeHint";
+import { MARKETPLACE_VITALITY_NOTE } from "./marketTrustProof";
 
 /* ---------- types ---------- */
 type RankedItem = {
@@ -183,6 +185,10 @@ export default function ShopProducts() {
           <p className="mx-auto mt-4 max-w-2xl font-montserrat text-sm text-market-muted sm:text-base">
             See what is trending from verified vendors. Live listings powered by our marketplace API.
           </p>
+          <MarketTrustBadgeHint className="mt-4 justify-center" />
+          <p className="mx-auto mt-2 max-w-xl font-montserrat text-xs text-market-muted/80">
+            {MARKETPLACE_VITALITY_NOTE}
+          </p>
         </div>
 
         {/* Products Carousel Section */}
@@ -301,7 +307,7 @@ function FeaturedProductCard({ item }: { item: FeaturedProduct }) {
           <p className="market-card-desc line-clamp-2">{trimmedDescription || "Explore this listing on Mosaic Biz Hub."}</p>
 
           <p className="font-poppins text-[10px] font-semibold uppercase tracking-wide text-market-teal sm:text-xs">
-            Featured product
+            Verified marketplace listing
           </p>
 
           <div className="mt-auto flex items-center justify-between gap-2 border-t border-white/10 pt-3">

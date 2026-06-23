@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Eye, EyeOff } from 'lucide-react';
 import AuthPageShell from '@/components/auth/AuthPageShell';
 import { FormField } from '@/components/ui/form-field';
+import { FormAlert } from '@/components/ui/form-alert';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
@@ -153,43 +154,49 @@ function ForgotPasswordContent() {
       hero={hero}
     >
       {step === 'request' ? (
-        <form className="space-y-4" onSubmit={handleRequestOtp}>
-          <FormField label="Email" htmlFor="email" required surface="auth">
+        <form className="auth-form-stack" onSubmit={handleRequestOtp}>
+          <FormField
+            label="Email"
+            htmlFor="email"
+            required
+            surface="auth"
+            helperText="We'll send a one-time code to this address."
+          >
             <Input
               id="email"
               name="email"
               type="email"
+              autoComplete="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
+              placeholder="you@example.com"
               surface="auth"
             />
           </FormField>
 
-          {error ? (
-            <div className="rounded border border-dashboard-warn-border bg-dashboard-warn-bg p-2 text-sm text-dashboard-warn-text">
-              {error}
-            </div>
-          ) : null}
+          {error ? <FormAlert variant="error">{error}</FormAlert> : null}
+          {success ? <FormAlert variant="success">{success}</FormAlert> : null}
 
-          {success ? (
-            <div className="rounded border border-green-300 bg-green-50 p-2 text-sm text-green-800">
-              {success}
-            </div>
-          ) : null}
-
-          <Button type="submit" className="w-full normal-case" disabled={loading}>
-            {loading ? 'Sending OTP...' : 'Send OTP'}
-          </Button>
+          <div className="auth-form-actions">
+            <Button type="submit" size="lg" className="w-full normal-case" disabled={loading}>
+              {loading ? 'Sending code…' : 'Send verification code'}
+            </Button>
+          </div>
         </form>
       ) : (
-        <form className="space-y-4" onSubmit={handleResetPassword}>
+        <form className="auth-form-stack" onSubmit={handleResetPassword}>
           <FormField label="Email" surface="auth">
             <Input type="email" value={email} readOnly surface="auth" className="bg-surface-panel text-brand-muted" />
           </FormField>
 
-          <FormField label="OTP" htmlFor="otp" required surface="auth">
+          <FormField
+            label="Verification code"
+            htmlFor="otp"
+            required
+            surface="auth"
+            helperText="Enter the 6-digit code from your email."
+          >
             <Input
               id="otp"
               name="otp"
@@ -199,28 +206,36 @@ function ForgotPasswordContent() {
               required
               value={otp}
               onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-              placeholder="Enter 6-digit OTP"
+              placeholder="000000"
               surface="auth"
+              className="tracking-[0.3em]"
             />
           </FormField>
 
-          <FormField label="New Password" htmlFor="newPassword" required surface="auth">
+          <FormField
+            label="New password"
+            htmlFor="newPassword"
+            required
+            surface="auth"
+            helperText="At least 6 characters with letters and numbers."
+          >
             <div className="relative">
               <Input
                 id="newPassword"
                 type={showNewPassword ? 'text' : 'password'}
                 name="newPassword"
+                autoComplete="new-password"
                 required
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="Enter your new password"
+                placeholder="Create a new password"
                 surface="auth"
                 className="pr-10"
               />
               <button
                 type="button"
                 onClick={() => setShowNewPassword((prev) => !prev)}
-                className="absolute inset-y-0 right-3 flex items-center text-brand-muted hover:text-brand-navy"
+                className="absolute inset-y-0 right-3 flex min-h-11 min-w-11 items-center justify-center text-brand-muted hover:text-brand-navy"
                 aria-label={showNewPassword ? 'Hide password' : 'Show password'}
               >
                 {showNewPassword ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -228,23 +243,24 @@ function ForgotPasswordContent() {
             </div>
           </FormField>
 
-          <FormField label="Confirm Password" htmlFor="confirmPassword" required surface="auth">
+          <FormField label="Confirm password" htmlFor="confirmPassword" required surface="auth">
             <div className="relative">
               <Input
                 id="confirmPassword"
                 type={showConfirmPassword ? 'text' : 'password'}
                 name="confirmPassword"
+                autoComplete="new-password"
                 required
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Confirm your new password"
+                placeholder="Re-enter your new password"
                 surface="auth"
                 className="pr-10"
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword((prev) => !prev)}
-                className="absolute inset-y-0 right-3 flex items-center text-brand-muted hover:text-brand-navy"
+                className="absolute inset-y-0 right-3 flex min-h-11 min-w-11 items-center justify-center text-brand-muted hover:text-brand-navy"
                 aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
               >
                 {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -252,41 +268,33 @@ function ForgotPasswordContent() {
             </div>
           </FormField>
 
-          {error ? (
-            <div className="rounded border border-dashboard-warn-border bg-dashboard-warn-bg p-2 text-sm text-dashboard-warn-text">
-              {error}
-            </div>
-          ) : null}
+          {error ? <FormAlert variant="error">{error}</FormAlert> : null}
+          {success ? <FormAlert variant="info">{success}</FormAlert> : null}
 
-          {success ? (
-            <div className="rounded border border-green-300 bg-green-50 p-2 text-sm text-green-800">
-              {success}
-            </div>
-          ) : null}
-
-          <Button type="submit" className="w-full normal-case" disabled={loading}>
-            {loading ? 'Resetting Password...' : 'Reset Password'}
-          </Button>
-
-          <button
-            type="button"
-            onClick={() => {
-              setStep('request');
-              setOtp('');
-              setNewPassword('');
-              setConfirmPassword('');
-              setError('');
-              setSuccess('');
-            }}
-            className="w-full text-center font-poppins text-sm font-medium text-brand-navy-light underline"
-          >
-            Use a different email
-          </button>
+          <div className="auth-form-actions">
+            <Button type="submit" size="lg" className="w-full normal-case" disabled={loading}>
+              {loading ? 'Resetting password…' : 'Reset password'}
+            </Button>
+            <button
+              type="button"
+              onClick={() => {
+                setStep('request');
+                setOtp('');
+                setNewPassword('');
+                setConfirmPassword('');
+                setError('');
+                setSuccess('');
+              }}
+              className="min-h-11 text-center font-poppins text-sm font-medium text-brand-navy-light underline"
+            >
+              Use a different email
+            </button>
+          </div>
         </form>
       )}
 
-      <p className="mt-6 text-center text-base text-brand-muted underline">
-        <Link href={loginHref}>Back to Sign In</Link>
+      <p className="auth-path-switch mt-6">
+        <Link href={loginHref}>Back to sign in</Link>
       </p>
     </AuthPageShell>
   );

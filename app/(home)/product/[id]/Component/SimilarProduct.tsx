@@ -9,6 +9,7 @@ import { Pagination, Keyboard, A11y } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import MarketEmptyState from '../../../Components/MarketEmptyState';
+import { SHOPPER_LOW_INVENTORY_NOTE } from '../../../Components/marketTrustProof';
 
 /* ---------- types ---------- */
 type RankedItem = {
@@ -303,6 +304,14 @@ export default function SimilarProduct({ productId }: { productId?: string }) {
             ctaLabel="Browse all products"
             ctaHref="/products"
           />
+        ) : items.length === 1 ? (
+          <div className="mx-auto max-w-sm space-y-4">
+            <p className="shopper-low-inventory-note">{SHOPPER_LOW_INVENTORY_NOTE}</p>
+            <SimilarProductCard item={items[0]} onImgLoad={handleImgLoad} />
+            <p className="text-center font-montserrat text-sm text-market-muted">
+              More picks from verified vendors are added as the marketplace grows.
+            </p>
+          </div>
         ) : (
           <div ref={eqRef}>
             <Swiper

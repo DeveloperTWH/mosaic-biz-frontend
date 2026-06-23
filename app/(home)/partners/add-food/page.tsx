@@ -1,8 +1,10 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Loader } from 'lucide-react';
 import VendorApplicationShell from '../components/VendorApplicationShell';
+import VendorOnboardingProgress from '../components/VendorOnboardingProgress';
+import VendorFormSection from '../components/VendorFormSection';
+import VendorFormActions from '../components/VendorFormActions';
 import DashboardLoadingBlock from '@/components/ui/dashboard-loading-block';
 import { useFoodForm } from './hooks/useServiceForm';
 import ServiceCategory from './components/ServiceCategory';
@@ -47,15 +49,20 @@ export default function AddFoodPage() {
   return (
     <VendorApplicationShell
       variant="dashboard"
-      title="List foods"
-      description="Showcase your food offerings"
+      title="List a food offering"
+      description="Share your menu, hours, and photos so hungry customers can find you."
       backHref="/partners/foods"
       backLabel="Back to foods"
     >
+      <VendorOnboardingProgress
+        currentStage={4}
+        saveNote="Upload cover and menu images when ready — you can edit this listing later."
+      />
+
       <div className="max-w-6xl">
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 space-y-6">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <div className="space-y-6 lg:col-span-2">
               <ServiceCategory
                 formData={formData}
                 errors={errors}
@@ -65,31 +72,29 @@ export default function AddFoodPage() {
                 onInputChange={handleInputChange}
               />
 
-              <div className="bg-gray-100 border-2 border-blue-400 rounded-md p-5">
-                <h2 className="text-base font-semibold text-gray-900 mb-4 border-l-4 border-[#c9a227] pl-3">
-                  Location & Hours
-                </h2>
-
+              <VendorFormSection
+                title="Location & hours"
+                description="Where customers can visit or pick up, and when you're open."
+              >
                 <LocationField
                   location={formData.location}
                   onLocationChange={(location) => handleInputChange('location', location)}
                 />
-
-                <div className="mt-4">
-                  <h3 className="text-sm font-medium text-gray-700 mb-3">Add Hours</h3>
+                <div>
+                  <h3 className="mb-3 font-poppins text-sm font-medium text-dashboard-text">Business hours</h3>
                   <BusinessHours businessHours={businessHours} onUpdate={updateBusinessHour} />
                 </div>
-              </div>
+              </VendorFormSection>
 
-              <div className="bg-gray-100 border border-gray-200 rounded-md p-5">
-                <h2 className="text-base font-semibold text-gray-900 mb-4 border-l-4 border-[#c9a227] pl-3">
-                  Booking Tool
-                </h2>
+              <VendorFormSection
+                title="Booking tool"
+                description="Optional reservation or ordering link."
+              >
                 <BookingTool
                   bookingToolLink={formData.bookingToolLink}
                   onBookingLinkChange={(link) => handleInputChange('bookingToolLink', link)}
                 />
-              </div>
+              </VendorFormSection>
             </div>
 
             <div className="lg:col-span-1">
@@ -117,32 +122,30 @@ export default function AddFoodPage() {
             </div>
           </div>
 
-          <div className="bg-gray-100 border border-gray-200 rounded-md p-5">
+          <VendorFormSection title="Additional details" description="Optional tags and notes for your food listing.">
             <MetaFields
               metaFields={formData.metaFields}
               onAdd={addMetaField}
               onUpdate={updateMetaField}
               onRemove={removeMetaField}
             />
-          </div>
+          </VendorFormSection>
 
-          <div className="flex items-center justify-start gap-3 pt-4">
-            <button
-              type="submit"
-              disabled={saving}
-              className="px-8 py-2.5 bg-[#c9a227] text-white rounded text-sm font-medium hover:bg-[#b8921f] flex items-center gap-2 disabled:opacity-50"
-            >
-              {saving ? <Loader className="w-4 h-4 animate-spin" /> : null}
-              {formData.title ? 'Add Food' : 'Create Food'}
-            </button>
-            <button
-              type="button"
-              onClick={() => router.push('/partners/foods')}
-              className="px-8 py-2.5 bg-gray-400 text-white rounded text-sm font-medium hover:bg-gray-500"
-            >
-              Cancel
-            </button>
-          </div>
+          <VendorFormActions
+            hint="Cover image and title are the minimum to create a food listing."
+            nextStepLabel="After listing food items, finish payout setup and final review to launch."
+            tertiary={{
+              label: 'Cancel',
+              onClick: () => router.push('/partners/foods'),
+            }}
+            primary={{
+              type: 'submit',
+              label: saving ? 'Saving…' : formData.title ? 'Save food listing' : 'Create food listing',
+              disabled: saving,
+              loading: saving,
+              loadingLabel: 'Saving…',
+            }}
+          />
         </form>
       </div>
     </VendorApplicationShell>

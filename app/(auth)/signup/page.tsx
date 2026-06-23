@@ -11,6 +11,12 @@ import { Eye, EyeOff, X } from "lucide-react";
 import TermsModal from "../../(home)/partners/final-review/components/TermsModal"; // Import the modal
 import { logAuthRequest } from "@/utils/authDebug";
 import { parseAuthJsonResponse } from "@/utils/parseAuthErrorResponse";
+import AuthFormSection from "@/components/auth/AuthFormSection";
+import AuthPathSwitch from "@/components/auth/AuthPathSwitch";
+import { FormField } from "@/components/ui/form-field";
+import { FormAlert } from "@/components/ui/form-alert";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 type MinorityType = {
   _id: string;
@@ -259,153 +265,169 @@ function SignupContent() {
             </div>
           </div>
 
-          <div className="flex items-center justify-center bg-white px-6">
+          <div className="flex items-center justify-center bg-white px-6 py-10">
             <div className="w-full max-w-xl">
-              <span className="inline-block mb-2 rounded-full bg-[#FFF6E0] px-2 text-[10px] font-thin font-montserrat text-[#C7A040]">
-                Business Owner
-              </span>
-              <h2 className="text-3xl font-bold text-brand-navy mb-2">
+              <span className="auth-role-badge">Business Owner</span>
+              <h2 className="mb-2 text-3xl font-bold text-brand-navy">
                 CREATE ACCOUNT
               </h2>
 
-              <div className="flex flex-col justify-start mb-5">
+              <div className="mb-6 flex flex-col justify-start">
                 <hr className="h-[2px] w-[80px] bg-brand-navy" />
-                <hr className="h-[2px] w-[80px] mt-[2px] mb-4 bg-brand-navy" />
+                <hr className="mb-4 mt-[2px] h-[2px] w-[80px] bg-brand-navy" />
               </div>
 
-              <form className="space-y-4" onSubmit={handleSubmit}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-base font-medium font-poppins text-brand-navy mb-2">
-                      First Name <span className="text-red-500">*</span>
-                    </label>
-                    <input 
-                      name="firstName"
-                      type="text"
-                      required
-                      className="w-full rounded-md border border-dashboard-input-border px-6 py-2 focus:ring-2 focus:ring-brand-gold/40 focus:border-brand-gold focus:outline-none" 
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-base font-medium font-poppins text-brand-navy mb-2">
-                      Last Name <span className="text-red-500">*</span>
-                    </label>
-                    <input 
-                      name="lastName"
-                      type="text"
-                      required
-                      className="w-full rounded-md border border-dashboard-input-border px-6 py-2 focus:ring-2 focus:ring-brand-gold/40 focus:border-brand-gold focus:outline-none" 
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-base font-medium font-poppins text-brand-navy mb-2">
-                      Mobile Number <span className="text-red-500">*</span>
-                    </label>
-                    <input 
-                      name="mobile"
-                      type="tel"
-                      required
-                      className="w-full rounded-md border border-dashboard-input-border px-6 py-2 focus:ring-2 focus:ring-brand-gold/40 focus:border-brand-gold focus:outline-none" 
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-base font-medium font-poppins text-brand-navy mb-2">
-                      Email Address <span className="text-red-500">*</span>
-                    </label>
-                    <input 
-                      name="email"
-                      type="email" 
-                      required
-                      className="w-full rounded-md border border-dashboard-input-border px-6 py-2 focus:ring-2 focus:ring-brand-gold/40 focus:border-brand-gold focus:outline-none" 
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-base font-medium font-poppins text-brand-navy mb-2">
-                      Password <span className="text-red-500">*</span>
-                    </label>
-                    <div className="relative">
-                      <input
-                        name="password"
-                        type={showPassword ? "text" : "password"}
+              <form className="auth-form-stack" onSubmit={handleSubmit}>
+                <AuthFormSection
+                  title="Your details"
+                  description="Tell us who you are so we can set up your vendor profile."
+                >
+                  <div className="auth-form-grid">
+                    <FormField label="First name" htmlFor="firstName" required surface="auth">
+                      <Input
+                        id="firstName"
+                        name="firstName"
+                        type="text"
                         required
-                        className="w-full rounded-md border border-dashboard-input-border px-6 py-2 pr-10 focus:ring-2 focus:ring-brand-gold/40 focus:border-brand-gold focus:outline-none"
+                        autoComplete="given-name"
+                        placeholder="Jane"
+                        surface="auth"
                       />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute inset-y-0 right-3 flex items-center text-brand-muted"
-                      >
-                        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-base font-medium font-poppins text-brand-navy mb-2">
-                      Confirm Password <span className="text-red-500">*</span>
-                    </label>
-                    <div className="relative">
-                      <input
-                        name="confirmPassword"
-                        type={showConfirmPassword ? "text" : "password"}
+                    </FormField>
+                    <FormField label="Last name" htmlFor="lastName" required surface="auth">
+                      <Input
+                        id="lastName"
+                        name="lastName"
+                        type="text"
                         required
-                        className="w-full rounded-md border border-dashboard-input-border px-6 py-2 pr-10 focus:ring-2 focus:ring-brand-gold/40 focus:border-brand-gold focus:outline-none"
+                        autoComplete="family-name"
+                        placeholder="Smith"
+                        surface="auth"
                       />
-                      <button
-                        type="button"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute inset-y-0 right-3 flex items-center text-brand-muted"
-                      >
-                        {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                      </button>
-                    </div>
+                    </FormField>
+                    <FormField label="Mobile number" htmlFor="mobile" required surface="auth">
+                      <Input
+                        id="mobile"
+                        name="mobile"
+                        type="tel"
+                        required
+                        autoComplete="tel"
+                        placeholder="(555) 555-0123"
+                        surface="auth"
+                      />
+                    </FormField>
+                    <FormField label="Email address" htmlFor="email" required surface="auth">
+                      <Input
+                        id="email"
+                        name="email"
+                        type="email"
+                        required
+                        autoComplete="email"
+                        placeholder="you@example.com"
+                        surface="auth"
+                      />
+                    </FormField>
                   </div>
-                </div>
+                </AuthFormSection>
 
-                <div className="flex items-start gap-2 text-xs text-brand-muted">
-                  <input type="checkbox" className="mt-2" required />
-                  <p>
-                    Your personal data will be used to support your experience
-                    throughout this website, to manage access to your account, and
-                    for other purposes described in our{" "}
+                <AuthFormSection
+                  title="Account security"
+                  description="Choose a password you'll use to sign in to your storefront."
+                >
+                  <div className="auth-form-grid">
+                    <FormField
+                      label="Password"
+                      htmlFor="password"
+                      required
+                      surface="auth"
+                      helperText="At least 6 characters with letters and numbers."
+                    >
+                      <div className="relative">
+                        <Input
+                          id="password"
+                          name="password"
+                          type={showPassword ? "text" : "password"}
+                          required
+                          autoComplete="new-password"
+                          placeholder="Create a password"
+                          surface="auth"
+                          className="pr-10"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute inset-y-0 right-3 flex min-h-11 min-w-11 items-center justify-center text-brand-muted hover:text-brand-navy"
+                          aria-label={showPassword ? "Hide password" : "Show password"}
+                        >
+                          {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                        </button>
+                      </div>
+                    </FormField>
+
+                    <FormField label="Confirm password" htmlFor="confirmPassword" required surface="auth">
+                      <div className="relative">
+                        <Input
+                          id="confirmPassword"
+                          name="confirmPassword"
+                          type={showConfirmPassword ? "text" : "password"}
+                          required
+                          autoComplete="new-password"
+                          placeholder="Re-enter your password"
+                          surface="auth"
+                          className="pr-10"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          className="absolute inset-y-0 right-3 flex min-h-11 min-w-11 items-center justify-center text-brand-muted hover:text-brand-navy"
+                          aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                        >
+                          {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                        </button>
+                      </div>
+                    </FormField>
+                  </div>
+                </AuthFormSection>
+
+                <label className="flex min-h-11 items-start gap-3 text-xs text-brand-muted">
+                  <input type="checkbox" className="mt-1 h-4 w-4 rounded border-dashboard-input-border" required />
+                  <span>
+                    Your personal data will be used to support your experience throughout this website, to manage access to your account, and for other purposes described in our{" "}
                     <button
                       type="button"
                       onClick={openPrivacyModal}
-                      className="text-brand-navy-light underline hover:text-brand-navy"
+                      className="font-medium text-brand-navy-light underline hover:text-brand-navy"
                     >
                       privacy policy
-                    </button>.
-                  </p>
-                </div>
+                    </button>
+                    .
+                  </span>
+                </label>
 
-                {(error || pwdError) && (
-                  <div className="text-sm text-red-600">
-                    {error || pwdError}
-                  </div>
-                )}
+                {(error || pwdError) ? (
+                  <FormAlert variant="error">{error || pwdError}</FormAlert>
+                ) : null}
 
-                <div className="flex items-center justify-between mt-4">
-                  <button 
-                    type="submit"
-                    disabled={loading}
-                    className="w-full max-w-xs bg-brand-navy-light hover:bg-brand-navy px-6 py-2 font-montserrat font-thin text-white transition  disabled:opacity-60"
-                  >
-                    {loading ? 'Registering...' : 'Register'}
-                  </button>
-                  <p className="text-sm text-brand-muted">
-                    Already a member?{" "}
-                    <a href={`/login?type=${type}`} className="text-brand-navy-light font-semibold underline">
-                      Sign In
-                    </a>
-                  </p>
+                <div className="auth-form-actions">
+                  <Button type="submit" size="lg" className="w-full normal-case" disabled={loading}>
+                    {loading ? "Creating account…" : "Create vendor account"}
+                  </Button>
                 </div>
               </form>
+
+              <AuthPathSwitch
+                className="mt-6"
+                message="Already a member?"
+                href={`/login?type=${type}`}
+                linkLabel="Sign in"
+              />
+
+              <AuthPathSwitch
+                className="mt-3"
+                message="Shopping as a customer?"
+                href="/signup?type=customer"
+                linkLabel="Create customer account"
+              />
             </div>
           </div>
         </div>
@@ -470,142 +492,158 @@ function SignupContent() {
             </div>
           </div>
 
-          <div className="flex items-center justify-center bg-white px-6">
+          <div className="flex items-center justify-center bg-white px-6 py-10">
             <div className="w-full max-w-xl">
-              <span className="inline-block mb-2 rounded-full bg-[#FFF6E0] px-2 text-[10px] font-thin font-montserrat text-[#C7A040]">
-                Customer
-              </span>
-              <h2 className="text-3xl font-bold text-brand-navy mb-2">
+              <span className="auth-role-badge">Customer</span>
+              <h2 className="mb-2 text-3xl font-bold text-brand-navy">
                 CREATE ACCOUNT
               </h2>
 
-              <div className="flex flex-col justify-start mb-5">
+              <div className="mb-6 flex flex-col justify-start">
                 <hr className="h-[2px] w-[80px] bg-brand-navy" />
-                <hr className="h-[2px] w-[80px] mt-[2px] mb-4 bg-brand-navy" />
+                <hr className="mb-4 mt-[2px] h-[2px] w-[80px] bg-brand-navy" />
               </div>
 
-              <form className="space-y-4" onSubmit={handleSubmit}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-base font-medium font-poppins text-brand-navy mb-2">
-                      Name <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      name="name"
-                      type="text"
-                      required
-                      className="w-full rounded-md border border-dashboard-input-border px-6 py-2 focus:ring-2 focus:ring-brand-gold/40 focus:border-brand-gold focus:outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-base font-medium font-poppins text-brand-navy mb-2">
-                      Mobile Number <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      name="mobile"
-                      type="tel"
-                      required
-                      className="w-full rounded-md border border-dashboard-input-border px-6 py-2 focus:ring-2 focus:ring-brand-gold/40 focus:border-brand-gold focus:outline-none"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-base font-medium font-poppins text-brand-navy mb-2">
-                      Email Address <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      name="email"
-                      type="email"
-                      required
-                      className="w-full rounded-md border border-dashboard-input-border px-6 py-2 focus:ring-2 focus:ring-brand-gold/40 focus:border-brand-gold focus:outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-base font-medium font-poppins text-brand-navy mb-2">
-                      Password <span className="text-red-500">*</span>
-                    </label>
-                    <div className="relative">
-                      <input
-                        name="password"
-                        type={showPassword ? "text" : "password"}
+              <form className="auth-form-stack" onSubmit={handleSubmit}>
+                <AuthFormSection
+                  title="Your details"
+                  description="A few details so we can personalize your shopping experience."
+                >
+                  <div className="auth-form-grid">
+                    <FormField label="Full name" htmlFor="name" required surface="auth">
+                      <Input
+                        id="name"
+                        name="name"
+                        type="text"
                         required
-                        className="w-full rounded-md border border-dashboard-input-border px-6 py-2 pr-10 focus:ring-2 focus:ring-brand-gold/40 focus:border-brand-gold focus:outline-none"
+                        autoComplete="name"
+                        placeholder="Jane Smith"
+                        surface="auth"
                       />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute inset-y-0 right-3 flex items-center text-brand-muted hover:text-brand-navy"
-                      >
-                        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-base font-medium font-poppins text-brand-navy mb-2">
-                      Confirm Password <span className="text-red-500">*</span>
-                    </label>
-                    <div className="relative">
-                      <input
-                        name="confirmPassword"
-                        type={showConfirmPassword ? "text" : "password"}
+                    </FormField>
+                    <FormField label="Mobile number" htmlFor="mobile" required surface="auth">
+                      <Input
+                        id="mobile"
+                        name="mobile"
+                        type="tel"
                         required
-                        className="w-full rounded-md border border-dashboard-input-border px-6 py-2 pr-10 focus:ring-2 focus:ring-brand-gold/40 focus:border-brand-gold focus:outline-none"
+                        autoComplete="tel"
+                        placeholder="(555) 555-0123"
+                        surface="auth"
                       />
-                      <button
-                        type="button"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute inset-y-0 right-3 flex items-center text-brand-muted hover:text-brand-navy"
-                      >
-                        {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                      </button>
-                    </div>
+                    </FormField>
+                    <FormField label="Email address" htmlFor="email" required surface="auth">
+                      <Input
+                        id="email"
+                        name="email"
+                        type="email"
+                        required
+                        autoComplete="email"
+                        placeholder="you@example.com"
+                        surface="auth"
+                      />
+                    </FormField>
                   </div>
-                </div>
+                </AuthFormSection>
 
-                <div className="flex items-start gap-2 text-xs text-brand-muted">
-                  <input type="checkbox" className="mt-2" required />
-                  <p className="font-montserrat font-thin">
-                    Your personal data will be used to support your experience
-                    throughout this website, to manage access to your account,
-                    and for other purposes described in our{" "}
+                <AuthFormSection
+                  title="Account security"
+                  description="Create a password to protect your account."
+                >
+                  <div className="auth-form-grid">
+                    <FormField
+                      label="Password"
+                      htmlFor="password"
+                      required
+                      surface="auth"
+                      helperText="At least 6 characters with letters and numbers."
+                    >
+                      <div className="relative">
+                        <Input
+                          id="password"
+                          name="password"
+                          type={showPassword ? "text" : "password"}
+                          required
+                          autoComplete="new-password"
+                          placeholder="Create a password"
+                          surface="auth"
+                          className="pr-10"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute inset-y-0 right-3 flex min-h-11 min-w-11 items-center justify-center text-brand-muted hover:text-brand-navy"
+                          aria-label={showPassword ? "Hide password" : "Show password"}
+                        >
+                          {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                        </button>
+                      </div>
+                    </FormField>
+
+                    <FormField label="Confirm password" htmlFor="confirmPassword" required surface="auth">
+                      <div className="relative">
+                        <Input
+                          id="confirmPassword"
+                          name="confirmPassword"
+                          type={showConfirmPassword ? "text" : "password"}
+                          required
+                          autoComplete="new-password"
+                          placeholder="Re-enter your password"
+                          surface="auth"
+                          className="pr-10"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          className="absolute inset-y-0 right-3 flex min-h-11 min-w-11 items-center justify-center text-brand-muted hover:text-brand-navy"
+                          aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                        >
+                          {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                        </button>
+                      </div>
+                    </FormField>
+                  </div>
+                </AuthFormSection>
+
+                <label className="flex min-h-11 items-start gap-3 text-xs text-brand-muted">
+                  <input type="checkbox" className="mt-1 h-4 w-4 rounded border-dashboard-input-border" required />
+                  <span>
+                    Your personal data will be used to support your experience throughout this website, to manage access to your account, and for other purposes described in our{" "}
                     <button
                       type="button"
                       onClick={openPrivacyModal}
-                      className="text-brand-navy-light font-medium underline hover:text-brand-navy"
+                      className="font-medium text-brand-navy-light underline hover:text-brand-navy"
                     >
                       privacy policy
-                    </button>.
-                  </p>
+                    </button>
+                    .
+                  </span>
+                </label>
+
+                {(error || pwdError) ? (
+                  <FormAlert variant="error">{error || pwdError}</FormAlert>
+                ) : null}
+
+                <div className="auth-form-actions">
+                  <Button type="submit" size="lg" className="w-full normal-case" disabled={loading}>
+                    {loading ? "Creating account…" : "Create customer account"}
+                  </Button>
                 </div>
-
-                {(error || pwdError) && (
-                  <div className="text-sm text-red-600">
-                    {error || pwdError}
-                  </div>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full bg-brand-navy-light hover:bg-brand-navy text-white py-2 text-[16px]  transition font-montserrat font-extralight disabled:opacity-60"
-                >
-                  {loading ? 'Registering...' : 'Register'}
-                </button>
               </form>
 
-              <p className="mt-6 text-center underline text-[16px] text-brand-muted">
-                Already a member?{" "}
-                <a href={`/login?type=${type}`}>
-                  Sign In
-                </a>
-              </p>
+              <AuthPathSwitch
+                className="mt-6"
+                message="Already a member?"
+                href={`/login?type=${type}`}
+                linkLabel="Sign in"
+              />
+
+              <AuthPathSwitch
+                className="mt-3"
+                message="Selling on Mosaic?"
+                href="/signup?type=vendor"
+                linkLabel="Create vendor account"
+              />
             </div>
           </div>
         </div>

@@ -20,7 +20,12 @@ import { buildSearchPageUrl, parseListingFiltersFromSearchParams, buildListingPa
 import { useListingFilters } from "@/hooks/useListingFilters";
 import MarketImage from "../Components/MarketImage";
 import CardRatingRow from "../Components/CardRatingRow";
+import MarketEmptyState from "../Components/MarketEmptyState";
 import MarketLoadingBlock from "../Components/MarketLoadingBlock";
+import MarketTrustBadgeHint from "../Components/MarketTrustBadgeHint";
+import PublicProductCard from "../Components/publicCards/PublicProductCard";
+import { mapRankedItemToPublicProductCard } from "../Components/publicCards/publicProductCardMappers";
+import { SHOPPER_LOW_INVENTORY_NOTE } from "../Components/marketTrustProof";
 
 type MinorityType = { _id: string; name: string };
 
@@ -224,6 +229,9 @@ const ProductsPageInner = () => {
                 ]}
                 imageUrl="/bgdetailpage.png"
             />
+            <div className="container-page pb-2 pt-2">
+                <MarketTrustBadgeHint className="justify-center text-center" />
+            </div>
             
             <FilterSection 
                 filters={{
@@ -292,8 +300,21 @@ const ProductsPageInner = () => {
                   </div>
                 ) : null}
 
+                {!error && items && items.length <= 3 && items.length > 0 ? (
+                  <p className="shopper-low-inventory-note mx-auto mb-6 max-w-2xl">{SHOPPER_LOW_INVENTORY_NOTE}</p>
+                ) : null}
+
                 {/* Products Carousel */}
-                {!error ? (
+                {!error && items?.length === 0 && !loading ? (
+                  <MarketEmptyState
+                    title="Featured picks coming soon"
+                    description="Browse the full catalog below or search the marketplace for verified products."
+                    ctaLabel="Search marketplace"
+                    ctaHref="/search"
+                  />
+                ) : null}
+
+                {!error && items && items.length > 0 ? (
                 <Swiper
                     onSwiper={setSwiperRef}
                     modules={[Navigation]}
@@ -320,9 +341,11 @@ const ProductsPageInner = () => {
                     autoplay={{ delay: 5000, disableOnInteraction: false }}
                     className="py-4"
                 >
-                    {items?.map((p) => (
-                        <SwiperSlide key={p._id} className="py-4 h-auto flex justify-center">
-                            <ProductCard item={p} />
+                    {items.map((p) => (
+                        <SwiperSlide key={p._id} className="flex h-auto justify-center py-4">
+                            <div className="h-full w-full max-w-[300px]">
+                              <PublicProductCard {...mapRankedItemToPublicProductCard(p)} />
+                            </div>
                         </SwiperSlide>
                     ))}
                 </Swiper>
@@ -525,64 +548,6 @@ function pickRating(p: RankedItem): number {
 
 function stripHtml(html: string): string {
     return html.replace(/<[^>]*>/g, '');
-}
-
-function ProductCard({ item }: { item: RankedItem }) {
-    const href = `/product/${item._id}`;
-    const title = pickTitle(item);
-    const description = item.description ?? "";
-    const strippedDescription = stripHtml(description);
-    const trimmedDescription =
-        strippedDescription.length > 100 ? `${strippedDescription.slice(0, 100).trimEnd()}...` : strippedDescription;
-    const images = gatherImages(item);
-    const { price, effective, onSale } = pickPrice(item);
-    const rating = pickRating(item);
-    const reviewCount = item.totalReviews ?? 0;
-
-    return (
-        <Link href={href} className="market-listing-card-link h-full sm:max-w-[300px]">
-            <article className="market-listing-card p-2">
-                <div className="market-card-media relative aspect-[4/3] w-full shrink-0 sm:aspect-square">
-                    <MarketImage src={images[0]} alt={title} aspect="square" objectFit="contain" />
-
-                    {onSale && (
-                        <div className="absolute left-3 top-3">
-                            <span className="rounded-full bg-red-600 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white sm:text-xs">
-                                Sale
-                            </span>
-                        </div>
-                    )}
-                </div>
-
-                <div className="flex flex-1 flex-col gap-2 p-3">
-                    <h3 className="market-card-title line-clamp-2">{title}</h3>
-
-                    <p className="market-card-desc line-clamp-2">
-                        {trimmedDescription || "Explore this product on Mosaic Biz Hub."}
-                    </p>
-
-                    <CardRatingRow rating={rating} reviewCount={reviewCount} />
-
-                    <div className="mt-auto">
-                        {onSale ? (
-                            <div className="flex flex-col gap-0.5">
-                                <span className="text-xs text-market-muted">Starting from</span>
-                                <div className="flex flex-wrap items-center gap-2">
-                                    <span className="market-card-price-sale">${effective.toFixed(2)}</span>
-                                    <span className="text-sm text-market-muted line-through">${price.toFixed(2)}</span>
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="flex flex-col gap-0.5">
-                                <span className="text-xs text-market-muted">Starting from</span>
-                                <span className="market-card-price">${price.toFixed(2)}</span>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </article>
-        </Link>
-    );
 }
 
 export default function Page() {

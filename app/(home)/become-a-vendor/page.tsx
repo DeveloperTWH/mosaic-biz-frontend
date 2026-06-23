@@ -2,6 +2,9 @@ import { FileText, Video, HeadphonesIcon } from "lucide-react";
 import Link from "next/link";
 import PublicPageHero from "../Components/PublicPageHero";
 import VendorExpandCta from "../Components/VendorExpandCta";
+import MarketTrustProofRow from "../Components/MarketTrustProofRow";
+import MarketTrustBadgeHint from "../Components/MarketTrustBadgeHint";
+import { VENDOR_TRUST_BENEFITS } from "../Components/marketTrustProof";
 
 const steps = [
   {
@@ -128,12 +131,14 @@ export default function BecomeAVendorPage() {
         </section>
 
         <div className="text-center">
+          <MarketTrustProofRow items={VENDOR_TRUST_BENEFITS} compact className="mb-8" />
           <Link href="/signup?type=vendor" className="market-btn-primary inline-block min-w-[260px]">
             Become A Vendor Today
           </Link>
           <p className="mt-3 font-montserrat text-sm text-market-muted">
-            One-time $24.99 verification fee applies
+            One-time $24.99 verification fee · review begins within 48 hours
           </p>
+          <MarketTrustBadgeHint audience="vendor" className="mt-4 justify-center" />
         </div>
       </div>
 

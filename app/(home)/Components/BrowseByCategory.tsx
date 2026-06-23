@@ -3,6 +3,7 @@
 import Link from "next/link";
 import BrowseServices from "./BrowsServices";
 import BrowseFoodAndGrocery from "./BrowsbyFoodndGrocerry";
+import MarketTrustBadgeHint from "./MarketTrustBadgeHint";
 
 export default function BrowseByCategory() {
   return (
@@ -33,6 +34,7 @@ export default function BrowseByCategory() {
         <Link href="/search" className="market-btn-primary inline-block">
           Search the marketplace
         </Link>
+        <MarketTrustBadgeHint className="mx-auto mt-4 max-w-lg justify-center" />
       </div>
     </section>
   );

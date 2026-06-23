@@ -1,10 +1,11 @@
 # Roadmap
 
 **Type:** Living document  
-**Last updated:** 2026-06-17  
+**Last updated:** 2026-06-22  
 **Audience:** Internal team
 
-Current status: [PROJECT_STATUS.md](PROJECT_STATUS.md)
+Current status: [PROJECT_STATUS.md](PROJECT_STATUS.md)  
+Branching standard (current): [GIT_WORKFLOW.md](GIT_WORKFLOW.md) — feature → `develop` → `main`. Older sections below may reference the legacy `sprint/frontend-release-candidate` branch from the launch sprint.
 
 ---
 

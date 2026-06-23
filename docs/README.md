@@ -1,7 +1,7 @@
 # Mosaic Biz Hub — Documentation Hub
 
 **Audience:** Internal team (Digital Builders, dev, QA, release control)  
-**Last updated:** 2026-06-19
+**Last updated:** 2026-06-22
 
 Mosaic Biz Hub is a Next.js marketplace frontend connecting consumers to verified minority-owned businesses (products, services, food). This repo (`mosaic-biz-frontend`) is the customer-facing app, vendor onboarding flows, partner dashboard, and admin UI. The API lives in a separate backend repo — see [Backend](#backend-repo) below.
 
@@ -16,7 +16,8 @@ Mosaic Biz Hub is a Next.js marketplace frontend connecting consumers to verifie
 | [PROJECT_STATUS.md](PROJECT_STATUS.md) | **Living** | 2026-06-17 | Current release posture, what shipped, blockers, verified vs pending QA |
 | [ROADMAP.md](ROADMAP.md) | **Living** | 2026-06-17 | Phased next steps and explicit non-goals |
 | [PROJECT_BREAKDOWN.md](PROJECT_BREAKDOWN.md) | Reference | 2026-06-19 | Full end-to-end picture: journeys, auth, data flow, code layout |
-| [ARCHITECTURE.md](ARCHITECTURE.md) | Reference | 2026-06-17 | Route groups, env vars, deployment model, auth summary |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | Reference | 2026-06-22 | Route groups, env vars, deployment model, auth summary |
+| [GIT_WORKFLOW.md](GIT_WORKFLOW.md) | **Reference** | 2026-06-22 | Branching model: feature → `develop` → `main` |
 | [API_CONTRACTS.md](API_CONTRACTS.md) | Reference | 2026-06-17 | Canonical endpoints the frontend calls |
 | [STYLE_GUIDE.md](STYLE_GUIDE.md) | Reference | 2026-06-17 | Design tokens (`brand-*`, `market-*`, dashboard surfaces) |
 | [FRONTEND_SMOKE_CHECKLIST.md](FRONTEND_SMOKE_CHECKLIST.md) | Reference | 2026-06-17 | Preview QA checklist after deploy |
@@ -57,17 +58,19 @@ Mosaic Biz Hub is a Next.js marketplace frontend connecting consumers to verifie
 1. [../README.md](../README.md) — clone, env, run locally
 2. [PROJECT_BREAKDOWN.md](PROJECT_BREAKDOWN.md) — how the whole frontend fits together
 3. [ARCHITECTURE.md](ARCHITECTURE.md) — App Router layout, branches, deployment
-4. [API_CONTRACTS.md](API_CONTRACTS.md) — which endpoints are canonical
-5. [STYLE_GUIDE.md](STYLE_GUIDE.md) — tokens and component patterns
+4. [GIT_WORKFLOW.md](GIT_WORKFLOW.md) — feature → `develop` → `main`
+5. [API_CONTRACTS.md](API_CONTRACTS.md) — which endpoints are canonical
+6. [STYLE_GUIDE.md](STYLE_GUIDE.md) — tokens and component patterns
 
 ### Release / QA
 
 1. [frontend/FRONTEND_DOCUMENTATION_EVIDENCE_LOG.md](frontend/FRONTEND_DOCUMENTATION_EVIDENCE_LOG.md) — as-built evidence pack index (launch readiness)
 2. [frontend/FRONTEND_LAUNCH_CONTRACT_ALIGNMENT.md](frontend/FRONTEND_LAUNCH_CONTRACT_ALIGNMENT.md) — API contract alignment, legacy paths, Vercel smoke steps
-3. [PROJECT_STATUS.md](PROJECT_STATUS.md) — RC branch, preview URL, pending human sign-off
-3. [FRONTEND_SMOKE_CHECKLIST.md](FRONTEND_SMOKE_CHECKLIST.md) — full smoke pass on Vercel preview
-4. [frontend/FRONTEND_VISUAL_QA_SURFACE.md](frontend/FRONTEND_VISUAL_QA_SURFACE.md) — priority visual QA URLs
-5. [HOMEPAGE_MARKETPLACE_REDESIGN_QA_REPORT.md](HOMEPAGE_MARKETPLACE_REDESIGN_QA_REPORT.md) — post-merge `/products` gate evidence
+3. [PROJECT_STATUS.md](PROJECT_STATUS.md) — `develop` / `main` posture, preview URL, pending human sign-off
+4. [GIT_WORKFLOW.md](GIT_WORKFLOW.md) — where to merge PRs (feature → `develop` → `main`)
+5. [FRONTEND_SMOKE_CHECKLIST.md](FRONTEND_SMOKE_CHECKLIST.md) — full smoke pass on Vercel preview
+6. [frontend/FRONTEND_VISUAL_QA_SURFACE.md](frontend/FRONTEND_VISUAL_QA_SURFACE.md) — priority visual QA URLs
+7. [HOMEPAGE_MARKETPLACE_REDESIGN_QA_REPORT.md](HOMEPAGE_MARKETPLACE_REDESIGN_QA_REPORT.md) — post-merge `/products` gate evidence
 
 ### Designer / frontend (public marketplace)
 
@@ -99,6 +102,8 @@ Frontend docs do **not** duplicate backend schema, migrations, or Stripe webhook
 | Item | Value |
 |------|--------|
 | GitHub (launch) | `Digital-Builders-757/mosaic-biz-frontend-launch` |
-| Integration branch | `sprint/frontend-release-candidate` |
-| Production deploy | **Not automatic** — manual promote only; production not deployed as of 2026-06-17 |
+| Integration branch | `develop` |
+| Production branch | `main` |
+| Branching model | Feature branches → `develop` → `main` — see [GIT_WORKFLOW.md](GIT_WORKFLOW.md) |
+| Production deploy | Vercel auto-deploy on merge to `main` |
 | Vercel previews | Deployment protection / SSO — automated QA may get HTTP 401 |

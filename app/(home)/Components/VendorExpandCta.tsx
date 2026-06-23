@@ -1,4 +1,7 @@
 import Link from "next/link";
+import MarketTrustProofRow from "./MarketTrustProofRow";
+import MarketTrustBadgeHint from "./MarketTrustBadgeHint";
+import { VENDOR_TRUST_BENEFITS } from "./marketTrustProof";
 
 export interface VendorExpandCtaProps {
   ctaHref?: string;
@@ -11,7 +14,7 @@ export default function VendorExpandCta({
 }: VendorExpandCtaProps) {
   return (
     <section
-      className="relative my-10 w-full bg-cover bg-center"
+      className="relative w-full bg-cover bg-center"
       style={{ backgroundImage: "url('/contact/becomeVendor.png')" }}
       aria-labelledby="vendor-expand-cta-heading"
     >
@@ -28,13 +31,14 @@ export default function VendorExpandCta({
           </p>
           <div className="market-section-divider mt-4" aria-hidden />
           <p className="mx-auto mt-6 max-w-2xl font-montserrat text-sm leading-relaxed text-market-muted sm:text-base">
-            Take your business to new heights by listing it on Mosaic Biz Hub. Connect
-            with customers who value minority-owned brands, showcase your unique
-            products and services, and grow your presence in the digital marketplace.
+            Showcase products and services to customers who value verified minority-owned
+            businesses — with trust badges that reflect your onboarding progress.
           </p>
-          <Link href={ctaHref} className="market-btn-outline mt-8 inline-block min-w-[220px]">
+          <MarketTrustProofRow items={VENDOR_TRUST_BENEFITS} compact className="mt-6" />
+          <Link href={ctaHref} className="market-btn-primary mt-8 inline-block w-full min-w-[220px] sm:w-auto">
             {ctaLabel}
           </Link>
+          <MarketTrustBadgeHint audience="vendor" className="mt-4 justify-center" />
         </div>
       </div>
     </section>
