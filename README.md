@@ -76,6 +76,7 @@ All internal docs: **[docs/README.md](docs/README.md)**
 | [Git workflow](docs/GIT_WORKFLOW.md) | Feature → `develop` → `main` |
 | [Smoke checklist](docs/FRONTEND_SMOKE_CHECKLIST.md) | Preview QA |
 | [Archive index](docs/archive/README.md) | Dated QA proofs — not current behavior |
+| [Backend doc redesign guide](docs/BACKEND_DOCUMENTATION_REDESIGN_GUIDE.md) | Align `mosaic-backend` docs with frontend |
 
 ---
 

@@ -36,7 +36,8 @@ Mosaic Biz Hub is a Next.js marketplace frontend connecting consumers to verifie
 |----------|--------------|
 | [PLATFORM_OPERATING_MODEL.md](PLATFORM_OPERATING_MODEL.md) | Eligibility, shipping, orders, payments, role journeys |
 | [MARKETPLACE_VENDOR_ELIGIBILITY.md](MARKETPLACE_VENDOR_ELIGIBILITY.md) | `isApproved && isActive`; admin vs public listing |
-| [BACKEND_AGENT_PROMPT_VENDOR_ELIGIBILITY_AND_DOCS.md](BACKEND_AGENT_PROMPT_VENDOR_ELIGIBILITY_AND_DOCS.md) | Copy-paste prompt for `mosaic-backend` |
+| [BACKEND_AGENT_PROMPT_VENDOR_ELIGIBILITY_AND_DOCS.md](BACKEND_AGENT_PROMPT_VENDOR_ELIGIBILITY_AND_DOCS.md) | Copy-paste prompt for `mosaic-backend` (eligibility implementation) |
+| [BACKEND_DOCUMENTATION_REDESIGN_GUIDE.md](BACKEND_DOCUMENTATION_REDESIGN_GUIDE.md) | Playbook to align backend docs with frontend + runtime |
 
 ### Reference — architecture & contracts
 
