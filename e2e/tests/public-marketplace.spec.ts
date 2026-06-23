@@ -32,6 +32,22 @@ test.describe("Public marketplace", () => {
     expect(request.url()).not.toContain("/api/products/featured");
   });
 
+  test("build-info route exposes safe release identity for QA", async ({ page }) => {
+    const response = await page.request.get("/api/build-info");
+    expect(response.status()).toBe(200);
+
+    const payload = await response.json();
+    expect(payload.service).toBe("mosaic-biz-frontend");
+    expect(payload.release).toMatchObject({
+      commit: expect.any(String),
+      environment: expect.any(String),
+      branch: expect.any(String),
+      deploymentId: expect.any(String),
+    });
+    expect(JSON.stringify(payload).toLowerCase()).not.toContain("secret");
+    expect(JSON.stringify(payload).toLowerCase()).not.toContain("token");
+  });
+
   test("products page renders Shop hero", async ({ page }) => {
     await page.goto("/products");
     await expect(page.locator("#public-page-hero-title")).toHaveText("Shop");

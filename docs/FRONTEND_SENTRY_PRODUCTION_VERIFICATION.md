@@ -79,6 +79,12 @@ Checked via `npx vercel env ls` — values encrypted/masked.
 
 Runtime reads `NEXT_PUBLIC_SENTRY_DSN` from [`lib/sentry/config.ts`](../lib/sentry/config.ts).
 
+Release identity is now shared with the safe build-info helper:
+
+- `GET /api/build-info` exposes non-secret commit/environment/branch/deployment metadata for QA evidence.
+- `lib/sentry/config.ts` uses the same release helper for Sentry release/environment.
+- See [`FRONTEND_RELEASE_IDENTITY.md`](FRONTEND_RELEASE_IDENTITY.md) for variable names and QA usage.
+
 See also [`SENTRY_VERCEL_SETUP.md`](SENTRY_VERCEL_SETUP.md).
 
 ---
