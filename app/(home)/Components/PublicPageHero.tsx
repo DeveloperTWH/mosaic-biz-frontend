@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 export type BreadcrumbItem = { label: string; href?: string };
 
@@ -8,6 +9,8 @@ export interface PublicPageHeroProps {
   breadcrumbs?: BreadcrumbItem[];
   imageUrl?: string;
   imageAlt?: string;
+  /** Compact height on desktop for catalog/browse pages. */
+  variant?: "default" | "compact";
 }
 
 const PublicPageHero = ({
@@ -15,13 +18,20 @@ const PublicPageHero = ({
   breadcrumbs = [],
   imageUrl,
   imageAlt,
+  variant = "default",
 }: PublicPageHeroProps) => {
   const titleId = "public-page-hero-title";
+  const isCompact = variant === "compact";
 
   return (
     <section
       aria-labelledby={titleId}
-      className="relative w-full min-w-full min-h-[220px] overflow-hidden border-b border-white/10 bg-market-bg md:min-h-[280px]"
+      className={cn(
+        "relative w-full min-w-full overflow-hidden border-b border-white/10 bg-market-bg",
+        isCompact
+          ? "public-page-hero--compact"
+          : "min-h-[220px] md:min-h-[280px]"
+      )}
     >
       {imageUrl ? (
         <Image
@@ -39,7 +49,14 @@ const PublicPageHero = ({
         aria-hidden
       />
 
-      <div className="relative flex min-h-[220px] flex-col items-center justify-center px-4 py-10 text-center sm:px-6 md:min-h-[280px] md:py-12">
+      <div
+        className={cn(
+          "public-page-hero-content relative flex flex-col items-center justify-center px-4 text-center sm:px-6",
+          isCompact
+            ? "min-h-[180px] py-8 md:min-h-[200px] md:py-10 lg:min-h-[148px] lg:py-6"
+            : "min-h-[220px] py-10 md:min-h-[280px] md:py-12"
+        )}
+      >
         {breadcrumbs.length > 0 ? (
           <nav aria-label="Breadcrumb" className="mb-3">
             <ol className="flex flex-wrap items-center justify-center gap-x-1.5 font-montserrat text-xs text-market-text/80 sm:text-sm">
@@ -70,7 +87,12 @@ const PublicPageHero = ({
 
         <h1
           id={titleId}
-          className="font-poppins text-2xl font-semibold leading-tight text-market-text sm:text-3xl md:text-4xl"
+          className={cn(
+            "font-poppins font-semibold leading-tight text-market-text",
+            isCompact
+              ? "text-2xl sm:text-3xl lg:text-[1.75rem]"
+              : "text-2xl sm:text-3xl md:text-4xl"
+          )}
         >
           {title}
         </h1>

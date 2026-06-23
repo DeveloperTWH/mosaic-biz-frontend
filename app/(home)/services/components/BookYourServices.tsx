@@ -5,7 +5,8 @@ import FilterAccordion from "./FilterAccordion";
 import ProductCard from "./ProductCard";
 import MarketLoadingBlock from "../../Components/MarketLoadingBlock";
 import MarketEmptyState from "../../Components/MarketEmptyState";
-import MobileFilterDrawer from "../../Components/MobileFilterDrawer";
+import CatalogListingLayout from "../../Components/CatalogListingLayout";
+import { formatCatalogRange } from "../../Components/CatalogListingToolbar";
 
 interface BookServicesProps {
   services: Service[];
@@ -37,10 +38,10 @@ const BookServices: React.FC<BookServicesProps> = ({
     subCategory: "",
     badge: "",
   });
-  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const startItem = totalProducts > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0;
-  const endItem = totalProducts > 0 ? Math.min(startItem + services.length - 1, totalProducts) : 0;
+  const endItem =
+    totalProducts > 0 ? Math.min(startItem + services.length - 1, totalProducts) : 0;
 
   const handleFilterChange = (filterType: keyof typeof selectedFilters, value: string) => {
     setSelectedFilters((prev) => ({
@@ -63,86 +64,62 @@ const BookServices: React.FC<BookServicesProps> = ({
     />
   );
 
-  return (
-    <section className="container-page py-8">
-      <div className="flex flex-col gap-6 lg:flex-row">
-        <div className="hidden w-full lg:block lg:w-1/4">
-          <div className="space-y-6">{filterPanel}</div>
-        </div>
-
-        <div className="w-full min-w-0 lg:w-3/4">
-          <button
-            type="button"
-            className="market-btn-secondary mb-4 w-full min-h-11 lg:hidden"
-            onClick={() => setDrawerOpen(true)}
-            aria-expanded={drawerOpen}
-          >
-            Filters
-          </button>
-
-          <MobileFilterDrawer
-            open={drawerOpen}
-            onClose={() => setDrawerOpen(false)}
-            resultCount={totalProducts}
-          >
-            {filterPanel}
-          </MobileFilterDrawer>
-
-          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <p className="market-result-count">
-              (Showing {startItem} - {endItem} Service Of {totalProducts} Services)
-            </p>
-
-            <div className="flex items-center gap-2">
-              <span className="market-result-count">Sort By:</span>
-              <div className="market-select-wrap">
-                <select className="market-select w-auto min-w-[140px] px-3 py-1 text-sm" aria-label="Sort services">
-                  <option>Default</option>
-                  <option>Price: Low to High</option>
-                  <option>Price: High to Low</option>
-                  <option>Most Popular</option>
-                  <option>Newest</option>
-                </select>
-                <div className="market-select-chevron">
-                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {loading ? (
-            <MarketLoadingBlock label="Loading services…" minHeight="min-h-[256px]" />
-          ) : services.length === 0 ? (
-            <MarketEmptyState
-              title="No services found"
-              description="Try adjusting your filters or search the marketplace."
-              ctaLabel="Search marketplace"
-              ctaHref="/search"
-            />
-          ) : (
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {services.map((service) => (
-                <ProductCard
-                  key={service._id}
-                  serviceId={service._id}
-                  title={(service as any).businessDetails?.businessName || service.title}
-                  image={service.coverImage}
-                  description={(service as any).businessDetails?.description || service.description}
-                  rating={service.averageRating}
-                  totalRatings={service.averageRating}
-                  reviews={service.totalReviews}
-                  badge={(service as any).businessDetails?.badge || (service as any).badge}
-                  price={(service as any).price}
-                  logo={(service as any).businessDetails?.logo}
-                />
-              ))}
-            </div>
-          )}
+  const sortSlot = (
+    <>
+      <span className="market-result-count">Sort by:</span>
+      <div className="market-select-wrap">
+        <select className="market-select w-auto min-w-[140px] px-3 py-1 text-sm" aria-label="Sort services">
+          <option>Default</option>
+          <option>Price: Low to High</option>
+          <option>Price: High to Low</option>
+          <option>Most Popular</option>
+          <option>Newest</option>
+        </select>
+        <div className="market-select-chevron">
+          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+          </svg>
         </div>
       </div>
-    </section>
+    </>
+  );
+
+  return (
+    <CatalogListingLayout
+      filterPanel={filterPanel}
+      resultCount={totalProducts}
+      summary={formatCatalogRange(startItem, endItem, totalProducts, "services")}
+      sortSlot={sortSlot}
+    >
+      {loading ? (
+        <MarketLoadingBlock label="Loading services…" minHeight="min-h-[256px]" />
+      ) : services.length === 0 ? (
+        <MarketEmptyState
+          title="No services found"
+          description="Try adjusting your filters or search the marketplace."
+          ctaLabel="Search marketplace"
+          ctaHref="/search"
+        />
+      ) : (
+        <div className="public-grid-listing public-grid-listing--services">
+          {services.map((service) => (
+            <ProductCard
+              key={service._id}
+              serviceId={service._id}
+              title={(service as any).businessDetails?.businessName || service.title}
+              image={service.coverImage}
+              description={(service as any).businessDetails?.description || service.description}
+              rating={service.averageRating}
+              totalRatings={service.averageRating}
+              reviews={service.totalReviews}
+              badge={(service as any).businessDetails?.badge || (service as any).badge}
+              price={(service as any).price}
+              logo={(service as any).businessDetails?.logo}
+            />
+          ))}
+        </div>
+      )}
+    </CatalogListingLayout>
   );
 };
 

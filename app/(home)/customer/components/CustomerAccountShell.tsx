@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import PublicPageHero, { type BreadcrumbItem } from "../../Components/PublicPageHero";
+import CustomerBrowseRail from "./CustomerBrowseRail";
 
 export interface CustomerAccountShellProps {
   title: string;
@@ -16,7 +17,10 @@ export default function CustomerAccountShell({
     <main className="w-full">
       <PublicPageHero title={title} breadcrumbs={breadcrumbs} />
       <div className="min-h-[50vh] bg-brand-cream">
-        <div className="container-page py-8 sm:py-10">{children}</div>
+        <div className="container-page py-8 sm:py-10">
+          <CustomerBrowseRail />
+          {children}
+        </div>
       </div>
     </main>
   );
