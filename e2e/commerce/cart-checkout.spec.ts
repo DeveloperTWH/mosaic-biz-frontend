@@ -7,7 +7,7 @@ test.describe("@mocked customer commerce", () => {
   test("browse detail add to cart as guest updates guest cart", async ({ page }) => {
     await setupMocks(page, { auth: "unauth" });
     await page.goto("/product/prod-e2e-001");
-    await expect(page.getByText("E2E Detail Product")).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole("heading", { name: "E2E Detail Product" }).last()).toBeVisible({ timeout: 15_000 });
 
     const addButton = page.getByRole("button", { name: /add to cart/i }).first();
     await expect(addButton).toBeEnabled({ timeout: 10_000 });
@@ -114,7 +114,7 @@ test.describe("@mocked customer commerce", () => {
     await page.goto(
       "/payment-success?payment_intent=pi_e2e_mock&redirect_status=succeeded&source=cart"
     );
-    await expect(page.getByRole("heading", { name: "Payment Receipt" })).toBeVisible({
+    await expect(page.getByRole("heading", { name: "Payment confirmed" })).toBeVisible({
       timeout: 15_000,
     });
   });

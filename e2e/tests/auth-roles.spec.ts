@@ -26,7 +26,7 @@ test.describe("Authentication pages (public)", () => {
   test("customer login page renders", async ({ page }) => {
     await page.goto("/login?type=customer");
     await expect(page.getByRole("heading", { name: "SIGN IN" })).toBeVisible();
-    await expect(page.getByPlaceholder("Enter your email")).toBeVisible();
+    await expect(page.getByPlaceholder("you@example.com")).toBeVisible();
     await expect(page.getByPlaceholder("Enter your password")).toBeVisible();
   });
 
@@ -85,7 +85,7 @@ test.describe("Role access with mocked session", () => {
     );
 
     await page.goto("/customer/order");
-    await expect(page.getByText("Search Orders")).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByPlaceholder("Search by product or order details")).toBeVisible({ timeout: 20_000 });
   });
 
   test("vendor role reaches partners hub with mocked auth", async ({ page }) => {

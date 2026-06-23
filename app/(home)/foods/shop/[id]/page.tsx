@@ -1,9 +1,10 @@
-import React from 'react'
+import { redirect } from 'next/navigation'
 
-const page = () => {
-  return (
-    <div>page</div>
-  )
+type FoodShopPageProps = {
+  params: Promise<{ id: string }>
 }
 
-export default page
+export default async function FoodShopPage({ params }: FoodShopPageProps) {
+  const { id } = await params
+  redirect(`/vendor-profile/food-vendor/${encodeURIComponent(id)}`)
+}

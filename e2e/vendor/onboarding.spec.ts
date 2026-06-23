@@ -48,7 +48,7 @@ test.describe("@mocked vendor onboarding", () => {
   test("rejected state shows rejection messaging", async ({ page }) => {
     await openPartnersHub(page, "rejected");
     await expect(
-      page.getByText("Your application is rejected due to not meeting verification criteria")
+      page.getByText("Your application did not meet verification criteria.")
     ).toBeVisible({ timeout: 15_000 });
   });
 
