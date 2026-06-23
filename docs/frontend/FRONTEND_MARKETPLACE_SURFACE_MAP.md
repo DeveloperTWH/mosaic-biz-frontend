@@ -1,10 +1,13 @@
 # Frontend Marketplace Surface Map — As Built
 
 **Type:** Reference (launch evidence pack)  
-**Last updated:** 2026-06-19  
+**Last updated:** 2026-06-23  
 **Evidence source:** Page components under `app/(home)/`, `lib/api/*`, grep for API paths
 
 Consumer-facing surfaces: browse, search, filter, detail, vendor profile, cart, checkout, payment success.
+
+**Platform behavior:** [../PLATFORM_OPERATING_MODEL.md](../PLATFORM_OPERATING_MODEL.md)  
+**Vendor eligibility:** [../MARKETPLACE_VENDOR_ELIGIBILITY.md](../MARKETPLACE_VENDOR_ELIGIBILITY.md)
 
 ---
 
@@ -72,6 +75,7 @@ Consumer-facing surfaces: browse, search, filter, detail, vendor profile, cart, 
 | **Renders** | Vendor grid with filters |
 | **APIs** | `GET /api/business?...` |
 | **File** | `app/(home)/vendors/components/VendorGrid.tsx` |
+| **Eligibility** | Backend should return only `isApproved && isActive` businesses; UI explains public listing rules |
 | **Redirect** | `/vendors/:id` → `/vendor-profile/product-vendor/:id` |
 
 ---
@@ -84,6 +88,7 @@ Consumer-facing surfaces: browse, search, filter, detail, vendor profile, cart, 
 |--------|----------|
 | **Renders** | Product detail, variants, add-to-cart, similar products |
 | **APIs** | `GET /api/product/:id`; similar: `/api/:productId/similar`; cart add via `utils/cartUtils.ts` |
+| **Eligibility** | `MarketplaceEligibilityBanner`; blocks add-to-cart when vendor not `isApproved && isActive` (`lib/marketplace/businessEligibility.ts`) |
 | **File** | `app/(home)/product/[id]/page.tsx` |
 | **Legacy** | `/products/[productid]/[id]` redirects here |
 
@@ -123,6 +128,8 @@ Admin featured **toggle** uses legacy `PATCH /admin/api/products/:id/featured` �
 |--------|----------|
 | **Renders** | Line items, quantity, address, guest merge prompt |
 | **APIs** | `GET /api/cart`; `POST /api/cart/add`; update/remove endpoints in `utils/cartUtils.ts`; `GET /api/cart/count`; `POST /api/cart/merge` |
+| **Eligibility** | Preflight via `resolveCartVendorEligibility`; disables Place order when blocked; logs `marketplace:checkout-eligibility-failed` |
+| **Constraint** | Single-vendor cart — switching vendors resets cart (backend rejects multi-vendor checkout) |
 | **Guest** | localStorage via `utils/guestCart.ts` |
 | **Credentials** | include on authenticated cart ops |
 
@@ -135,7 +142,7 @@ Admin featured **toggle** uses legacy `PATCH /admin/api/products/:id/featured` �
 | `/checkout` | Main checkout | Stripe Elements; return_url → `NEXT_PUBLIC_CLIENT_BASE_URL` + `/payment-success` |
 | `/checkout/address` | Shipping address | Address APIs in `ClientForm.tsx` — Evidence Needed |
 | `/checkout/payment` | Payment step | Stripe confirm; same return URL env |
-| `/checkout/buy-now` | Direct purchase | `GET /api/public/product/:id`; order initiate |
+| `/checkout/buy-now` | Direct purchase | `GET /api/public/product/:id`; `POST /api/orders/initiate` |
 | `/payment-success` | Confirmation | `GET /api/orders/retrieve-intent/:paymentIntentId` |
 
 Legacy alternate: `/payment`, `/payment/checkout`, `/payment/success` (onboarding submit on legacy success).
@@ -154,6 +161,8 @@ Legacy alternate: `/payment`, `/payment/checkout`, `/payment/success` (onboardin
 
 ## Cross-links
 
+- [../PLATFORM_OPERATING_MODEL.md](../PLATFORM_OPERATING_MODEL.md)
+- [../MARKETPLACE_VENDOR_ELIGIBILITY.md](../MARKETPLACE_VENDOR_ELIGIBILITY.md)
 - [FRONTEND_ROUTE_MAP.md](FRONTEND_ROUTE_MAP.md)
 - [FRONTEND_API_USAGE_INVENTORY.md](FRONTEND_API_USAGE_INVENTORY.md)
 - [FRONTEND_VISUAL_QA_SURFACE.md](FRONTEND_VISUAL_QA_SURFACE.md)

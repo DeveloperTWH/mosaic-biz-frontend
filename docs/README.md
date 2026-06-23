@@ -1,11 +1,13 @@
 # Mosaic Biz Hub — Documentation Hub
 
 **Audience:** Internal team (Digital Builders, dev, QA, release control)  
-**Last updated:** 2026-06-22
+**Last updated:** 2026-06-23
 
 Mosaic Biz Hub is a Next.js marketplace frontend connecting consumers to verified minority-owned businesses (products, services, food). This repo (`mosaic-biz-frontend`) is the customer-facing app, vendor onboarding flows, partner dashboard, and admin UI. The API lives in a separate backend repo — see [Backend](#backend-repo) below.
 
-**Start here if you are new:** [../README.md](../README.md) → [PROJECT_BREAKDOWN.md](PROJECT_BREAKDOWN.md) → [ARCHITECTURE.md](ARCHITECTURE.md) → [STYLE_GUIDE.md](STYLE_GUIDE.md)
+**Start here if you are new:** [../README.md](../README.md) → [PLATFORM_OPERATING_MODEL.md](PLATFORM_OPERATING_MODEL.md) → [PROJECT_BREAKDOWN.md](PROJECT_BREAKDOWN.md) → [ARCHITECTURE.md](ARCHITECTURE.md)
+
+**Platform behavior (what Mosaic is supposed to do):** [PLATFORM_OPERATING_MODEL.md](PLATFORM_OPERATING_MODEL.md) — vendor eligibility, shipping, orders, payments, role journeys.
 
 ---
 
@@ -15,7 +17,10 @@ Mosaic Biz Hub is a Next.js marketplace frontend connecting consumers to verifie
 |----------|------|--------------|--------------|
 | [PROJECT_STATUS.md](PROJECT_STATUS.md) | **Living** | 2026-06-17 | Current release posture, what shipped, blockers, verified vs pending QA |
 | [ROADMAP.md](ROADMAP.md) | **Living** | 2026-06-17 | Phased next steps and explicit non-goals |
-| [PROJECT_BREAKDOWN.md](PROJECT_BREAKDOWN.md) | Reference | 2026-06-19 | Full end-to-end picture: journeys, auth, data flow, code layout |
+| [PLATFORM_OPERATING_MODEL.md](PLATFORM_OPERATING_MODEL.md) | **Source of truth** | 2026-06-23 | Intended platform behavior: eligibility, shipping, orders, role journeys |
+| [MARKETPLACE_VENDOR_ELIGIBILITY.md](MARKETPLACE_VENDOR_ELIGIBILITY.md) | Reference | 2026-06-23 | Admin vs public vendor visibility; backend follow-up checklist |
+| [BACKEND_AGENT_PROMPT_VENDOR_ELIGIBILITY_AND_DOCS.md](BACKEND_AGENT_PROMPT_VENDOR_ELIGIBILITY_AND_DOCS.md) | Reference | 2026-06-23 | Copy-paste prompt for backend agent (mosaic-backend) |
+| [PROJECT_BREAKDOWN.md](PROJECT_BREAKDOWN.md) | Reference | 2026-06-23 | Full end-to-end picture: journeys, auth, data flow, code layout |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Reference | 2026-06-22 | Route groups, env vars, deployment model, auth summary |
 | [GIT_WORKFLOW.md](GIT_WORKFLOW.md) | **Reference** | 2026-06-22 | Branching model: feature → `develop` → `main` |
 | [API_CONTRACTS.md](API_CONTRACTS.md) | Reference | 2026-06-17 | Canonical endpoints the frontend calls |
@@ -47,7 +52,7 @@ Mosaic Biz Hub is a Next.js marketplace frontend connecting consumers to verifie
 | [frontend/FRONTEND_LAUNCH_CONTRACT_ALIGNMENT.md](frontend/FRONTEND_LAUNCH_CONTRACT_ALIGNMENT.md) | **Evidence** | 2026-06-19 | Launch contract alignment: legacy paths, env vars, fix-owner matrix, preview smoke |
 | [frontend/FRONTEND_VENDOR_AUTH_E2E_SMOKE.md](frontend/FRONTEND_VENDOR_AUTH_E2E_SMOKE.md) | **Evidence** | 2026-06-19 | Vendor auth E2E smoke gate (#143): preview SSO block + supplementary signup path |
 
-**Rule of thumb:** For “where are we today?” read **PROJECT_STATUS**. For “what’s next?” read **ROADMAP**. Do not treat historical audits as current blockers without checking PROJECT_STATUS.
+**Rule of thumb:** For “what is the platform supposed to do?” read **PLATFORM_OPERATING_MODEL**. For “where are we today?” read **PROJECT_STATUS**. For “what’s next?” read **ROADMAP**. Do not treat historical audits as current blockers without checking PROJECT_STATUS.
 
 ---
 

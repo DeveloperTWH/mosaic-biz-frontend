@@ -2,9 +2,11 @@
 
 **Type:** Reference  
 **Audience:** New developers, PMs, and anyone onboarding to the codebase  
-**Last updated:** 2026-06-19
+**Last updated:** 2026-06-23
 
 Supplements [ARCHITECTURE.md](ARCHITECTURE.md) with a end-to-end picture of how the frontend fits together — user journeys, auth, data flow, and code organization.
+
+**Platform behavior (intended operating model):** [PLATFORM_OPERATING_MODEL.md](PLATFORM_OPERATING_MODEL.md)
 
 ---
 
@@ -322,10 +324,17 @@ flowchart LR
 4. **Legacy routes** — some mock/detail paths still exist; canonical paths are `/product/[id]`, `/service/[slug]`
 5. **Minimal shadcn adoption** — `components/ui/` exists but most pages use inline Tailwind
 6. **Backend owns everything persistent** — schema, RLS, webhooks, CORS are not in this repo
+7. **Vendor eligibility split** — public listing requires `isApproved && isActive`; admin "Active" alone is insufficient ([MARKETPLACE_VENDOR_ELIGIBILITY.md](MARKETPLACE_VENDOR_ELIGIBILITY.md))
+8. **Single-vendor checkout** — cart resets when switching vendors; backend rejects multi-vendor orders ([PLATFORM_OPERATING_MODEL.md](PLATFORM_OPERATING_MODEL.md#multi-vendor-checkout))
+9. **Vendor-managed shipping** — business-level flat or quantity-based rates; no live carrier integration in MVP
 
 ---
 
 ## Further Reading
+
+- [PLATFORM_OPERATING_MODEL.md](PLATFORM_OPERATING_MODEL.md) — intended platform behavior (eligibility, shipping, orders)
+- [MARKETPLACE_VENDOR_ELIGIBILITY.md](MARKETPLACE_VENDOR_ELIGIBILITY.md) — admin vs public vendor visibility
+- [BACKEND_AGENT_PROMPT_VENDOR_ELIGIBILITY_AND_DOCS.md](BACKEND_AGENT_PROMPT_VENDOR_ELIGIBILITY_AND_DOCS.md) — backend implementation prompt
 
 - [ARCHITECTURE.md](ARCHITECTURE.md) — routes, env, deployment, auth
 - [API_CONTRACTS.md](API_CONTRACTS.md) — endpoint reference

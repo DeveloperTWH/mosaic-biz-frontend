@@ -1,5 +1,7 @@
 # Marketplace vendor eligibility
 
+**See also:** [PLATFORM_OPERATING_MODEL.md](PLATFORM_OPERATING_MODEL.md) for the full platform picture (shipping, orders, payments).
+
 This document explains why admin "Active" businesses may not appear on `/vendors`, and why checkout can fail for products that still appear in the catalog.
 
 ## Customer-facing rules
@@ -33,6 +35,8 @@ The admin business list now shows three distinct states:
 Previously the UI used `isActive ?? isApproved`, which marked businesses as "Active" when only one flag was true.
 
 ## Backend follow-up (required)
+
+**Ready-to-send prompt:** [BACKEND_AGENT_PROMPT_VENDOR_ELIGIBILITY_AND_DOCS.md](BACKEND_AGENT_PROMPT_VENDOR_ELIGIBILITY_AND_DOCS.md)
 
 Run a backend agent against `Techware-Hut/mosaic-backend` to:
 
