@@ -4,20 +4,20 @@ import { BadgeCheck, Rocket, Users } from "lucide-react";
 const TRUST_ITEMS = [
   {
     icon: BadgeCheck,
-    title: "Verified Businesses",
-    description: "Shop vendors reviewed for trust and quality.",
+    title: "Verified Onboarding",
+    description: "Businesses are reviewed before they can list products or services.",
     href: "/consumer/trustbadge",
   },
   {
     icon: Rocket,
-    title: "Fast Onboarding",
-    description: "Verification review begins within 48 hours after you apply.",
+    title: "48-Hour Review Start",
+    description: "Vendor verification review begins within 48 hours after you apply.",
     href: "/become-a-vendor",
   },
   {
     icon: Users,
-    title: "Community First",
-    description: "Every purchase supports minority-owned excellence.",
+    title: "Purpose-Driven Commerce",
+    description: "Every purchase supports verified minority-owned businesses.",
     href: "/about",
   },
 ];

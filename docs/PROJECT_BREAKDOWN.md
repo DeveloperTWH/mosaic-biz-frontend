@@ -285,16 +285,16 @@ npm run build  # Release gate
 
 ```mermaid
 flowchart LR
-  feature[Feature branch] --> preview[Vercel Preview]
-  rc[sprint/frontend-release-candidate] --> rcPreview[RC Preview]
-  rcPreview --> qa[Smoke checklist QA]
-  qa --> manual[Manual promote]
-  manual --> prod[Production]
+  feature[Feature branch] --> develop[develop]
+  develop --> devPreview[Develop preview / QA]
+  develop --> main[main]
+  main --> prod[Production]
 ```
 
 - Launch repo: `Digital-Builders-757/mosaic-biz-frontend-launch`
-- Integration branch: `sprint/frontend-release-candidate`
-- Production is **not** auto-deployed from `main`
+- Integration branch: `develop`
+- Production branch: `main` (Vercel auto-deploy on merge)
+- Branching standard: [GIT_WORKFLOW.md](GIT_WORKFLOW.md)
 - QA checklist: [FRONTEND_SMOKE_CHECKLIST.md](FRONTEND_SMOKE_CHECKLIST.md)
 
 ---

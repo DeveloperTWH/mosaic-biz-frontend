@@ -1,15 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useIsMarketLoggedIn } from "@/hooks/useMarketSession";
+import MarketTrustProofRow from "./MarketTrustProofRow";
+import { SHOPPER_TRUST_PROOFS } from "./marketTrustProof";
+
+const HERO_CATEGORIES = [
+  { href: "/products", label: "Products" },
+  { href: "/services", label: "Services" },
+  { href: "/foods", label: "Foods" },
+  { href: "/vendors", label: "Vendors" },
+] as const;
 
 const Hero = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    const session = localStorage.getItem("user_session");
-    setIsLoggedIn(session === "true");
-  }, []);
+  const isLoggedIn = useIsMarketLoggedIn();
 
   return (
     <div className="relative bg-market-bg">
@@ -24,7 +28,7 @@ const Hero = () => {
           className="pointer-events-none absolute inset-0 bg-market-glow-radial"
           aria-hidden
         />
-        <div className="relative mx-auto w-full max-w-5xl px-4 py-16 text-center sm:px-6 sm:py-20">
+        <div className="relative mx-auto w-full max-w-5xl px-4 py-12 text-center sm:px-6 sm:py-16 lg:py-20">
           <p className="mb-4 font-montserrat text-xs font-semibold uppercase tracking-[0.2em] text-market-gold sm:text-sm">
             Mosaic Biz Hub
           </p>
@@ -32,78 +36,59 @@ const Hero = () => {
             Shop the Movement.
             <span className="mt-2 block text-market-gold">Support the Culture.</span>
           </h1>
-          <p className="mx-auto mb-10 max-w-2xl font-montserrat text-sm text-market-muted sm:text-base">
+          <p className="mx-auto mb-6 max-w-2xl font-montserrat text-sm text-market-muted sm:mb-8 sm:text-base">
             From food to fashion to services, Mosaic Biz Hub connects you to verified
             minority-owned businesses and gives entrepreneurs the tools to grow.
           </p>
 
-          {isLoggedIn === null ? (
-            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <div className="h-11 w-48 rounded bg-white/10" />
-              <div className="h-11 w-48 rounded bg-white/10" />
-            </div>
-          ) : isLoggedIn ? (
-            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Link href="/products" className="market-btn-primary w-full text-center sm:min-w-[220px] sm:w-auto">
-                Shop the Marketplace
-              </Link>
+          <div className="hero-cta-group">
+            <Link href="/products" className="hero-cta-primary">
+              Shop the Marketplace
+            </Link>
+            {isLoggedIn ? (
               <Link href="/customer/order" className="market-btn-outline w-full text-center sm:min-w-[220px] sm:w-auto">
                 My Orders
               </Link>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Link href="/products" className="market-btn-primary w-full text-center sm:min-w-[220px] sm:w-auto">
-                Explore Marketplace
-              </Link>
-              <Link href="/become-a-vendor" className="market-btn-outline w-full text-center sm:min-w-[220px] sm:w-auto">
+            ) : (
+              <Link href="/become-a-vendor" className="market-btn-secondary w-full text-center sm:min-w-[220px] sm:w-auto">
                 Become a Vendor
               </Link>
-            </div>
-          )}
-
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-2 sm:gap-3">
-            {[
-              { href: "/products", label: "Products" },
-              { href: "/services", label: "Services" },
-              { href: "/foods", label: "Foods" },
-              { href: "/vendors", label: "Vendors" },
-            ].map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="market-nav-link rounded-full border border-white/15 bg-market-elevated/80 px-4 py-2 font-montserrat text-xs font-medium text-market-text transition-colors hover:border-market-gold/40 hover:text-market-gold sm:text-sm"
-              >
-                {item.label}
-              </Link>
-            ))}
+            )}
           </div>
 
-          <p className="mt-6 font-montserrat text-xs text-market-muted">
+          <MarketTrustProofRow items={SHOPPER_TRUST_PROOFS} className="mt-6 sm:mt-8" />
+
+          <div className="hero-browse-divider">
+            <p className="mb-3 font-montserrat text-xs uppercase tracking-wider text-market-muted/70">
+              Browse categories
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              {HERO_CATEGORIES.map((item) => (
+                <Link key={item.href} href={item.href} className="hero-category-pill">
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          <p className="hero-trust-footnote">
             <Link href="/consumer/trustbadge" className="text-market-gold underline hover:text-market-gold-hover">
               Learn about trust badges
             </Link>
             {" — "}verified onboarding, not customer ratings.
+            {!isLoggedIn ? (
+              <>
+                {" · "}
+                <Link href="/login?type=customer" className="text-market-gold underline hover:text-market-gold-hover">
+                  Customer login
+                </Link>
+                {" · "}
+                <Link href="/login?type=vendor" className="text-market-gold underline hover:text-market-gold-hover">
+                  Vendor login
+                </Link>
+              </>
+            ) : null}
           </p>
-
-          {isLoggedIn === false ? (
-            <p className="mt-3 text-xs text-market-muted">
-              Already have an account?{" "}
-              <Link
-                href="/login?type=customer"
-                className="text-market-gold underline hover:text-market-gold-hover"
-              >
-                Customer login
-              </Link>
-              {" · "}
-              <Link
-                href="/login?type=vendor"
-                className="text-market-gold underline hover:text-market-gold-hover"
-              >
-                Vendor login
-              </Link>
-            </p>
-          ) : null}
         </div>
       </section>
     </div>

@@ -7,8 +7,17 @@ import PublicSearchFilterBar from "../Components/PublicSearchFilterBar";
 import PublicPageHero from "../Components/PublicPageHero";
 import PublicFilterSection from "../Components/PublicFilterSection";
 import MarketLoadingBlock from "../Components/MarketLoadingBlock";
-import MarketEmptyState from "../Components/MarketEmptyState";
+import MarketDiscoveryPanel from "../Components/MarketDiscoveryPanel";
 import MarketImage from "../Components/MarketImage";
+import {
+  MARKET_ALTERNATE_SEARCHES,
+  MARKET_BROWSE_LINKS,
+  MARKET_CULTURAL_LINKS,
+  MARKET_SUGGESTED_SEARCHES,
+} from "../Components/marketDiscovery";
+import { SEARCH_TRUST_NOTE, SHOPPER_LOW_INVENTORY_NOTE } from "../Components/marketTrustProof";
+import PublicProductCard from "../Components/publicCards/PublicProductCard";
+import { mapApiProductToPublicProductCard } from "../Components/publicCards/publicProductCardMappers";
 import { PublicSearchFilters, parseListingFiltersFromSearchParams, buildSearchPageUrlWithTab, searchParamsUsesLegacyNames } from "../Components/publicSearch";
 
 type ApiBusiness = {
@@ -121,53 +130,7 @@ function buildSearchApiUrl(filters: PublicSearchFilters): string {
 }
 
 function ProductCard({ item }: { item: ApiProduct }) {
-  const title = item.title || "Untitled Product";
-  const description = stripHtml(item.description);
-  const trimmedDescription =
-    description.length > 100 ? `${description.slice(0, 100).trimEnd()}...` : description;
-  const price = toNumber(item.price);
-  const badgeImage = getBadgeImage(item.businessId?.badge);
-  const vendorName = item.businessId?.businessName?.trim();
-
-  return (
-    <Link href={`/product/${item._id}`} className="market-listing-card-link h-full">
-      <article className="market-listing-card p-2">
-        <div className="market-card-media relative aspect-[4/3] w-full shrink-0 sm:aspect-square">
-          <MarketImage src={item.coverImage} alt={title} aspect="square" objectFit="contain" fallbackLabel="Image coming soon" />
-        </div>
-
-        <div className="flex flex-1 flex-col gap-2 p-3">
-          <h3 className="market-card-title line-clamp-2">{title}</h3>
-          <p className="market-card-desc line-clamp-2">
-            {trimmedDescription || "Explore this product on Mosaic Biz Hub."}
-          </p>
-
-          {vendorName ? (
-            <p className="market-card-rating-meta">{vendorName}</p>
-          ) : null}
-
-          <div className="mt-auto flex flex-col gap-0.5">
-            <span className="text-xs text-market-muted">Starting from</span>
-            <span className="market-card-price">${price.toFixed(2)}</span>
-          </div>
-
-          {badgeImage ? (
-            <div className="market-card-footer mt-2 gap-2 py-2">
-              <span className="text-xs font-semibold text-market-muted">Earned badge</span>
-              <img
-                src={badgeImage}
-                alt={`${item.businessId?.badge || "Business"} badge`}
-                className="h-10 object-contain sm:h-12"
-                onError={(e) => {
-                  e.currentTarget.src = "/badge.png";
-                }}
-              />
-            </div>
-          ) : null}
-        </div>
-      </article>
-    </Link>
-  );
+  return <PublicProductCard {...mapApiProductToPublicProductCard(item)} />;
 }
 
 function BusinessResultCard({
@@ -218,6 +181,10 @@ function BusinessResultCard({
 
           {meta ? <p className="market-card-rating-meta">{meta}</p> : null}
 
+          {badgeImage ? (
+            <p className="market-card-trust-label">Verified vendor · {badge} badge</p>
+          ) : null}
+
           <div className="mt-auto flex items-center justify-between gap-2 border-t border-white/10 pt-3">
             <span className="market-card-action">View details</span>
             {badgeImage ? (
@@ -249,6 +216,7 @@ function SearchPageContent() {
   const [response, setResponse] = useState<SearchApiResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
   const [activeTab, setActiveTab] = useState<SearchTab>(() => {
     const tab = searchParams.get("tab");
     if (tab === "services" || tab === "foods" || tab === "products") return tab;
@@ -349,7 +317,7 @@ function SearchPageContent() {
     loadResults();
 
     return () => controller.abort();
-  }, [queryFilters]);
+  }, [queryFilters, retryCount]);
 
   useEffect(() => {
     const productsCount = response?.totals?.products ?? 0;
@@ -374,22 +342,54 @@ function SearchPageContent() {
     );
   };
 
+  const clearAllFilters = () => {
+    router.push("/search");
+  };
+
+  const clearFilter = (field: keyof PublicSearchFilters) => {
+    router.push(
+      buildSearchPageUrlWithTab({
+        ...queryFilters,
+        [field]: "",
+        tab: activeTab,
+      })
+    );
+  };
+
+  const activeFilterChips = useMemo(() => {
+    const chips: Array<{ label: string; onClear?: () => void }> = [];
+    if (queryFilters.keyword.trim()) {
+      chips.push({
+        label: `"${queryFilters.keyword.trim()}"`,
+        onClear: () => clearFilter("keyword"),
+      });
+    }
+    if (queryFilters.location.trim()) {
+      chips.push({
+        label: queryFilters.location.trim(),
+        onClear: () => clearFilter("location"),
+      });
+    }
+    if (queryFilters.minorityType.trim()) {
+      chips.push({
+        label: queryFilters.minorityType.trim(),
+        onClear: () => clearFilter("minorityType"),
+      });
+    }
+    return chips;
+  }, [queryFilters, activeTab, router]);
+
   const products = response?.data?.products ?? [];
   const services = response?.data?.services ?? [];
   const foods = response?.data?.foods ?? [];
-  // const totalResults = response?.totals?.all ?? 0;
   const totalResults =
-  (response?.data?.products?.length ?? 0) +
-  (response?.data?.services?.length ?? 0) +
-  (response?.data?.foods?.length ?? 0);
+    (response?.data?.products?.length ?? 0) +
+    (response?.data?.services?.length ?? 0) +
+    (response?.data?.foods?.length ?? 0);
 
-  // const tabItems: Array<{ key: SearchTab; label: string; count: number }> = [
-  //   { key: "products", label: "Search For Products", count: response?.totals?.products ?? 0 },
-  //   { key: "services", label: "Search For Services", count: response?.totals?.services ?? 0 },
-  //   { key: "foods", label: "Search For Food Item", count: response?.totals?.foods ?? 0 },
-  // ];
+  const isLowInventory = totalResults > 0 && totalResults <= 3;
 
-const tabItems = [
+  const tabItems = [
   { key: "products", label: "Products", count: response?.totals?.products ?? 0 },
   { key: "services", label: "Services", count: response?.totals?.services ?? 0 },
   { key: "foods", label: "Foods", count: response?.totals?.foods ?? 0 },
@@ -415,74 +415,143 @@ const tabItems = [
         imageUrl="/bgdetailpage.png"
       />
       <PublicFilterSection>
-        <PublicSearchFilterBar filters={filters} onChange={setFilters} onSubmit={handleSearch} />
+        <PublicSearchFilterBar
+          filters={filters}
+          onChange={setFilters}
+          onSubmit={handleSearch}
+          showClearFilters
+          onClearFilters={clearAllFilters}
+        />
       </PublicFilterSection>
 
       <section className="container-page public-section max-w-[1400px]">
-        <div className="mb-8 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-center">
-          {tabItems.map((tab) => {
-            const isActive = activeTab === tab.key;
-            return (
-              <button
-                key={tab.key}
-                type="button"
-                onClick={() => {
-                  setActiveTab(tab.key);
-                  router.replace(
-                    buildSearchPageUrlWithTab({
-                      ...filters,
-                      tab: tab.key,
-                    })
-                  );
-                }}
-                className={`relative w-full border px-4 py-3 text-sm font-semibold transition-colors sm:min-w-[180px] sm:w-auto lg:min-w-[220px] ${
-                  isActive
-                    ? "border-market-gold bg-market-gold text-market-header"
-                    : "border-white/15 bg-market-elevated text-market-text hover:border-market-gold/40"
-                }`}
-              >
-                {tab.label} ({tab.count})
-              </button>
-            );
-          })}
-        </div>
+        {tabItems.length > 0 ? (
+          <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-center">
+            {tabItems.map((tab) => {
+              const isActive = activeTab === tab.key;
+              return (
+                <button
+                  key={tab.key}
+                  type="button"
+                  onClick={() => {
+                    setActiveTab(tab.key);
+                    router.replace(
+                      buildSearchPageUrlWithTab({
+                        ...filters,
+                        tab: tab.key,
+                      })
+                    );
+                  }}
+                  className={`relative w-full border px-4 py-3 text-sm font-semibold transition-colors sm:min-w-[180px] sm:w-auto lg:min-w-[220px] ${
+                    isActive
+                      ? "border-market-gold bg-market-gold text-market-header"
+                      : "border-white/15 bg-market-elevated text-market-text hover:border-market-gold/40"
+                  }`}
+                >
+                  {tab.label} ({tab.count})
+                </button>
+              );
+            })}
+          </div>
+        ) : null}
+
+        {hasAnyFilter && !loading && !error ? (
+          <div className="mb-4 flex flex-wrap items-center justify-center gap-2">
+            {activeFilterChips.map((chip) =>
+              chip.onClear ? (
+                <button
+                  key={chip.label}
+                  type="button"
+                  onClick={chip.onClear}
+                  className="market-active-filter-chip"
+                >
+                  {chip.label}
+                  <span aria-hidden className="ml-1 opacity-70">
+                    ×
+                  </span>
+                </button>
+              ) : (
+                <span key={chip.label} className="market-active-filter-chip market-active-filter-chip--static">
+                  {chip.label}
+                </span>
+              )
+            )}
+          </div>
+        ) : null}
 
         <div className="mb-6 flex flex-col gap-2 text-sm text-market-muted md:flex-row md:items-center md:justify-between">
           <p className="market-result-count">
-            ({totalResults > 0 ? `Showing 1 - ${totalResults} results` : "No results yet"})
+            {totalResults > 0
+              ? `Showing ${totalResults} result${totalResults === 1 ? "" : "s"}`
+              : hasAnyFilter
+                ? "No matches for your filters"
+                : "Start with a keyword, state, or business type"}
           </p>
-          <p className="text-xs uppercase tracking-[0.14em] text-market-muted">
-            Keyword: {queryFilters.keyword || "Any"} | Location: {queryFilters.location || "Any"} | Minority:{" "}
-            {queryFilters.minorityType || "Any"}
-          </p>
+          {hasAnyFilter ? (
+            <p className="hidden text-xs uppercase tracking-[0.14em] text-market-muted sm:block">
+              Keyword: {queryFilters.keyword || "Any"} · Location: {queryFilters.location || "Any"} · Type:{" "}
+              {queryFilters.minorityType || "Any"}
+            </p>
+          ) : null}
         </div>
 
         {loading ? (
-          <MarketLoadingBlock label="Searching results…" minHeight="min-h-[320px]" />
+          <MarketLoadingBlock variant="searchGrid" label="Searching the marketplace…" />
         ) : error ? (
-          <div className="market-state-error">{error}</div>
+          <MarketDiscoveryPanel
+            title="Search temporarily unavailable"
+            description={error}
+            onRetry={() => setRetryCount((count) => count + 1)}
+            actions={[
+              { label: "Browse all products", href: "/products", variant: "primary" },
+              { label: "Browse vendors", href: "/vendors", variant: "outline" },
+            ]}
+            browseLinks={MARKET_BROWSE_LINKS}
+          />
         ) : totalResults === 0 && !hasAnyFilter ? (
-          <MarketEmptyState
-            title="Search the marketplace"
-            description="Enter a keyword, state, or minority-owned business type above to find products, services, and food vendors."
-            ctaLabel="Browse products"
-            ctaHref="/products"
+          <MarketDiscoveryPanel
+            title="Discover verified minority-owned businesses"
+            description="Search by product, service, state, or business type to find trusted vendors across the marketplace."
+            trustNote={SEARCH_TRUST_NOTE}
+            showTrustHint
+            actions={[
+              { label: "Browse all products", href: "/products", variant: "primary" },
+              { label: "Browse vendors", href: "/vendors", variant: "outline" },
+            ]}
+            suggestions={MARKET_SUGGESTED_SEARCHES}
+            browseLinks={MARKET_BROWSE_LINKS}
+            collections={MARKET_CULTURAL_LINKS}
           />
         ) : totalResults === 0 ? (
-          <MarketEmptyState
-            title="No matches yet"
-            description="Try another keyword, state, or minority type to explore the marketplace."
-            ctaLabel="Browse all products"
-            ctaHref="/products"
+          <MarketDiscoveryPanel
+            title="No matches for this search"
+            description="Try a different keyword, broaden your location, or explore curated categories below."
+            trustNote="Verified vendors may still match under different keywords or categories."
+            showTrustHint
+            activeFilters={activeFilterChips}
+            actions={[
+              { label: "Clear all filters", onClick: clearAllFilters, variant: "outline" },
+              { label: "Browse all products", href: "/products", variant: "primary" },
+              { label: "Browse vendors", href: "/vendors", variant: "secondary" },
+            ]}
+            suggestions={MARKET_ALTERNATE_SEARCHES}
+            browseLinks={MARKET_BROWSE_LINKS}
           />
         ) : (
           <>
             {activeTab === "products" ? (
-              <div className="public-grid-listing">
-                {products.map((item) => (
-                  <ProductCard key={item._id} item={item} />
-                ))}
-              </div>
+              <>
+                {isLowInventory && products.length > 0 ? (
+                  <p className="shopper-low-inventory-note">{SHOPPER_LOW_INVENTORY_NOTE}</p>
+                ) : null}
+                <div
+                  className={`public-grid-listing${products.length > 0 && products.length <= 3 ? " public-grid-listing--low-count" : ""}`}
+                >
+                  {products.map((item) => (
+                    <ProductCard key={item._id} item={item} />
+                  ))}
+                </div>
+              </>
             ) : null}
 
             {activeTab === "services" ? (
@@ -517,6 +586,18 @@ const tabItems = [
                   />
                 ))}
               </div>
+            ) : null}
+
+            {isLowInventory ? (
+              <MarketDiscoveryPanel
+                compact
+                className="mt-8"
+                title="Keep exploring"
+                description="Discover more products, services, and food vendors across the marketplace."
+                showTrustHint
+                suggestions={MARKET_SUGGESTED_SEARCHES.slice(0, 4)}
+                browseLinks={MARKET_BROWSE_LINKS}
+              />
             ) : null}
           </>
         )}

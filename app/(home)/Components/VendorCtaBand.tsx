@@ -1,4 +1,7 @@
 import Link from "next/link";
+import MarketTrustProofRow from "./MarketTrustProofRow";
+import MarketTrustBadgeHint from "./MarketTrustBadgeHint";
+import { VENDOR_TRUST_BENEFITS } from "./marketTrustProof";
 
 export default function VendorCtaBand() {
   return (
@@ -7,14 +10,16 @@ export default function VendorCtaBand() {
       <div className="container-page relative max-w-3xl">
         <h2 className="market-section-heading-inverse">Ready to grow your business?</h2>
         <p className="mx-auto mt-4 max-w-xl font-montserrat text-sm text-market-muted sm:text-base">
-          Join Mosaic Biz Hub and reach customers who want to support minority-owned brands.
+          List on Mosaic Biz Hub and connect with shoppers who actively seek minority-owned brands.
         </p>
+        <MarketTrustProofRow items={VENDOR_TRUST_BENEFITS} compact className="mt-6" />
         <Link
           href="/become-a-vendor"
           className="market-btn-primary mt-8 inline-block w-full sm:min-w-[240px] sm:w-auto"
         >
           Become a Vendor
         </Link>
+        <MarketTrustBadgeHint audience="vendor" className="mt-4 justify-center" />
       </div>
     </section>
   );

@@ -14,6 +14,10 @@ import {
 } from "lucide-react";
 import TermsModal from "./components/TermsModal";
 import Congratulations from "./components/Congratulations";
+import VendorApplicationShell from "../components/VendorApplicationShell";
+import VendorOnboardingProgress from "../components/VendorOnboardingProgress";
+import VendorFormActions from "../components/VendorFormActions";
+import DashboardLoadingBlock from "@/components/ui/dashboard-loading-block";
 
 interface Business {
   _id: string;
@@ -425,9 +429,9 @@ export default function FinalReviewPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#c9a227]"></div>
-      </div>
+      <VendorApplicationShell variant="dashboard" title="Final review">
+        <DashboardLoadingBlock label="Loading your application summary…" minHeight="min-h-[50vh]" />
+      </VendorApplicationShell>
     );
   }
 
@@ -435,33 +439,44 @@ export default function FinalReviewPage() {
     return <Congratulations business={business} />;
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-3xl mx-auto px-4">
+  const incompleteCount = steps.filter((s) => s.status === "incompleted" || s.status === "pending").length;
 
-        {/* Header */}
-        <div className="text-center mb-10">
-          <h1 className="text-2xl font-bold text-gray-900 tracking-wide">FINAL REVIEW</h1>
-          <p className="text-gray-500 mt-2 text-sm">
-            review and submit the profile
-          </p>
-          {onboardingData && (
-            <p className="text-xs text-gray-400 mt-1">
-              Application ID: {onboardingData.applicationId}
-            </p>
-          )}
-        </div>
+  return (
+    <VendorApplicationShell
+      variant="dashboard"
+      maxWidthClass="max-w-3xl"
+      title="Final review"
+      description="Confirm each step below, then publish when everything looks correct."
+      backHref="/partners"
+      backLabel="Back to vendor hub"
+    >
+      <VendorOnboardingProgress
+        currentStage={6}
+        saveNote={
+          incompleteCount > 0
+            ? `${incompleteCount} step${incompleteCount === 1 ? "" : "s"} still need attention before you can publish.`
+            : "All steps complete — certify below and publish your storefront."
+        }
+      />
+
+      {onboardingData ? (
+        <p className="mb-6 text-center font-montserrat text-xs text-dashboard-muted">
+          Application ID: {onboardingData.applicationId}
+        </p>
+      ) : null}
 
         {/* Steps List with Accordion */}
-        <div className="space-y-3 mb-8">
+        <div className="mb-8 space-y-3">
           {steps.map((step, index) => (
             <div
               key={index}
-              className="bg-[#f5f5f0] rounded-lg overflow-hidden"
+              className="overflow-hidden rounded-xl border border-dashboard-border-light bg-white shadow-sm"
             >
               {/* Step Header - Always Visible */}
-              <div className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-100 transition-colors"
-                onClick={() => step.number === "06" ? router.push(step.link) : toggleStep(index + 1)}>
+              <div
+                className="flex cursor-pointer items-center justify-between p-4 transition-colors hover:bg-surface-cream"
+                onClick={() => step.number === "06" ? router.push(step.link) : toggleStep(index + 1)}
+              >
                 <div className="flex items-center gap-4 flex-1">
                   {/* Number Badge */}
                   <span className="w-8 h-8 rounded-md bg-[#c9a227] flex items-center justify-center text-sm font-bold text-white">
@@ -919,79 +934,69 @@ export default function FinalReviewPage() {
           ))}
         </div>
 
-        {/* Checkboxes */}
-        <div className="mb-8 space-y-3">
-          <label className="flex items-start gap-3 cursor-pointer">
+        {/* Certification */}
+        <div className="vendor-form-section mb-6">
+          <h2 className="vendor-form-section-title mb-4">Certify & publish</h2>
+          <div className="space-y-3">
+          <label className="flex min-h-11 cursor-pointer items-start gap-3">
             <input
               type="checkbox"
               checked={confirmChecked}
               onChange={(e) => setConfirmChecked(e.target.checked)}
-              className="mt-0.5 w-4 h-4 rounded border-gray-300 text-[#1e3a5f] focus:ring-[#1e3a5f]"
+              className="mt-1 h-4 w-4 rounded border-gray-300 text-brand-navy focus:ring-brand-gold"
             />
-            <span className="text-xs text-gray-600 leading-relaxed">
-              I Certify That All The Business Information Provided Is True, Accurate, And Complete To The Best Of My Knowledge.
+            <span className="text-sm leading-relaxed text-dashboard-muted">
+              I certify that all business information provided is true, accurate, and complete to the best of my knowledge.
             </span>
           </label>
 
-          <label className="flex items-start gap-3 cursor-pointer">
+          <label className="flex min-h-11 cursor-pointer items-start gap-3">
             <input
               type="checkbox"
               checked={agreeChecked}
               onChange={(e) => setAgreeChecked(e.target.checked)}
-              className="mt-0.5 w-4 h-4 rounded border-gray-300 text-[#1e3a5f] focus:ring-[#1e3a5f]"
+              className="mt-1 h-4 w-4 rounded border-gray-300 text-brand-navy focus:ring-brand-gold"
             />
-            <span className="text-xs text-gray-600 leading-relaxed">
-              I Agree To Abide By Hub's{" "}
+            <span className="text-sm leading-relaxed text-dashboard-muted">
+              I agree to abide by Hub&apos;s{" "}
               <button
                 type="button"
                 onClick={() => openModal("terms")}
-                className="text-[#1e3a5f] hover:text-[#c9a227] underline font-medium transition-colors"
+                className="font-medium text-brand-navy-light underline hover:text-brand-navy"
               >
-                Terms And Conditions
+                Terms and Conditions
               </button>{" "}
-              And{" "}
+              and{" "}
               <button
                 type="button"
                 onClick={() => openModal("privacy")}
-                className="text-[#1e3a5f] hover:text-[#c9a227] underline font-medium transition-colors"
+                className="font-medium text-brand-navy-light underline hover:text-brand-navy"
               >
                 Privacy Policy
               </button>
-              {" "}And{" "}
+              {" "}and{" "}
               <button
                 type="button"
                 onClick={() => openModal("directory")}
-                className="text-[#1e3a5f] hover:text-[#c9a227] underline font-medium transition-colors"
+                className="font-medium text-brand-navy-light underline hover:text-brand-navy"
               >
                 Directory Policy
-              </button>.
+              </button>
+              .
             </span>
           </label>
+          </div>
         </div>
 
-        {/* Buttons */}
-        <div className="flex gap-3">
-          <button
-            onClick={handleSubmit}
-            disabled={!confirmChecked || !agreeChecked}
-            className={`px-8 py-2.5 rounded text-sm font-medium transition-colors ${confirmChecked && agreeChecked
-              ? 'bg-[#1e3a5f] text-white hover:bg-[#152a45] cursor-pointer'
-              : 'bg-[#1e3a5f] text-white opacity-50 cursor-not-allowed'
-              }`}
-          >
-            Publish Profile and Products
-          </button>
-          {/* <button
-            onClick={() => {
-              setConfirmChecked(false);
-              setAgreeChecked(false);
-            }}
-            className="px-8 py-2.5 rounded text-sm font-medium bg-gray-400 text-white hover:bg-gray-500 transition-colors"
-          >
-            Clear Response
-          </button> */}
-        </div>
-      </div>
+        <VendorFormActions
+          hint="Expand any incomplete step above to fix issues before publishing."
+          nextStepLabel="Once published, your storefront goes live for customers on Mosaic Biz Hub."
+          primary={{
+            label: "Publish profile and listings",
+            onClick: handleSubmit,
+            disabled: !confirmChecked || !agreeChecked,
+          }}
+        />
 
       {/* Terms Modal */}
       <TermsModal
@@ -1012,6 +1017,6 @@ export default function FinalReviewPage() {
           <img src={selectedDoc} alt="Preview" className="max-h-full max-w-full object-contain" />
         </div>
       )}
-    </div>
+    </VendorApplicationShell>
   );
 }

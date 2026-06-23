@@ -3,38 +3,7 @@
 import Link from "next/link";
 import MarketEmptyState from "./MarketEmptyState";
 import MarketImage from "./MarketImage";
-
-type CulturalCollection = {
-  id: string;
-  title: string;
-  description: string;
-  href: string;
-  image: string;
-};
-
-const STATIC_COLLECTIONS: CulturalCollection[] = [
-  {
-    id: "black-owned",
-    title: "Black-Owned Excellence",
-    description: "Discover products and services from Black-owned businesses in your community.",
-    href: "/search?minorityType=Black",
-    image: "/Carousel/nature-3.jpg",
-  },
-  {
-    id: "latinx",
-    title: "Latinx Heritage",
-    description: "Celebrate culture through food, services, and goods from Latinx entrepreneurs.",
-    href: "/search?minorityType=Latinx",
-    image: "/Carousel/nature-2.jpg",
-  },
-  {
-    id: "women-owned",
-    title: "Women-Owned Ventures",
-    description: "Support women-led businesses building the future of local commerce.",
-    href: "/search?minorityType=Woman",
-    image: "/Carousel/nature-1.jpg",
-  },
-];
+import { MARKET_CULTURAL_COLLECTIONS } from "./marketDiscovery";
 
 /**
  * Curated cultural discovery sections for homepage.
@@ -51,7 +20,7 @@ export function CulturalDiscoveryCollections() {
         </p>
       </div>
       <div className="grid gap-4 sm:grid-cols-2 sm:gap-6 md:grid-cols-3">
-        {STATIC_COLLECTIONS.map((col) => (
+        {MARKET_CULTURAL_COLLECTIONS.map((col) => (
           <Link
             key={col.id}
             href={col.href}

@@ -814,7 +814,7 @@ const Page: React.FC = () => {
             <div className="relative flex min-w-max items-start justify-between gap-4 px-2 sm:min-w-full">
               <div className="absolute left-6 right-6 top-6 -z-10 hidden h-[2px] bg-gray-200 sm:block">
                 <div
-                  className="h-full bg-[#c9a44a] transition-all duration-300"
+                  className="h-full bg-dashboard-gold transition-all duration-300"
                   style={{ width: `${progressWidth}%` }}
                 />
               </div>
@@ -827,21 +827,22 @@ const Page: React.FC = () => {
                     type="button"
                     onClick={() => setSelectedStage(step.number)}
                     className="flex w-32 shrink-0 flex-col items-center gap-3 text-center sm:w-40"
+                    aria-current={selectedStage === step.number ? "step" : undefined}
                   >
                     <span
                       className={`flex h-12 w-12 items-center justify-center rounded-full border font-semibold transition-colors ${
                         stripStatus === "completed"
-                          ? "bg-[#c9a44a] border-[#c9a44a] text-white"
+                          ? "border-dashboard-gold bg-dashboard-gold text-white"
                           : stripStatus === "active"
-                          ? "bg-[#f7f2df] border-[#c9a44a] text-[#c9a44a]"
-                          : "bg-[#d7d7d7] border-[#d7d7d7] text-white"
+                          ? "border-dashboard-gold bg-brand-cream text-dashboard-gold"
+                          : "border-gray-300 bg-gray-200 text-white"
                       }`}
                     >
                       {step.number}
                     </span>
                     <span
                       className={`text-sm font-semibold leading-5 ${
-                        stripStatus === "locked" ? "text-gray-400" : "text-[#c9a44a]"
+                        stripStatus === "locked" ? "text-gray-400" : "text-dashboard-gold"
                       }`}
                     >
                       {step.label}
@@ -852,10 +853,22 @@ const Page: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-            <h3 className="font-semibold text-gray-900 mb-5 pb-3 border-b border-gray-100">
-              Stage {selectedStage}: {onboardingSteps.find((step) => step.number === selectedStage)?.label}
-            </h3>
+          <div className="rounded-xl border border-dashboard-border-light bg-white p-6 shadow-sm">
+            <div className="mb-5 border-b border-dashboard-border-light pb-4">
+              <p className="font-montserrat text-xs font-semibold uppercase tracking-wide text-dashboard-gold">
+                Step {selectedStage} of {onboardingSteps.length}
+              </p>
+              <h3 className="mt-1 font-poppins text-lg font-semibold text-dashboard-text">
+                {onboardingSteps.find((step) => step.number === selectedStage)?.label}
+              </h3>
+              <p className="mt-2 font-montserrat text-sm text-dashboard-muted">
+                {selectedStage === onboardingStatus.data.currentStage
+                  ? "This is your current focus — complete the actions below to move forward."
+                  : selectedStage < onboardingStatus.data.currentStage
+                    ? "You've completed this stage. Select it to review status or make updates."
+                    : "Complete earlier stages to unlock this step."}
+              </p>
+            </div>
             {renderSelectedStageCard()}
           </div>
         </div>
@@ -867,10 +880,12 @@ const Page: React.FC = () => {
             {/* <div className="w-20 h-20 mx-auto mb-6 bg-blue-100 rounded-full flex items-center justify-center">
               <Plus className="w-10 h-10 text-blue-600" />
             </div> */}
-            <h2 className="mb-4 text-2xl font-bold text-dashboard-text">Start Your Vendor Journey</h2>
-            <p className="mb-6 text-dashboard-muted">
-              List your business on our platform and start reaching new customers.
-              Complete our simple 6-step verification process to get started.
+            <h2 className="mb-4 text-2xl font-bold text-dashboard-text">Start your vendor journey</h2>
+            <p className="mb-2 text-dashboard-muted">
+              Six guided steps from verification to launch. Most vendors complete setup over a few sessions — progress saves as you go.
+            </p>
+            <p className="mb-6 text-sm text-dashboard-muted">
+              You&apos;ll need minority-owned business verification documents, EIN or SSN, and a business license to begin.
             </p>
             <button
               type="button"

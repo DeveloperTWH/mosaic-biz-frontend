@@ -1,136 +1,98 @@
 "use client";
 
 import Image from "next/image";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, Pagination } from "swiper/modules";
 import { useState } from "react";
 import Link from "next/link";
-
-import "swiper/css";
-import "swiper/css/pagination";
+import { cn } from "@/lib/utils";
+import { MarketingSectionHeader } from "../../Components/marketing/MarketingSections";
+import MarketTrustProofRow from "../../Components/MarketTrustProofRow";
+import { SHOPPER_TRUST_PROOFS } from "../../Components/marketTrustProof";
 
 const tabContent = [
   {
     title: "Browse",
     description:
-      "Explore a curated ecosystem of excellence. Navigate through vibrant categories—from beauty and wellness to business services and tech. Filter by identity, location, or industry to find vendors that reflect your values and meet your needs. Every listing is verified, so you can shop with confidence.",
+      "Explore a curated ecosystem of excellence. Navigate vibrant categories — from beauty and wellness to business services and tech. Filter by identity, location, or industry to find vendors that reflect your values. Every listing is verified, so you can shop with confidence.",
+    icon: "/howitworks/Browseicon2.png",
   },
   {
     title: "Discover",
     description:
-      "Find more than products—find purpose. Each vendor profile tells a story. Learn about their mission, culture, and community impact. Discover exclusive offers, seasonal promotions, and featured Power Brands that are shaping the future of e-commerce.",
+      "Find more than products — find purpose. Each vendor profile tells a story about mission, culture, and community impact. Discover exclusive offers, seasonal promotions, and featured brands shaping the future of e-commerce.",
+    icon: "/howitworks/Discovericon2.png",
   },
   {
     title: "Connect",
     description:
-      "Build real relationships, not just transactions. Message vendors directly through our secure platform. Ask questions, request quotes, or follow your favorite brands to get notified about new drops, events, and deals. With in-app messaging and push alerts, staying connected is effortless.",
+      "Build real relationships, not just transactions. Message vendors through our secure platform, request quotes, and follow favorite brands for new drops, events, and deals.",
+    icon: "/howitworks/Connecticon2.png",
   },
   {
     title: "Support",
     description:
-      "Empower businesses with every click. Every purchase fuels economic equity. Leave verified reviews, share your favorite vendors, and participate in loyalty programs that reward both you and the businesses you love. Vendors get access to tools like analytics, CRM, and AI chatbots to grow sustainably.",
+      "Empower businesses with every click. Leave verified reviews, share favorite vendors, and participate in programs that reward both shoppers and the businesses they love.",
+    icon: "/howitworks/Supporticon2.png",
   },
 ];
 
-const icons = [
-  "/howitworks/Browseicon2.png",
-  "/howitworks/Discovericon2.png",
-  "/howitworks/Connecticon2.png",
-  "/howitworks/Supporticon2.png",
-];
-
 export default function HowItWorks() {
-  const [tabClick, setTabClick] = useState(0);
+  const [activeTab, setActiveTab] = useState(0);
+  const active = tabContent[activeTab];
 
   return (
-    <section className="bg-white">
-      <div className="py-4 lg:py-6 max-w-7xl mx-auto px-6">
-        {/* Heading - Compact */}
-        <div className="text-center mb-4">
-          <h2 className="text-xl md:text-2xl font-bold text-gray-900 font-poppins">
-            HOW IT WORKS
-          </h2>
+    <section className="public-section bg-market-surface">
+      <div className="container-page">
+        <MarketingSectionHeader
+          title="How it works"
+          description="Mosaic Biz Hub connects conscious consumers with verified minority-owned businesses through a platform built for visibility, trust, and growth."
+        />
 
-<p className="mt-2 text-gray-600 text-[12px] leading-5 max-w-6xl mx-auto font-mulish font-normal">
-  Mosaic Biz Hub isn’t just a marketplace, it’s a movement. Our Mosaic creates a multicultural tapestry of unstoppable success, a marketplace of diverse business excellence.
-  We connect conscious consumers with verified, minority-owned businesses through a platform built for visibility, trust, and growth. Mosaic Biz Hub is dedicated to empowering all minority-owned businesses at least 51% owned that are Hispanic or Latino, Asian, African American, Women, or disabled veterans, by providing a dynamic, inclusive, and accessible online/mobile marketplace that fosters economic growth, amplifies diverse voices, and connects entrepreneurs with eager consumers. Whether you're here to shop with purpose or scale your brand, here’s how to make the most of your experience
-</p>
+        <MarketTrustProofRow items={SHOPPER_TRUST_PROOFS} className="mb-8" />
 
-          <div className="flex justify-center mt-3">
-            <div className="w-16 h-[2px] bg-gray-300" />
-          </div>
-        </div>
-
-        {/* Content - Compact Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-stretch">
-          {/* Left Tabs */}
-          <div className="lg:col-span-5 grid gap-1">
-            <Image
-              src={tabClick === 0 ? "/howitworks/browseClick.png" : "/howitworks/browse.png"}
-              alt="Browse"
-              width={400}
-              height={100}
-              onClick={() => setTabClick(0)}
-              className="cursor-pointer block w-full h-[70px] object-contain object-left"
-            />
-
-            <Image
-              src={tabClick === 1 ? "/howitworks/discoverClick.png" : "/howitworks/discover.png"}
-              alt="Discover"
-              width={400}
-              height={100}
-              onClick={() => setTabClick(1)}
-              className="cursor-pointer block w-full h-[70px] object-contain object-left"
-            />
-
-            <Image
-              src={tabClick === 2 ? "/howitworks/connectClick.png" : "/howitworks/connect.png"}
-              alt="Connect"
-              width={400}
-              height={100}
-              onClick={() => setTabClick(2)}
-              className="cursor-pointer block w-full h-[70px] object-contain object-left"
-            />
-
-            <Image
-              src={tabClick === 3 ? "/howitworks/supportClick.png" : "/howitworks/support.png"}
-              alt="Support"
-              width={400}
-              height={100}
-              onClick={() => setTabClick(3)}
-              className="cursor-pointer block w-full h-[70px] object-contain object-left"
-            />
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:gap-6">
+          <div className="grid gap-2 lg:col-span-5">
+            {tabContent.map((tab, index) => (
+              <button
+                key={tab.title}
+                type="button"
+                onClick={() => setActiveTab(index)}
+                className={cn(
+                  "marketing-how-tab",
+                  activeTab === index && "marketing-how-tab--active"
+                )}
+                aria-pressed={activeTab === index}
+              >
+                <span className="text-market-gold">{String(index + 1).padStart(2, "0")}</span>
+                {tab.title}
+              </button>
+            ))}
           </div>
 
-          {/* Right Content */}
-          <div className="lg:col-span-7 bg-gray-50 p-3 flex items-center gap-2 min-h-[250px] md:min-h-[270px]">
+          <div className="marketing-how-panel lg:col-span-7">
             <div className="flex-shrink-0">
               <Image
-                src={icons[tabClick]}
-                alt="Step Icon"
-                width={96}
-                height={96}
+                src={active.icon}
+                alt=""
+                width={72}
+                height={72}
                 className="object-contain"
               />
             </div>
-
-<div className="flex flex-col gap-1.5 text-[#5F5F5F] text-[13px] leading-5 font-montserrat font-[500] capitalize flex-1">
-  <p>{tabContent[tabClick].description}</p>
-</div>
+            <div className="flex-1">
+              <h3 className="font-poppins text-lg font-semibold text-market-text">{active.title}</h3>
+              <p className="mt-3 font-montserrat text-sm leading-relaxed text-market-muted sm:text-base">
+                {active.description}
+              </p>
+            </div>
           </div>
         </div>
 
-        {/* Learn More Button */}
-        <div className="flex justify-center mt-3">
-          <Link 
-            href="/how-to-use-this-app"
-            className="px-6 py-2 bg-[#1e3a5f] text-white text-xs font-medium hover:bg-[#2a4a6f] transition-colors"
-          >
-            Learn More
+        <div className="mt-8 flex justify-center">
+          <Link href="/how-to-use-this-app" className="market-btn-primary min-w-[200px] text-center">
+            See full guide
           </Link>
         </div>
       </div>
     </section>
   );
 }
-

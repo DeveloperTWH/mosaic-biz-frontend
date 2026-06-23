@@ -1,7 +1,7 @@
 # Frontend Smoke Checklist
 
 Repo: `Digital-Builders-757/mosaic-biz-frontend-launch`  
-**Run against:** Vercel **release-candidate preview** — not localhost alone (CORS may block production API from local origin).
+**Run against:** Vercel **`develop` preview** (integration gate) — not localhost alone (CORS may block production API from local origin). Feature-branch previews are useful for scoped review; sign-off for production promotion happens on **`develop`** before merge to `main`.
 
 **Current status & preview URL pattern:** [PROJECT_STATUS.md](PROJECT_STATUS.md)
 
@@ -9,9 +9,9 @@ Mark pass/fail with evidence (screenshot, URL, or Sentry issue link).
 
 ---
 
-## Release-candidate gate (post PR #30)
+## Integration gate (`develop`)
 
-Run first on `sprint/frontend-release-candidate` preview after SSO login:
+Run on the **`develop` preview** after SSO login (before promoting `develop` → `main`):
 
 - [ ] Hard refresh `/products` (Ctrl+Shift+R)
 - [ ] Network: `https://api.mosaicbizhub.com/api/products/list?...` → **200**
@@ -24,7 +24,7 @@ Evidence template: [HOMEPAGE_MARKETPLACE_REDESIGN_QA_REPORT.md](HOMEPAGE_MARKETP
 
 ## Build and deploy
 
-- [ ] `npm run build` passes on release branch
+- [ ] `npm run build` passes on the branch under test (`develop` or feature)
 - [ ] Preview deploy loads without 500 on `/`
 - [ ] `NEXT_PUBLIC_API_BASE_URL` points to `https://api.mosaicbizhub.com`
 

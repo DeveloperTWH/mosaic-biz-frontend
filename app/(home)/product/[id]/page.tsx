@@ -26,6 +26,9 @@ import TrustBadge from "../../Components/TrustBadge";
 import { pickBadgeValue } from "@/lib/trustBadge";
 import { buildSearchPageUrl, PublicSearchFilters } from "../../Components/publicSearch";
 import MarketEmptyState from "../../Components/MarketEmptyState";
+import ShopperTrustCallout from "../../Components/ShopperTrustCallout";
+import { SHOPPER_PRODUCT_TRUST_NOTE } from "../../Components/marketTrustProof";
+import { getStockHint } from "../../Components/publicCards/publicProductCardMappers";
 
 const getAttributeGroups = (variants: Variant[]): Map<string, Set<string>> => {
   const attributeMap = new Map<string, Set<string>>();
@@ -621,7 +624,7 @@ setMainImage(firstImage);
       )}
 
       {/* Main Content */}
-      <div className="container-page py-8">
+      <div className="container-page market-content-safe-bottom py-8">
         <Link
           href="/products"
           className="mb-6 inline-flex min-h-11 items-center font-montserrat text-sm font-medium text-market-teal transition-colors hover:text-brand-teal-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-market-gold"
@@ -632,20 +635,21 @@ setMainImage(firstImage);
 
           {/* LEFT: Images */}
           <div className="lg:w-[45%]">
-            <div className="relative w-full aspect-square bg-gray-50 rounded overflow-hidden border border-gray-100">
+            <div className="relative aspect-square w-full overflow-hidden rounded-xl border border-dashboard-border-light bg-white">
               {mainImage || productImages[0] || product.coverImage ? (
                 <img
                   src={mainImage || productImages[0] || product.coverImage}
                   alt={product.title}
-                  className="absolute inset-0 object-cover w-full h-full"
+                  className="absolute inset-0 h-full w-full object-contain p-4"
                 />
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center font-montserrat text-sm text-brand-muted">
-                  No image available
+                  Image coming soon
                 </div>
               )}
               <button
-                className="absolute z-10 p-2 rounded-full top-3 right-3 bg-white/90 hover:bg-white shadow"
+                type="button"
+                className="absolute right-3 top-3 z-10 flex min-h-11 min-w-11 items-center justify-center rounded-full bg-white/95 shadow hover:bg-white"
                 onClick={async () => {
                   try {
                     await toggleWishlist(product._id);
@@ -654,28 +658,30 @@ setMainImage(firstImage);
                     toast.error('Failed to update wishlist');
                   }
                 }}
+                aria-label={liked ? "Remove from wishlist" : "Add to wishlist"}
               >
-                <Heart className={`w-4 h-4 ${liked ? 'text-red-500 fill-red-500' : 'text-brand-muted'}`} fill={liked ? 'currentColor' : 'none'} />
+                <Heart className={`h-4 w-4 ${liked ? 'text-red-500 fill-red-500' : 'text-brand-muted'}`} fill={liked ? 'currentColor' : 'none'} />
               </button>
             </div>
 
             {/* Thumbnails */}
 {productImages.length > 0 && (
-  <div className="flex gap-2 mt-3 flex-wrap">
+  <div className="mt-3 flex flex-wrap gap-2">
     {productImages.map((img: string, i: number) => (
       <button
+        type="button"
         key={i}
         onClick={() => setMainImage(img)}
-        className={`w-[80px] h-[80px] border-2 rounded overflow-hidden transition-all ${
+        className={`h-20 w-20 overflow-hidden rounded-lg border-2 bg-white transition-all ${
           mainImage === img
-            ? "border-[#c79b44]"
-            : "border-gray-200 hover:border-gray-300"
+            ? "border-brand-gold ring-2 ring-brand-gold/30"
+            : "border-dashboard-border-light hover:border-brand-gold/50"
         }`}
       >
         <img
           src={img}
-          alt={`thumb-${i}`}
-          className="object-cover w-full h-full"
+          alt={`${product.title} view ${i + 1}`}
+          className="h-full w-full object-contain p-1"
         />
       </button>
     ))}
@@ -718,12 +724,9 @@ setMainImage(firstImage);
             </div>
 
             {/* Product Title */}
-<h1
-  className="text-[22px] leading-snug text-brand-navy"
-  style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600 , fontSize: '36px' }}
->
-  {product.title}
-</h1>
+            <h1 className="font-poppins text-2xl font-semibold leading-snug text-brand-navy sm:text-3xl">
+              {product.title}
+            </h1>
 
             {/* Rating */}
             <div className="flex items-center gap-2">
@@ -865,11 +868,28 @@ setMainImage(firstImage);
   </div>
 </div> */}
 
+            {selectedVariant ? (
+              <p className="text-sm font-medium text-brand-navy">
+                {(() => {
+                  const hint = getStockHint(selectedVariant.stock, selectedVariant.allowBackorder);
+                  if (hint === "Out of stock") {
+                    return <span className="text-dashboard-warn-text">Currently out of stock</span>;
+                  }
+                  if (hint) {
+                    return <span className="text-brand-gold">{hint} — order soon</span>;
+                  }
+                  return <span className="text-brand-muted">In stock — ready to ship from verified vendor</span>;
+                })()}
+              </p>
+            ) : null}
+
+            <div className="shopper-buy-box space-y-4">
             {/* Action Buttons */}
-            <div className="flex gap-3 pt-2">
+            <div className="flex flex-col gap-3 sm:flex-row">
               {cartQty > 0 ? (
-                <div className="flex items-center gap-2">
+                <div className="commerce-qty-control flex-1 flex-wrap">
                   <button
+                    type="button"
                     onClick={async () => {
                       if (!selectedVariant?.variantId) return;
                       setIsBlocking(true);
@@ -886,10 +906,12 @@ setMainImage(firstImage);
                       } catch { toast.error('Failed to update cart'); }
                       finally { setIsBlocking(false); }
                     }}
-                    className="w-9 h-9 text-base font-bold text-white bg-red-500 rounded hover:bg-red-600"
+                    className="commerce-qty-btn"
+                    aria-label="Decrease quantity"
                   >−</button>
-                  <span className="min-w-[28px] text-center font-medium">{cartQty}</span>
+                  <span className="min-w-[2rem] text-center text-base font-semibold text-brand-navy">{cartQty}</span>
                   <button
+                    type="button"
                     onClick={async () => {
                       if (!selectedVariant?.variantId) return;
                       setIsBlocking(true);
@@ -901,38 +923,35 @@ setMainImage(firstImage);
                       catch { toast.error('Failed to update cart'); }
                       finally { setIsBlocking(false); }
                     }}
-                    className="w-9 h-9 text-base font-bold text-white bg-green-600 rounded hover:bg-green-700"
+                    className="commerce-qty-btn"
+                    aria-label="Increase quantity"
                   >+</button>
+                  <Link href="/cart" className="ml-auto text-sm font-semibold text-brand-navy-light underline">
+                    View cart
+                  </Link>
                 </div>
               ) : (
                 <button
-                  className="flex-1 py-2.5 font-semibold text-white bg-[#1e3a5f] rounded hover:bg-[#152a45] disabled:opacity-60 disabled:cursor-not-allowed transition-colors text-sm uppercase tracking-wide"
-                  disabled={isBlocking || loadingQty || !isVariantSelected() || Boolean(selectedVariant && selectedVariant.stock <= 0)}
+                  type="button"
+                  className="commerce-action-primary"
+                  disabled={isBlocking || loadingQty || !isVariantSelected() || Boolean(selectedVariant && selectedVariant.stock <= 0 && !selectedVariant.allowBackorder)}
                   onClick={handleAddToCartClick}
                 >
-                  {!isVariantSelected() ? 'Select Options' : selectedVariant && selectedVariant.stock <= 0 ? 'Out of Stock' : 'Add To Cart'}
+                  {!isVariantSelected() ? 'Select options' : selectedVariant && selectedVariant.stock <= 0 && !selectedVariant.allowBackorder ? 'Out of stock' : 'Add to cart'}
                 </button>
               )}
 
-
-              {/* uncomment later */}
               <button
-                className="flex-1 py-2.5 font-semibold text-white bg-[#c79b44] rounded hover:bg-[#b08a3a] transition-colors text-sm uppercase tracking-wide disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={!isVariantSelected() || Boolean(selectedVariant && selectedVariant.stock <= 0)}
-                onClick={() => {
-                  if (!selectedVariant?.variantId) { toast.error('Variant information is missing'); return; }
-                  const sizeValue = selectedVariant.attributes?.size || selectedVariant.attributes?.Size || 'default';
-                  const queryParams = new URLSearchParams({
-                    type: 'buy', productId: product._id, variantId: selectedVariant.variantId,
-                    size: sizeValue,
-                    quantity: '1',
-                    shippingMethod: selectedShipping,
-                  });
-                  router.push(`/checkout/buy-now?${queryParams.toString()}`);
-                }}
+                type="button"
+                className="commerce-action-secondary"
+                disabled={!isVariantSelected() || Boolean(selectedVariant && selectedVariant.stock <= 0 && !selectedVariant.allowBackorder)}
+                onClick={handleBuyNowClick}
               >
-                Buy Now
+                Buy now
               </button>
+            </div>
+
+            <ShopperTrustCallout>{SHOPPER_PRODUCT_TRUST_NOTE}</ShopperTrustCallout>
             </div>
 
             {/* Product Details Table — RIGHT COLUMN */}
@@ -1211,7 +1230,7 @@ setMainImage(firstImage);
         primaryLabel={
           !isVariantSelected()
             ? "Select options"
-            : selectedVariant && selectedVariant.stock <= 0
+            : selectedVariant && selectedVariant.stock <= 0 && !selectedVariant.allowBackorder
               ? "Out of stock"
               : "Add to cart"
         }
@@ -1220,12 +1239,12 @@ setMainImage(firstImage);
           isBlocking ||
           loadingQty ||
           !isVariantSelected() ||
-          Boolean(selectedVariant && selectedVariant.stock <= 0)
+          Boolean(selectedVariant && selectedVariant.stock <= 0 && !selectedVariant.allowBackorder)
         }
         secondaryLabel="Buy now"
         onSecondaryClick={handleBuyNowClick}
         secondaryDisabled={
-          !isVariantSelected() || Boolean(selectedVariant && selectedVariant.stock <= 0)
+          !isVariantSelected() || Boolean(selectedVariant && selectedVariant.stock <= 0 && !selectedVariant.allowBackorder)
         }
       />
     </div>

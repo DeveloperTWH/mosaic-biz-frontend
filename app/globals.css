@@ -168,7 +168,67 @@ body {
 }
 
 .hero-mobile-cap {
-  @apply min-h-[420px] sm:min-h-[520px] lg:min-h-[640px];
+  @apply min-h-[380px] sm:min-h-[520px] lg:min-h-[640px];
+}
+
+.hero-cta-group {
+  @apply mx-auto flex max-w-md flex-col items-stretch justify-center gap-3 sm:max-w-none sm:flex-row sm:items-center;
+}
+
+.hero-cta-primary {
+  @apply market-btn-primary w-full text-center shadow-market-glow sm:min-w-[240px] sm:w-auto;
+}
+
+.hero-browse-divider {
+  @apply mx-auto mt-5 max-w-lg border-t border-white/10 pt-5 sm:mt-6 sm:pt-6;
+}
+
+.hero-category-pill {
+  @apply market-nav-link rounded-full border border-white/10 bg-white/5 px-3 py-1.5 font-montserrat text-xs font-medium text-market-muted/90 transition-colors hover:border-market-gold/30 hover:text-market-gold;
+}
+
+.hero-trust-footnote {
+  @apply mx-auto mt-4 max-w-xl font-montserrat text-xs leading-relaxed text-market-muted/80;
+}
+
+.market-trust-proof-row {
+  @apply mx-auto grid max-w-3xl grid-cols-1 gap-3 text-left sm:grid-cols-3 sm:gap-4;
+}
+
+.market-trust-proof-row--compact {
+  @apply max-w-2xl gap-2 sm:grid-cols-1;
+}
+
+.market-trust-proof-item {
+  @apply flex items-start gap-2.5 rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 font-montserrat text-xs leading-relaxed text-market-text/90 sm:text-sm;
+}
+
+.market-trust-proof-icon {
+  @apply mt-0.5 h-4 w-4 text-market-teal;
+}
+
+.market-trust-badge-hint {
+  @apply mx-auto flex max-w-2xl items-start gap-2 text-left font-montserrat text-xs leading-relaxed text-market-muted sm:text-sm;
+}
+
+.market-trust-badge-hint-icon {
+  @apply mt-0.5 h-4 w-4 text-market-gold;
+}
+
+.market-trust-note {
+  @apply mx-auto max-w-2xl rounded-lg border border-white/10 bg-market-surface/80 px-4 py-3 text-center font-montserrat text-xs leading-relaxed text-market-muted sm:text-sm;
+}
+
+.market-vendor-benefit-list {
+  @apply mx-auto mt-6 max-w-xl space-y-2 text-left;
+}
+
+.market-vendor-benefit-item {
+  @apply flex items-start gap-2 font-montserrat text-sm text-market-text/90;
+}
+
+.market-vendor-benefit-icon {
+  @apply mt-0.5 h-4 w-4 shrink-0 text-market-gold;
 }
 
 .btn-primary {
@@ -394,6 +454,264 @@ body {
   @apply rounded-xl border border-market-gold/25 bg-market-elevated px-6 py-5 text-center;
 }
 
+/* Public auth & marketing forms */
+.auth-form-stack {
+  @apply flex flex-col gap-5;
+}
+
+.auth-form-grid {
+  @apply grid grid-cols-1 gap-5 md:grid-cols-2;
+}
+
+.auth-form-actions {
+  @apply flex flex-col gap-3 pt-1;
+}
+
+.auth-form-section {
+  @apply flex flex-col gap-4;
+}
+
+.auth-form-section-header {
+  @apply border-b border-dashboard-border-light pb-3;
+}
+
+.auth-form-section-title {
+  @apply font-poppins text-sm font-semibold uppercase tracking-wide text-brand-navy;
+}
+
+.auth-form-section-desc {
+  @apply mt-1 font-montserrat text-xs leading-relaxed text-brand-muted;
+}
+
+.auth-form-section-body {
+  @apply flex flex-col gap-5;
+}
+
+.auth-path-switch {
+  @apply text-center font-montserrat text-sm text-brand-muted;
+}
+
+.form-alert {
+  @apply rounded-lg border px-3 py-2.5 font-montserrat text-sm leading-relaxed;
+}
+
+.form-alert--success {
+  @apply border-green-300 bg-green-50 text-green-800;
+}
+
+.form-alert--error {
+  @apply border-dashboard-warn-border bg-dashboard-warn-bg text-dashboard-warn-text;
+}
+
+.form-alert--info {
+  @apply border-brand-gold/30 bg-brand-cream text-brand-navy;
+}
+
+.public-form-shell {
+  @apply market-card p-5 sm:p-6 md:p-8;
+}
+
+.public-form-stack {
+  @apply flex flex-col gap-5;
+}
+
+.public-form-grid {
+  @apply grid grid-cols-1 gap-5 md:grid-cols-2;
+}
+
+.auth-otp-input {
+  @apply h-12 w-11 px-0 text-center text-xl font-semibold sm:w-12;
+}
+
+.auth-role-badge {
+  @apply mb-2 inline-block rounded-full bg-brand-cream px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-brand-gold;
+}
+
+/* Vendor onboarding forms */
+.vendor-form-section {
+  @apply rounded-xl border border-dashboard-border-light bg-white p-5 shadow-sm sm:p-6;
+}
+
+.vendor-form-section--market {
+  @apply rounded-xl border border-white/10 bg-white/5 p-5 sm:p-6;
+}
+
+.vendor-form-section-header {
+  @apply mb-5 flex items-start gap-3 border-b border-dashboard-border-light pb-4;
+}
+
+.vendor-form-section--market .vendor-form-section-header {
+  @apply border-white/10;
+}
+
+.vendor-form-section-icon {
+  @apply flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-cream text-brand-gold;
+}
+
+.vendor-form-section-title {
+  @apply font-poppins text-base font-semibold text-dashboard-text sm:text-lg;
+}
+
+.vendor-form-section--market .vendor-form-section-title {
+  @apply text-market-text;
+}
+
+.vendor-form-section-desc {
+  @apply mt-1 font-montserrat text-sm leading-relaxed text-dashboard-muted;
+}
+
+.vendor-form-section--market .vendor-form-section-desc {
+  @apply text-market-muted;
+}
+
+.vendor-form-section-body {
+  @apply flex flex-col gap-5;
+}
+
+.vendor-form-actions {
+  @apply mt-8 rounded-xl border border-dashboard-border-light bg-surface-panel p-4 sm:p-5;
+}
+
+.vendor-form-actions-meta {
+  @apply mb-4 space-y-2 border-b border-dashboard-border-light pb-4;
+}
+
+.vendor-form-actions-hint {
+  @apply font-montserrat text-sm text-dashboard-muted;
+}
+
+.vendor-form-actions-next {
+  @apply font-montserrat text-sm leading-relaxed text-dashboard-text;
+}
+
+.vendor-form-actions-buttons {
+  @apply flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end;
+}
+
+.vendor-onboarding-progress {
+  @apply mb-6 rounded-xl border border-dashboard-border-light bg-white p-4 shadow-sm sm:p-5;
+}
+
+.vendor-onboarding-progress--market {
+  @apply mb-6 rounded-xl border border-white/10 bg-market-elevated p-4 shadow-market-card sm:p-5;
+}
+
+.vendor-onboarding-progress-eyebrow {
+  @apply font-montserrat text-xs font-semibold uppercase tracking-wide text-dashboard-gold;
+}
+
+.vendor-onboarding-progress--market .vendor-onboarding-progress-eyebrow {
+  @apply text-market-gold;
+}
+
+.vendor-onboarding-progress-title {
+  @apply mt-1 font-poppins text-lg font-semibold text-dashboard-text sm:text-xl;
+}
+
+.vendor-onboarding-progress--market .vendor-onboarding-progress-title {
+  @apply text-market-text;
+}
+
+.vendor-onboarding-progress-hint {
+  @apply mt-2 max-w-2xl font-montserrat text-sm leading-relaxed text-dashboard-muted;
+}
+
+.vendor-onboarding-progress--market .vendor-onboarding-progress-hint {
+  @apply text-market-muted;
+}
+
+.vendor-onboarding-progress-hub-link {
+  @apply font-montserrat text-sm font-semibold text-dashboard-gold hover:underline;
+}
+
+.vendor-onboarding-progress--market .vendor-onboarding-progress-hub-link {
+  @apply text-market-gold;
+}
+
+.vendor-onboarding-progress-bar {
+  @apply mt-4 h-2 overflow-hidden rounded-full bg-gray-200;
+}
+
+.vendor-onboarding-progress--market .vendor-onboarding-progress-bar {
+  @apply bg-white/10;
+}
+
+.vendor-onboarding-progress-bar-fill {
+  @apply h-full bg-dashboard-gold transition-all duration-300;
+}
+
+.vendor-onboarding-progress--market .vendor-onboarding-progress-bar-fill {
+  @apply bg-market-gold;
+}
+
+.vendor-onboarding-progress-steps {
+  @apply mt-4 hidden gap-2 overflow-x-auto pb-1 lg:flex;
+}
+
+.vendor-onboarding-progress-step {
+  @apply flex min-w-[7rem] flex-col items-center gap-1 rounded-lg px-2 py-2 text-center transition-colors hover:bg-gray-50;
+}
+
+.vendor-onboarding-progress-step--current {
+  @apply bg-brand-cream/60;
+}
+
+.vendor-onboarding-progress-step--done {
+  @apply text-dashboard-muted;
+}
+
+.vendor-onboarding-progress-step-num {
+  @apply flex h-7 w-7 items-center justify-center rounded-full bg-gray-200 text-xs font-bold text-dashboard-text;
+}
+
+.vendor-onboarding-progress-step--current .vendor-onboarding-progress-step-num {
+  @apply bg-dashboard-gold text-white;
+}
+
+.vendor-onboarding-progress-step--done .vendor-onboarding-progress-step-num {
+  @apply bg-dashboard-gold/30 text-dashboard-gold;
+}
+
+.vendor-onboarding-progress-step-label {
+  @apply font-montserrat text-[10px] font-medium uppercase leading-tight tracking-wide text-dashboard-muted;
+}
+
+.vendor-onboarding-progress-save-note {
+  @apply mt-4 rounded-lg border border-dashboard-border-light bg-surface-cream px-3 py-2 font-montserrat text-xs text-dashboard-muted;
+}
+
+.vendor-onboarding-progress--market .vendor-onboarding-progress-save-note {
+  @apply border-market-gold/20 bg-market-gold/10 text-market-muted;
+}
+
+.vendor-upload-zone-label {
+  @apply mb-1 block font-poppins text-sm font-medium text-dashboard-text;
+}
+
+.vendor-upload-zone-helper {
+  @apply mb-3 font-montserrat text-xs leading-relaxed text-dashboard-muted;
+}
+
+.vendor-upload-zone-drop {
+  @apply flex min-h-[8rem] cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-dashboard-border-light bg-surface-cream px-4 py-6 text-center transition-colors hover:border-dashboard-gold hover:bg-white;
+}
+
+.vendor-upload-zone-drop-title {
+  @apply font-poppins text-sm font-medium text-dashboard-text;
+}
+
+.vendor-upload-zone-drop-hint {
+  @apply font-montserrat text-xs text-dashboard-muted;
+}
+
+.vendor-upload-zone-error {
+  @apply mt-2 font-montserrat text-xs text-dashboard-warn-text;
+}
+
+.vendor-upload-zone-preview {
+  @apply rounded-lg border border-dashboard-border-light bg-white p-3;
+}
+
 .market-card {
   @apply rounded-2xl border border-white/15 bg-market-surface shadow-market-card transition-all duration-300 hover:border-market-gold/25 hover:bg-market-elevated hover:shadow-market-glow;
 }
@@ -497,6 +815,90 @@ body {
   @apply font-poppins text-xs font-semibold uppercase tracking-wide text-market-gold;
 }
 
+.market-card-trust-label {
+  @apply font-montserrat text-[11px] font-semibold uppercase tracking-wide text-market-teal sm:text-xs;
+}
+
+.market-card-vendor-meta {
+  @apply font-montserrat text-xs text-market-text/85;
+}
+
+.market-card-vendor-meta-label {
+  @apply mr-1.5 font-semibold uppercase tracking-wide text-market-muted;
+}
+
+.market-card-body {
+  @apply flex flex-1 flex-col gap-2 p-3 sm:p-4;
+}
+
+.market-card-media--product {
+  @apply aspect-[4/3] sm:aspect-square;
+}
+
+.market-card-price-block {
+  @apply mt-auto flex flex-col gap-0.5;
+}
+
+.market-card-price-label {
+  @apply font-montserrat text-xs text-market-muted;
+}
+
+.market-card-price-muted {
+  @apply font-poppins text-sm font-medium text-market-muted;
+}
+
+.market-card-price-compare {
+  @apply font-montserrat text-sm text-market-muted line-through;
+}
+
+.market-card-sale-badge {
+  @apply absolute left-3 top-3 rounded-full bg-red-600 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white sm:text-xs;
+}
+
+.market-card-stock-hint {
+  @apply absolute bottom-3 left-3 rounded-full bg-market-header/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-market-gold backdrop-blur-sm;
+}
+
+.market-card-cta-row {
+  @apply mt-2 flex min-h-[44px] items-center justify-between gap-2 border-t border-white/10 pt-3;
+}
+
+.market-card-badge-wrap {
+  @apply flex h-10 shrink-0 items-center justify-center sm:h-11;
+}
+
+.market-card-badge-image {
+  @apply h-10 max-w-[4.5rem] object-contain sm:h-11;
+}
+
+.public-grid-listing--low-count {
+  @apply sm:grid-cols-1 md:mx-auto md:max-w-md lg:max-w-lg;
+}
+
+.shopper-low-inventory-note {
+  @apply mb-6 rounded-xl border border-market-gold/25 bg-market-elevated px-4 py-3 text-center font-montserrat text-sm leading-relaxed text-market-muted;
+}
+
+.shopper-buy-box {
+  @apply rounded-xl border border-gray-100 bg-gray-50/80 p-4 sm:p-5;
+}
+
+.commerce-qty-control {
+  @apply flex min-h-11 items-center gap-3;
+}
+
+.commerce-qty-btn {
+  @apply flex h-11 w-11 items-center justify-center rounded-lg border border-dashboard-input-border bg-white text-lg font-semibold text-brand-navy transition hover:border-brand-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+.commerce-action-primary {
+  @apply min-h-11 flex-1 rounded-lg bg-brand-navy-light px-4 py-2.5 text-sm font-semibold uppercase tracking-wide text-white transition hover:bg-brand-navy disabled:cursor-not-allowed disabled:opacity-60;
+}
+
+.commerce-action-secondary {
+  @apply min-h-11 flex-1 rounded-lg bg-brand-gold px-4 py-2.5 text-sm font-semibold uppercase tracking-wide text-brand-navy transition hover:bg-brand-gold-light disabled:cursor-not-allowed disabled:opacity-50;
+}
+
 .market-empty-state {
   @apply market-card p-8 text-center;
 }
@@ -518,6 +920,74 @@ body {
 
 .market-empty-state-desc {
   @apply mt-2 font-montserrat text-sm text-market-text/85;
+}
+
+.market-discovery-panel {
+  @apply market-card p-6 text-center sm:p-8;
+}
+
+.market-discovery-panel--compact {
+  @apply p-4 sm:p-5;
+}
+
+.market-discovery-panel-title {
+  @apply font-poppins text-lg font-semibold text-market-text sm:text-xl;
+}
+
+.market-discovery-panel-desc {
+  @apply mx-auto mt-2 max-w-xl font-montserrat text-sm leading-relaxed text-market-text/85;
+}
+
+.market-discovery-section-label {
+  @apply font-montserrat text-xs font-semibold uppercase tracking-wider text-market-muted/80;
+}
+
+.market-suggestion-chip {
+  @apply market-nav-link inline-flex min-h-9 items-center rounded-full border border-white/10 bg-white/5 px-3 py-1.5 font-montserrat text-xs font-medium text-market-muted transition-colors hover:border-market-gold/35 hover:text-market-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-market-gold/50 sm:text-sm;
+}
+
+.market-suggestion-chip--accent {
+  @apply border-market-gold/25 bg-market-gold/10 text-market-text hover:bg-market-gold/15;
+}
+
+.market-active-filter-chip {
+  @apply inline-flex min-h-9 items-center rounded-full border border-market-gold/35 bg-market-gold/10 px-3 py-1 font-montserrat text-xs font-medium text-market-text transition-colors hover:border-market-gold/50 hover:bg-market-gold/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-market-gold/50;
+}
+
+.market-active-filter-chip--static {
+  @apply cursor-default hover:border-market-gold/35 hover:bg-market-gold/10;
+}
+
+.market-filter-loading-hint {
+  @apply mt-1.5 font-montserrat text-xs text-market-muted/80;
+}
+
+.market-select-wrap--loading .market-select-chevron {
+  @apply animate-pulse;
+}
+
+.market-search-skeleton-card {
+  @apply overflow-hidden rounded-2xl border border-white/10 bg-market-surface;
+}
+
+.market-search-skeleton-media {
+  @apply aspect-[4/3] w-full animate-pulse bg-white/5 sm:aspect-square;
+}
+
+.market-search-skeleton-line {
+  @apply h-3 animate-pulse rounded bg-white/10;
+}
+
+.market-search-skeleton-line--title {
+  @apply w-3/4;
+}
+
+.market-search-skeleton-line--body {
+  @apply w-full;
+}
+
+.market-search-skeleton-line--short {
+  @apply w-1/2;
 }
 
 .market-state-error {
@@ -737,6 +1207,82 @@ body {
   bottom: -5px !important;
 }
 
+/* Marketing pages (About, Contact, How-to) — shared rhythm with marketplace */
+.marketing-media-frame {
+  @apply overflow-hidden rounded-2xl border border-white/10 bg-market-elevated shadow-market-card;
+}
+
+.marketing-media-frame img {
+  @apply aspect-[4/3] w-full object-cover;
+}
+
+.marketing-feature-card {
+  @apply market-card h-full p-6 sm:p-8;
+}
+
+.marketing-feature-card--featured {
+  @apply border-market-gold/35 bg-market-elevated shadow-market-glow;
+}
+
+.marketing-feature-card--featured p {
+  @apply text-market-text/90;
+}
+
+.marketing-bullet-list {
+  @apply space-y-4 font-montserrat text-sm leading-relaxed text-market-muted sm:text-base;
+}
+
+.marketing-bullet-item {
+  @apply relative pl-5 before:absolute before:left-0 before:top-[0.55em] before:h-1.5 before:w-1.5 before:rounded-full before:bg-market-gold;
+}
+
+.marketing-step-section {
+  @apply grid grid-cols-1 overflow-hidden bg-market-bg md:grid-cols-2;
+}
+
+.marketing-step-section--reverse .marketing-step-content {
+  @apply md:order-2;
+}
+
+.marketing-step-section--reverse .marketing-step-media {
+  @apply md:order-1;
+}
+
+.marketing-step-content {
+  @apply flex flex-col justify-center px-4 py-10 sm:px-8 sm:py-14 md:px-12 lg:px-16;
+}
+
+.marketing-step-media {
+  @apply relative min-h-[280px] md:min-h-[420px];
+}
+
+.marketing-step-label {
+  @apply font-montserrat text-xs font-semibold uppercase tracking-[0.2em] text-market-gold;
+}
+
+.marketing-step-title {
+  @apply font-poppins text-xl font-bold uppercase tracking-wide text-market-text sm:text-2xl;
+}
+
+.marketing-contact-card {
+  @apply market-card flex h-full flex-col p-6 sm:p-8;
+}
+
+.marketing-form-panel {
+  @apply market-card p-6 sm:p-8 lg:p-10;
+}
+
+.marketing-how-tab {
+  @apply flex min-h-11 w-full items-center gap-3 rounded-lg border border-white/10 bg-market-elevated px-4 py-3 text-left font-poppins text-sm font-semibold uppercase tracking-wide text-market-muted transition hover:border-market-gold/30 hover:text-market-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-market-gold/50;
+}
+
+.marketing-how-tab--active {
+  @apply border-market-gold/40 bg-market-surface text-market-gold shadow-market-glow;
+}
+
+.marketing-how-panel {
+  @apply market-card flex min-h-[240px] items-start gap-4 p-5 sm:p-6;
+}
 
 
 

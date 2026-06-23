@@ -13,7 +13,9 @@ import {
   persistClientSession,
 } from '@/utils/authUtils';
 import AuthPageShell from '@/components/auth/AuthPageShell';
+import AuthPathSwitch from '@/components/auth/AuthPathSwitch';
 import { FormField } from '@/components/ui/form-field';
+import { FormAlert } from '@/components/ui/form-alert';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
@@ -36,21 +38,10 @@ function LoginContent() {
       ? 'Password reset successful. Please sign in with your new password.'
       : '';
 
-  const role = type === 'vendor' ? 'business_owner' : 'customer';
   const safeRedirect =
     redirect && redirect.startsWith('/') && !redirect.startsWith('//')
       ? redirect
       : null;
-
-  const handleGoogleLoginRedirect = () => {
-    const returnTo =
-      typeof window !== 'undefined' ? window.location.origin : '';
-    const url =
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/google` +
-      `?role=${encodeURIComponent(role)}` +
-      `&redirect=${encodeURIComponent(returnTo)}`;
-    window.location.href = url;
-  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -135,6 +126,7 @@ function LoginContent() {
   }
 
   const typeLabel = type === 'vendor' ? 'Vendor' : 'Customer';
+  const alternateType = type === 'vendor' ? 'customer' : 'vendor';
   const hero =
     type === 'vendor' ? (
       <>
@@ -143,7 +135,7 @@ function LoginContent() {
           <span className="font-bold text-brand-gold">STOREFRONT</span>
         </h1>
         <p className="mb-8 font-montserrat text-sm font-light leading-relaxed text-white/80">
-          Sign in to manage your products, track orders, and grow your business on Mosaic BizHub.
+          Sign in to manage your products, track orders, and grow your business on Mosaic Biz Hub.
         </p>
         <div className="space-y-5 text-sm">
           <div>
@@ -172,16 +164,23 @@ function LoginContent() {
 
   return (
     <AuthPageShell typeLabel={typeLabel} title="SIGN IN" hero={hero}>
-      <form className="space-y-4" onSubmit={handleSubmit}>
-        <FormField label="Email" htmlFor="email" required surface="auth">
+      <form className="auth-form-stack" onSubmit={handleSubmit}>
+        <FormField
+          label="Email"
+          htmlFor="email"
+          required
+          surface="auth"
+          helperText="Use the email address linked to your account."
+        >
           <Input
             id="email"
             name="email"
             type="email"
+            autoComplete="email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter your email"
+            placeholder="you@example.com"
             surface="auth"
           />
         </FormField>
@@ -192,6 +191,7 @@ function LoginContent() {
               id="password"
               type={showPassword ? 'text' : 'password'}
               name="password"
+              autoComplete="current-password"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -202,7 +202,7 @@ function LoginContent() {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute inset-y-0 right-3 flex items-center text-brand-muted hover:text-brand-navy"
+              className="absolute inset-y-0 right-3 flex min-h-11 min-w-11 items-center justify-center text-brand-muted hover:text-brand-navy"
               aria-label={showPassword ? 'Hide password' : 'Show password'}
             >
               {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -210,42 +210,42 @@ function LoginContent() {
           </div>
         </FormField>
 
-        <div className="flex items-center justify-between text-sm">
-          <label className="flex items-center gap-2 font-montserrat font-light text-brand-muted">
-            <input type="checkbox" className="rounded border-dashboard-input-border" />
-            Keep Me Signed In
+        <div className="flex flex-col gap-3 text-sm sm:flex-row sm:items-center sm:justify-between">
+          <label className="flex min-h-11 items-center gap-2 font-montserrat text-brand-muted">
+            <input type="checkbox" className="h-4 w-4 rounded border-dashboard-input-border" />
+            Keep me signed in
           </label>
           <Link
             href={`/forgot-password?type=${encodeURIComponent(type)}`}
-            className="font-medium text-brand-navy-light hover:underline"
+            className="min-h-11 font-medium leading-[2.75rem] text-brand-navy-light hover:underline sm:leading-normal"
           >
-            Forget Password
+            Forgot password?
           </Link>
         </div>
 
-        {successMessage ? (
-          <div className="rounded border border-green-300 bg-green-50 p-2 text-sm text-green-800">
-            {successMessage}
-          </div>
-        ) : null}
+        {successMessage ? <FormAlert variant="success">{successMessage}</FormAlert> : null}
+        {error ? <FormAlert variant="error">{error}</FormAlert> : null}
 
-        {error ? (
-          <div className="rounded border border-dashboard-warn-border bg-dashboard-warn-bg p-2 text-sm text-dashboard-warn-text">
-            {error}
-          </div>
-        ) : null}
-
-        <Button type="submit" className="w-full normal-case" disabled={loading}>
-          {loading ? 'Signing In...' : 'Sign In'}
-        </Button>
+        <div className="auth-form-actions">
+          <Button type="submit" size="lg" className="w-full normal-case" disabled={loading}>
+            {loading ? 'Signing in…' : 'Sign in'}
+          </Button>
+        </div>
       </form>
 
-      <p className="mt-6 text-center text-base text-brand-muted underline">
-        New Here?{" "}
-        <Link href={`/signup?type=${type}`} className="text-brand-navy-light">
-          Create Account
-        </Link>
-      </p>
+      <AuthPathSwitch
+        className="mt-6"
+        message="New here?"
+        href={`/signup?type=${type}`}
+        linkLabel="Create account"
+      />
+
+      <AuthPathSwitch
+        className="mt-3"
+        message={type === 'vendor' ? 'Shopping as a customer?' : 'Selling on Mosaic?'}
+        href={`/login?type=${alternateType}`}
+        linkLabel={type === 'vendor' ? 'Customer sign in' : 'Vendor sign in'}
+      />
     </AuthPageShell>
   );
 }

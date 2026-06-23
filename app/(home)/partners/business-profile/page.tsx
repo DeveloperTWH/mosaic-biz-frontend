@@ -5,13 +5,14 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 import TermsModal from "../final-review/components/TermsModal";
 import VendorApplicationShell from "../components/VendorApplicationShell";
+import VendorOnboardingProgress from "../components/VendorOnboardingProgress";
+import VendorFormActions from "../components/VendorFormActions";
 import {
   getOnboardingData,
   updateBusinessProfile
 } from '@/lib/api/vendorOnboarding';
 import {
   ArrowLeft,
-  Save,
   Loader,
   Upload,
   Link as LinkIcon,
@@ -562,8 +563,15 @@ export default function BusinessProfilePage({
       variant="dashboard"
       maxWidthClass="max-w-4xl"
       title="Set Up Your Business Profile"
-      description="Create a public profile to showcase your business, products, and services."
+      description="Add your logo, bio, and policies. Customers see this information on your storefront — you can save and return anytime."
     >
+      {!embedded ? (
+        <VendorOnboardingProgress
+          currentStage={3}
+          saveNote="Changes are saved when you click Save profile. Logo must be exactly 500×500 px."
+        />
+      ) : null}
+
       <form onSubmit={handleSubmit} className="space-y-6">
 
           {/* Personal Information - ALL DISABLED except Language */}
@@ -1315,32 +1323,21 @@ export default function BusinessProfilePage({
           </div>
 
           {/* Form Actions */}
-          <div className="flex items-center justify-end gap-3">
-            {/* <button
-              type="button"
-              onClick={() => router.push('/partners')}
-              className="px-5 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium"
-            >
-              Continue The Onboarding process
-            </button> */}
-            <button
-              type="submit"
-              disabled={saving}
-              className="px-5 py-2 bg-[#c9a227] text-white rounded-lg hover:bg-[#b8921f] transition-colors text-sm font-medium flex items-center gap-2 disabled:opacity-50"
-            >
-              {saving ? (
-                <>
-                  <Loader className="w-4 h-4 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Save className="w-4 h-4" />
-                  Save Profile
-                </>
-              )}
-            </button>
-          </div>
+          <VendorFormActions
+            hint="Required: business bio and logo. Refund/terms documents depend on your policy selection above."
+            nextStepLabel="Next, list your first product, service, or food item from the vendor hub."
+            tertiary={{
+              label: "Back to hub",
+              onClick: () => router.push("/partners"),
+            }}
+            primary={{
+              type: "submit",
+              label: saving ? "Saving…" : "Save profile",
+              disabled: saving,
+              loading: saving,
+              loadingLabel: "Saving…",
+            }}
+          />
         </form>
     </VendorApplicationShell>
   );

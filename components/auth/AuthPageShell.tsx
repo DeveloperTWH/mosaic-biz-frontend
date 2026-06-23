@@ -29,7 +29,7 @@ export default function AuthPageShell({ typeLabel, title, hero, children }: Auth
 
       <div className="flex min-w-0 items-center justify-center bg-white px-6 py-10">
         <div className="w-full max-w-md min-w-0">
-          <span className="mb-2 inline-block rounded-full bg-brand-cream px-2 py-0.5 text-[10px] font-medium text-brand-gold">
+          <span className="auth-role-badge mb-2 inline-block">
             {typeLabel}
           </span>
           <h2 className="mb-2 font-poppins text-3xl font-bold text-brand-navy">{title}</h2>

@@ -15,6 +15,7 @@ import {
 import AuthPageShell from '@/components/auth/AuthPageShell';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { FormAlert } from '@/components/ui/form-alert';
 
 function VerifyOtpPage() {
   const searchParams = useSearchParams();
@@ -30,6 +31,7 @@ function VerifyOtpPage() {
 
   const [otp, setOtp] = useState<string[]>(Array(6).fill(''));
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const [resendDisabled, setResendDisabled] = useState(false);
   const [countdown, setCountdown] = useState(0);
 
@@ -66,9 +68,11 @@ function VerifyOtpPage() {
     const joinedOtp = otp.join('');
 
     if (joinedOtp.length !== 6) {
-      setError('Please enter a 6-digit OTP');
+      setError('Please enter the full 6-digit code.');
       return;
     }
+
+    setLoading(true);
 
     try {
       const verifyUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/verify-otp`;
@@ -118,11 +122,13 @@ function VerifyOtpPage() {
           isBusinessOwner(sessionUser) ? '/partners' : (safeRedirect || '/')
         );
       } else {
-        setError(errorMessage || data?.message || 'Invalid OTP');
+        setError(errorMessage || data?.message || 'Invalid code. Please try again.');
       }
     } catch (err) {
       console.error('OTP verification error:', err);
       setError('Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -155,12 +161,12 @@ function VerifyOtpPage() {
       });
 
       if (data?.success) {
-        toast.success('OTP resent successfully!');
+        toast.success('A new code has been sent to your email.');
       } else {
-        toast.error(errorMessage || data?.message || 'Failed to resend OTP');
+        toast.error(errorMessage || data?.message || 'Failed to resend code');
       }
     } catch {
-      toast.error('Error while resending OTP');
+      toast.error('Error while resending code');
     }
 
     const interval = setInterval(() => {
@@ -190,43 +196,54 @@ function VerifyOtpPage() {
   );
 
   return (
-    <AuthPageShell typeLabel={typeLabel} title="VERIFY OTP" hero={hero}>
+    <AuthPageShell typeLabel={typeLabel} title="VERIFY CODE" hero={hero}>
       {email ? (
-        <p className="mb-4 text-sm text-brand-muted">
-          Enter the OTP sent to <span className="font-semibold text-brand-navy">{email}</span>
+        <p className="mb-1 font-montserrat text-sm text-brand-muted">
+          Code sent to{' '}
+          <span className="font-semibold text-brand-navy">{email}</span>
         </p>
       ) : null}
+      <p className="mb-5 font-montserrat text-xs text-brand-muted">
+        Check your inbox and spam folder. The code expires shortly.
+      </p>
 
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4 flex justify-between gap-2">
-          {[...Array(6)].map((_, idx) => (
-            <Input
-              key={idx}
-              type="text"
-              inputMode="numeric"
-              maxLength={1}
-              surface="auth"
-              className="h-12 w-12 px-0 text-center text-xl"
-              value={otp[idx] || ''}
-              onChange={(e) => handleOtpChange(e, idx)}
-              onKeyDown={(e) => handleKeyDown(e, idx)}
-              ref={(el) => {
-                if (el) inputRefs.current[idx] = el;
-              }}
-            />
-          ))}
+      <form className="auth-form-stack" onSubmit={handleSubmit}>
+        <div>
+          <p className="mb-2 font-poppins text-sm font-medium text-brand-navy">
+            Verification code <span className="text-red-500">*</span>
+          </p>
+          <div className="flex justify-between gap-2" role="group" aria-label="6-digit verification code">
+            {[...Array(6)].map((_, idx) => (
+              <Input
+                key={idx}
+                type="text"
+                inputMode="numeric"
+                maxLength={1}
+                autoComplete={idx === 0 ? 'one-time-code' : 'off'}
+                surface="auth"
+                className="auth-otp-input"
+                value={otp[idx] || ''}
+                onChange={(e) => handleOtpChange(e, idx)}
+                onKeyDown={(e) => handleKeyDown(e, idx)}
+                aria-label={`Digit ${idx + 1} of 6`}
+                ref={(el) => {
+                  if (el) inputRefs.current[idx] = el;
+                }}
+              />
+            ))}
+          </div>
         </div>
 
-        {error ? (
-          <p className="mb-4 text-sm text-dashboard-warn-text">{error}</p>
-        ) : null}
+        {error ? <FormAlert variant="error">{error}</FormAlert> : null}
 
-        <Button type="submit" className="w-full normal-case">
-          Verify OTP
-        </Button>
+        <div className="auth-form-actions">
+          <Button type="submit" size="lg" className="w-full normal-case" disabled={loading}>
+            {loading ? 'Verifying…' : 'Verify and continue'}
+          </Button>
+        </div>
       </form>
 
-      <p className="mt-4 text-center text-sm text-brand-muted">
+      <p className="mt-5 text-center font-montserrat text-sm text-brand-muted">
         Didn&apos;t receive the code?{' '}
         {resendDisabled ? (
           <span className="font-semibold text-brand-muted">Resend in {countdown}s</span>
@@ -234,17 +251,15 @@ function VerifyOtpPage() {
           <button
             type="button"
             onClick={handleResendOtp}
-            className="font-semibold text-brand-navy-light underline hover:text-brand-navy"
+            className="min-h-11 font-semibold text-brand-navy-light underline hover:text-brand-navy"
           >
-            Resend OTP
+            Resend code
           </button>
         )}
       </p>
 
-      <p className="mt-6 text-center text-sm text-brand-muted">
-        <Link href="/" className="text-brand-navy-light underline">
-          Back to home
-        </Link>
+      <p className="auth-path-switch mt-6">
+        <Link href="/">Back to home</Link>
       </p>
     </AuthPageShell>
   );

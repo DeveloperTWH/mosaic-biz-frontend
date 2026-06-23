@@ -5,12 +5,13 @@ Next.js marketplace frontend for **Mosaic Biz Hub** — a platform connecting co
 | Item | Value |
 |------|--------|
 | Launch repo | [Digital-Builders-757/mosaic-biz-frontend-launch](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch) |
-| Integration branch | `sprint/frontend-release-candidate` |
+| Integration branch | `develop` |
+| Production branch | `main` |
 | API | `https://api.mosaicbizhub.com` (backend: `Techware-Hut/mosaic-backend`) |
 | Docs hub | **[docs/README.md](docs/README.md)** |
 | Current status | [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md) |
 
-**Production is not auto-deployed.** Work merges to the release-candidate branch and is validated on Vercel preview before any manual production promote.
+**Branching:** feature branches → `develop` → `main`. See [docs/GIT_WORKFLOW.md](docs/GIT_WORKFLOW.md). Merging to `main` auto-deploys production on Vercel.
 
 ---
 
@@ -68,15 +69,16 @@ All internal docs live under [`docs/`](docs/README.md):
 - **[Architecture](docs/ARCHITECTURE.md)** — routes, env, deployment, auth
 - **[API contracts](docs/API_CONTRACTS.md)** — canonical endpoints
 - **[Style guide](docs/STYLE_GUIDE.md)** — design tokens
+- **[Git workflow](docs/GIT_WORKFLOW.md)** — feature → `develop` → `main`
 - **[Smoke checklist](docs/FRONTEND_SMOKE_CHECKLIST.md)** — preview QA
 
 ---
 
 ## Release workflow (summary)
 
-1. Feature/sprint work → PR into `sprint/frontend-release-candidate` on the **launch repo**
-2. Vercel builds a **Preview** (may require team SSO)
-3. QA runs [smoke checklist](docs/FRONTEND_SMOKE_CHECKLIST.md) on preview
-4. Manual promote to production when approved — not on every merge to `main`
+1. Branch from `develop` → work on a feature branch → PR into **`develop`**
+2. Vercel builds **previews** for feature branches and `develop` (may require team SSO)
+3. QA runs the [smoke checklist](docs/FRONTEND_SMOKE_CHECKLIST.md) on the **`develop` preview**
+4. When integration is signed off → PR **`develop` into `main`** → production auto-deploys
 
-See [docs/ROADMAP.md](docs/ROADMAP.md) for current phase and non-goals.
+Full details: [docs/GIT_WORKFLOW.md](docs/GIT_WORKFLOW.md). Current phase: [docs/ROADMAP.md](docs/ROADMAP.md).
