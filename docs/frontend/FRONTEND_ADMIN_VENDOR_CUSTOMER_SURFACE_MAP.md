@@ -1,8 +1,10 @@
 # Frontend Admin / Vendor / Customer Surface Map — As Built
 
 **Type:** Reference (launch evidence pack)  
-**Last updated:** 2026-06-19  
+**Last updated:** 2026-06-23  
 **Evidence source:** `app/(home)/customer/*`, `app/(home)/partners/*`, `app/(partner)/*`, `app/(admin)/*`, API grep
+
+**Platform behavior:** [../PLATFORM_OPERATING_MODEL.md](../PLATFORM_OPERATING_MODEL.md)
 
 ---
 
@@ -95,7 +97,7 @@ flowchart LR
 | URL | Purpose | Key APIs |
 |-----|---------|----------|
 | `/admin` | Dashboard stats | `GET /api/admin/business`; status PATCH |
-| `/admin/businesses` | Business management | Evidence Needed |
+| `/admin/businesses` | Business management | Shows **Approved**, **Admin active**, and **Public on marketplace** separately (`lib/admin/businessStatusDisplay.ts`); warns when active but not approved |
 | `/admin/products` | Product moderation | `lib/api/products-admin.ts` → **legacy** `/admin/api/products` |
 | `/admin/users` | User list | **legacy** `GET /admin/users` |
 | `/admin/orders` | Order oversight | `GET /api/orders/admin` |
@@ -128,6 +130,8 @@ Live probe note (2026-06-18 in routeContract): `/api/admin/users` and `/api/stri
 
 ## Cross-links
 
+- [../PLATFORM_OPERATING_MODEL.md](../PLATFORM_OPERATING_MODEL.md)
+- [../MARKETPLACE_VENDOR_ELIGIBILITY.md](../MARKETPLACE_VENDOR_ELIGIBILITY.md)
 - [FRONTEND_ROUTE_MAP.md](FRONTEND_ROUTE_MAP.md)
 - [FRONTEND_API_USAGE_INVENTORY.md](FRONTEND_API_USAGE_INVENTORY.md)
 - [../STRIPE_CONNECT_FRONTEND_FLOW.md](../STRIPE_CONNECT_FRONTEND_FLOW.md)

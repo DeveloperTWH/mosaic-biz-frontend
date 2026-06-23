@@ -144,11 +144,15 @@ export default function VendorGrid() {
             ) : vendors.length === 0 ? (
                 <MarketEmptyState
                     title="No vendors found"
-                    description="Try adjusting your filters or search the marketplace."
+                    description="Only approved and active vendors appear here. If you expect more results, an admin may need to finalize vendor approval or activate the business."
                     ctaLabel="Search marketplace"
                     ctaHref="/search"
                 />
             ) : (
+                <>
+                <div className="mb-6 rounded-lg border border-white/10 bg-market-surface/60 px-4 py-3 text-sm text-market-muted">
+                    Showing publicly listed vendors (approved and active). Products from unapproved vendors are hidden from checkout.
+                </div>
                 <div className="mb-6 grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5">
                     {vendors.map((vendor) => (
                         <Link key={vendor._id} href={`/vendor-profile/product-vendor/${vendor._id}`} className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-market-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-market-bg rounded-2xl">
@@ -166,6 +170,7 @@ export default function VendorGrid() {
                         </Link>
                     ))}
                 </div>
+                </>
             )}
             <div className="flex flex-col items-center justify-center gap-4 mt-4 sm:flex-row">
                 {totalPages > 0 ? (

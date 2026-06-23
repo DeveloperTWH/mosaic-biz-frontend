@@ -1,7 +1,7 @@
 # Project Status
 
 **Type:** Living document  
-**Last updated:** 2026-06-22  
+**Last updated:** 2026-06-23  
 **Audience:** Internal team
 
 For phased next work see [ROADMAP.md](ROADMAP.md). For architecture and env setup see [ARCHITECTURE.md](ARCHITECTURE.md).
@@ -17,7 +17,8 @@ Visual Pass 3 evidence: [frontend/evidence/visual-pass-3/README.md](frontend/evi
 |------|--------|
 | Launch repo | `Digital-Builders-757/mosaic-biz-frontend-launch` |
 | Integration branch | `develop` |
-| Production branch | `main` @ `ce6a81bf` |
+| Production branch | `main` @ `b26cb470` (pending PR for vendor eligibility) |
+| `develop` tip | `671d7f98` — vendor eligibility guardrails + desktop catalog polish |
 | Branching model | Feature → `develop` → `main` — [GIT_WORKFLOW.md](GIT_WORKFLOW.md) |
 | Production deployed | **Yes** — Vercel auto-deploy on merge to `main` |
 | Production URL | https://mosaic-biz-frontend-launch.vercel.app |
@@ -51,6 +52,17 @@ Visual Pass 3 evidence: [frontend/evidence/visual-pass-3/README.md](frontend/evi
 Child issues closed: #178 onboarding shell, #179 form controls, #180 payment states, #181 partner hub, #182 storefront continuity.
 
 Evidence: [VISUAL_PASS_3_MOBILE_A11Y_QA.md](VISUAL_PASS_3_MOBILE_A11Y_QA.md), [frontend/evidence/visual-pass-3/](frontend/evidence/visual-pass-3/).
+
+### Vendor eligibility + platform docs (2026-06-23)
+
+| Item | Status | Notes |
+|------|--------|-------|
+| Desktop catalog redesign | **Merged to develop** | PR [#198](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/198); promoted to main via PR [#199](https://github.com/Digital-Builders-757/mosaic-biz-frontend-launch/pull/199) |
+| Vendor eligibility guardrails | **On develop** @ `671d7f98` | Admin status clarity, product/cart/checkout blocks, diagnostics |
+| Platform operating model docs | **On develop** | [PLATFORM_OPERATING_MODEL.md](PLATFORM_OPERATING_MODEL.md), [BACKEND_AGENT_PROMPT_VENDOR_ELIGIBILITY_AND_DOCS.md](BACKEND_AGENT_PROMPT_VENDOR_ELIGIBILITY_AND_DOCS.md) |
+| Backend catalog/cart filter | **Pending** | Frontend mitigates; server enforcement required in `mosaic-backend` |
+
+**Blocker pattern:** Admin shows "Active" businesses that are not `isApproved`; products may still appear in catalog while checkout fails at `POST /api/orders/initiate`. See [MARKETPLACE_VENDOR_ELIGIBILITY.md](MARKETPLACE_VENDOR_ELIGIBILITY.md).
 
 ### Prior significant merges
 

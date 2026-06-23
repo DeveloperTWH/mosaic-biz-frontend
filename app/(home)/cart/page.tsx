@@ -4,6 +4,7 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { toast } from "react-toastify";
 import MarketEmptyState from "../Components/MarketEmptyState";
+import MarketplaceEligibilityBanner from "../Components/MarketplaceEligibilityBanner";
 import ShopperTrustCallout from "../Components/ShopperTrustCallout";
 import { SHOPPER_CART_TRUST_NOTE } from "../Components/marketTrustProof";
 import { getStockHint } from "../Components/publicCards/publicProductCardMappers";
@@ -16,6 +17,7 @@ import {
     type CartPricingSummary,
     resolveDisplayPrice,
 } from "@/utils/cartUtils";
+import type { MarketplaceEligibility } from "@/lib/marketplace/businessEligibility";
 
 type DeliverySpeed = "standard" | "express" | "overnight" | "local";
 
@@ -113,6 +115,7 @@ export default function CartPage() {
     const [couponCode, setCouponCode] = useState<string>("");
     const [applyingCoupon, setApplyingCoupon] = useState<boolean>(false);
     const [appliedDiscount, setAppliedDiscount] = useState<AppliedDiscount | null>(null);
+    const [vendorEligibility, setVendorEligibility] = useState<MarketplaceEligibility | null>(null);
 
     const isSaleActive = (salePrice?: number | null, discountEndDate?: string | null) => {
         if (salePrice == null) return false;
@@ -164,6 +167,7 @@ export default function CartPage() {
 
             setItemsProduct(res.items as CartItem[]);
             setCartPricing(res.pricing ?? null);
+            setVendorEligibility(res.vendorEligibility ?? null);
             setSelectedDeliverySpeed(
                 (res.pricing?.selectedDeliverySpeed as DeliverySpeed | undefined) ??
                 deliverySpeed
@@ -195,6 +199,7 @@ export default function CartPage() {
             const res = await getCartDetailedResponse(deliverySpeed);
             setItemsProduct(res.items as CartItem[]);
             setCartPricing(res.pricing ?? null);
+            setVendorEligibility(res.vendorEligibility ?? null);
             setSelectedDeliverySpeed(
                 (res.pricing?.selectedDeliverySpeed as DeliverySpeed | undefined) ??
                 deliverySpeed
@@ -910,10 +915,18 @@ export default function CartPage() {
 
                                 <ShopperTrustCallout className="mt-4">{SHOPPER_CART_TRUST_NOTE}</ShopperTrustCallout>
 
+                                {vendorEligibility ? (
+                                    <MarketplaceEligibilityBanner
+                                        eligibility={vendorEligibility}
+                                        className="mt-4"
+                                    />
+                                ) : null}
+
                                 <div className="mt-5 lg:sticky lg:bottom-4">
                                     <button
                                         type="button"
-                                        className="commerce-action-primary w-full"
+                                        className="commerce-action-primary w-full disabled:cursor-not-allowed disabled:opacity-60"
+                                        disabled={Boolean(vendorEligibility && !vendorEligibility.eligible)}
                                         onClick={() => {
                                             if (!selectedAddress) {
                                                 toast.error("Please add a delivery address before placing your order.");

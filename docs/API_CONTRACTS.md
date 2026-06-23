@@ -1,7 +1,7 @@
 # API Contracts (Frontend Consumption)
 
 **Type:** Reference  
-**Last updated:** 2026-06-17
+**Last updated:** 2026-06-23
 
 This document lists endpoints **called by this frontend**. Request/response schemas and server behavior live in the backend repo (`Techware-Hut/mosaic-backend`).
 
@@ -15,6 +15,9 @@ Base URL: `NEXT_PUBLIC_API_BASE_URL` (default `https://api.mosaicbizhub.com`).
 |------|--------|
 | Featured products | Use **`GET /api/featured-products`** only |
 | Do not use | `/api/products/featured` — **not referenced** in this codebase |
+| Product router mount | Backend mounts at **`/api/product`** (singular); ignore stale plural comments in backend source |
+| Vendor public listing | Business must have **`isApproved && isActive`** — see [PLATFORM_OPERATING_MODEL.md](PLATFORM_OPERATING_MODEL.md) |
+| Checkout | **`POST /api/orders/initiate`** — single-vendor only; requires approved vendor + Stripe Connect |
 | Credentials | Most authenticated calls use `withCredentials: true` / `credentials: 'include'` |
 | Local CORS | Browser calls from `localhost` to production API may fail — QA on Vercel preview |
 
