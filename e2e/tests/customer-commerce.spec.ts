@@ -43,7 +43,7 @@ test.describe("Customer commerce (mocked, no live Stripe)", () => {
     );
 
     await page.goto(`/product/${MOCK_PRODUCT_ID}`);
-    await expect(page.getByText("E2E Test Product")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "E2E Test Product" }).last()).toBeVisible();
 
     const addButton = page.getByRole("button", { name: /add to cart/i }).first();
     if (await addButton.isVisible().catch(() => false)) {
@@ -81,10 +81,10 @@ test.describe("Customer commerce (mocked, no live Stripe)", () => {
     await page.goto(
       "/payment-success?payment_intent=pi_e2e_mock_intent&redirect_status=succeeded"
     );
-    await expect(page.getByText("Payment Receipt")).toBeVisible({
+    await expect(page.getByRole("heading", { name: "Payment confirmed" })).toBeVisible({
       timeout: 20_000,
     });
-    await expect(page.getByText("Amount Paid")).toBeVisible();
+    await expect(page.getByText("Amount paid:")).toBeVisible();
   });
 
   test("payment cancel/failure UI on payment-success route", async ({ page }) => {
@@ -119,7 +119,7 @@ test.describe("Customer commerce (mocked, no live Stripe)", () => {
     await page.goto(
       "/payment-success?payment_intent=pi_e2e_slow&redirect_status=succeeded"
     );
-    await expect(page.getByText("Confirming your payment...")).toBeVisible();
+    await expect(page.getByText(/Confirming your payment/)).toBeVisible();
   });
 
   test("order initiate request shape is POST without live charge", async ({

@@ -13,7 +13,7 @@ test.describe("@mocked auth and role access", () => {
     await setupMocks(page, { auth: "customer" });
     await seedClientSession(page, "customer");
     await page.goto("/customer/order");
-    await expect(page.getByPlaceholder("Search Orders")).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByPlaceholder("Search by product or order details")).toBeVisible({ timeout: 15_000 });
   });
 
   test("vendor can access partners hub without login bounce", async ({ page }) => {

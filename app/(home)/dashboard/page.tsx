@@ -1,9 +1,5 @@
-import React from 'react'
+import { redirect } from 'next/navigation'
 
-const page = () => {
-  return (
-    <div className='h-[60vh] flex justify-center items-center bg-red-100'>Welcome Back !</div>
-  )
+export default function DashboardPage() {
+  redirect('/customer/order')
 }
-
-export default page
