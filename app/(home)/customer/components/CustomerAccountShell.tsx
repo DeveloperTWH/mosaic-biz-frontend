@@ -15,7 +15,7 @@ export default function CustomerAccountShell({
 }: CustomerAccountShellProps) {
   return (
     <main className="w-full">
-      <PublicPageHero title={title} breadcrumbs={breadcrumbs} />
+      <PublicPageHero title={title} breadcrumbs={breadcrumbs} variant="compact" />
       <div className="min-h-[50vh] bg-brand-cream">
         <div className="container-page py-8 sm:py-10">
           <CustomerBrowseRail />

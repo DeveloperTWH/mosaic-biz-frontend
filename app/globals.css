@@ -77,7 +77,7 @@ body {
   padding-top: calc(var(--header-h) + var(--announcement-h));
 }
 
-@media (max-width: 1279px) {
+@media (max-width: 1023px) {
   :root.with-fixed-header {
     --bottom-nav-h: calc(3.5rem + env(safe-area-inset-bottom, 0px));
   }
@@ -223,8 +223,12 @@ body {
   @apply border-market-gold bg-market-gold text-market-header;
 }
 
-.catalog-search-tab--inactive {
-  @apply border-white/15 bg-market-elevated text-market-text hover:border-market-gold/40;
+.commerce-detail-shell {
+  @apply min-h-screen bg-market-bg;
+}
+
+.commerce-detail-content {
+  @apply container-page market-content-safe-bottom py-6 sm:py-8 lg:py-10;
 }
 
 .public-page-hero--compact {

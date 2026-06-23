@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 import { createServiceBooking } from "@/lib/api/serviceBookings";
 import { Review } from "@/types/review";
 import ClientTestimonials from "../../../Components/ClientTestimonials";
-import PublicSearchFilterBar from "../../../Components/PublicSearchFilterBar";
+import CommerceMobileSearchBar from "../../../Components/CommerceMobileSearchBar";
 import MobileStickyActionBar from "../../../Components/MobileStickyActionBar";
 import TrustBadge from "../../../Components/TrustBadge";
 import { buildSearchPageUrl, PublicSearchFilters } from "../../../Components/publicSearch";
@@ -1021,7 +1021,7 @@ export default function ServiceVendorProfilePage() {
 </div>
 
       {/* ── Filter Bar ── */}
-      <PublicSearchFilterBar
+      <CommerceMobileSearchBar
         filters={filters}
         onChange={setFilters}
         onSubmit={() => router.push(buildSearchPageUrl(filters))}

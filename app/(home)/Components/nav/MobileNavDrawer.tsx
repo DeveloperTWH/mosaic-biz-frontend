@@ -108,7 +108,7 @@ export default function MobileNavDrawer({
   const bottomOffset = "var(--bottom-nav-h, 0px)";
 
   return createPortal(
-    <div className="fixed inset-0 z-[55] xl:hidden" aria-hidden={!open}>
+    <div className="fixed inset-0 z-[55] lg:hidden" aria-hidden={!open}>
       <button
         type="button"
         className="absolute inset-x-0 bg-market-bg/85"

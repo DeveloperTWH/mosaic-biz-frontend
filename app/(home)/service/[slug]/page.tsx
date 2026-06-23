@@ -152,7 +152,11 @@ const ServiceDetailPage = () => {
 
     if (!service) return (
         <div className="bg-market-bg">
-            <PublicPageHero title="Service" breadcrumbs={[{ label: "Home", href: "/" }, { label: "Services", href: "/services" }, { label: "Not found" }]} />
+            <PublicPageHero
+                title="Service"
+                variant="compact"
+                breadcrumbs={[{ label: "Home", href: "/" }, { label: "Services", href: "/services" }, { label: "Not found" }]}
+            />
             <div className="container-page py-12">
                 <MarketEmptyState
                     title="Service not found"
@@ -168,6 +172,7 @@ const ServiceDetailPage = () => {
         <>
             <PublicPageHero
                 title={service.title || "Service"}
+                variant="compact"
                 breadcrumbs={[
                     { label: "Home", href: "/" },
                     { label: "Services", href: "/services" },

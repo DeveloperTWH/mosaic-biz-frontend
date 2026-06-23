@@ -79,7 +79,7 @@ const Navbar = () => {
   useEffect(() => {
     if (!isOpen) return;
     const onResize = () => {
-      if (window.matchMedia("(min-width: 1280px)").matches) {
+      if (window.matchMedia("(min-width: 1024px)").matches) {
         setIsOpen(false);
       }
     };
@@ -119,7 +119,7 @@ const Navbar = () => {
           bump={bump}
         />
 
-        <div className="flex shrink-0 items-center xl:hidden">
+        <div className="flex shrink-0 items-center lg:hidden">
           <button
             type="button"
             className="market-nav-link flex min-h-11 min-w-11 items-center justify-center rounded text-market-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-market-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-market-header"

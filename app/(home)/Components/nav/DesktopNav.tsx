@@ -56,7 +56,7 @@ export default function DesktopNav() {
 
   return (
     <nav
-      className="hidden items-center gap-6 text-xs font-medium tracking-wide xl:flex"
+      className="hidden flex-1 items-center justify-center gap-4 text-[11px] font-medium tracking-wide lg:flex xl:gap-6 xl:text-xs"
       aria-label="Main navigation"
     >
       <Link

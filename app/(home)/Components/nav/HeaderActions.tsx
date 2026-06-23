@@ -31,7 +31,7 @@ export default function HeaderActions({
   const showCustomerNav = isCustomer === true || storedRole === "customer";
   const showVendorNav = storedRole === "business_owner";
 
-  const visibilityClass = variant === "desktop" ? "hidden xl:flex" : "flex xl:hidden";
+  const visibilityClass = variant === "desktop" ? "hidden lg:flex" : "flex lg:hidden";
 
   if (isLoggedIn === null) {
     return (
