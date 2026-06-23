@@ -50,6 +50,7 @@ test.describe("Public marketplace", () => {
 
   test("products page renders Shop hero", async ({ page }) => {
     await page.goto("/products");
+    await expect(page).toHaveTitle(/Shop Products \| Mosaic Biz Hub/);
     await expect(page.locator("#public-page-hero-title")).toHaveText("Shop");
   });
 
@@ -106,6 +107,7 @@ test.describe("Public marketplace", () => {
 
   test("become-a-vendor funnel entry loads", async ({ page }) => {
     await page.goto("/become-a-vendor");
+    await expect(page).toHaveTitle(/Become a Vendor \| Mosaic Biz Hub/);
     await expect(page).toHaveURL(/become-a-vendor/);
     await expect(page.locator("body")).not.toBeEmpty();
   });

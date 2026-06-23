@@ -11,6 +11,7 @@
     "format:check": "prettier --check .",
     "test:unit": "node --import tsx --test lib/api/**/*.test.ts",
     "test:e2e": "playwright test",
+    "test:screenshots": "playwright test e2e/tests/public-screenshot-pilot.spec.ts",
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:report": "playwright show-report",
     "quality:scan": "node scripts/run-quality-scan.mjs",
