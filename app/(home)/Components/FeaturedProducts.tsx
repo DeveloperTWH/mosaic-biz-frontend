@@ -8,6 +8,11 @@ import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import { getFeaturedProducts, FeaturedProduct } from "@/lib/api/featured-products";
+import MarketEmptyState from "./MarketEmptyState";
+import MarketErrorState from "./MarketErrorState";
+import MarketImage from "./MarketImage";
+import MarketLoadingBlock from "./MarketLoadingBlock";
+import MarketPrice from "./MarketPrice";
 
 export default function FeaturedProducts() {
   const [products, setProducts] = useState<FeaturedProduct[]>([]);
@@ -18,23 +23,23 @@ export default function FeaturedProducts() {
   const prevButton = React.useRef(null);
   const nextButton = React.useRef(null);
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setLoading(true);
-        const data = await getFeaturedProducts(1, 12);
-        setProducts(data.products);
-        setError(null);
-      } catch (err: any) {
-        console.error('Error fetching featured products:', err);
-        setError('Failed to load featured products');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProducts();
+  const fetchProducts = React.useCallback(async () => {
+    try {
+      setLoading(true);
+      const data = await getFeaturedProducts(1, 12);
+      setProducts(Array.isArray(data.products) ? data.products : []);
+      setError(null);
+    } catch (err) {
+      console.error('Error fetching featured products:', err);
+      setError('Featured products are temporarily unavailable.');
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
 
   if (loading) {
     return (
@@ -48,10 +53,7 @@ export default function FeaturedProducts() {
             <hr className="w-20 h-1 bg-green-900" />
           </div>
         </div>
-        <div className="text-center py-8">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-          <p className="mt-2 text-gray-600">Loading featured products...</p>
-        </div>
+        <MarketLoadingBlock label="Loading featured products..." minHeight="min-h-[220px]" />
       </section>
     );
   }
@@ -59,9 +61,15 @@ export default function FeaturedProducts() {
   if (error) {
     return (
       <section className="pt-12 pb-16 px-4 sm:px-6 lg:px-12 max-w-[1400px] mx-auto w-full">
-        <div className="text-center py-8">
-          <p className="text-red-600">{error}</p>
-        </div>
+        <MarketErrorState
+          title="Featured products are temporarily unavailable"
+          description="We could not load featured products right now."
+          onRetry={fetchProducts}
+          retryLabel="Retry"
+          ctaLabel="Browse products"
+          ctaHref="/products"
+          className="py-8"
+        />
       </section>
     );
   }
@@ -82,7 +90,13 @@ export default function FeaturedProducts() {
       </div>
 
       {products.length === 0 ? (
-        <div className="text-center text-gray-600 py-8">No featured products available.</div>
+        <MarketEmptyState
+          title="No featured products yet"
+          description="Featured products will appear here as vendors publish them."
+          ctaLabel="Browse products"
+          ctaHref="/products"
+          className="py-8"
+        />
       ) : (
         <div className="relative">
           {/* Navigation Buttons */}
@@ -160,16 +174,18 @@ export default function FeaturedProducts() {
 
 function ProductCard({ product }: { product: FeaturedProduct }) {
   const href = `/product/${product._id}`;
+  const categoryName = product.category?.name || product.categoryId?.name || "Product";
+  const subcategoryName = product.subcategory?.name || product.subcategoryId?.name;
 
   return (
     <div className="bg-green p-3 border-2 border-[#D9D9D9] w-[300px] shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col h-[420px]">
       {/* Product Image - Fixed Height */}
       <div className="relative h-60 overflow-hidden bg-gray-100 flex-shrink-0">
-        <img
+        <MarketImage
           src={product.coverImage}
-          alt={product.title}
-          loading="lazy"
-          className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+          alt={product.title || "Featured product image"}
+          fallbackLabel="Image coming soon"
+          className="h-full w-full"
         />
         
         <div className="absolute top-3 left-3">
@@ -194,11 +210,11 @@ function ProductCard({ product }: { product: FeaturedProduct }) {
         {/* Category */}
         <div className="mb-3">
           <span className="inline-block px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">
-            {product.category.name}
+            {categoryName}
           </span>
-          {product.subcategory && (
+          {subcategoryName && (
             <span className="inline-block px-2 py-1 text-xs bg-green-100 text-green-800 rounded ml-1">
-              {product.subcategory.name}
+              {subcategoryName}
             </span>
           )}
         </div>
@@ -225,9 +241,11 @@ function ProductCard({ product }: { product: FeaturedProduct }) {
 
         {/* Price */}
         <div className="flex-shrink-0">
-          <span className="text-sm font-bold text-gray-900">
-            ${product.price.toFixed(2)}
-          </span>
+          <MarketPrice
+            value={product.price}
+            priceClassName="text-sm font-bold text-gray-900"
+            labelClassName="sr-only"
+          />
         </div>
       </div>
     </div>

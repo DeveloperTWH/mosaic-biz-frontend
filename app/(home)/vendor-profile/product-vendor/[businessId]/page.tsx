@@ -8,7 +8,11 @@ import ClientTestimonials from "../../../Components/ClientTestimonials";
 import CommerceMobileSearchBar from "../../../Components/CommerceMobileSearchBar";
 import { buildSearchPageUrl, PublicSearchFilters } from "../../../Components/publicSearch";
 import MarketEmptyState from "../../../Components/MarketEmptyState";
+import MarketErrorState from "../../../Components/MarketErrorState";
+import MarketImage from "../../../Components/MarketImage";
 import MarketLoadingBlock from "../../../Components/MarketLoadingBlock";
+import MarketPrice from "../../../Components/MarketPrice";
+import { toFiniteNumber } from "@/lib/marketplace/display";
 
 type VendorBusiness = {
   _id: string;
@@ -65,8 +69,8 @@ type VendorProduct = {
   _id: string;
   title: string;
   description?: string;
-  image: string;
-  price: number;
+  image?: string;
+  price: number | null;
   salePrice: number | null;
   rating: number;
   reviewCount: number;
@@ -113,8 +117,8 @@ function normalizePublicBusinessProducts(payload: PublicBusinessProductsResponse
       _id: String(item?._id ?? ""),
       title: String(item?.title ?? "Untitled Product"),
       description: typeof item?.description === "string" ? item.description.replace(/<[^>]*>/g, "") : "",
-      image: item?.coverImage || "/ShopProduct/Aria-SK6-Helmet 1.png",
-      price: toNumber(item?.price),
+      image: item?.coverImage,
+      price: toFiniteNumber(item?.price),
       salePrice: null,
       rating: 0,
       reviewCount: 0,
@@ -295,8 +299,9 @@ export default function ProductVendorProfilePage() {
         const productsJson = (await productsRes.json()) as PublicBusinessProductsResponse;
         setProducts(normalizePublicBusinessProducts(productsJson));
         setApiTotal(toNumber(productsJson.total));
-      } catch (err: any) {
-        setError(err?.message || "Failed to load vendor profile.");
+      } catch (err) {
+        console.error("Product vendor profile load error:", err);
+        setError("We could not load this vendor profile. Please try again.");
       } finally {
         setLoading(false);
       }
@@ -392,8 +397,9 @@ export default function ProductVendorProfilePage() {
 
       setRevealedFields(buildRevealState());
       setRevealModal(null);
-    } catch (err: any) {
-      setRevealError(err?.message || "Unable to reveal contact details right now.");
+    } catch (err) {
+      console.error("Product vendor contact reveal error:", err);
+      setRevealError("Unable to reveal contact details right now.");
     } finally {
       setRevealLoading(false);
     }
@@ -435,9 +441,9 @@ export default function ProductVendorProfilePage() {
         <MarketLoadingBlock label="Loading vendor profile…" minHeight="min-h-[40vh]" />
       ) : error ? (
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12 py-10">
-          <MarketEmptyState
+          <MarketErrorState
             title="Vendor profile unavailable"
-            description={error}
+            description="We could not load this vendor profile. Please try again."
             ctaLabel="Browse vendors"
             ctaHref="/vendors"
             onRetry={() => setReloadKey((key) => key + 1)}
@@ -723,10 +729,11 @@ export default function ProductVendorProfilePage() {
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mt-4">
               {filteredProducts.map((item) => {
-                const effectivePrice =
-                  item.salePrice != null && item.salePrice > 0 && item.salePrice < item.price
-                    ? item.salePrice
-                    : item.price;
+                const onSale =
+                  item.price != null &&
+                  item.salePrice != null &&
+                  item.salePrice > 0 &&
+                  item.salePrice < item.price;
 
                 return (
                   <Link
@@ -735,11 +742,13 @@ export default function ProductVendorProfilePage() {
                     className="vendor-profile-product-card"
                   >
                     <div className="vendor-profile-product-card-media">
-                      <img
+                      <MarketImage
                         src={item.image}
                         alt={item.title}
-                        loading="lazy"
-                        className="h-full w-full object-contain transition-transform duration-500 hover:scale-105"
+                        aspect="square"
+                        objectFit="contain"
+                        fallbackLabel="Image coming soon"
+                        className="h-full w-full transition-transform duration-500 hover:scale-105"
                       />
                     </div>
 
@@ -756,26 +765,14 @@ export default function ProductVendorProfilePage() {
                         {item.reviewCount} ratings & reviews
                       </p>
 
-<div className="mt-auto flex flex-col leading-tight">
-  <span className="text-xs text-brand-muted">
-    Starting from
-  </span>
-
-  {item.salePrice != null && item.salePrice < item.price ? (
-    <div className="flex items-center gap-2">
-      <span className="text-base font-semibold text-brand-orange">
-        ${effectivePrice.toFixed(2)}
-      </span>
-      <span className="text-xs text-brand-muted line-through">
-        ${item.price.toFixed(2)}
-      </span>
-    </div>
-  ) : (
-    <span className="text-base font-semibold text-brand-navy">
-      ${effectivePrice.toFixed(2)}
-    </span>
-  )}
-</div>
+                      <MarketPrice
+                        value={onSale ? item.salePrice : item.price}
+                        compareAt={onSale ? item.price : null}
+                        onSale={onSale}
+                        label="Starting from"
+                        priceClassName={onSale ? "text-base font-semibold text-brand-orange" : "text-base font-semibold text-brand-navy"}
+                        compareClassName="text-xs text-brand-muted line-through"
+                      />
                     </div>
                   </Link>
                 );

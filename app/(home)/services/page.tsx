@@ -15,6 +15,8 @@ import { Category, SubCategory, SubCategoryResponse, ServiceCategoryResponse } f
 import PublicSearchFilterBar from "../Components/PublicSearchFilterBar";
 import PublicFilterSection from "../Components/PublicFilterSection";
 import { buildSearchPageUrl, PublicSearchFilters } from "../Components/publicSearch";
+import MarketErrorState from "../Components/MarketErrorState";
+import MarketLoadingBlock from "../Components/MarketLoadingBlock";
 
 type MinorityType = { _id: string; name: string };
 type ServicesListResponse = {
@@ -227,16 +229,11 @@ const ServicePageContent = () => {
 
       {fetchError ? (
         <div className="mx-auto max-w-[1400px] px-4 py-6">
-          <div className="rounded border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-            {fetchError}{" "}
-            <button
-              type="button"
-              onClick={() => fetchServices()}
-              className="font-semibold underline"
-            >
-              Retry
-            </button>
-          </div>
+          <MarketErrorState
+            title="Services are temporarily unavailable"
+            description="We could not load service listings. Please try again."
+            onRetry={() => fetchServices()}
+          />
         </div>
       ) : null}
 
@@ -275,12 +272,7 @@ function ServicePageFallback() {
         ]}
         imageUrl="/bgdetailpage.png"
       />
-      <section className="flex min-h-[320px] items-center justify-center px-4 py-10">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-12 w-12 animate-spin rounded-full border-4 border-market-gold border-t-transparent" />
-          <p className="text-sm font-medium text-market-muted">Loading services...</p>
-        </div>
-      </section>
+      <MarketLoadingBlock label="Loading services..." minHeight="min-h-[320px]" />
     </main>
   );
 }

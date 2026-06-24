@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import MarketImage from "../MarketImage";
+import MarketPrice from "../MarketPrice";
 import CardRatingRow from "../CardRatingRow";
 import { getBadgeImage, handleBadgeImageError } from "./marketBadge";
 
@@ -43,8 +44,6 @@ export default function PublicProductCard({
 }: PublicProductCardProps) {
   const badgeImage = getBadgeImage(badge);
   const hasRating = (rating ?? 0) > 0 || reviewCount > 0;
-  const effectivePrice = onSale && compareAtPrice != null ? compareAtPrice : price;
-  const showPrice = effectivePrice != null && effectivePrice > 0;
   const displayTrustLabel =
     trustLabel ?? (badge ? `Verified vendor · ${badge} badge` : undefined);
 
@@ -84,24 +83,12 @@ export default function PublicProductCard({
             <CardRatingRow rating={rating ?? 0} reviewCount={reviewCount} />
           ) : null}
 
-          {showPrice ? (
-            <div className="market-card-price-block">
-              <span className="market-card-price-label">Starting from</span>
-              {onSale && compareAtPrice != null && price != null ? (
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="market-card-price-sale">${compareAtPrice.toFixed(2)}</span>
-                  <span className="market-card-price-compare">${price.toFixed(2)}</span>
-                </div>
-              ) : (
-                <span className="market-card-price">${effectivePrice!.toFixed(2)}</span>
-              )}
-            </div>
-          ) : (
-            <div className="market-card-price-block">
-              <span className="market-card-price-label">Price</span>
-              <span className="market-card-price-muted">On request</span>
-            </div>
-          )}
+          <MarketPrice
+            value={onSale ? compareAtPrice : price}
+            compareAt={onSale ? price : null}
+            onSale={onSale}
+            label="Starting from"
+          />
 
           <div className="market-card-cta-row">
             <span className="market-card-action">{actionLabel}</span>

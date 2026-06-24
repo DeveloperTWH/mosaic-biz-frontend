@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo, useRef, useCallback } from "react";
 import { useParams } from "next/navigation";
 import FilterSidebar from "./FilterSidebar";
-import { Star, StarHalf, RotateCcw } from "lucide-react";
+import { Star, StarHalf } from "lucide-react";
 import BannerSection from "./BannerSection";
 import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -11,6 +11,11 @@ import { Navigation, Pagination, Keyboard, A11y, Autoplay } from "swiper/modules
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import MarketEmptyState from "../../../Components/MarketEmptyState";
+import MarketErrorState from "../../../Components/MarketErrorState";
+import MarketImage from "../../../Components/MarketImage";
+import MarketPrice from "../../../Components/MarketPrice";
+import { toFiniteNumber } from "@/lib/marketplace/display";
 
 /* ---------- types ---------- */
 type RankedItem = {
@@ -82,7 +87,7 @@ function gatherImages(p: RankedItem): string[] {
       out.push(src);
     }
   }
-  return out.length ? out : ["/ShopProduct/Aria-SK6-Helmet 1.png"];
+  return out;
 }
 function pickTitle(p: RankedItem): string {
   return p.title ?? "Untitled Product";
@@ -99,18 +104,18 @@ function pickPrice(p: RankedItem) {
   const fe = p.firstEligible;
   if (!fe) {
     return {
-      price: 0,
+      price: null as number | null,
       salePrice: null as number | null,
-      effective: 0,
+      effective: null as number | null,
       onSale: false,
       size: undefined as string | undefined,
       label: undefined as string | undefined,
       color: undefined as string | undefined,
     };
   }
-  const price = Number(fe.price ?? 0);
-  const salePrice = fe.salePrice == null ? null : Number(fe.salePrice);
-  const onSale = Boolean(fe.onSale && salePrice != null);
+  const price = toFiniteNumber(fe.price);
+  const salePrice = toFiniteNumber(fe.salePrice);
+  const onSale = Boolean(fe.onSale && salePrice !== null && price !== null && salePrice < price);
   const effective = onSale ? (salePrice as number) : price;
   return { price, salePrice, effective, onSale, size: fe.size, label: fe.label, color: fe.color };
 }
@@ -160,9 +165,9 @@ function useRankedProducts() {
       setItems(data.items.slice(0, PAGE_SIZE));
     } catch (e: any) {
       if (isAbortError(e)) return; // ignore navigation/unmount aborts
-      console.error("ShopProducts fetch error:", e);
+      console.error("Category products fetch error:", e);
       if (!mountedRef.current) return;
-      setError(e?.message || "Failed to load products.");
+      setError("Products are temporarily unavailable.");
       setItems((prev) => prev ?? []);
     } finally {
       if (mountedRef.current) setLoading(false);
@@ -250,9 +255,11 @@ export default function SearchPageContent() {
         if (!abort) {
           const priced = (data.items || []).filter((item) => {
             const price =
-              item.firstEligible?.effectivePrice ??
-              item.firstEligible?.price ??
-              0;
+              toFiniteNumber(item.firstEligible?.effectivePrice) ??
+              toFiniteNumber(item.firstEligible?.price);
+            if (price === null) {
+              return (filters.minPrice ?? 0) <= 0;
+            }
             return (
               price >= (filters.minPrice ?? 0) &&
               price <= (filters.maxPrice ?? Infinity)
@@ -284,9 +291,23 @@ export default function SearchPageContent() {
           {products === null || loading ? (
             <SkeletonGrid />
           ) : error ? (
-            <ErrorBlock error={error} onRetry={reload} />
+            <MarketErrorState
+              title="Products are temporarily unavailable"
+              description="We could not load this product category right now."
+              onRetry={reload}
+              retryLabel="Retry"
+              ctaLabel="Browse all products"
+              ctaHref="/products"
+              className="py-8"
+            />
           ) : products.length === 0 ? (
-            <div className="text-center text-gray-600">No products to display.</div>
+            <MarketEmptyState
+              title="No products found"
+              description="Try changing your filters or browse the full product catalog."
+              ctaLabel="Browse all products"
+              ctaHref="/products"
+              className="py-8"
+            />
           ) : (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
               {products.map((p) => (
@@ -322,11 +343,8 @@ function ProductCard({ item }: { item: RankedItem }) {
   const { price, salePrice, effective, onSale, size, label, color } = pickPrice(item);
   const rating = pickRating(item);
   const ratingCount = pickRatingCount(item);
-  const norm = (n: number) => (Number.isFinite(n) ? n : 0);
-  const _price = norm(price);
-  const _sale = norm(salePrice ?? NaN);
-  const discount = _price > 0 && Number.isFinite(_sale) && _sale < _price
-    ? ((_price - _sale) / _price) * 100
+  const discount = price !== null && salePrice !== null && price > 0 && salePrice < price
+    ? ((price - salePrice) / price) * 100
     : 0;
 
   const fmtPct = (n: number) => {
@@ -362,29 +380,40 @@ function ProductCard({ item }: { item: RankedItem }) {
         <div className="relative w-full overflow-hidden bg-gray-50 rounded-xl">
           <div className="pt-[100%]" />
           <div className="absolute inset-0">
-            <Swiper
-              modules={[Navigation, Pagination, Keyboard, A11y, Autoplay]}
-              slidesPerView={1}
-              pagination={{ clickable: true, dynamicBullets: true }}
-              keyboard={{ enabled: true }}
-              autoplay={{ delay: 2500, disableOnInteraction: false, pauseOnMouseEnter: false }}
-              loop
-              onSliderMove={() => (draggingRef.current = true)}
-              onTouchStart={() => (draggingRef.current = false)}
-              onTouchEnd={() => setTimeout(() => (draggingRef.current = false), 0)}
-              className="h-full product-swiper"
-            >
-              {images.map((src, i) => (
-                <SwiperSlide key={i}>
-                  <img
-                    src={src}
-                    alt={`${title} ${i + 1}`}
-                    loading="lazy"
-                    className="object-contain w-full h-full p-3"
-                  />
-                </SwiperSlide>
-              ))}
-            </Swiper>
+            {images.length > 0 ? (
+              <Swiper
+                modules={[Navigation, Pagination, Keyboard, A11y, Autoplay]}
+                slidesPerView={1}
+                pagination={{ clickable: true, dynamicBullets: true }}
+                keyboard={{ enabled: true }}
+                autoplay={{ delay: 2500, disableOnInteraction: false, pauseOnMouseEnter: false }}
+                loop
+                onSliderMove={() => (draggingRef.current = true)}
+                onTouchStart={() => (draggingRef.current = false)}
+                onTouchEnd={() => setTimeout(() => (draggingRef.current = false), 0)}
+                className="h-full product-swiper"
+              >
+                {images.map((src, i) => (
+                  <SwiperSlide key={i}>
+                    <MarketImage
+                      src={src}
+                      alt={`${title} ${i + 1}`}
+                      objectFit="contain"
+                      fallbackLabel="Image coming soon"
+                      className="h-full w-full"
+                    />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            ) : (
+              <MarketImage
+                src={null}
+                alt={`${title} image`}
+                objectFit="contain"
+                fallbackLabel="Image coming soon"
+                className="h-full w-full"
+              />
+            )}
           </div>
 
           {onSale && (
@@ -480,22 +509,14 @@ function ProductCard({ item }: { item: RankedItem }) {
         </div>
 
         {/* Price */}
-        <div className="flex items-baseline gap-2">
-          {onSale ? (
-            <>
-              <span className="text-base font-semibold text-red-600 sm:text-lg">
-                ${effective.toFixed(2)}
-              </span>
-              <span className="text-xs text-gray-500 line-through sm:text-sm">
-                ${price.toFixed(2)}
-              </span>
-            </>
-          ) : (
-            <span className="text-base font-semibold text-gray-900 sm:text-lg">
-              ${price.toFixed(2)}
-            </span>
-          )}
-        </div>
+        <MarketPrice
+          value={onSale ? effective : price}
+          compareAt={onSale ? price : null}
+          onSale={onSale}
+          priceClassName={onSale ? "text-base font-semibold text-red-600 sm:text-lg" : "text-base font-semibold text-gray-900 sm:text-lg"}
+          compareClassName="text-xs text-gray-500 line-through sm:text-sm"
+          labelClassName="sr-only"
+        />
 
         {/* Full-card link overlay (prevents click during drag) */}
         <style jsx global>{`
@@ -543,18 +564,3 @@ function SkeletonGrid() {
   );
 }
 
-function ErrorBlock({ error, onRetry }: { error: string; onRetry: () => void }) {
-  return (
-    <div className="flex flex-col items-center gap-3 text-center">
-      <div className="text-red-600">
-        We’re having trouble loading products: {error}
-      </div>
-      <button
-        onClick={onRetry}
-        className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white rounded bg-custom-orange"
-      >
-        <RotateCcw size={16} /> Retry
-      </button>
-    </div>
-  );
-}

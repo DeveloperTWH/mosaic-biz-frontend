@@ -1,5 +1,6 @@
 import { trimDescription, toDisplayPrice } from "./publicCardUtils";
 import type { PublicProductCardProps } from "./PublicProductCard";
+import { toFiniteNumber } from "@/lib/marketplace/display";
 
 type FirstEligible = {
   images?: string[];
@@ -49,14 +50,14 @@ function gatherImage(item: RankedLike): string | undefined {
 function pickPriceFields(item: RankedLike) {
   const fe = item.firstEligible;
   if (fe) {
-    const price = Number(fe.price ?? 0);
-    const salePrice = fe.salePrice == null ? null : Number(fe.salePrice);
+    const price = toFiniteNumber(fe.price);
+    const salePrice = fe.salePrice == null ? null : toFiniteNumber(fe.salePrice);
     const onSale = Boolean(fe.onSale && salePrice != null);
-    const effective = onSale ? (salePrice as number) : (fe.effectivePrice ?? price);
+    const effective = onSale ? salePrice : (toFiniteNumber(fe.effectivePrice) ?? price);
     return { price, compareAtPrice: onSale ? price : null, onSale, effective };
   }
 
-  const price = toDisplayPrice(item.price) ?? 0;
+  const price = toDisplayPrice(item.price);
   return { price, compareAtPrice: null as number | null, onSale: false, effective: price };
 }
 
@@ -102,7 +103,7 @@ export function mapApiProductToPublicProductCard(item: {
   coverImage?: string;
   businessId?: { businessName?: string; badge?: string | null };
 }): PublicProductCardProps {
-  const price = toDisplayPrice(item.price) ?? 0;
+  const price = toDisplayPrice(item.price);
 
   return {
     href: `/product/${item._id}`,

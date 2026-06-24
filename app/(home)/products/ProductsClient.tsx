@@ -21,6 +21,7 @@ import { useListingFilters } from "@/hooks/useListingFilters";
 import MarketImage from "../Components/MarketImage";
 import CardRatingRow from "../Components/CardRatingRow";
 import MarketEmptyState from "../Components/MarketEmptyState";
+import MarketErrorState from "../Components/MarketErrorState";
 import MarketLoadingBlock from "../Components/MarketLoadingBlock";
 import MarketTrustBadgeHint from "../Components/MarketTrustBadgeHint";
 import PublicProductCard from "../Components/publicCards/PublicProductCard";
@@ -294,12 +295,12 @@ const ProductsPageInner = () => {
                     </div>
 
                 {error ? (
-                  <div className="mb-6 rounded border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-                    Unable to load featured picks: {error}{" "}
-                    <button type="button" onClick={reload} className="font-semibold underline">
-                      Retry
-                    </button>
-                  </div>
+                  <MarketErrorState
+                    title="Featured picks are temporarily unavailable"
+                    description="We could not load featured marketplace picks. Please retry or continue browsing products below."
+                    onRetry={reload}
+                    className="mb-6"
+                  />
                 ) : null}
 
                 {!error && items && items.length <= 3 && items.length > 0 ? (
@@ -356,11 +357,12 @@ const ProductsPageInner = () => {
             </div>
 
             {listFetchError ? (
-              <div className="mx-4 mb-6 rounded border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-                {listFetchError}{" "}
-                <button type="button" onClick={() => fetchProducts()} className="font-semibold underline">
-                  Retry
-                </button>
+              <div className="container-page mb-6">
+                <MarketErrorState
+                  title="Products are temporarily unavailable"
+                  description="We could not load the product catalog. Please try again."
+                  onRetry={() => fetchProducts()}
+                />
               </div>
             ) : null}
 
@@ -457,9 +459,9 @@ function useRankedProducts() {
             setItems(data.items.slice(0, PAGE_SIZE));
         } catch (e: any) {
             if (isAbortError(e)) return;
-            console.error("ShopProducts fetch error:", e);
+            console.error("Product catalog load error:", e);
             if (!mountedRef.current) return;
-            setError(e?.message || "Failed to load products.");
+            setError("Products are temporarily unavailable.");
             setItems((prev) => prev ?? []);
         } finally {
             if (mountedRef.current) setLoading(false);
