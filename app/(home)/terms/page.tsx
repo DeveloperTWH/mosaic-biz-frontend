@@ -21,7 +21,7 @@ const Terms = () => {
         <p>
           By accessing or using Mosaic Biz Hub ("Platform", "we", "our", or
           "us"), including the website and application at
-          <strong className="font-semibold"> mosaicbizhub.com</strong>, you agree to be bound by these
+          <strong className="font-semibold"> app.mosaicbizhub.com</strong>, you agree to be bound by these
           Terms & Conditions. If you do not agree, you may not use the Platform.
         </p>
       </section>

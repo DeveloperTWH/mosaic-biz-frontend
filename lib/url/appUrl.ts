@@ -1,5 +1,4 @@
-export const DEFAULT_APP_ORIGIN = "https://mosaicbizhub.com";
-export const LEGACY_APP_HOST = "app.mosaicbizhub.com";
+export const DEFAULT_APP_ORIGIN = "https://app.mosaicbizhub.com";
 
 const HTTP_URL_PATTERN = /^https?:\/\//i;
 const CONFIGURED_ORIGIN_KEYS = [
@@ -23,18 +22,13 @@ function toOrigin(url: URL): string {
 
 export function normalizeAppOrigin(value?: string | null): string {
   const parsed = parseUrl(value) ?? new URL(DEFAULT_APP_ORIGIN);
-
-  if (parsed.hostname.toLowerCase() === LEGACY_APP_HOST) {
-    return DEFAULT_APP_ORIGIN;
-  }
-
   return toOrigin(parsed);
 }
 
 export function getConfiguredAppOrigin(): string {
   for (const key of CONFIGURED_ORIGIN_KEYS) {
     const parsed = parseUrl(process.env[key]);
-    if (parsed && parsed.hostname.toLowerCase() !== LEGACY_APP_HOST) {
+    if (parsed) {
       return toOrigin(parsed);
     }
   }
@@ -57,11 +51,6 @@ export function buildAppUrl(pathOrUrl: string, origin = getRuntimeAppOrigin()): 
   if (HTTP_URL_PATTERN.test(rawPath)) {
     const parsed = parseUrl(rawPath);
     if (!parsed) return new URL("/", `${normalizedOrigin}/`).toString();
-    if (parsed.hostname.toLowerCase() === LEGACY_APP_HOST) {
-      const canonical = new URL(normalizedOrigin);
-      parsed.protocol = canonical.protocol;
-      parsed.host = canonical.host;
-    }
     return parsed.toString();
   }
 

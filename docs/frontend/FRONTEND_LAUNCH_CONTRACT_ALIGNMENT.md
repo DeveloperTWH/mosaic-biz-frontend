@@ -29,7 +29,7 @@ The frontend as-built documentation pack (merged to `main` via PR #147) and prio
 
 1. **Canonical featured products:** `GET /api/featured-products` only — `/api/products/featured` is not used in app code.
 2. **Legacy admin and Stripe dashboard mounts remain active** and must not be “normalized” to `/api/admin/users` or `/api/stripe/*` without a backend migration (live probes: modern paths return **404**).
-3. **Checkout** uses `POST /api/orders/initiate` + Stripe Elements; `return_url` is built through `lib/url/appUrl.ts` so legacy app-domain origins are normalized before redirecting.
+3. **Checkout** uses `POST /api/orders/initiate` + Stripe Elements; `return_url` is built through `lib/url/appUrl.ts` so redirects use the runtime app origin with `app.mosaicbizhub.com` as the production fallback.
 4. **No code route migrations** are required in this PR — constants are already centralized; primary deliverable is contract documentation + grep re-verification.
 
 ---
@@ -221,7 +221,7 @@ Uses `STRIPE_CONNECT_DASHBOARD` constants + `@stripe/connect-js` embedded compon
 | Stripe confirm | Stripe Elements `confirmPayment` | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `buildAppUrl(...)` (for canonicalized `return_url`) |
 | Retrieve intent | `GET /api/orders/retrieve-intent/:paymentIntentId` | `NEXT_PUBLIC_API_BASE_URL` |
 
-**Important:** `NEXT_PUBLIC_APP_URL` is used as a configured fallback by `lib/url/appUrl.ts`; Stripe `return_url` prefers the runtime browser origin and rewrites `app.mosaicbizhub.com` to the canonical root domain.
+**Important:** `NEXT_PUBLIC_APP_URL` is used as a configured fallback by `lib/url/appUrl.ts`; Stripe `return_url` prefers the runtime browser origin. Production login should run on `app.mosaicbizhub.com`.
 
 ---
 

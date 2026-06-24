@@ -8,7 +8,7 @@ export default function ReferAVendorPage() {
   const shareUrl =
     typeof window !== "undefined"
       ? buildAppUrl("/become-a-vendor")
-      : "https://mosaicbizhub.com/become-a-vendor";
+      : "https://app.mosaicbizhub.com/become-a-vendor";
   const mailto = `mailto:?subject=${encodeURIComponent("Join Mosaic Biz Hub as a vendor")}&body=${encodeURIComponent(
     `I thought your business would be a great fit for Mosaic Biz Hub — a marketplace for minority-owned businesses.\n\nApply here: ${shareUrl}`
   )}`;

@@ -8,11 +8,11 @@ import {
 } from "../url/appUrl";
 
 describe("app URL helpers", () => {
-  it("normalizes the legacy app subdomain to the canonical root domain", () => {
+  it("uses the app subdomain as the production default", () => {
     assert.equal(normalizeAppOrigin("https://app.mosaicbizhub.com"), DEFAULT_APP_ORIGIN);
     assert.equal(
       buildAppUrl("https://app.mosaicbizhub.com/partners/connect/return?businessId=abc"),
-      "https://mosaicbizhub.com/partners/connect/return?businessId=abc"
+      "https://app.mosaicbizhub.com/partners/connect/return?businessId=abc"
     );
   });
 
@@ -23,7 +23,7 @@ describe("app URL helpers", () => {
     );
   });
 
-  it("skips stale app-domain env and uses the next configured origin", () => {
+  it("uses NEXT_PUBLIC_APP_URL before the client-base fallback", () => {
     const previousAppUrl = process.env.NEXT_PUBLIC_APP_URL;
     const previousClientBaseUrl = process.env.NEXT_PUBLIC_CLIENT_BASE_URL;
     process.env.NEXT_PUBLIC_APP_URL = "https://app.mosaicbizhub.com";
@@ -32,7 +32,7 @@ describe("app URL helpers", () => {
     try {
       assert.equal(
         getConfiguredAppOrigin(),
-        "https://mosaic-biz-frontend-launch.vercel.app"
+        "https://app.mosaicbizhub.com"
       );
     } finally {
       if (previousAppUrl === undefined) {
@@ -49,7 +49,7 @@ describe("app URL helpers", () => {
     }
   });
 
-  it("falls back to the canonical root domain when env is missing or invalid", () => {
+  it("falls back to the production app domain when env is missing or invalid", () => {
     const previousAppUrl = process.env.NEXT_PUBLIC_APP_URL;
     const previousClientBaseUrl = process.env.NEXT_PUBLIC_CLIENT_BASE_URL;
     process.env.NEXT_PUBLIC_APP_URL = "not a url";
