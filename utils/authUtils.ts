@@ -1,15 +1,21 @@
-import { checkAuthSession, isSessionActive } from "@/lib/api/authSession";
+import {
+  checkAuthSession,
+  isSessionActive,
+  type AuthSessionUser,
+} from "@/lib/api/authSession";
 
 export const isUserLoggedIn = isSessionActive;
 
-export interface AuthenticatedUser {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  mobile: string;
-  gender?: string;
-}
+export type AuthenticatedUser = AuthSessionUser;
+
+export const AUTH_SESSION_NOT_ESTABLISHED_MESSAGE =
+  "Sign-in succeeded but session was not established. Try again or contact support.";
+
+export const AUTH_NETWORK_ERROR_MESSAGE =
+  "Unable to reach the authentication service. Check your connection and try again.";
+
+export const AUTH_VERIFICATION_NOT_ESTABLISHED_MESSAGE =
+  "Verification succeeded but session was not established. Try again or contact support.";
 
 export const isBusinessOwner = (user: AuthenticatedUser | null | undefined): boolean =>
   user?.role === "business_owner";

@@ -9,31 +9,39 @@ import "react-toastify/dist/ReactToastify.css";
 import "swiper/css";
 import "swiper/css/pagination";
 import { fontVariables } from "@/lib/fonts";
+import {
+  DEFAULT_SHARE_IMAGE,
+  DEFAULT_SITE_DESCRIPTION,
+  SITE_NAME,
+  getMetadataBase,
+} from "@/lib/seo/metadata";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://mosaicbizhub.com"),
+  metadataBase: getMetadataBase(),
   icons: {
     icon: "/mosaic-brand-logo.png",
     apple: "/mosaic-brand-logo.png",
   },
   title: {
     default: "Mosaic Biz Hub — Where Culture and Commerce Connect",
-    template: "%s | Mosaic Biz Hub",
+    template: `%s | ${SITE_NAME}`,
   },
-  description:
-    "Discover and support trusted minority-owned businesses. Shop products, book services, and explore food from verified vendors on Mosaic Biz Hub.",
+  description: DEFAULT_SITE_DESCRIPTION,
   openGraph: {
     type: "website",
     locale: "en_US",
-    siteName: "Mosaic Biz Hub",
+    siteName: SITE_NAME,
     title: "Mosaic Biz Hub — Where Culture and Commerce Connect",
     description:
-      "Discover and support trusted minority-owned businesses on a mobile-first marketplace built for community commerce.",
+      DEFAULT_SITE_DESCRIPTION,
+    url: "/",
+    images: [{ url: DEFAULT_SHARE_IMAGE, alt: `${SITE_NAME} marketplace preview` }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Mosaic Biz Hub",
-    description: "Discover trusted minority-owned businesses.",
+    title: SITE_NAME,
+    description: DEFAULT_SITE_DESCRIPTION,
+    images: [DEFAULT_SHARE_IMAGE],
   },
   robots: { index: true, follow: true },
 };

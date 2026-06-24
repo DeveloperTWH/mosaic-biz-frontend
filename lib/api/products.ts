@@ -16,7 +16,7 @@ export async function listProducts(filters: Partial<ListingFilters> = {}): Promi
 
 export async function getProductById(id: string): Promise<ProductListItem | null> {
   try {
-    const res = await api.get(`/api/product/${id}`);
+    const res = await api.get(`/api/public/product/${id}`);
     return (res.data?.data ?? res.data) as ProductListItem;
   } catch {
     return null;

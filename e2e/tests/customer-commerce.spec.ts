@@ -43,7 +43,7 @@ test.describe("Customer commerce (mocked, no live Stripe)", () => {
     );
 
     await page.goto(`/product/${MOCK_PRODUCT_ID}`);
-    await expect(page.getByText("E2E Test Product")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "E2E Test Product" }).last()).toBeVisible();
 
     const addButton = page.getByRole("button", { name: /add to cart/i }).first();
     if (await addButton.isVisible().catch(() => false)) {
@@ -54,6 +54,91 @@ test.describe("Customer commerce (mocked, no live Stripe)", () => {
     await expect(page.getByRole("button", { name: "Place Order" })).toBeVisible({
       timeout: 20_000,
     });
+  });
+
+  test("product detail exposes honest review empty state and customer review form", async ({
+    page,
+  }) => {
+    await installCommerceMocks(page);
+
+    await page.route(`**/api/public/product/${MOCK_PRODUCT_ID}**`, (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(publicProductDetailResponse),
+      })
+    );
+
+    let submittedRating: unknown = null;
+    let submittedComment: unknown = null;
+    await page.route(`**/api/product/${MOCK_PRODUCT_ID}/reviews**`, async (route) => {
+      if (route.request().method() === "POST") {
+        const body = route.request().postDataJSON() as Record<string, unknown>;
+        submittedRating = body.rating;
+        submittedComment = body.comment;
+
+        return route.fulfill({
+          status: 201,
+          contentType: "application/json",
+          body: JSON.stringify({
+            success: true,
+            data: {
+              review: {
+                _id: "review-e2e-001",
+                userId: {
+                  _id: "customer-e2e-001",
+                  name: "E2E Customer",
+                  profileImage: "",
+                },
+                listingId: MOCK_PRODUCT_ID,
+                listingType: "product",
+                rating: body.rating,
+                comment: body.comment,
+                image: "",
+                createdAt: "2026-06-23T00:00:00.000Z",
+                updatedAt: "2026-06-23T00:00:00.000Z",
+              },
+              summary: {
+                totalReviews: 1,
+                averageRating: body.rating,
+                ratingBreakdown: { [String(body.rating)]: 1 },
+              },
+            },
+          }),
+        });
+      }
+
+      return route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          success: true,
+          data: {
+            reviews: [],
+            summary: {
+              totalReviews: 0,
+              averageRating: 0,
+              ratingBreakdown: {},
+            },
+          },
+        }),
+      });
+    });
+
+    await page.goto(`/product/${MOCK_PRODUCT_ID}`);
+    await expect(page.getByRole("heading", { name: "E2E Test Product" }).last()).toBeVisible();
+    await expect(
+      page.getByText("No reviews yet. Be the first to rate this product.")
+    ).toBeVisible({ timeout: 20_000 });
+
+    await page.getByRole("button", { name: "Rate Product" }).click();
+    await expect(page.getByLabel("Your Review")).toBeVisible();
+    await page.getByRole("button", { name: "Rate 4 stars" }).click();
+    await page.getByLabel("Your Review").fill("Helpful product and clear vendor details.");
+    await page.getByRole("button", { name: "Submit Review" }).click();
+
+    await expect.poll(() => submittedRating).toBe(4);
+    await expect.poll(() => submittedComment).toBe("Helpful product and clear vendor details.");
   });
 
   test("checkout page renders for mocked customer session", async ({ page }) => {
@@ -81,10 +166,10 @@ test.describe("Customer commerce (mocked, no live Stripe)", () => {
     await page.goto(
       "/payment-success?payment_intent=pi_e2e_mock_intent&redirect_status=succeeded"
     );
-    await expect(page.getByText("Payment Receipt")).toBeVisible({
+    await expect(page.getByRole("heading", { name: "Payment confirmed" })).toBeVisible({
       timeout: 20_000,
     });
-    await expect(page.getByText("Amount Paid")).toBeVisible();
+    await expect(page.getByText("Amount paid:")).toBeVisible();
   });
 
   test("payment cancel/failure UI on payment-success route", async ({ page }) => {
@@ -119,7 +204,7 @@ test.describe("Customer commerce (mocked, no live Stripe)", () => {
     await page.goto(
       "/payment-success?payment_intent=pi_e2e_slow&redirect_status=succeeded"
     );
-    await expect(page.getByText("Confirming your payment...")).toBeVisible();
+    await expect(page.getByText(/Confirming your payment/)).toBeVisible();
   });
 
   test("order initiate request shape is POST without live charge", async ({

@@ -15,7 +15,7 @@ test.describe("Public marketplace", () => {
   test("homepage loads hero and marketplace CTAs", async ({ page }) => {
     await page.goto("/");
     await expect(
-      page.getByRole("link", { name: "Explore Marketplace" })
+      page.getByRole("link", { name: "Shop the Marketplace" })
     ).toBeVisible({ timeout: 20_000 });
     await expect(
       page.getByRole("link", { name: "Become a Vendor" }).first()
@@ -32,8 +32,25 @@ test.describe("Public marketplace", () => {
     expect(request.url()).not.toContain("/api/products/featured");
   });
 
+  test("build-info route exposes safe release identity for QA", async ({ page }) => {
+    const response = await page.request.get("/api/build-info");
+    expect(response.status()).toBe(200);
+
+    const payload = await response.json();
+    expect(payload.service).toBe("mosaic-biz-frontend");
+    expect(payload.release).toMatchObject({
+      commit: expect.any(String),
+      environment: expect.any(String),
+      branch: expect.any(String),
+      deploymentId: expect.any(String),
+    });
+    expect(JSON.stringify(payload).toLowerCase()).not.toContain("secret");
+    expect(JSON.stringify(payload).toLowerCase()).not.toContain("token");
+  });
+
   test("products page renders Shop hero", async ({ page }) => {
     await page.goto("/products");
+    await expect(page).toHaveTitle(/Shop Products \| Mosaic Biz Hub/);
     await expect(page.locator("#public-page-hero-title")).toHaveText("Shop");
   });
 
@@ -55,7 +72,7 @@ test.describe("Public marketplace", () => {
   test("search page renders Search hero and empty-state copy", async ({ page }) => {
     await page.goto("/search");
     await expect(page.getByRole("heading", { name: "Search" })).toBeVisible();
-    await expect(page.getByText("Search the marketplace")).toBeVisible();
+    await expect(page.getByText("Start with a keyword, state, or business type")).toBeVisible();
   });
 
   test("product detail route loads for mocked product", async ({ page }) => {
@@ -68,7 +85,7 @@ test.describe("Public marketplace", () => {
     );
 
     await page.goto(`/product/${MOCK_PRODUCT_ID}`);
-    await expect(page.getByText("E2E Test Product")).toBeVisible({
+    await expect(page.getByRole("heading", { name: "E2E Test Product" }).last()).toBeVisible({
       timeout: 20_000,
     });
   });
@@ -90,6 +107,7 @@ test.describe("Public marketplace", () => {
 
   test("become-a-vendor funnel entry loads", async ({ page }) => {
     await page.goto("/become-a-vendor");
+    await expect(page).toHaveTitle(/Become a Vendor \| Mosaic Biz Hub/);
     await expect(page).toHaveURL(/become-a-vendor/);
     await expect(page.locator("body")).not.toBeEmpty();
   });

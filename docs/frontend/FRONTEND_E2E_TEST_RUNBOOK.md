@@ -32,6 +32,7 @@ Manual smoke references:
 | Command | Description |
 |---------|-------------|
 | `npm run test:e2e` | Headless Playwright suite |
+| `npm run test:screenshots` | Public route screenshot pilot for PR visual proof |
 | `npm run test:e2e:headed` | Headed browser for debugging |
 | `npm run test:e2e:report` | Open last HTML report |
 
@@ -125,6 +126,8 @@ playwright.config.ts
 ```
 
 Artifacts: `playwright-report/`, `test-results/` (gitignored)
+
+Screenshot QA details live in [PUBLIC_SCREENSHOT_QA_RUNBOOK.md](../PUBLIC_SCREENSHOT_QA_RUNBOOK.md).
 
 ---
 
