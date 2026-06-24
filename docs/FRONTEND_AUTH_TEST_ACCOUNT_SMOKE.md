@@ -22,7 +22,7 @@
 
 | Item | Value |
 |------|-------|
-| Production frontend | https://app.mosaicbizhub.com (alias: mosaic-biz-frontend-launch.vercel.app) |
+| Production frontend | https://mosaicbizhub.com (transition: app.mosaicbizhub.com, QA: mosaic-biz-frontend-launch.vercel.app) |
 | API base (`NEXT_PUBLIC_API_BASE_URL`) | https://api.mosaicbizhub.com |
 | Local debug logging | Set `NEXT_PUBLIC_AUTH_DEBUG=true` in `.env.local` (non-production only) |
 
@@ -82,7 +82,7 @@ Use a **verified vendor** account (signup OTP already completed). Disposable ema
 
 1. Log out or use a fresh browser profile.
 2. Open DevTools → Network → Preserve log → Disable cache.
-3. Navigate to `https://app.mosaicbizhub.com/login?type=vendor`.
+3. Navigate to `https://mosaicbizhub.com/login?type=vendor`.
 4. Submit email + password.
 5. Record network calls (redact PII):
 

@@ -24,6 +24,7 @@ describe("SEO metadata helpers", () => {
     assert.equal(metadata.title, "Shop Products");
     assert.equal(metadata.description, "Browse products from verified Mosaic Biz Hub vendors.");
     assert.deepEqual(metadata.alternates, { canonical: "/products" });
+    assert.equal(metadata.metadataBase?.toString(), `${DEFAULT_SITE_URL}/`);
     assert.equal(metadata.openGraph?.siteName, "Mosaic Biz Hub");
     assert.equal(metadata.openGraph?.url, "/products");
     assert.equal(metadata.twitter?.card, "summary_large_image");
