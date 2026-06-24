@@ -67,7 +67,7 @@ export default function ServiceCategoryPage({ params }: PageProps) {
         try {
             setLoading(true);
             const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/services/list?categorySlug=${id}&search=${q ?? searchText}&minorityType=${m ?? minorityType}&city=${c ?? searchLocation}`
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/services/list?categorySlug=${id}&search=${q ?? searchText}&minorityType=${m ?? minorityType}&state=${c ?? searchLocation}`
             );
             const data = await res.json();
             if (data.success) {

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { Product, FilterOptions } from '../types';
+import { deleteVendorProduct } from '@/lib/api/vendorProducts';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -96,25 +97,10 @@ export const useProducts = (businessId: string) => {
 
   const deleteProduct = async (productId: string): Promise<boolean> => {
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/api/product/delete-product/${productId}`,
-        {
-          method: 'DELETE',
-          credentials: 'include',
-        }
-      );
-      
-      const data = await response.json();
-      
-      // Check for message instead of success
-      if (data.message || data.success) {
-        toast.success(data.message || 'Product deleted successfully');
-        await refreshProducts(); // Refresh immediately after successful delete
-        return true;
-      } else {
-        toast.error(data.error || 'Failed to delete product');
-        return false;
-      }
+      const result = await deleteVendorProduct(productId);
+      toast.success(result.message);
+      await refreshProducts();
+      return true;
     } catch (error: any) {
       console.error('Error deleting product:', error);
       toast.error(error.message || 'Error deleting product');

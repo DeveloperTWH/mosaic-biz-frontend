@@ -10,6 +10,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import DeleteConfirmationModal from '@/app/components/DeleteConfirmationModal';
 import DashboardEmptyState from '@/components/ui/dashboard-empty-state';
+import DashboardLoadingBlock from '@/components/ui/dashboard-loading-block';
 
 
 
@@ -65,6 +66,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
     productId: string;
     variantId?: string;
   }>({ type: 'product', productId: '' });
+  const [deleteInProgress, setDeleteInProgress] = useState(false);
 
 
 
@@ -130,6 +132,9 @@ const ProductTable: React.FC<ProductTableProps> = ({
   };
 
   const handleDelete = async () => {
+    if (deleteInProgress) return;
+
+    setDeleteInProgress(true);
     try {
       if (deleteTarget.type === 'product') {
         await axios.delete(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/product/delete-product/${deleteTarget.productId}`, {
@@ -144,10 +149,11 @@ const ProductTable: React.FC<ProductTableProps> = ({
       }
 
       changePage(currentPage)
+      setShowDeleteModal(false);
     } catch (err) {
       toast.error('Delete failed');
     } finally {
-      setShowDeleteModal(false);
+      setDeleteInProgress(false);
     }
   };
 
@@ -160,6 +166,20 @@ const ProductTable: React.FC<ProductTableProps> = ({
   };
 
 
+
+  if (isLoading) {
+    return <DashboardLoadingBlock label="Loading products..." />;
+  }
+
+  if (error) {
+    return (
+      <DashboardEmptyState
+        title="Products could not be loaded"
+        description={error}
+        className="py-10"
+      />
+    );
+  }
 
   if (products.length === 0) {
     return (
@@ -185,7 +205,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
       </div>
 
       <div className="hidden overflow-x-auto md:block">
-        <table className="w-full min-w-[800px text-sm text-left border-collapse">
+        <table className="w-full min-w-[800px] text-sm text-left border-collapse">
           <thead className="text-white">
             <tr>
               <th className="px-4 py-2">Toggle</th>
@@ -475,9 +495,12 @@ const ProductTable: React.FC<ProductTableProps> = ({
 
       {showDeleteModal && (
         <DeleteConfirmationModal
-          onCancel={() => setShowDeleteModal(false)}
+          onCancel={() => {
+            if (!deleteInProgress) setShowDeleteModal(false);
+          }}
           onConfirm={handleDelete}
           title="Confirm Delete"
+          loading={deleteInProgress}
           message={
             deleteTarget.type === 'product'
               ? 'Are you sure you want to delete this product? This action will also delete all its variants.'

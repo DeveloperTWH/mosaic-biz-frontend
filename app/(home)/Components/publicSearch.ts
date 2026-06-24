@@ -71,6 +71,14 @@ export const US_STATE_OPTIONS = [
   "Wyoming",
 ] as const;
 
+export const PUBLIC_BADGE_FILTER_OPTIONS = [
+  { label: "Bronze", value: "bronze" },
+  { label: "Silver", value: "silver" },
+  { label: "Gold", value: "gold" },
+  { label: "Platinum", value: "platinum" },
+  { label: "Diamond", value: "diamond" },
+] as const;
+
 export function buildSearchPageUrl(filters: Partial<PublicSearchFilters>): string {
   return buildSearchPageUrlWithTab(filters);
 }
@@ -85,6 +93,7 @@ export type ListingFilters = PublicSearchFilters & {
   priceMin?: string;
   priceMax?: string;
   page?: string;
+  country?: string;
 };
 
 export const DEFAULT_LISTING_FILTERS: ListingFilters = {
@@ -100,7 +109,7 @@ export const DEFAULT_LISTING_FILTERS: ListingFilters = {
 };
 
 const LEGACY_KEYWORD_KEYS = ["keyword", "q", "search"] as const;
-const LEGACY_LOCATION_KEYS = ["location", "city"] as const;
+const LOCATION_KEYS = ["state", "location", "city"] as const;
 
 function readFirstParam(params: URLSearchParams, keys: readonly string[]): string {
   for (const key of keys) {
@@ -110,7 +119,7 @@ function readFirstParam(params: URLSearchParams, keys: readonly string[]): strin
   return "";
 }
 
-/** True when URL uses legacy search param names that should be replaced with canonical q/city */
+/** True when URL uses legacy search param names that should be replaced with canonical q/state */
 export function searchParamsUsesLegacyNames(
   params: URLSearchParams | null | undefined
 ): boolean {
@@ -118,7 +127,8 @@ export function searchParamsUsesLegacyNames(
   return (
     params.has("keyword") ||
     params.has("search") ||
-    params.has("location")
+    params.has("location") ||
+    params.has("city")
   );
 }
 
@@ -134,16 +144,25 @@ export function parseListingFiltersFromSearchParams(
 
   return {
     keyword: readFirstParam(params, LEGACY_KEYWORD_KEYS),
-    location: readFirstParam(params, LEGACY_LOCATION_KEYS),
+    location: readFirstParam(params, LOCATION_KEYS),
     minorityType: params.get("minorityType")?.trim() || "",
-    category: params.get("category")?.trim() || params.get("categoryId")?.trim() || "",
-    subcategory: params.get("subcategory")?.trim() || params.get("subcategoryId")?.trim() || "",
+    category:
+      params.get("category")?.trim() ||
+      params.get("categoryId")?.trim() ||
+      params.get("categorySlug")?.trim() ||
+      "",
+    subcategory:
+      params.get("subcategory")?.trim() ||
+      params.get("subcategoryId")?.trim() ||
+      params.get("subcategorySlug")?.trim() ||
+      "",
     badge: params.get("badge")?.trim() || "",
     sort: params.get("sort")?.trim() || "",
     tab: validTab,
     priceMin: params.get("priceMin")?.trim() || "",
     priceMax: params.get("priceMax")?.trim() || "",
     page: params.get("page")?.trim() || "",
+    country: params.get("country")?.trim() || "",
   };
 }
 
@@ -153,7 +172,7 @@ export function buildListingPageUrl(path: string, filters: Partial<ListingFilter
   const normalized = { ...DEFAULT_LISTING_FILTERS, ...filters };
 
   if (normalized.keyword?.trim()) params.set("q", normalized.keyword.trim());
-  if (normalized.location?.trim()) params.set("city", normalized.location.trim());
+  if (normalized.location?.trim()) params.set("state", normalized.location.trim());
   if (normalized.minorityType?.trim()) params.set("minorityType", normalized.minorityType.trim());
   if (normalized.category?.trim()) params.set("category", normalized.category.trim());
   if (normalized.subcategory?.trim()) params.set("subcategory", normalized.subcategory.trim());
@@ -162,6 +181,7 @@ export function buildListingPageUrl(path: string, filters: Partial<ListingFilter
   if (normalized.priceMin?.trim()) params.set("priceMin", normalized.priceMin.trim());
   if (normalized.priceMax?.trim()) params.set("priceMax", normalized.priceMax.trim());
   if (normalized.page?.trim()) params.set("page", normalized.page.trim());
+  if (normalized.country?.trim()) params.set("country", normalized.country.trim());
   if (normalized.tab && normalized.tab !== "products" && path.startsWith("/search")) {
     params.set("tab", normalized.tab);
   }
@@ -180,13 +200,14 @@ export function buildSearchPageUrlWithTab(filters: Partial<ListingFilters>): str
 export function listingFiltersToApiParams(filters: Partial<ListingFilters>): Record<string, string> {
   const api: Record<string, string> = {};
   if (filters.keyword?.trim()) api.search = filters.keyword.trim();
-  if (filters.location?.trim()) api.city = filters.location.trim();
+  if (filters.location?.trim()) api.state = filters.location.trim();
   if (filters.minorityType?.trim()) api.minorityType = filters.minorityType.trim();
   if (filters.category?.trim()) api.categoryId = filters.category.trim();
   if (filters.subcategory?.trim()) api.subcategoryId = filters.subcategory.trim();
   if (filters.badge?.trim()) api.badge = filters.badge.trim();
   if (filters.sort?.trim()) api.sort = filters.sort.trim();
   if (filters.page?.trim()) api.page = filters.page.trim();
+  if (filters.country?.trim()) api.country = filters.country.trim();
   if (filters.priceMin?.trim() && filters.priceMax?.trim()) {
     api.price = `${filters.priceMin}-${filters.priceMax}`;
   }

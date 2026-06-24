@@ -12,6 +12,7 @@ import EditProductModal from './components/product-modal/EditProductModal';
 import ConfirmDialog from './components/ConfirmDialog'; // You'll need to create this
 import AddDiscountModal from './components/AddDiscountModal';
 import ViewDiscountsModal from './components/ViewDiscountsModal';
+import { getVendorInventoryProductCount } from '@/lib/marketplace/productCounts';
 interface ProductsPageProps {
   onNextTab?: () => void;
 }
@@ -22,6 +23,7 @@ export default function ProductsPage({ onNextTab }: ProductsPageProps = {}) {
   const [loadingBusiness, setLoadingBusiness] = useState(true);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [productToDelete, setProductToDelete] = useState<string | null>(null);
+  const [deleteInProgress, setDeleteInProgress] = useState(false);
   const [showDiscountModal, setShowDiscountModal] = useState(false);
   const [showDiscountListModal, setShowDiscountListModal] = useState(false);
   
@@ -41,7 +43,6 @@ export default function ProductsPage({ onNextTab }: ProductsPageProps = {}) {
     openViewModal,
     openEditModal,
     closeModal,
-    handleDelete,
     saveEdit
   } = useProductModal();
 
@@ -86,22 +87,23 @@ export default function ProductsPage({ onNextTab }: ProductsPageProps = {}) {
   };
 
   const handleConfirmDelete = async () => {
-    if (!productToDelete) return;
-    
-    setShowConfirmDialog(false);
+    if (!productToDelete || deleteInProgress) return;
+
+    setDeleteInProgress(true);
     const deleted = await deleteProduct(productToDelete);
     if (deleted) {
-      await refreshProducts(); // Refresh the list
-      setProductToDelete(null);
-      
       // If there's an open modal, close it
       if (modalType === 'view' && selectedProduct?._id === productToDelete) {
         closeModal();
       }
+      setShowConfirmDialog(false);
+      setProductToDelete(null);
     }
+    setDeleteInProgress(false);
   };
 
   const handleCancelDelete = () => {
+    if (deleteInProgress) return;
     setShowConfirmDialog(false);
     setProductToDelete(null);
   };
@@ -164,7 +166,7 @@ export default function ProductsPage({ onNextTab }: ProductsPageProps = {}) {
         <ProductFilters
           filters={filters}
           onFilterChange={updateFilter}
-          totalProducts={products.length}
+          totalProducts={getVendorInventoryProductCount(products)}
         />
         
         
@@ -241,8 +243,9 @@ export default function ProductsPage({ onNextTab }: ProductsPageProps = {}) {
         isOpen={showConfirmDialog}
         title="Delete Product"
         message="Are you sure you want to delete this product? This action cannot be undone."
-        confirmText="Delete"
+        confirmText={deleteInProgress ? "Deleting..." : "Delete"}
         cancelText="Cancel"
+        isLoading={deleteInProgress}
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
       />

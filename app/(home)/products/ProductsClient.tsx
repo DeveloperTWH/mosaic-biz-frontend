@@ -27,6 +27,7 @@ import MarketTrustBadgeHint from "../Components/MarketTrustBadgeHint";
 import PublicProductCard from "../Components/publicCards/PublicProductCard";
 import { mapRankedItemToPublicProductCard } from "../Components/publicCards/publicProductCardMappers";
 import { SHOPPER_LOW_INVENTORY_NOTE } from "../Components/marketTrustProof";
+import { getPublicProductListTotal } from "@/lib/marketplace/productCounts";
 
 type MinorityType = { _id: string; name: string };
 
@@ -134,7 +135,7 @@ const ProductsPageInner = () => {
             const defaultLimit = 10;
             const params: any = {
                 search: (q ?? searchText) || "",
-                city: (c ?? searchLocation) || "",
+                state: (c ?? searchLocation) || "",
                 minorityType: (m ?? minorityType) || "",
                 page: 1,
                 limit: defaultLimit,
@@ -154,7 +155,7 @@ const ProductsPageInner = () => {
             const apiProducts = Array.isArray(responseData.data) ? responseData.data : [];
             // console.log("api", apiProducts)
             setProducts(apiProducts);
-            setTotalProducts(Number(responseData.total ?? apiProducts.length ?? 0));
+            setTotalProducts(getPublicProductListTotal(responseData, apiProducts.length));
             setCurrentPage(Number(responseData.page ?? params.page ?? 1));
             setItemsPerPage(Number(responseData.pageSize ?? responseData.limit ?? params.limit ?? defaultLimit));
         } catch (err) {
@@ -183,7 +184,7 @@ const ProductsPageInner = () => {
             const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/services/list`, {
                 params: {
                     search: searchText,
-                    city: searchLocation,
+                    state: searchLocation,
                     minorityType,
                     page: 1,
                     limit: 10,

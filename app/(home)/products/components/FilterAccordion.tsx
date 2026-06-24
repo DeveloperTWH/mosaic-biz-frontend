@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Slider from "@mui/material/Slider";
 import { Category, SubCategory, CategoryResponse, SubCategoryResponse } from "@/types/Category";
+import { PUBLIC_BADGE_FILTER_OPTIONS } from "../../Components/publicSearch";
 
 interface FilterAccordionProps {
   onFilterChange?: (category: string, subCategory: string) => void;
@@ -98,7 +99,7 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({
     },
     {
       title: "Select Badge",
-      items: ["Silver", "Gold", "Platinum", "Diamond"],
+      items: PUBLIC_BADGE_FILTER_OPTIONS.map((option) => option.label),
     },
     {
       title: "Price",
@@ -239,13 +240,15 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({
 
                           if (section.title === "Select Badge") {
                             setSelectedBadge(item);
-                            onBadgeSelect?.(item.toLowerCase());
+                            const badgeOption = PUBLIC_BADGE_FILTER_OPTIONS.find((option) => option.label === item);
+                            onBadgeSelect?.(badgeOption?.value ?? item.toLowerCase());
                           }
                         }}
                         style={{
                           cursor:
                             section.title === "Categories" ||
-                            section.title === "Sub Categories"
+                            section.title === "Sub Categories" ||
+                            section.title === "Select Badge"
                               ? "pointer"
                               : "default",
                           fontFamily:

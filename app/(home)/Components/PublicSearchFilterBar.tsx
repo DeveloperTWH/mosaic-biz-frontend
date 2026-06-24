@@ -106,7 +106,7 @@ export default function PublicSearchFilterBar({
               onChange={(event) => onChange({ ...filters, location: event.target.value })}
               className="market-select"
             >
-              <option value="">All states</option>
+              <option value="">All locations</option>
               {US_STATE_OPTIONS.map((state) => (
                 <option key={state} value={state}>
                   {state}
@@ -119,6 +119,9 @@ export default function PublicSearchFilterBar({
               </svg>
             </div>
           </div>
+          <p className="market-filter-loading-hint">
+            State filters search current marketplace listings; availability may vary.
+          </p>
         </div>
 
         <div className="min-w-0 flex-1">
