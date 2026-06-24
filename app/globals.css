@@ -1197,6 +1197,50 @@ body {
 }
 
 /* Partner dashboard surfaces */
+.dashboard-app-shell {
+  @apply min-h-screen bg-surface-cream text-dashboard-text;
+}
+
+.dashboard-sidebar {
+  @apply fixed left-0 top-0 z-40 flex h-dvh w-[17rem] max-w-[86vw] flex-col overflow-hidden bg-brand-navy text-white shadow-xl transition-transform duration-300 md:static md:h-screen md:translate-x-0;
+}
+
+.dashboard-sidebar-brand {
+  @apply border-b border-white/10 px-5 py-5;
+}
+
+.dashboard-business-avatar {
+  @apply flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-dashboard-gold/50 bg-dashboard-gold text-base font-bold text-brand-navy;
+}
+
+.dashboard-sidebar-nav {
+  @apply custom-scrollbar flex-1 space-y-1 overflow-y-auto px-3 py-4;
+}
+
+.dashboard-sidebar-link {
+  @apply flex min-h-11 w-full items-center gap-3 rounded-lg px-3 py-2.5 font-montserrat text-sm font-semibold text-white/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dashboard-gold;
+}
+
+.dashboard-sidebar-link--active {
+  @apply bg-dashboard-gold text-brand-navy shadow-sm;
+}
+
+.dashboard-sidebar-link--inactive {
+  @apply hover:bg-white/10 hover:text-white;
+}
+
+.dashboard-sidebar-footer {
+  @apply border-t border-white/10 p-3;
+}
+
+.dashboard-topbar {
+  @apply sticky top-0 z-20 flex w-full items-center justify-between border-b border-border-warm bg-surface-panel/95 px-4 py-3 shadow-sm backdrop-blur md:px-6;
+}
+
+.dashboard-shell-main {
+  @apply flex-1 overflow-y-auto p-4 md:p-6 xl:p-8;
+}
+
 .dashboard-card {
   @apply rounded-xl border border-border-warm bg-surface-panel p-4 shadow-sm sm:p-5;
 }
@@ -1206,7 +1250,15 @@ body {
 }
 
 .dashboard-table-shell thead {
-  @apply bg-brand-navy text-white;
+  @apply border-b border-dashboard-border-light bg-surface-cream text-left text-dashboard-muted;
+}
+
+.dashboard-table-shell th {
+  @apply px-4 py-3 font-montserrat text-xs font-semibold uppercase tracking-wide;
+}
+
+.dashboard-table-shell td {
+  @apply px-4 py-3 text-dashboard-text;
 }
 
 .dashboard-empty-state {
@@ -1219,6 +1271,98 @@ body {
 
 .dashboard-empty-state-desc {
   @apply mt-2 font-montserrat text-sm text-dashboard-muted;
+}
+
+.dashboard-page-header {
+  @apply flex flex-col gap-4 rounded-xl border border-border-warm bg-surface-panel px-4 py-4 shadow-sm sm:px-5 md:flex-row md:items-center md:justify-between;
+}
+
+.dashboard-page-eyebrow {
+  @apply font-montserrat text-xs font-semibold uppercase tracking-wide text-dashboard-gold;
+}
+
+.dashboard-page-title {
+  @apply mt-1 font-poppins text-xl font-semibold text-dashboard-text sm:text-2xl;
+}
+
+.dashboard-page-description {
+  @apply mt-2 max-w-3xl font-montserrat text-sm leading-relaxed text-dashboard-muted;
+}
+
+.dashboard-page-action {
+  @apply flex w-full shrink-0 flex-col gap-2 sm:w-auto sm:flex-row sm:items-center sm:justify-end;
+}
+
+.dashboard-stat-card {
+  @apply rounded-xl border border-border-warm bg-surface-panel p-4 shadow-sm transition-colors hover:border-dashboard-gold/50;
+}
+
+.dashboard-stat-label {
+  @apply font-montserrat text-xs font-semibold uppercase tracking-wide text-dashboard-muted;
+}
+
+.dashboard-stat-value {
+  @apply mt-2 font-poppins text-2xl font-semibold text-dashboard-text;
+}
+
+.dashboard-stat-description {
+  @apply mt-2 font-montserrat text-xs leading-relaxed text-dashboard-muted;
+}
+
+.dashboard-stat-icon {
+  @apply flex h-11 w-11 shrink-0 items-center justify-center rounded-lg;
+}
+
+.dashboard-status-pill {
+  @apply inline-flex items-center rounded-full border px-2.5 py-1 font-montserrat text-xs font-semibold;
+}
+
+.dashboard-action {
+  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 py-2 font-poppins text-xs font-semibold uppercase tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dashboard-gold/50 disabled:pointer-events-none disabled:opacity-60;
+}
+
+.dashboard-action--primary {
+  @apply bg-dashboard-gold text-brand-navy hover:bg-brand-gold-light;
+}
+
+.dashboard-action--secondary {
+  @apply bg-brand-navy text-white hover:bg-brand-navy-light;
+}
+
+.dashboard-action--ghost {
+  @apply border border-dashboard-border-light bg-white text-dashboard-text hover:border-dashboard-gold hover:bg-surface-cream;
+}
+
+.dashboard-action--danger {
+  @apply bg-red-600 text-white hover:bg-red-700;
+}
+
+.dashboard-icon-button {
+  @apply inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg border border-dashboard-border-light bg-white p-2 text-dashboard-muted transition-colors hover:border-dashboard-gold hover:text-dashboard-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dashboard-gold/50;
+}
+
+.dashboard-icon-button--warning {
+  @apply border-brand-gold/40 text-brand-gold hover:bg-brand-gold/10;
+}
+
+.dashboard-icon-button--danger {
+  @apply border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700;
+}
+
+.dashboard-mobile-card {
+  @apply rounded-xl border border-border-warm bg-surface-panel p-4 shadow-sm;
+}
+
+.dashboard-pagination {
+  @apply mt-5 flex flex-wrap items-center justify-end gap-2;
+}
+
+.dashboard-pagination-button {
+  @apply min-h-10 rounded-lg border border-dashboard-border-light bg-white px-3 py-1 font-montserrat text-sm font-semibold text-dashboard-text transition-colors hover:border-dashboard-gold disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+.dashboard-pagination-button--active {
+  @apply border-dashboard-gold bg-dashboard-gold text-brand-navy;
 }
 
 .market-result-count {

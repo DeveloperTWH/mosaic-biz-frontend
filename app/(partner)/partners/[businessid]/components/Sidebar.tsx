@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   LayoutDashboard,
   Boxes,
@@ -11,6 +11,7 @@ import {
   LogOut,
   X,
   Wallet,
+  Store,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useParams } from "next/navigation";
@@ -34,13 +35,19 @@ const Sidebar: React.FC<SidebarProps> = ({
   const businessId = params.businessid as string;
   const { business } = useBusinessStore();
 
-  const [showUploadScreen, setShowUploadScreen] = useState(false);
-
-  useEffect(() => {
-    if (business && Object.keys(business).length > 0) {
-      setShowUploadScreen(!business.logo);
-    }
-  }, [business]);
+  const [dismissedUploadBusinessId, setDismissedUploadBusinessId] = useState<string | null>(null);
+  const businessRecordId = business?._id ?? businessId;
+  const showUploadScreen =
+    Boolean(business && Object.keys(business).length > 0 && !business.logo) &&
+    dismissedUploadBusinessId !== businessRecordId;
+  const setShowUploadScreen = useCallback<React.Dispatch<React.SetStateAction<boolean>>>(
+    (value) => {
+      const nextValue =
+        typeof value === "function" ? value(showUploadScreen) : value;
+      setDismissedUploadBusinessId(nextValue ? null : businessRecordId);
+    },
+    [businessRecordId, showUploadScreen],
+  );
 
   const navItems = [
     { label: "Dashboard", icon: <LayoutDashboard className="h-5 w-5" /> },
@@ -79,25 +86,26 @@ const Sidebar: React.FC<SidebarProps> = ({
         />
       ) : (
         <aside
-          className={`fixed left-0 top-0 z-40 flex h-screen w-64 flex-col overflow-hidden bg-brand-navy shadow transition-transform duration-300 md:static md:translate-x-0 ${
+          className={`dashboard-sidebar ${
             isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
           }`}
+          aria-label="Vendor dashboard navigation"
         >
           <div className="flex justify-end p-4 md:hidden">
             <button
               type="button"
               onClick={() => setIsOpen(false)}
-              className="rounded p-1 text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dashboard-gold"
+              className="rounded-lg p-2 text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dashboard-gold"
               aria-label="Close menu"
             >
               <X className="h-5 w-5" />
             </button>
           </div>
 
-          <div className="flex flex-col items-center p-6">
-            <div className="rounded-full border-2 border-white/80 p-1">
+          <div className="dashboard-sidebar-brand">
+            <div className="flex items-center gap-3">
               {business?.logo ? (
-                <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full">
+                <div className="dashboard-business-avatar">
                   <img
                     src={business.logo}
                     alt={displayName}
@@ -105,17 +113,22 @@ const Sidebar: React.FC<SidebarProps> = ({
                   />
                 </div>
               ) : (
-                <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-dashboard-gold text-lg font-bold text-brand-navy">
+                <div className="dashboard-business-avatar">
                   {avatarInitial}
                 </div>
               )}
+              <div className="min-w-0">
+                <p className="font-montserrat text-[10px] font-semibold uppercase tracking-[0.18em] text-dashboard-gold">
+                  Vendor workspace
+                </p>
+                <h2 className="mt-1 truncate font-poppins text-sm font-semibold text-white" title={displayName}>
+                  {displayName}
+                </h2>
+              </div>
             </div>
-            <h2 className="mt-2 text-center text-lg font-semibold capitalize text-white">
-              {displayName}
-            </h2>
           </div>
 
-          <nav className="custom-scrollbar flex-1 space-y-1 overflow-y-auto py-4">
+          <nav className="dashboard-sidebar-nav">
             {navItems.map((item) => {
               const link = getLink(item.label);
               const isActive =
@@ -127,25 +140,36 @@ const Sidebar: React.FC<SidebarProps> = ({
                 <Link
                   key={item.label}
                   href={link}
-                  className={`flex min-h-11 w-full items-center gap-3 px-4 py-3 text-sm font-medium text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dashboard-gold ${
+                  onClick={() => setIsOpen(false)}
+                  className={`dashboard-sidebar-link ${
                     isActive
-                      ? "bg-dashboard-gold/20 text-dashboard-gold"
-                      : "hover:bg-white/10"
+                      ? "dashboard-sidebar-link--active"
+                      : "dashboard-sidebar-link--inactive"
                   }`}
+                  aria-current={isActive ? "page" : undefined}
                 >
-                  {item.icon} {item.label}
+                  <span className="shrink-0">{item.icon}</span>
+                  <span className="min-w-0 truncate">{item.label}</span>
                 </Link>
               );
             })}
           </nav>
 
-          <div className="pb-4">
+          <div className="dashboard-sidebar-footer">
+            <Link
+              href="/partners"
+              onClick={() => setIsOpen(false)}
+              className="dashboard-sidebar-link dashboard-sidebar-link--inactive mb-1"
+            >
+              <Store className="h-5 w-5" />
+              <span>Partner hub</span>
+            </Link>
             <button
               type="button"
               onClick={async () => await logoutUser()}
-              className="flex min-h-11 w-full items-center gap-3 px-4 py-2 text-sm font-medium text-white hover:bg-red-600/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dashboard-gold"
+              className="flex min-h-11 w-full items-center gap-3 rounded-lg px-3 py-2.5 font-montserrat text-sm font-semibold text-white/80 transition-colors hover:bg-red-600/80 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dashboard-gold"
             >
-              <LogOut className="h-5 w-5" /> Logout
+              <LogOut className="h-5 w-5" /> <span>Logout</span>
             </button>
           </div>
         </aside>

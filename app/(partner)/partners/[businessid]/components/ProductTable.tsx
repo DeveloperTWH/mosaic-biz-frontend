@@ -4,12 +4,17 @@ import React, { useState } from 'react';
 import { Eye, Pencil, Trash2, Plus, ChevronDown, ChevronUp } from 'lucide-react';
 import Image from 'next/image';
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useBusinessStore } from '@/app/store/businessStore';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import DeleteConfirmationModal from '@/app/components/DeleteConfirmationModal';
 import DashboardEmptyState from '@/components/ui/dashboard-empty-state';
+import {
+  DashboardActionLink,
+  DashboardPagination,
+  DashboardStatusPill,
+} from '@/components/ui/dashboard-primitives';
 import DashboardLoadingBlock from '@/components/ui/dashboard-loading-block';
 
 
@@ -69,11 +74,6 @@ const ProductTable: React.FC<ProductTableProps> = ({
   const [deleteInProgress, setDeleteInProgress] = useState(false);
 
 
-
-
-  const router = useRouter();
-
-
   const toggleExpand = (id: string) => {
     setExpanded(prev =>
       prev.includes(id) ? prev.filter(e => e !== id) : [...prev, id]
@@ -86,49 +86,6 @@ const ProductTable: React.FC<ProductTableProps> = ({
 
   const changePage = (page: number) => {
     if (page >= 1 && page <= totalPages) onPageChange(page);
-  };
-
-  const renderPagination = () => {
-    const pages = [];
-    const maxVisible = 5;
-    let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
-    let end = Math.min(totalPages, start + maxVisible - 1);
-    if (end - start < maxVisible - 1) start = Math.max(1, end - maxVisible + 1);
-
-    for (let i = start; i <= end; i++) {
-      pages.push(
-        <button
-          key={i}
-          onClick={() => changePage(i)}
-          className={`px-3 py-1 border rounded ${currentPage === i
-            ? 'bg-black text-white'
-            : 'bg-white text-black hover:bg-gray-100'
-            }`}
-        >
-          {i}
-        </button>
-      );
-    }
-
-    return (
-      <div className="flex items-center justify-end gap-2 mt-4">
-        <button
-          onClick={() => changePage(currentPage - 1)}
-          disabled={currentPage === 1}
-          className="px-3 py-1 text-black bg-white border rounded disabled:opacity-50"
-        >
-          Prev
-        </button>
-        {pages}
-        <button
-          onClick={() => changePage(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          className="px-3 py-1 text-black bg-white border rounded disabled:opacity-50"
-        >
-          Next
-        </button>
-      </div>
-    );
   };
 
   const handleDelete = async () => {
@@ -195,18 +152,22 @@ const ProductTable: React.FC<ProductTableProps> = ({
   return (
     <div className="dashboard-table-shell p-4 md:p-6">
       <div className="flex flex-col items-start justify-between gap-3 mb-6 sm:flex-row sm:items-center">
-        <h3 className="text-xl font-bold capitalize">{business?.listingType}</h3>
-        <Link
+        <div>
+          <p className="dashboard-page-eyebrow">Listings</p>
+          <h3 className="font-poppins text-xl font-semibold capitalize text-dashboard-text">
+            {business?.listingType} inventory
+          </h3>
+        </div>
+        <DashboardActionLink
           href={`/partners/${businessid}/inventory/add-${business?.listingType}`}
-          className="inline-flex min-h-11 items-center gap-2 rounded bg-dashboard-gold px-4 py-2 text-sm font-semibold text-brand-navy hover:bg-brand-gold-light"
         >
           <Plus className="w-4 h-4" /> Add {business?.listingType}
-        </Link>
+        </DashboardActionLink>
       </div>
 
       <div className="hidden overflow-x-auto md:block">
-        <table className="w-full min-w-[800px] text-sm text-left border-collapse">
-          <thead className="text-white">
+        <table className="w-full min-w-[800px] border-collapse text-left text-sm">
+          <thead>
             <tr>
               <th className="px-4 py-2">Toggle</th>
               <th className="px-4 py-2">Product</th>
@@ -218,12 +179,15 @@ const ProductTable: React.FC<ProductTableProps> = ({
           <tbody>
             {products.map(product => (
               <React.Fragment key={product._id}>
-                <tr
-                  className={`border-b hover:bg-gray-50 ${hasOutOfStockVariant(product) ? 'bg-red-200' : ''}`}
-                >
+                <tr className={`border-b border-dashboard-border-light hover:bg-surface-cream ${hasOutOfStockVariant(product) ? 'bg-dashboard-warn-bg' : ''}`}>
                   <td className="px-4 py-3 align-top">
-                    <button onClick={() => toggleExpand(product._id)}>
-                      {expanded.includes(product._id) ? <ChevronUp /> : <ChevronDown />}
+                    <button
+                      type="button"
+                      onClick={() => toggleExpand(product._id)}
+                      className="dashboard-icon-button"
+                      aria-label={expanded.includes(product._id) ? "Collapse product variants" : "Expand product variants"}
+                    >
+                      {expanded.includes(product._id) ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                     </button>
                   </td>
                   <td className="px-4 py-3 font-semibold align-top">
@@ -242,19 +206,17 @@ const ProductTable: React.FC<ProductTableProps> = ({
                       <span className="text-base font-medium">{product.title}</span>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-gray-600 align-top">{product.description}</td>
+                  <td className="px-4 py-3 text-dashboard-muted align-top">{product.description}</td>
                   <td className="px-4 py-3 text-sm align-top">{product.variants.length} Variants</td>
                   <td className="px-4 py-3 align-top">
-                    <div className="flex items-start gap-2">
-                      <Link href={`/products/view/${product._id}`}>
-                        <button className="p-1 rounded bg-custom-orange hover:opacity-90">
-                          <Eye className="w-4 h-4 text-white" />
-                        </button>
+                    <div className="flex flex-wrap items-start gap-2">
+                      <Link href={`/products/view/${product._id}`} className="dashboard-action dashboard-action--ghost min-h-10 px-3 py-1">
+                        <Eye className="h-4 w-4" />
+                        View
                       </Link>
-                      <Link href={`/partners/${businessid}/inventory/edit/${product._id}`}>
-                        <button className="p-1 rounded bg-custom-yellow hover:opacity-90">
-                          <Pencil className="w-4 h-4 text-white" />
-                        </button>
+                      <Link href={`/partners/${businessid}/inventory/edit/${product._id}`} className="dashboard-action dashboard-action--primary min-h-10 px-3 py-1">
+                        <Pencil className="h-4 w-4" />
+                        Edit
                       </Link>
                       <button
                         type="button"
@@ -263,8 +225,9 @@ const ProductTable: React.FC<ProductTableProps> = ({
                           setShowDeleteModal(true);
                         }}
 
-                        className="p-1 bg-gray-400 rounded hover:bg-gray-500">
-                        <Trash2 className="w-4 h-4 text-white" />
+                        className="dashboard-action dashboard-action--danger min-h-10 px-3 py-1">
+                        <Trash2 className="h-4 w-4" />
+                        Delete
                       </button>
                     </div>
                   </td>
@@ -272,7 +235,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
 
                 {expanded.includes(product._id) && (
                   <tr>
-                    <td colSpan={5} className="p-4 bg-gray-50">
+                    <td colSpan={5} className="bg-surface-cream p-4">
                       <div className="flex flex-col">
                         {product.variants.map((variant, idx) => {
                           const isOutOfStock = variant.sizes.some(size => size.stock === 0);
@@ -280,12 +243,12 @@ const ProductTable: React.FC<ProductTableProps> = ({
                           return (
                             <div
                               key={variant.variantId}
-                              className={`flex flex-col justify-between h-full p-4 space-y-4 bg-white border rounded-md shadow ${isOutOfStock ? 'bg-red-200' : ''}`}  // Add highlight here
+                              className={`flex h-full flex-col justify-between space-y-4 rounded-xl border border-dashboard-border-light bg-white p-4 shadow-sm ${isOutOfStock ? 'bg-dashboard-warn-bg' : ''}`}
                             >
                               {/* Header */}
                               <div className="flex items-center justify-between cursor-pointer" onClick={() => toggleVariantExpand(variant.variantId)}>
-                                <p className="text-sm font-semibold text-gray-700">
-                                  {idx + 1}. Variant Color: <span className="text-black">{variant.color}</span>
+                                <p className="text-sm font-semibold text-dashboard-text">
+                                  {idx + 1}. Variant Color: <span className="text-dashboard-muted">{variant.color}</span>
                                 </p>
                                 <button>
                                   {isExpanded ? <ChevronUp /> : <ChevronDown />}
@@ -310,33 +273,33 @@ const ProductTable: React.FC<ProductTableProps> = ({
                               {/* Collapsible Content */}
                               {isExpanded && (
                                 <div
-                                  className={`flex flex-col gap-4 pl-10 ${variant.sizes.some(size => size.stock === 0) ? 'bg-red-200' : ''}`}
+                                  className={`flex flex-col gap-4 pl-10 ${variant.sizes.some(size => size.stock === 0) ? 'bg-dashboard-warn-bg' : ''}`}
                                 >
                                   {variant.sizes.map(size => (
                                     <div
                                       key={size.sizeId}
-                                      className={`relative border rounded-md p-4 space-y-1 text-sm shadow-sm transition ${size.stock === 0
-                                        ? 'bg-red-100 text-red-700 font-semibold' // Individual size is out of stock
-                                        : 'bg-gray-50'
+                                      className={`relative rounded-md border border-dashboard-border-light p-4 space-y-1 text-sm shadow-sm transition ${size.stock === 0
+                                        ? 'bg-dashboard-warn-bg text-dashboard-warn-text font-semibold'
+                                        : 'bg-surface-panel'
                                         }`}
                                     >
                                       <p><strong>{variant.label} :</strong> {size.size}</p>
                                       <p><strong>SKU:</strong> {size.sku}</p>
                                       <p><strong>Stock:</strong> {size.stock}</p>
                                       {variant.isPublished ? (
-                                        <span className="text-xs font-medium text-green-600">Published</span>
+                                        <DashboardStatusPill tone="success">Published</DashboardStatusPill>
                                       ) : (
-                                        <span className="text-xs font-medium text-yellow-600">Unpublished</span>
+                                        <DashboardStatusPill tone="warning">Unpublished</DashboardStatusPill>
                                       )}
 
                                       {size.salePrice && size.discountEndDate && new Date() < new Date(size.discountEndDate) ? (
                                         <>
                                           <p>
                                             <strong>Price:</strong>{' '}
-                                            <span className="text-gray-500 line-through">${size.price}</span>{' '}
-                                            <span className="font-semibold text-green-600">${size.salePrice}</span>
+                                            <span className="text-dashboard-muted line-through">${size.price}</span>{' '}
+                                            <span className="font-semibold text-brand-teal-dark">${size.salePrice}</span>
                                           </p>
-                                          <p className="text-sm text-gray-600">
+                                          <p className="text-sm text-dashboard-muted">
                                             <strong>Offer valid till:</strong>{' '}
                                             {new Date(size.discountEndDate).toLocaleDateString()}
                                           </p>
@@ -347,12 +310,12 @@ const ProductTable: React.FC<ProductTableProps> = ({
 
                                       {/* Actions */}
                                       <div className="absolute flex gap-1 top-2 right-2">
-                                        <button className="p-1 bg-blue-500 rounded hover:bg-blue-600" title="View">
-                                          <Eye className="w-4 h-4 text-white" />
+                                        <button className="dashboard-icon-button" title="View" aria-label="View variant">
+                                          <Eye className="h-4 w-4" />
                                         </button>
                                         <Link href={`/partners/${businessid}/inventory/edit/${product._id}/${variant.variantId}`}>
-                                          <button className="h-full p-1 bg-yellow-500 rounded hover:bg-yellow-600" title="Edit">
-                                            <Pencil className="w-4 h-4 text-white" />
+                                          <button className="dashboard-icon-button dashboard-icon-button--warning" title="Edit" aria-label="Edit variant">
+                                            <Pencil className="h-4 w-4" />
                                           </button>
                                         </Link>
                                         <button
@@ -360,10 +323,11 @@ const ProductTable: React.FC<ProductTableProps> = ({
                                             setDeleteTarget({ type: 'variant', productId: product._id, variantId: variant.variantId });
                                             setShowDeleteModal(true);
                                           }}
-                                          className="p-1 bg-gray-500 rounded hover:bg-gray-600"
+                                          className="dashboard-icon-button dashboard-icon-button--danger"
                                           title="Delete"
+                                          aria-label="Delete variant"
                                         >
-                                          <Trash2 className="w-4 h-4 text-white" />
+                                          <Trash2 className="h-4 w-4" />
                                         </button>
                                       </div>
                                     </div>
@@ -376,8 +340,8 @@ const ProductTable: React.FC<ProductTableProps> = ({
 
                         {/* Add Variant Block */}
                         <Link href={`/partners/${businessid}/inventory/edit/${product._id}/add-variant`}>
-                          <div className="flex items-center justify-center h-full p-4 text-center bg-gray-100 border border-dashed rounded-md cursor-pointer hover:border-gray-500">
-                            <button className="flex flex-col items-center justify-center gap-2 text-gray-600 hover:text-black">
+                          <div className="flex h-full cursor-pointer items-center justify-center rounded-md border border-dashed border-dashboard-border-light bg-surface-cream p-4 text-center hover:border-dashboard-gold">
+                            <button className="flex flex-col items-center justify-center gap-2 text-dashboard-muted hover:text-dashboard-text">
                               <Plus className="w-6 h-6" />
                               <span className="text-sm font-medium">Add Variant</span>
                             </button>
@@ -397,7 +361,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
       {/* Mobile Cards */}
       <div className="space-y-4 md:hidden">
         {products.map(product => (
-          <div key={product._id} className="p-4 bg-white border rounded shadow-sm">
+          <div key={product._id} className="dashboard-mobile-card">
             <div className="flex items-start gap-4">
               {product.coverImage && (
                 <Image
@@ -410,21 +374,19 @@ const ProductTable: React.FC<ProductTableProps> = ({
               )}
               <div>
                 <h4 className="text-base font-semibold">{product.title}</h4>
-                <p className="text-sm text-gray-600 line-clamp-2">{product.description}</p>
-                <p className="mt-1 text-xs text-gray-500">{product.variants.length} Variants</p>
+                <p className="text-sm text-dashboard-muted line-clamp-2">{product.description}</p>
+                <p className="mt-1 text-xs text-dashboard-muted">{product.variants.length} Variants</p>
               </div>
             </div>
 
             <div className="flex flex-wrap items-center gap-2 mt-3">
-              <Link href={`/products/view/${product._id}`}>
-                <button className="p-1 rounded bg-custom-orange hover:opacity-90">
-                  <Eye className="w-4 h-4 text-white" />
-                </button>
+              <Link href={`/products/view/${product._id}`} className="dashboard-action dashboard-action--ghost min-h-10 px-3 py-1">
+                <Eye className="h-4 w-4" />
+                View
               </Link>
-              <Link href={`/partners/${businessid}/inventory/edit/${product._id}`}>
-                <button className="p-1 rounded bg-custom-yellow hover:opacity-90">
-                  <Pencil className="w-4 h-4 text-white" />
-                </button>
+              <Link href={`/partners/${businessid}/inventory/edit/${product._id}`} className="dashboard-action dashboard-action--primary min-h-10 px-3 py-1">
+                <Pencil className="h-4 w-4" />
+                Edit
               </Link>
               <button
                 type="button"
@@ -432,9 +394,10 @@ const ProductTable: React.FC<ProductTableProps> = ({
                   setDeleteTarget({ type: 'product', productId: product._id });
                   setShowDeleteModal(true);
                 }}
-                className="p-1 bg-gray-400 rounded hover:bg-gray-500"
+                className="dashboard-action dashboard-action--danger min-h-10 px-3 py-1"
               >
-                <Trash2 className="w-4 h-4 text-white" />
+                <Trash2 className="h-4 w-4" />
+                Delete
               </button>
             </div>
 
@@ -442,9 +405,9 @@ const ProductTable: React.FC<ProductTableProps> = ({
             {expanded.includes(product._id) && (
               <div className="mt-4 space-y-4">
                 {product.variants.map(variant => (
-                  <div key={variant.variantId} className="p-4 border rounded bg-gray-50">
+                  <div key={variant.variantId} className="rounded-lg border border-dashboard-border-light bg-surface-cream p-4">
                     <p className="text-sm font-semibold">
-                      Color: <span className="text-black">{variant.color}</span>
+                      Color: <span className="text-dashboard-muted">{variant.color}</span>
                     </p>
                     <div className="flex flex-wrap gap-2 mt-2">
                       {variant.images.slice(0, 3).map((img, i) => (
@@ -462,8 +425,8 @@ const ProductTable: React.FC<ProductTableProps> = ({
                       {variant.sizes.map(size => (
                         <div
                           key={size.sizeId}
-                          className={`p-2 rounded-md border ${size.stock === 0
-                            ? 'bg-red-100 text-red-700'
+                          className={`rounded-md border border-dashboard-border-light p-2 ${size.stock === 0
+                            ? 'bg-dashboard-warn-bg text-dashboard-warn-text'
                             : 'bg-white'
                             }`}
                         >
@@ -471,9 +434,9 @@ const ProductTable: React.FC<ProductTableProps> = ({
                           <p className="text-sm"><strong>Stock:</strong> {size.stock}</p>
                           <p className="text-sm"><strong>SKU:</strong> {size.sku}</p>
                           {variant.isPublished ? (
-                            <span className="text-xs font-medium text-green-600">Published</span>
+                            <DashboardStatusPill tone="success">Published</DashboardStatusPill>
                           ) : (
-                            <span className="text-xs font-medium text-yellow-600">Unpublished</span>
+                            <DashboardStatusPill tone="warning">Unpublished</DashboardStatusPill>
                           )}
                         </div>
                       ))}
@@ -483,7 +446,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
               </div>
             )}
 
-            <button onClick={() => toggleExpand(product._id)} className="mt-3 text-sm text-blue-600 underline">
+            <button onClick={() => toggleExpand(product._id)} className="mt-3 font-montserrat text-sm font-semibold text-dashboard-gold underline">
               {expanded.includes(product._id) ? 'Hide Variants' : 'Show Variants'}
             </button>
           </div>
@@ -491,7 +454,11 @@ const ProductTable: React.FC<ProductTableProps> = ({
       </div>
 
 
-      {renderPagination()}
+      <DashboardPagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={onPageChange}
+      />
 
       {showDeleteModal && (
         <DeleteConfirmationModal

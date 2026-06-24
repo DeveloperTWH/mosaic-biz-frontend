@@ -21,6 +21,11 @@ import { ProductListingItem } from "@/types/product";
 import { Subscription, SubscriptionPlantype } from '@/types/subscription';
 import ServiceTable from './components/ServiceTable';
 import DashboardLoadingBlock from '@/components/ui/dashboard-loading-block';
+import {
+  DashboardActionLink,
+  DashboardPageHeader,
+  DashboardStatusPill,
+} from '@/components/ui/dashboard-primitives';
 
 const DashboardPage = () => {
   const { business, setBusiness, clearBusiness } = useBusinessStore();
@@ -43,6 +48,9 @@ const DashboardPage = () => {
 
 
   const { businessid } = useParams();  // Here `businessid` corresponds to [businessid] in the route
+  const listingLabel = businessData?.listingType
+    ? `${businessData.listingType.charAt(0).toUpperCase()}${businessData.listingType.slice(1)} business`
+    : "Vendor business";
 
   useEffect(() => {
 
@@ -99,7 +107,7 @@ const DashboardPage = () => {
 
 
 
-  const fetchFoodData = async (businessId: string, page: number = 1, limit: number = 4) => {
+  async function fetchFoodData(businessId: string, page: number = 1, limit: number = 4) {
     try {
       const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/private/food/list`, {
         withCredentials: true,
@@ -114,9 +122,9 @@ const DashboardPage = () => {
       console.log('Error fetching food data:', err);
       setError('Error fetching food items.');
     }
-  };
+  }
 
-  const fetchServiceData = async (businessId: string, page: number = 1, limit: number = 4) => {
+  async function fetchServiceData(businessId: string, page: number = 1, limit: number = 4) {
     try {
       const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/private/services/list`, {
         withCredentials: true,
@@ -132,10 +140,10 @@ const DashboardPage = () => {
       console.log('Error fetching service data:', err);
       setError('Error fetching services.');
     }
-  };
+  }
 
 
-  const fetchProductData = async (businessId: string, page: number = 1, limit: number = 4) => {
+  async function fetchProductData(businessId: string, page: number = 1, limit: number = 4) {
     try {
       setIsLoading(true);
 
@@ -166,7 +174,7 @@ const DashboardPage = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }
 
 
   return (
@@ -189,6 +197,22 @@ const DashboardPage = () => {
           <Suspense fallback={<DashboardLoadingBlock label="Loading business data…" />}>
             {businessData && (
               <>
+                <DashboardPageHeader
+                  eyebrow="Vendor dashboard"
+                  title={businessData.businessName || "Business dashboard"}
+                  description={`Manage this ${listingLabel.toLowerCase()}, review inventory readiness, and keep the storefront prepared for customers.`}
+                  action={
+                    <DashboardActionLink href={`/partners/${businessid}/inventory`}>
+                      Manage inventory
+                    </DashboardActionLink>
+                  }
+                />
+                <div className="flex flex-wrap gap-2">
+                  <DashboardStatusPill tone="neutral">{listingLabel}</DashboardStatusPill>
+                  {subscriptionPlan?.name ? (
+                    <DashboardStatusPill tone="gold">{subscriptionPlan.name}</DashboardStatusPill>
+                  ) : null}
+                </div>
                 <OverviewCards listingType={businessData.listingType} total={total} totalReviews={0} totalOrdersOrBookings={0} outOfStockOrUnpublished={outOfStockOrUnpublished} />
                 <div className="flex flex-col gap-6 lg:flex-row">
                   <div className="w-full lg:w-3/4">
