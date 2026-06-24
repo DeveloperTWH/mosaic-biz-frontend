@@ -100,7 +100,7 @@ Base URL for all calls: `NEXT_PUBLIC_API_BASE_URL` (axios default in `lib/api.ts
 | `app/(home)/checkout/buy-now/page.tsx` | BuyNow | GET | `/api/public/product/:productId` | none | Buy-now payload |
 | `app/(home)/checkout/address/ClientForm.tsx` | ClientForm | POST/PATCH | address APIs | Evidence Needed | Evidence Needed |
 | `app/(home)/payment-success/page.tsx` | PaymentSuccess | GET | `/api/orders/retrieve-intent/:paymentIntentId` | include | Order confirmation |
-| `app/(home)/checkout/page.tsx` | Checkout | — | Stripe Elements | — | return_url uses `NEXT_PUBLIC_CLIENT_BASE_URL` |
+| `app/(home)/checkout/page.tsx` | Checkout | — | Stripe Elements | — | return_url uses `buildAppUrl` helper |
 
 ---
 

@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
+import { getConfiguredAppOrigin } from "@/lib/url/appUrl";
 
 export const SITE_NAME = "Mosaic Biz Hub";
 export const DEFAULT_SITE_DESCRIPTION =
   "Discover and support trusted minority-owned businesses. Shop products, book services, and explore food from verified vendors on Mosaic Biz Hub.";
 export const DEFAULT_SHARE_IMAGE = "/herobanner.png";
-export const DEFAULT_SITE_URL = "https://mosaicbizhub.com";
+export const DEFAULT_SITE_URL = "https://app.mosaicbizhub.com";
 
 type PageMetadataInput = {
   title: string;
@@ -16,13 +17,7 @@ type PageMetadataInput = {
 };
 
 export function getMetadataBase(): URL {
-  const rawUrl = process.env.NEXT_PUBLIC_APP_URL || DEFAULT_SITE_URL;
-
-  try {
-    return new URL(rawUrl);
-  } catch {
-    return new URL(DEFAULT_SITE_URL);
-  }
+  return new URL(getConfiguredAppOrigin());
 }
 
 export function normalizeCanonicalPath(path: string): string {

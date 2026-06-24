@@ -8,6 +8,7 @@ import {
   useElements,
 } from '@stripe/react-stripe-js';
 import { useRouter } from 'next/navigation';
+import { buildAppUrl } from '@/lib/url/appUrl';
 
 const CheckoutForm = () => {
   const stripe = useStripe();
@@ -31,7 +32,7 @@ const CheckoutForm = () => {
       const { error, paymentIntent } = await stripe.confirmPayment({
         elements,
         confirmParams: {
-          return_url: `${window.location.origin}/payment/success`,
+          return_url: buildAppUrl('/payment/success'),
         },
         redirect: 'if_required',
       });

@@ -7,6 +7,7 @@ import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-
 import { loadStripe } from '@stripe/stripe-js';
 import { fetchSubscriptionPlans, getSubscriptionById } from '@/lib/api/subscription/subscriptionApi';
 import { SubscriptionPlanResponse } from '@/types/subscription-response';
+import { buildAppUrl } from '@/lib/url/appUrl';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -276,7 +277,7 @@ function StripePaymentForm({ plan }: { plan: SubscriptionPlanResponse }) {
       const { error: submitError } = await stripe.confirmPayment({
         elements,
         confirmParams: {
-          return_url: `${window.location.origin}/partners/tier-selection/success`,
+          return_url: buildAppUrl('/partners/tier-selection/success'),
         },
       });
 

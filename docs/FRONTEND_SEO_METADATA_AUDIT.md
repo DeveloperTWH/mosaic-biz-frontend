@@ -31,7 +31,7 @@ This pass adds a shared metadata helper at `lib/seo/metadata.ts` and route-level
 - Metadata copy must not invent inventory, reviews, shipping guarantees, vendor eligibility, or payment outcomes.
 - Transactional and account routes use `noIndex`.
 - Dynamic detail pages currently use honest generic fallback copy until backend-provided SEO fields are available.
-- `NEXT_PUBLIC_APP_URL` remains the canonical origin source. Invalid values fall back to `https://mosaicbizhub.com`.
+- `NEXT_PUBLIC_APP_URL` remains the canonical origin source. Invalid values fall back to `https://app.mosaicbizhub.com`.
 
 ## Backend SEO Fields Needed Later
 

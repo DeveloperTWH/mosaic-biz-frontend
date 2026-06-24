@@ -25,8 +25,8 @@ This document describes how the frontend handles Stripe Connect onboarding retur
 
 Production examples:
 
-- `https://mosaicbizhub.com/partners/connect/return`
-- `https://mosaicbizhub.com/partners/connect/refresh`
+- `https://app.mosaicbizhub.com/partners/connect/return`
+- `https://app.mosaicbizhub.com/partners/connect/refresh`
 
 Preview / staging should use the deployed frontend origin configured in the backend.
 

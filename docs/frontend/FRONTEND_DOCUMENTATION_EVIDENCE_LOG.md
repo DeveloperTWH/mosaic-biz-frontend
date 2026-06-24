@@ -106,7 +106,7 @@ Build warnings noted (non-blocking):
 | `/api/admin/users` vs `/admin/users` | Frontend uses **legacy** `/admin/users`; routeContract documents `/api/admin/users` returns 404 on live probe |
 | `/api/stripe/*` vs `/stripe/*` | Frontend finance page uses **legacy** `/stripe/*` root mount |
 | Admin featured toggle vs public featured | Admin: `PATCH /admin/api/products/:id/featured`; Public: `GET /api/featured-products` — different endpoints by design |
-| `NEXT_PUBLIC_APP_URL` vs `NEXT_PUBLIC_CLIENT_BASE_URL` | Both used; checkout return URLs use `CLIENT_BASE_URL`; metadata uses `APP_URL` — **Evidence Needed** for Vercel parity |
+| `NEXT_PUBLIC_APP_URL` vs `NEXT_PUBLIC_CLIENT_BASE_URL` | Centralized in `lib/url/appUrl.ts`; checkout return URLs prefer browser origin and use env only as fallback |
 
 ---
 
@@ -138,7 +138,7 @@ Build warnings noted (non-blocking):
 
 1. Human QA on Vercel RC preview using [../FRONTEND_SMOKE_CHECKLIST.md](../FRONTEND_SMOKE_CHECKLIST.md) and [FRONTEND_VISUAL_QA_SURFACE.md](FRONTEND_VISUAL_QA_SURFACE.md).
 2. Cross-repo review with `Techware-Hut/mosaic-backend` to confirm legacy path mounts (`/admin/users`, `/stripe/*`) remain supported at launch.
-3. Align Vercel env: `NEXT_PUBLIC_APP_URL` and `NEXT_PUBLIC_CLIENT_BASE_URL` to same frontend origin.
+3. Confirm Vercel env: `NEXT_PUBLIC_APP_URL` matches the intended frontend origin; `NEXT_PUBLIC_CLIENT_BASE_URL` is optional fallback only.
 4. Triage lint debt separately — not part of this documentation pack.
 
 ---
