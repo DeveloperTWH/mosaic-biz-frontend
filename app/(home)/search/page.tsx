@@ -307,7 +307,7 @@ function SearchPageContent() {
         });
       } catch (err: any) {
         if (err?.name === "AbortError") return;
-        setError(err?.message || "Something went wrong while searching.");
+        setError("Search is temporarily unavailable. Please try again.");
         setResponse(null);
       } finally {
         setLoading(false);
@@ -499,7 +499,7 @@ function SearchPageContent() {
         ) : error ? (
           <MarketDiscoveryPanel
             title="Search temporarily unavailable"
-            description={error}
+            description="We could not load marketplace results. Please retry or browse a category below."
             onRetry={() => setRetryCount((count) => count + 1)}
             actions={[
               { label: "Browse all products", href: "/products", variant: "primary" },

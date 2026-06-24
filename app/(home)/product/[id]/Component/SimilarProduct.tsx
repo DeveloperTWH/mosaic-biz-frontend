@@ -3,13 +3,17 @@
 import React from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { Star, StarHalf, RotateCcw } from 'lucide-react';
+import { Star, StarHalf } from 'lucide-react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Keyboard, A11y } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
+import MarketErrorState from '../../../Components/MarketErrorState';
 import MarketEmptyState from '../../../Components/MarketEmptyState';
+import MarketImage from '../../../Components/MarketImage';
+import MarketPrice from '../../../Components/MarketPrice';
 import { SHOPPER_LOW_INVENTORY_NOTE } from '../../../Components/marketTrustProof';
+import { toFiniteNumber } from '@/lib/marketplace/display';
 
 /* ---------- types ---------- */
 type RankedItem = {
@@ -53,7 +57,7 @@ function buildSimilarUrl(productId: string) {
 function pickImage(p: RankedItem) {
   const arr = [...(p.firstEligible?.images || []), ...(p.coverImage ? [p.coverImage] : [])];
   const dedup = Array.from(new Set(arr));
-  return dedup[0] || '/ShopProduct/Aria-SK6-Helmet 1.png';
+  return dedup[0] || null;
 }
 
 function ratingNum(p: RankedItem) {
@@ -68,13 +72,6 @@ function ratingCount(p: RankedItem) {
 
 function stripHtml(html: string): string {
   return html.replace(/<[^>]*>/g, '');
-}
-
-function getPriceNumber(v?: number | { $numberDecimal: string } | null) {
-  if (v == null) return 0;
-  if (typeof v === 'number') return v;
-  if ('$numberDecimal' in v) return Number(v.$numberDecimal);
-  return 0;
 }
 
 /* ---------- data hook ---------- */
@@ -107,7 +104,8 @@ function useSimilar(productId?: string) {
     } catch (e: unknown) {
       const err = e as { name?: string; message?: string };
       if (err?.name === 'AbortError') return;
-      setError(err?.message || 'Failed to load similar products');
+      console.error('Similar products load error:', err);
+      setError('Similar products are temporarily unavailable.');
       setItems((prev) => prev ?? []);
     } finally {
       setLoading(false);
@@ -124,10 +122,8 @@ function useSimilar(productId?: string) {
 
 function SimilarProductCard({
   item,
-  onImgLoad,
 }: {
   item: RankedItem;
-  onImgLoad?: () => void;
 }) {
   const img = pickImage(item);
   const href = `/product/${item._id}`;
@@ -136,20 +132,19 @@ function SimilarProductCard({
   const hasHalf = r % 1 >= 0.25 && r % 1 < 0.75;
   const empty = 5 - full - (hasHalf ? 1 : 0);
   const fe = item.firstEligible;
-  const price = getPriceNumber(fe?.price ?? item.price);
-  const sale = getPriceNumber(fe?.salePrice ?? item.salePrice ?? null);
-  const onSale = !!fe?.onSale && sale > 0;
-  const effective = onSale ? sale : price;
+  const price = toFiniteNumber(fe?.price ?? item.price);
+  const sale = toFiniteNumber(fe?.salePrice ?? item.salePrice ?? null);
+  const onSale = Boolean(fe?.onSale && sale !== null && sale > 0 && price !== null && sale < price);
 
   return (
     <Link href={href} target="_blank" className="market-card similar-card flex h-full flex-col p-4">
-      <div className="market-card-media relative mx-auto mb-4 flex h-[200px] w-full items-center justify-center">
-        <img
+      <div className="relative">
+        <MarketImage
           src={img}
-          alt={item.title}
-          className="max-h-full max-w-full object-contain p-3"
-          loading="lazy"
-          onLoad={onImgLoad}
+          alt={item.title || 'Similar product image'}
+          objectFit="contain"
+          fallbackLabel="Image coming soon"
+          className="mx-auto mb-4 h-[200px] w-full"
         />
         {onSale && (
           <span className="absolute left-2 top-2 rounded bg-red-600 px-2 py-0.5 text-[11px] font-semibold text-white">
@@ -191,17 +186,15 @@ function SimilarProductCard({
         )}
       </div>
 
-      <div className="mt-auto flex flex-col leading-tight">
-        <span className="text-xs text-market-muted">Starting from</span>
-        {onSale ? (
-          <div className="flex items-baseline gap-2">
-            <span className="market-card-price-sale text-sm sm:text-base">${effective.toFixed(2)}</span>
-            <span className="text-xs text-market-muted line-through">${price.toFixed(2)}</span>
-          </div>
-        ) : (
-          <span className="market-card-price text-sm sm:text-base">${price.toFixed(2)}</span>
-        )}
-      </div>
+      <MarketPrice
+        value={onSale ? sale : price}
+        compareAt={onSale ? price : null}
+        onSale={onSale}
+        label="Starting from"
+        priceClassName={onSale ? 'market-card-price-sale text-sm sm:text-base' : 'market-card-price text-sm sm:text-base'}
+        compareClassName="text-xs text-market-muted line-through"
+        className="mt-auto"
+      />
     </Link>
   );
 }
@@ -246,10 +239,6 @@ export default function SimilarProduct({ productId }: { productId?: string }) {
     return () => window.removeEventListener('resize', onResize);
   }, [equalizeHeights]);
 
-  const handleImgLoad = React.useCallback(() => {
-    equalizeHeights();
-  }, [equalizeHeights]);
-
   if (!effectiveId || !isValidObjectId(effectiveId)) return null;
 
   const swiperBreakpoints = {
@@ -288,14 +277,15 @@ export default function SimilarProduct({ productId }: { productId?: string }) {
           </Swiper>
         ) : error ? (
           <div className="flex flex-col items-center justify-center gap-2 text-red-400">
-            {error}
-            <button
-              type="button"
-              onClick={reload}
-              className="market-btn-outline inline-flex items-center gap-1 px-3 py-1 text-xs normal-case"
-            >
-              <RotateCcw size={14} /> Retry
-            </button>
+            <MarketErrorState
+              title="Similar products are temporarily unavailable"
+              description="We could not load related items right now."
+              onRetry={reload}
+              retryLabel="Retry"
+              ctaLabel="Browse all products"
+              ctaHref="/products"
+              className="py-8"
+            />
           </div>
         ) : items.length === 0 ? (
           <MarketEmptyState
@@ -307,7 +297,7 @@ export default function SimilarProduct({ productId }: { productId?: string }) {
         ) : items.length === 1 ? (
           <div className="mx-auto max-w-sm space-y-4">
             <p className="shopper-low-inventory-note">{SHOPPER_LOW_INVENTORY_NOTE}</p>
-            <SimilarProductCard item={items[0]} onImgLoad={handleImgLoad} />
+            <SimilarProductCard item={items[0]} />
             <p className="text-center font-montserrat text-sm text-market-muted">
               More picks from verified vendors are added as the marketplace grows.
             </p>
@@ -325,7 +315,7 @@ export default function SimilarProduct({ productId }: { productId?: string }) {
             >
               {items.map((p) => (
                 <SwiperSlide key={p._id}>
-                  <SimilarProductCard item={p} onImgLoad={handleImgLoad} />
+                  <SimilarProductCard item={p} />
                 </SwiperSlide>
               ))}
             </Swiper>

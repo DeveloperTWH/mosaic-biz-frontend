@@ -1,9 +1,9 @@
 "use client";
 
-import MarketEmptyState from "./Components/MarketEmptyState";
+import MarketErrorState from "./Components/MarketErrorState";
 
 export default function HomeError({
-  error,
+  error: _error,
   reset,
 }: {
   error: Error & { digest?: string };
@@ -11,15 +11,11 @@ export default function HomeError({
 }) {
   return (
     <div className="container-page py-16">
-      <MarketEmptyState
+      <MarketErrorState
         title="Something went wrong"
-        description={error.message || "We couldn't load this page. Please try again."}
+        description="We could not load this page. Please try again."
+        onRetry={reset}
       />
-      <div className="mt-4 text-center">
-        <button type="button" className="market-btn-primary min-h-11 px-6" onClick={() => reset()}>
-          Try again
-        </button>
-      </div>
     </div>
   );
 }

@@ -21,7 +21,9 @@ import { toggleWishlist, isProductWishlisted } from '@/utils/wishlistUtils';
 import CommerceMobileSearchBar from "../../Components/CommerceMobileSearchBar";
 import PublicPageHero from "../../Components/PublicPageHero";
 import MarketplaceEligibilityBanner from "../../Components/MarketplaceEligibilityBanner";
+import MarketImage from "../../Components/MarketImage";
 import MarketLoadingBlock from "../../Components/MarketLoadingBlock";
+import MarketPrice from "../../Components/MarketPrice";
 import MobileStickyActionBar from "../../Components/MobileStickyActionBar";
 import TrustBadge from "../../Components/TrustBadge";
 import { pickBadgeValue } from "@/lib/trustBadge";
@@ -37,6 +39,7 @@ import {
   type MarketplaceEligibility,
 } from "@/lib/marketplace/businessEligibility";
 import { fetchPublicVendorEligibility } from "@/lib/marketplace/fetchPublicVendorEligibility";
+import { formatMarketPrice } from "@/lib/marketplace/display";
 
 const getAttributeGroups = (variants: Variant[]): Map<string, Set<string>> => {
   const attributeMap = new Map<string, Set<string>>();
@@ -239,9 +242,10 @@ export default function ProductDetailPage() {
           setLiked(false);
         }
       } catch (err) {
+        console.error("Product detail load error:", err);
         setProduct(null);
         setLoadState("error");
-        toast.error('Failed to load product details');
+        toast.error('Product details are temporarily unavailable.');
       }
     };
     loadProduct();
@@ -669,18 +673,15 @@ setMainImage(firstImage);
 
           {/* LEFT: Images */}
           <div className="lg:w-[45%]">
-            <div className="relative aspect-square w-full overflow-hidden rounded-xl border border-dashboard-border-light bg-white">
-              {mainImage || productImages[0] || product.coverImage ? (
-                <img
-                  src={mainImage || productImages[0] || product.coverImage}
-                  alt={product.title}
-                  className="absolute inset-0 h-full w-full object-contain p-4"
-                />
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center font-montserrat text-sm text-brand-muted">
-                  Image coming soon
-                </div>
-              )}
+            <div className="relative">
+              <MarketImage
+                src={mainImage || productImages[0] || product.coverImage}
+                alt={product.title || "Product image"}
+                aspect="square"
+                objectFit="contain"
+                fallbackLabel="Image coming soon"
+                className="rounded-xl border border-dashboard-border-light bg-white"
+              />
               <button
                 type="button"
                 className="absolute right-3 top-3 z-10 flex min-h-11 min-w-11 items-center justify-center rounded-full bg-white/95 shadow hover:bg-white"
@@ -772,39 +773,29 @@ setMainImage(firstImage);
               </span>
             </div>
 
-            {/* Price (hide when 0) */}
-  {/* Price (hide when 0) */}
-{price.current > 0 && (
-  <div className="flex items-baseline gap-3 pb-3 border-b border-gray-200">
-    {/* Current price (sale price) */}
-    <span
-      className="commerce-price-primary"
-      style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600 }}
-    >
-      ${price.current.toFixed(2)}
-    </span>
-
-    {/* Slashed/original price */}
-    {price.onSale && price.original > price.current && (
-      <>
-        <span className="commerce-price-compare">
-          ${price.original.toFixed(2)}
-        </span>
-        {price.discount > 0 && (
-          <span className="text-sm font-semibold text-green-600">
-            {price.discount}% OFF
-          </span>
-        )}
-      </>
-    )}
-
-    {(selectedVariant?.taxIncluded ?? product.taxIncluded) && (
-      <span className="rounded border border-green-200 bg-green-50 px-2 py-1 text-xs font-medium text-green-700">
-        Tax incl.
-      </span>
-    )}
-  </div>
-)}
+            <div className="flex flex-wrap items-baseline gap-3 border-b border-gray-200 pb-3">
+              <MarketPrice
+                value={price.current > 0 ? price.current : null}
+                compareAt={price.onSale && price.original > price.current ? price.original : null}
+                onSale={price.onSale && price.original > price.current}
+                unavailableLabel="Price on request"
+                label="Product price"
+                className="contents"
+                labelClassName="sr-only"
+                priceClassName="commerce-price-primary"
+                compareClassName="commerce-price-compare"
+              />
+              {price.discount > 0 ? (
+                <span className="text-sm font-semibold text-green-600">
+                  {price.discount}% OFF
+                </span>
+              ) : null}
+              {(selectedVariant?.taxIncluded ?? product.taxIncluded) && price.current > 0 ? (
+                <span className="rounded border border-green-200 bg-green-50 px-2 py-1 text-xs font-medium text-green-700">
+                  Tax incl.
+                </span>
+              ) : null}
+            </div>
 
             {(selectedVariant?.taxIncluded ?? product.taxIncluded) && (
               <p className="text-xs text-brand-muted -mt-1">
@@ -1257,7 +1248,7 @@ setMainImage(firstImage);
         leading={
           price.current > 0 ? (
             <span className="font-poppins text-base font-semibold text-market-gold sm:text-lg">
-              ${price.current.toFixed(2)}
+              {formatMarketPrice(price.current)}
             </span>
           ) : undefined
         }

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { RotateCcw, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
@@ -11,6 +11,8 @@ import { getFeaturedProducts, FeaturedProduct } from "@/lib/api/featured-product
 import MarketImage from "./MarketImage";
 import MarketLoadingBlock from "./MarketLoadingBlock";
 import MarketEmptyState from "./MarketEmptyState";
+import MarketErrorState from "./MarketErrorState";
+import MarketPrice from "./MarketPrice";
 import MarketTrustBadgeHint from "./MarketTrustBadgeHint";
 import { MARKETPLACE_VITALITY_NOTE } from "./marketTrustProof";
 
@@ -151,7 +153,8 @@ function useFeaturedProducts(searchFilters?: { businessType: string; location: s
     } catch (e: any) {
       console.error("Featured products fetch error:", e);
       if (!mountedRef.current) return;
-      setError(e?.message || "Failed to load featured products.");
+      console.error("Featured products load error:", e);
+      setError("Featured products are temporarily unavailable.");
       setItems((prev) => prev ?? []);
     } finally {
       if (mountedRef.current) setLoading(false);
@@ -196,7 +199,14 @@ export default function ShopProducts() {
         {items === null || (loading && items === null) ? (
           <SkeletonCarousel />
         ) : error ? (
-          <ErrorBlock error={error} onRetry={reload} />
+          <MarketErrorState
+            title="Featured products are temporarily unavailable"
+            description="We could not load featured products right now. Please try again or browse the full marketplace."
+            onRetry={reload}
+            ctaLabel="Browse all products"
+            ctaHref="/products"
+            className="market-card py-8"
+          />
         ) : items.length === 0 ? (
           <MarketEmptyState
             title="Featured products coming soon"
@@ -311,9 +321,11 @@ function FeaturedProductCard({ item }: { item: FeaturedProduct }) {
           </p>
 
           <div className="mt-auto flex items-center justify-between gap-2 border-t border-white/10 pt-3">
-            <span className="market-card-price text-base sm:text-lg">
-              {price !== null ? `$${price.toFixed(2)}` : "Price on request"}
-            </span>
+            <MarketPrice
+              value={price}
+              priceClassName="market-card-price text-base sm:text-lg"
+              labelClassName="sr-only"
+            />
             <span className="market-card-action">View</span>
           </div>
         </div>
@@ -346,23 +358,6 @@ function SkeletonCarousel() {
           </div>
         ))}
       </div>
-    </div>
-  );
-}
-
-/* ---------- Error Block ---------- */
-function ErrorBlock({ error, onRetry }: { error: string; onRetry: () => void }) {
-  return (
-    <div className="market-card flex flex-col items-center gap-3 rounded-xl py-8 text-center">
-      <p className="font-montserrat text-sm text-market-text/90">
-        We&apos;re having trouble loading products: {error}
-      </p>
-      <button
-        onClick={onRetry}
-        className="market-btn-primary inline-flex items-center gap-2 px-4 py-2 text-sm normal-case"
-      >
-        <RotateCcw size={16} /> Retry
-      </button>
     </div>
   );
 }

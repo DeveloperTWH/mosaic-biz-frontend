@@ -11,6 +11,7 @@ import CommerceMobileSearchBar from "../../../Components/CommerceMobileSearchBar
 import MobileStickyActionBar from "../../../Components/MobileStickyActionBar";
 import { buildSearchPageUrl, PublicSearchFilters } from "../../../Components/publicSearch";
 import MarketEmptyState from "../../../Components/MarketEmptyState";
+import MarketErrorState from "../../../Components/MarketErrorState";
 import MarketLoadingBlock from "../../../Components/MarketLoadingBlock";
 
 type CategoryRef = {
@@ -522,8 +523,9 @@ export default function FoodVendorProfilePage() {
         if (!json.success || !json.data?.food) throw new Error("Food vendor profile unavailable.");
 
         setData(normalizeData(json));
-      } catch (e: any) {
-        setError(e?.message || "Error loading food vendor profile.");
+      } catch (e) {
+        console.error("Food vendor profile load error:", e);
+        setError("We could not load this food vendor profile. Please try again.");
       } finally {
         setLoading(false);
       }
@@ -591,9 +593,9 @@ export default function FoodVendorProfilePage() {
   if (error) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-20">
-        <MarketEmptyState
+        <MarketErrorState
           title="Food vendor profile unavailable"
-          description={error}
+          description="We could not load this food vendor profile. Please try again."
           ctaLabel="Browse foods"
           ctaHref="/foods"
           onRetry={() => setReloadKey((key) => key + 1)}
@@ -685,8 +687,9 @@ export default function FoodVendorProfilePage() {
 
       setRevealed(buildRevealState());
       setRevealModal(null);
-    } catch (err: any) {
-      setRevealError(err?.message || "Unable to reveal contact details right now.");
+    } catch (err) {
+      console.error("Food vendor contact reveal error:", err);
+      setRevealError("Unable to reveal contact details right now.");
     } finally {
       setRevealLoading(false);
     }

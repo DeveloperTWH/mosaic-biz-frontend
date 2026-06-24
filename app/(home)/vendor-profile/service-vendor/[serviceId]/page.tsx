@@ -13,8 +13,10 @@ import MobileStickyActionBar from "../../../Components/MobileStickyActionBar";
 import TrustBadge from "../../../Components/TrustBadge";
 import { buildSearchPageUrl, PublicSearchFilters } from "../../../Components/publicSearch";
 import MarketEmptyState from "../../../Components/MarketEmptyState";
+import MarketErrorState from "../../../Components/MarketErrorState";
 import MarketLoadingBlock from "../../../Components/MarketLoadingBlock";
 import AccountEmptyState from "@/components/ui/account-empty-state";
+import { formatMarketPrice, toFiniteNumber } from "@/lib/marketplace/display";
 
 /* ─────────────── Types based on actual API response ─────────────── */
 type ServiceContact = {
@@ -31,7 +33,7 @@ type ServiceItem = {
   image: string;
   images: string[];
   durationMinutes: number;
-  price: number;
+  price: number | null;
 };
 
 type BusinessHour = {
@@ -172,7 +174,7 @@ function normalizeData(payload: ApiResponse) {
       description: typeof s.description === "string" ? s.description.replace(/<[^>]*>/g, "") : "",
       image: s.image || "/ShopProduct/Aria-SK6-Helmet 1.png",
       durationMinutes: s.durationMinutes || 0,
-      price: Number(s.price) || 0,
+      price: toFiniteNumber(s.price),
     })),
     contact: {
       phone: service?.contact?.phone || business?.phone || "",
@@ -619,7 +621,10 @@ export default function ServiceVendorProfilePage() {
         const json = await res.json() as ApiResponse;
         if (!json.success || !json.data) throw new Error("Profile unavailable.");
         setData(normalizeData(json));
-      } catch (e: any) { setError(e?.message || "Error loading profile."); }
+      } catch (e) {
+        console.error("Service vendor profile load error:", e);
+        setError("We could not load this service profile. Please try again.");
+      }
       finally { setLoading(false); }
     })();
   }, [serviceId, reloadKey]);
@@ -643,8 +648,11 @@ export default function ServiceVendorProfilePage() {
       const mtDur = !duration || s.durationMinutes.toString().includes(duration);
       return mtName && mtLoc && mtDur;
     });
-    if (sort === "price_asc") list.sort((a, b) => a.price - b.price);
-    else if (sort === "price_desc") list.sort((a, b) => b.price - a.price);
+    if (sort === "price_asc") {
+      list.sort((a, b) => (a.price ?? Number.POSITIVE_INFINITY) - (b.price ?? Number.POSITIVE_INFINITY));
+    } else if (sort === "price_desc") {
+      list.sort((a, b) => (b.price ?? Number.NEGATIVE_INFINITY) - (a.price ?? Number.NEGATIVE_INFINITY));
+    }
     else if (sort === "duration_asc") list.sort((a, b) => a.durationMinutes - b.durationMinutes);
     else if (sort === "duration_desc") list.sort((a, b) => b.durationMinutes - a.durationMinutes);
     return list;
@@ -675,7 +683,7 @@ export default function ServiceVendorProfilePage() {
   );
 
   const totalPrice = useMemo(
-    () => selectedServices.reduce((sum, service) => sum + (service.price || 0), 0),
+    () => selectedServices.reduce((sum, service) => sum + (service.price ?? 0), 0),
     [selectedServices]
   );
 
@@ -715,9 +723,9 @@ export default function ServiceVendorProfilePage() {
 
   if (error) return (
     <div className="mx-auto max-w-3xl px-4 py-20">
-      <MarketEmptyState
+      <MarketErrorState
         title="Service profile unavailable"
-        description={error}
+        description="We could not load this service profile. Please try again."
         ctaLabel="Browse services"
         ctaHref="/services"
         onRetry={() => setReloadKey((key) => key + 1)}
@@ -888,8 +896,9 @@ export default function ServiceVendorProfilePage() {
 
       setRevealed(buildRevealState());
       setRevealModal(null);
-    } catch (err: any) {
-      setRevealError(err?.message || "Unable to reveal contact details right now.");
+    } catch (err) {
+      console.error("Service vendor contact reveal error:", err);
+      setRevealError("Unable to reveal contact details right now.");
     } finally {
       setRevealLoading(false);
     }
@@ -1257,7 +1266,7 @@ export default function ServiceVendorProfilePage() {
 
   {/* Price */}
   <span className="text-xs font-semibold text-brand-navy">
-    ${svc.price.toFixed(2)}
+    {formatMarketPrice(svc.price) ?? "Price on request"}
   </span>
 </div>
           </div>
@@ -1507,7 +1516,7 @@ export default function ServiceVendorProfilePage() {
                     {svc.name}
                   </span>
                   <span className="text-xs font-semibold text-brand-navy">
-                    ${svc.price.toFixed(2)}
+                    {formatMarketPrice(svc.price) ?? "Price on request"}
                   </span>
                 </div>
                 <p className="mt-1 text-xs font-medium uppercase tracking-wide text-brand-muted">
@@ -1635,7 +1644,7 @@ export default function ServiceVendorProfilePage() {
           Booking Summary
         </p>
         <span className="text-[12px] font-bold text-brand-navy-light">
-          ${totalPrice.toFixed(2)}
+          {formatMarketPrice(totalPrice) ?? "Price on request"}
         </span>
       </div>
       <p className="mt-2 text-xs text-brand-muted">
@@ -1774,7 +1783,7 @@ export default function ServiceVendorProfilePage() {
         leading={
           totalPrice > 0 && !hasDirectBookingLink ? (
             <span className="font-poppins text-sm font-semibold text-market-gold">
-              ${totalPrice.toFixed(2)}
+              {formatMarketPrice(totalPrice)}
             </span>
           ) : undefined
         }

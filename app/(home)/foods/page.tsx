@@ -16,6 +16,7 @@ import BrowseFoods from '../Components/BrowseFoods';
 import PublicSearchFilterBar from '../Components/PublicSearchFilterBar';
 import PublicFilterSection from '../Components/PublicFilterSection';
 import { buildSearchPageUrl, DEFAULT_PUBLIC_SEARCH_FILTERS, PublicSearchFilters } from '../Components/publicSearch';
+import MarketErrorState from '../Components/MarketErrorState';
 
 type FoodsListResponse = {
   success?: boolean;
@@ -131,16 +132,11 @@ const FoodSection = () => {
 
       {fetchError ? (
         <div className="container-page py-6">
-          <div className="market-state-error flex flex-wrap items-center justify-between gap-3">
-            <span>{fetchError}</span>
-            <button
-              type="button"
-              onClick={() => fetchFoods(undefined, undefined)}
-              className="font-semibold text-market-gold underline hover:text-market-gold-hover"
-            >
-              Retry
-            </button>
-          </div>
+          <MarketErrorState
+            title="Food listings are temporarily unavailable"
+            description="We could not load food and grocery listings. Please try again."
+            onRetry={() => fetchFoods(undefined, undefined)}
+          />
         </div>
       ) : null}
 
