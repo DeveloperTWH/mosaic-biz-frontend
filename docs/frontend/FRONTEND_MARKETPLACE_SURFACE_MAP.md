@@ -141,7 +141,7 @@ Admin featured **toggle** uses legacy `PATCH /admin/api/products/:id/featured` �
 
 | URL | Purpose | Key APIs / env |
 |-----|---------|----------------|
-| `/checkout` | Main checkout | Stripe Elements; return_url → `NEXT_PUBLIC_CLIENT_BASE_URL` + `/payment-success` |
+| `/checkout` | Main checkout | Stripe Elements; return_url → `buildAppUrl("/payment-success")` |
 | `/checkout/address` | Shipping address | Address APIs in `ClientForm.tsx` — Evidence Needed |
 | `/checkout/payment` | Payment step | Stripe confirm; same return URL env |
 | `/checkout/buy-now` | Direct purchase | `GET /api/public/product/:id`; `POST /api/orders/initiate` |

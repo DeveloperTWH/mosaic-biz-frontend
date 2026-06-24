@@ -31,7 +31,9 @@ describe("SEO metadata helpers", () => {
 
   it("falls back to the production origin when NEXT_PUBLIC_APP_URL is invalid", () => {
     const previousUrl = process.env.NEXT_PUBLIC_APP_URL;
+    const previousClientBaseUrl = process.env.NEXT_PUBLIC_CLIENT_BASE_URL;
     process.env.NEXT_PUBLIC_APP_URL = "not a url";
+    delete process.env.NEXT_PUBLIC_CLIENT_BASE_URL;
 
     try {
       assert.equal(getMetadataBase().toString(), `${DEFAULT_SITE_URL}/`);
@@ -40,6 +42,12 @@ describe("SEO metadata helpers", () => {
         delete process.env.NEXT_PUBLIC_APP_URL;
       } else {
         process.env.NEXT_PUBLIC_APP_URL = previousUrl;
+      }
+
+      if (previousClientBaseUrl === undefined) {
+        delete process.env.NEXT_PUBLIC_CLIENT_BASE_URL;
+      } else {
+        process.env.NEXT_PUBLIC_CLIENT_BASE_URL = previousClientBaseUrl;
       }
     }
   });

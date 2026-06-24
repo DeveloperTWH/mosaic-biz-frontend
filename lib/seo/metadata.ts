@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getConfiguredAppOrigin } from "@/lib/url/appUrl";
 
 export const SITE_NAME = "Mosaic Biz Hub";
 export const DEFAULT_SITE_DESCRIPTION =
@@ -16,13 +17,7 @@ type PageMetadataInput = {
 };
 
 export function getMetadataBase(): URL {
-  const rawUrl = process.env.NEXT_PUBLIC_APP_URL || DEFAULT_SITE_URL;
-
-  try {
-    return new URL(rawUrl);
-  } catch {
-    return new URL(DEFAULT_SITE_URL);
-  }
+  return new URL(getConfiguredAppOrigin());
 }
 
 export function normalizeCanonicalPath(path: string): string {

@@ -15,6 +15,7 @@ import {
 import VendorApplicationShell from '../../components/VendorApplicationShell';
 import VendorOnboardingStatusPanel from '../../components/VendorOnboardingStatusPanel';
 import { Button } from '@/components/ui/button';
+import { buildAppUrl } from '@/lib/url/appUrl';
 
 type PostPaymentPhase = 'idle' | 'confirming' | 'submitting' | 'pending' | 'success';
 
@@ -79,7 +80,7 @@ function VendorPaymentForm({
       const { error, paymentIntent } = await stripe.confirmPayment({
         elements,
         confirmParams: {
-          return_url: `${window.location.origin}/partners`,
+          return_url: buildAppUrl('/partners'),
         },
         redirect: 'if_required',
       });

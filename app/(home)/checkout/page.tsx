@@ -11,6 +11,7 @@ import {
 import { stripePromise } from '@/utils/stripe';
 import type { StripeError, PaymentIntent } from '@stripe/stripe-js';
 import { Suspense } from 'react';
+import { buildAppUrl } from '@/lib/url/appUrl';
 
 function CheckoutForm() {
   const stripe = useStripe();
@@ -25,7 +26,7 @@ function CheckoutForm() {
       await stripe.confirmPayment({
         elements,
         confirmParams: {
-          return_url: `${process.env.NEXT_PUBLIC_CLIENT_BASE_URL}/payment-success`,
+          return_url: buildAppUrl('/payment-success'),
         },
       });
 

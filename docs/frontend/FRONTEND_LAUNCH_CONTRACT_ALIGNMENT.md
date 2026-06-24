@@ -29,7 +29,7 @@ The frontend as-built documentation pack (merged to `main` via PR #147) and prio
 
 1. **Canonical featured products:** `GET /api/featured-products` only — `/api/products/featured` is not used in app code.
 2. **Legacy admin and Stripe dashboard mounts remain active** and must not be “normalized” to `/api/admin/users` or `/api/stripe/*` without a backend migration (live probes: modern paths return **404**).
-3. **Checkout** uses `POST /api/orders/initiate` + Stripe Elements; `return_url` depends on `NEXT_PUBLIC_CLIENT_BASE_URL` (not `NEXT_PUBLIC_APP_URL`).
+3. **Checkout** uses `POST /api/orders/initiate` + Stripe Elements; `return_url` is built through `lib/url/appUrl.ts` so legacy app-domain origins are normalized before redirecting.
 4. **No code route migrations** are required in this PR — constants are already centralized; primary deliverable is contract documentation + grep re-verification.
 
 ---
@@ -49,7 +49,7 @@ Run on branch `fix/frontend-launch-contract-env-and-legacy-route-audit` @ `95437
 | `LEGACY_ADMIN_USERS` / `LEGACY_ADMIN_PRODUCTS` / `STRIPE_CONNECT_DASHBOARD` | **4 files** | `routeContract.ts`, `admin/users/page.tsx`, `products-admin.ts`, `finance/page.tsx` |
 | `NEXT_PUBLIC_API_BASE_URL` | **~107 files**, **~130 occurrences** | Sole public API root |
 | `NEXT_PUBLIC_APP_URL` | **1 file** | `app/(home)/layout.tsx` (metadata) |
-| `NEXT_PUBLIC_CLIENT_BASE_URL` | **2 files**, **3 occurrences** | Checkout `return_url` only |
+| `NEXT_PUBLIC_CLIENT_BASE_URL` | Fallback only | `lib/url/appUrl.ts` |
 
 ---
 
@@ -218,10 +218,10 @@ Uses `STRIPE_CONNECT_DASHBOARD` constants + `@stripe/connect-js` embedded compon
 | Step | Endpoint | Env vars (names only) |
 |------|----------|----------------------|
 | Initiate order | `POST /api/orders/initiate` | `NEXT_PUBLIC_API_BASE_URL` |
-| Stripe confirm | Stripe Elements `confirmPayment` | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `NEXT_PUBLIC_CLIENT_BASE_URL` (for `return_url` → `/payment-success`) |
+| Stripe confirm | Stripe Elements `confirmPayment` | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `buildAppUrl(...)` (for canonicalized `return_url`) |
 | Retrieve intent | `GET /api/orders/retrieve-intent/:paymentIntentId` | `NEXT_PUBLIC_API_BASE_URL` |
 
-**Important:** `NEXT_PUBLIC_APP_URL` is used for `metadataBase` in `app/(home)/layout.tsx` only — **not** for Stripe `return_url`. Checkout uses `NEXT_PUBLIC_CLIENT_BASE_URL` exclusively.
+**Important:** `NEXT_PUBLIC_APP_URL` is used as a configured fallback by `lib/url/appUrl.ts`; Stripe `return_url` prefers the runtime browser origin and rewrites `app.mosaicbizhub.com` to the canonical root domain.
 
 ---
 
@@ -231,7 +231,7 @@ Uses `STRIPE_CONNECT_DASHBOARD` constants + `@stripe/connect-js` embedded compon
 |------|---------|---------------|---------------------|
 | `NEXT_PUBLIC_API_BASE_URL` | Backend API root | ~107 files | **Required** — must point to production API host |
 | `NEXT_PUBLIC_APP_URL` | Frontend origin for metadata / OG | `app/(home)/layout.tsx` | **Confirm** — should match deployed frontend origin |
-| `NEXT_PUBLIC_CLIENT_BASE_URL` | Stripe `return_url` base | `checkout/page.tsx`, `checkout/payment/page.tsx` | **Confirm** — must match frontend origin for payment redirect |
+| `NEXT_PUBLIC_CLIENT_BASE_URL` | Stripe `return_url` fallback | `lib/url/appUrl.ts` | **Optional** — runtime browser origin is preferred |
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Stripe Elements / Connect | checkout, `utils/stripe.ts`, tier checkout | **Required** for payment flows |
 | `NEXT_PUBLIC_GOOGLE_MAPS_KEY` | Maps / Places | cart address, inventory forms | Optional for non-map flows |
 | `NEXT_PUBLIC_RANKED_PATH` | Override ranked API path | `ShopProducts.tsx`, `ProductsClient.tsx` | Optional |
@@ -239,7 +239,7 @@ Uses `STRIPE_CONNECT_DASHBOARD` constants + `@stripe/connect-js` embedded compon
 | `NEXT_PUBLIC_SENTRY_DSN` | Client Sentry | `lib/sentry/config.ts` | Optional |
 | `SENTRY_ORG`, `SENTRY_PROJECT`, `SENTRY_AUTH_TOKEN` | Build-time Sentry | `next.config.ts` | Optional |
 
-**Evidence Needed:** Whether `NEXT_PUBLIC_APP_URL` and `NEXT_PUBLIC_CLIENT_BASE_URL` are set to the same frontend origin on Vercel preview and production. README documents `NEXT_PUBLIC_APP_URL` for local dev; `NEXT_PUBLIC_CLIENT_BASE_URL` is needed for checkout redirects.
+**Evidence Needed:** Whether `NEXT_PUBLIC_APP_URL` is set to the intended frontend origin on Vercel preview and production. `NEXT_PUBLIC_CLIENT_BASE_URL` is now only a fallback for non-browser contexts.
 
 ---
 
@@ -254,7 +254,7 @@ Uses `STRIPE_CONNECT_DASHBOARD` constants + `@stripe/connect-js` embedded compon
 | Dual admin prefix styles long-term | **Backend** | Optional consolidation timeline |
 | Admin featured toggle vs public featured | **Aligned** | Different endpoints by design — no change |
 | `/api/products/featured` | **Aligned** | Not used — keep `GET /api/featured-products` |
-| `NEXT_PUBLIC_APP_URL` vs `NEXT_PUBLIC_CLIENT_BASE_URL` parity | **Vercel env** | Confirm both set to same frontend origin on preview + prod |
+| `NEXT_PUBLIC_APP_URL` canonical value | **Vercel env** | Confirm set to intended frontend origin on preview + prod |
 | `NEXT_PUBLIC_API_BASE_URL` on Vercel | **Vercel env** | Confirm points to `api.mosaicbizhub.com` (names only in dashboard) |
 | Cross-origin cookies / middleware on preview | **Evidence Needed** | Preview vs local CORS/cookie behavior |
 | Partner onboarding stage edge routing | **Evidence Needed** | Dual partner surfaces documented |

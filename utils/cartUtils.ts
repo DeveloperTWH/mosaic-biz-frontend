@@ -6,6 +6,7 @@ import {
   type MarketplaceEligibility,
 } from '@/lib/marketplace/businessEligibility';
 import { fetchPublicVendorEligibility } from '@/lib/marketplace/fetchPublicVendorEligibility';
+import { buildAppUrl } from '@/lib/url/appUrl';
 import { toast } from 'react-toastify';
 
 interface CartItem {
@@ -1602,7 +1603,7 @@ export async function handlePlaceOrderFlow(
   }
 
   // Redirect to payment page; pass what you need there
-  const url = new URL(paymentPage, window.location.origin);
+  const url = new URL(paymentPage, buildAppUrl('/'));
   url.searchParams.set("orderId", String(orderId));
   url.searchParams.set("source", checkoutSource);
   if (groupOrderId) url.searchParams.set("groupOrderId", String(groupOrderId));

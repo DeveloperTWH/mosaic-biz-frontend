@@ -35,6 +35,7 @@ npm install
 ```bash
 NEXT_PUBLIC_API_BASE_URL=http://localhost:3001   # local backend, or https://api.mosaicbizhub.com for API-only checks
 NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_CLIENT_BASE_URL=http://localhost:3000 # optional fallback; Stripe redirects prefer the current browser origin
 ```
 
 3. Start the dev server:

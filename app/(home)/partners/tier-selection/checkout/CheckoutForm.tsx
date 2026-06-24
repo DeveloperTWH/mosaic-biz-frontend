@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { Loader } from 'lucide-react';
 import { SubscriptionPlanResponse } from '@/types/subscription-response';
+import { buildAppUrl } from '@/lib/url/appUrl';
 
 interface CheckoutFormProps {
   plan: SubscriptionPlanResponse;
@@ -29,7 +30,7 @@ export default function CheckoutForm({ plan }: CheckoutFormProps) {
       const { error: submitError } = await stripe.confirmPayment({
         elements,
         confirmParams: {
-          return_url: `${window.location.origin}/partners/tier-selection/success`,
+          return_url: buildAppUrl('/partners/tier-selection/success'),
         },
       });
 
