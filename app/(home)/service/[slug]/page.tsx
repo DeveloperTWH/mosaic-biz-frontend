@@ -12,6 +12,7 @@ import { Service } from '@/types/service';
 import { Review } from '@/types/review';
 import { toast } from "react-toastify"
 import Link from "next/link";
+import { createServiceBooking } from "@/lib/api/serviceBookings";
 
 interface GetServiceBySlugResponse {
     success: boolean;
@@ -94,38 +95,33 @@ const ServiceDetailPage = () => {
             return;
         }
 
-        try {
-            const res = await axios.post(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/bookings/create`,
-                {
-                    serviceId: service?._id,
-                    serviceItems: form.selectedServices,
-                    date: form.date,
-                    time: form.time,
-                    notes: `Customer: ${form.name}, Phone: ${form.phone}`,
-                    amountPaid: 0,
-                    paymentStatus: 'pending',
-                    name: form.name,
-                    email: form.email,
-                    phone: form.phone,
-                },
-                { withCredentials: true }
-            );
+        if (!service?._id) {
+            toast.error("Service details are still loading. Please try again.");
+            return;
+        }
 
-            if (res.data.success) {
-                toast.success("Appointment request submitted!");
-                setForm({
-                    name: '',
-                    email: '',
-                    phone: '',
-                    selectedServices: [],
-                    date: '',
-                    time: '',
-                });
-            }
+        try {
+            await createServiceBooking({
+                serviceId: service._id,
+                name: form.name,
+                email: form.email,
+                phone: form.phone,
+                services: form.selectedServices,
+                date: form.date,
+                slot: form.time,
+            });
+            toast.success("Appointment request submitted!");
+            setForm({
+                name: '',
+                email: '',
+                phone: '',
+                selectedServices: [],
+                date: '',
+                time: '',
+            });
         } catch (err) {
             console.error(err);
-            toast.error("Failed to submit appointment");
+            toast.error(err instanceof Error ? err.message : "Failed to submit appointment");
         }
     };
 

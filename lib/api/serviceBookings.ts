@@ -26,7 +26,7 @@ function getAuthToken() {
 export async function createServiceBooking(input: CreateServiceBookingInput) {
   const token = getAuthToken();
   const response = await fetch(
-    `${getApiBaseUrl()}/api/bookings/service/${input.serviceId}`,
+    `${getApiBaseUrl()}/api/bookings/service/${encodeURIComponent(input.serviceId)}`,
     {
       method: "POST",
       credentials: "include",
