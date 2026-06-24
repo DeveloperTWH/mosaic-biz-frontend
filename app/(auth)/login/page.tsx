@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { useState, Suspense } from 'react'
 import Link from 'next/link'
 import { Eye, EyeOff } from 'lucide-react';
-import { checkAuthSessionResult } from '@/lib/api/authSession';
+import { confirmPostLoginSession } from '@/lib/api/authSession';
 import { buildApiUrl } from '@/lib/api/httpClient';
 import { logAuthRequest } from '@/utils/authDebug';
 import { parseAuthJsonResponse } from '@/utils/parseAuthErrorResponse';
@@ -80,17 +80,17 @@ function LoginContent() {
       });
 
       if (data?.success && data.user) {
-        const sessionResult = await checkAuthSessionResult();
+        const sessionResult = await confirmPostLoginSession();
         const sessionCheckUrl = buildApiUrl('/api/users/auth/check');
         const sessionStatus =
           sessionResult.kind === 'authenticated' || sessionResult.kind === 'unauthenticated'
-            ? sessionResult.status
-            : (sessionResult.status ?? 0);
+            ? 200
+            : (sessionResult.error.status ?? 0);
 
         logAuthRequest({
           endpoint: sessionCheckUrl,
           method: 'GET',
-          status: sessionStatus,
+          status: sessionResult.kind === 'unauthenticated' ? 401 : sessionStatus,
           credentialsIncluded: true,
           body:
             sessionResult.kind === 'authenticated'

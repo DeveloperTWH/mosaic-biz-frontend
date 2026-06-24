@@ -6,11 +6,15 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { logAuthRequest } from "@/utils/authDebug";
 import { parseAuthJsonResponse } from "@/utils/parseAuthErrorResponse";
 import {
-  getAuthenticatedUser,
+  AUTH_NETWORK_ERROR_MESSAGE,
+  AUTH_SESSION_NOT_ESTABLISHED_MESSAGE,
+  clearStaleClientSession,
   getPostLoginRedirectPath,
   isAdmin,
   persistClientSession,
 } from "@/utils/authUtils";
+import { confirmPostLoginSession } from "@/lib/api/authSession";
+import { buildApiUrl } from "@/lib/api/httpClient";
 
 const SignInContent = () => {
   const [email, setEmail] = useState("");
@@ -34,7 +38,7 @@ const SignInContent = () => {
     setError("");
 
     try {
-      const loginUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/login`;
+      const loginUrl = buildApiUrl("/api/users/login");
       const res = await fetch(loginUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -62,33 +66,47 @@ const SignInContent = () => {
       });
 
       if (data?.success && data.user) {
-        const sessionUser = await getAuthenticatedUser();
+        const sessionResult = await confirmPostLoginSession();
+        const sessionCheckUrl = buildApiUrl("/api/users/auth/check");
 
         logAuthRequest({
-          endpoint: `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/auth/check`,
+          endpoint: sessionCheckUrl,
           method: "GET",
-          status: sessionUser ? 200 : 401,
+          status: sessionResult.kind === "unauthenticated" ? 401 : 200,
           credentialsIncluded: true,
-          body: sessionUser
-            ? { success: true, user: { role: sessionUser.role } }
-            : undefined,
+          body:
+            sessionResult.kind === "authenticated"
+              ? { success: true, user: { role: sessionResult.user.role } }
+              : sessionResult.kind === "error"
+                ? { outcome: sessionResult.kind, errorKind: sessionResult.error.kind }
+                : { outcome: sessionResult.kind },
         });
 
-        if (!sessionUser) {
+        if (sessionResult.kind === "unauthenticated") {
+          clearStaleClientSession();
+          setError(AUTH_SESSION_NOT_ESTABLISHED_MESSAGE);
+          return;
+        }
+
+        if (sessionResult.kind === "error") {
+          clearStaleClientSession();
           setError(
-            "Sign-in succeeded but session was not established. Try again or contact support."
+            sessionResult.error.kind === "network" || sessionResult.error.kind === "timeout"
+              ? AUTH_NETWORK_ERROR_MESSAGE
+              : AUTH_SESSION_NOT_ESTABLISHED_MESSAGE
           );
           return;
         }
 
-        if (!isAdmin(sessionUser)) {
+        if (!isAdmin(sessionResult.user)) {
+          clearStaleClientSession();
           setError("This account does not have admin access.");
           return;
         }
 
-        persistClientSession(sessionUser);
+        persistClientSession(sessionResult.user);
         toast.success("Welcome!");
-        router.push(getPostLoginRedirectPath(sessionUser, safeRedirect));
+        router.push(getPostLoginRedirectPath(sessionResult.user, safeRedirect));
       } else if (data?.otpPending && data.user?.email) {
         router.push(
           `/verify-otp?email=${encodeURIComponent(data.user.email)}&type=${encodeURIComponent(

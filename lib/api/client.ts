@@ -5,7 +5,7 @@ import { apiRequest, buildApiUrl, getApiBaseUrl } from "./httpClient";
 export { api };
 export { ApiClientError, getUserSafeMessage } from "./errors";
 export { apiRequest, apiRequestEnvelope, buildApiUrl, getApiBaseUrl } from "./httpClient";
-export { checkAuthSession, isSessionActive, logoutSession } from "./authSession";
+export { checkAuthSession, checkAuthSessionResult, confirmPostLoginSession, isSessionActive, logoutSession } from "./authSession";
 export { initiateOrder, getUserSafeOrderErrorMessage } from "./orders";
 export {
   listPendingVendorApplications,

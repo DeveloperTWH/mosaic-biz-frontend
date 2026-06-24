@@ -2,19 +2,24 @@ import { ApiClientError } from "./errors";
 import { parseApiResponse } from "./parseResponse";
 import { buildApiUrl, createApiClientError } from "./httpClient";
 
+export type AuthSessionUser = {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  mobile: string;
+  gender?: string;
+};
+
 export type AuthCheckResponse = {
   success?: boolean;
-  user?: {
-    id: string;
-    name: string;
-    email: string;
-    role: string;
-    mobile: string;
-    gender?: string;
+  user?: AuthSessionUser;
+  data?: {
+    user?: AuthSessionUser;
   };
 };
 
-export type AuthenticatedSessionUser = NonNullable<AuthCheckResponse["user"]>;
+export type AuthenticatedSessionUser = AuthSessionUser;
 
 export type AuthSessionCheckResult =
   | {
@@ -32,11 +37,86 @@ export type AuthSessionCheckResult =
       error: ApiClientError;
     };
 
+export type PostLoginSessionResult =
+  | { kind: "authenticated"; user: AuthenticatedSessionUser }
+  | { kind: "unauthenticated" }
+  | { kind: "error"; error: ApiClientError };
+
+type RawAuthUser = {
+  id?: string;
+  _id?: string;
+  name?: string;
+  email?: string;
+  role?: string;
+  mobile?: string;
+  gender?: string;
+};
+
+const POST_LOGIN_RETRY_DELAYS_MS = [0, 100, 300] as const;
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export function normalizeAuthUser(
+  raw: RawAuthUser | null | undefined
+): AuthSessionUser | null {
+  if (!raw?.role) {
+    return null;
+  }
+
+  const id = raw.id ?? raw._id;
+  if (!id) {
+    return null;
+  }
+
+  return {
+    id: String(id),
+    name: raw.name ?? "",
+    email: raw.email ?? "",
+    role: raw.role,
+    mobile: raw.mobile ?? "",
+    gender: raw.gender,
+  };
+}
+
+export function extractAuthUserFromPayload(payload: unknown): AuthSessionUser | null {
+  if (!payload || typeof payload !== "object") {
+    return null;
+  }
+
+  const root = payload as Record<string, unknown>;
+  const directUser = normalizeAuthUser(root.user as RawAuthUser | undefined);
+  if (directUser) {
+    return directUser;
+  }
+
+  const data = root.data;
+  if (data && typeof data === "object") {
+    const nestedUser = normalizeAuthUser(
+      (data as Record<string, unknown>).user as RawAuthUser | undefined
+    );
+    if (nestedUser) {
+      return nestedUser;
+    }
+  }
+
+  return normalizeAuthUser(root as RawAuthUser);
+}
+
+function isImmediatePostLoginError(error: ApiClientError): boolean {
+  return (
+    error.kind === "network" ||
+    error.kind === "timeout" ||
+    error.kind === "malformed" ||
+    error.kind === "serverError" ||
+    error.kind === "forbidden" ||
+    error.kind === "validation"
+  );
+}
+
 /**
  * Cookie-session auth check with explicit failure classification.
- *
- * Use this result when the caller must distinguish an absent session from
- * network, CORS, server, or malformed-response failures.
  */
 export async function checkAuthSessionResult(): Promise<AuthSessionCheckResult> {
   try {
@@ -61,11 +141,8 @@ export async function checkAuthSessionResult(): Promise<AuthSessionCheckResult> 
       };
     }
 
-    const user =
-      parsed.data?.user ??
-      (parsed.payload as AuthCheckResponse | null)?.user;
-
-    if (user?.id && user?.role) {
+    const user = extractAuthUserFromPayload(parsed.data ?? parsed.payload);
+    if (user) {
       return {
         kind: "authenticated",
         status: res.status,
@@ -106,11 +183,37 @@ export async function checkAuthSessionResult(): Promise<AuthSessionCheckResult> 
   }
 }
 
+export async function confirmPostLoginSession(
+  options: { retryDelaysMs?: readonly number[] } = {}
+): Promise<PostLoginSessionResult> {
+  const delays = options.retryDelaysMs ?? POST_LOGIN_RETRY_DELAYS_MS;
+
+  for (let attempt = 0; attempt < delays.length; attempt++) {
+    if (delays[attempt] > 0) {
+      await sleep(delays[attempt]);
+    }
+
+    const result = await checkAuthSessionResult();
+
+    if (result.kind === "authenticated") {
+      return { kind: "authenticated", user: result.user };
+    }
+
+    if (result.kind === "error") {
+      if (isImmediatePostLoginError(result.error)) {
+        return { kind: "error", error: result.error };
+      }
+    }
+  }
+
+  return { kind: "unauthenticated" };
+}
+
 /**
  * Backward-compatible cookie-session auth check.
  * Returns null for unauthenticated and non-success outcomes.
  */
-export async function checkAuthSession(): Promise<AuthCheckResponse["user"] | null> {
+export async function checkAuthSession(): Promise<AuthSessionUser | null> {
   const result = await checkAuthSessionResult();
   return result.kind === "authenticated" ? result.user : null;
 }

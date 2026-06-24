@@ -8,10 +8,13 @@ import Link from 'next/link';
 import { logAuthRequest } from '@/utils/authDebug';
 import { parseAuthJsonResponse } from '@/utils/parseAuthErrorResponse';
 import {
-  getAuthenticatedUser,
+  AUTH_NETWORK_ERROR_MESSAGE,
+  AUTH_VERIFICATION_NOT_ESTABLISHED_MESSAGE,
   isBusinessOwner,
   persistClientSession,
 } from '@/utils/authUtils';
+import { confirmPostLoginSession } from '@/lib/api/authSession';
+import { buildApiUrl } from '@/lib/api/httpClient';
 import AuthPageShell from '@/components/auth/AuthPageShell';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -75,7 +78,7 @@ function VerifyOtpPage() {
     setLoading(true);
 
     try {
-      const verifyUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/verify-otp`;
+      const verifyUrl = buildApiUrl('/api/users/verify-otp');
       const res = await fetch(verifyUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -98,28 +101,42 @@ function VerifyOtpPage() {
       });
 
       if (data?.success && data.user) {
-        const sessionUser = await getAuthenticatedUser();
+        const sessionResult = await confirmPostLoginSession();
+        const sessionCheckUrl = buildApiUrl('/api/users/auth/check');
 
         logAuthRequest({
-          endpoint: `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/auth/check`,
+          endpoint: sessionCheckUrl,
           method: 'GET',
-          status: sessionUser ? 200 : 401,
+          status: sessionResult.kind === 'unauthenticated' ? 401 : 200,
           credentialsIncluded: true,
-          body: sessionUser
-            ? { success: true, user: { role: sessionUser.role } }
-            : undefined,
+          body:
+            sessionResult.kind === 'authenticated'
+              ? { success: true, user: { role: sessionResult.user.role } }
+              : sessionResult.kind === 'error'
+                ? { outcome: sessionResult.kind, errorKind: sessionResult.error.kind }
+                : { outcome: sessionResult.kind },
         });
 
-        if (!sessionUser) {
-          setError(
-            'Verification succeeded but session was not established. Try again or contact support.'
-          );
+        if (sessionResult.kind === 'unauthenticated') {
+          setError(AUTH_VERIFICATION_NOT_ESTABLISHED_MESSAGE);
           return;
         }
 
-        persistClientSession(sessionUser);
+        if (sessionResult.kind === 'error') {
+          switch (sessionResult.error.kind) {
+            case 'network':
+            case 'timeout':
+              setError(AUTH_NETWORK_ERROR_MESSAGE);
+              break;
+            default:
+              setError(AUTH_VERIFICATION_NOT_ESTABLISHED_MESSAGE);
+          }
+          return;
+        }
+
+        persistClientSession(sessionResult.user);
         router.push(
-          isBusinessOwner(sessionUser) ? '/partners' : (safeRedirect || '/')
+          isBusinessOwner(sessionResult.user) ? '/partners' : (safeRedirect || '/')
         );
       } else {
         setError(errorMessage || data?.message || 'Invalid code. Please try again.');
@@ -139,7 +156,7 @@ function VerifyOtpPage() {
     setCountdown(30);
 
     try {
-      const resendUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/resend-otp`;
+      const resendUrl = buildApiUrl('/api/users/resend-otp');
       const res = await fetch(resendUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
