@@ -1,7 +1,9 @@
 // app/payment/layout.tsx
 import type { Metadata } from 'next';
+import { getMetadataBase } from '@/lib/seo/metadata';
 
 export const metadata: Metadata = {
+  metadataBase: getMetadataBase(),
   title: 'Payment Processing',
   description: 'Secure payment processing',
 };

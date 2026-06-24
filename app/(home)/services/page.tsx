@@ -1,22 +1,23 @@
 "use client"
 
-import React, { Suspense, useEffect, useRef, useState } from "react";
+import React, { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import axios from "axios";
-import { useRouter, useSearchParams } from "next/navigation";
-import CategoryGrid from "./components/CategoryGrid";
 import PublicPageHero from "../Components/PublicPageHero";
 import BookServices from "./components/BookYourServices";
-import FeatureBlogs from "../Components/FeatureBlogs";
 import { Service } from "@/types/service";
-import FilterAccordion from "./components/FilterAccordion";
 import JoinVendorBanner from "./components/JoinVendorBanner";
 import BrowseServices from "../Components/BrowsServices";
-import { Category, SubCategory, SubCategoryResponse, ServiceCategoryResponse } from "@/types/Category";
+import { Category, ServiceCategoryResponse } from "@/types/Category";
 import PublicSearchFilterBar from "../Components/PublicSearchFilterBar";
 import PublicFilterSection from "../Components/PublicFilterSection";
-import { buildSearchPageUrl, PublicSearchFilters } from "../Components/publicSearch";
+import {
+  listingFiltersToApiParams,
+  type ListingFilters,
+  PublicSearchFilters,
+} from "../Components/publicSearch";
 import MarketErrorState from "../Components/MarketErrorState";
 import MarketLoadingBlock from "../Components/MarketLoadingBlock";
+import { useListingFilters } from "@/hooks/useListingFilters";
 
 type MinorityType = { _id: string; name: string };
 type ServicesListResponse = {
@@ -29,8 +30,7 @@ type ServicesListResponse = {
 };
 
 const ServicePageContent = () => {
-  const router = useRouter();
-  const searchParams = useSearchParams();
+  const { filters: urlFilters, setFilters: setUrlFilters, resetFilters } = useListingFilters("/services");
   const [searchText, setSearchText] = useState("");
   const [minorityType, setMinorityType] = useState("");
   const [searchLocation, setSearchLocation] = useState("");
@@ -42,43 +42,20 @@ const ServicePageContent = () => {
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
-  const [subcategories, setSubcategories] = useState<SubCategory[]>([]);
-  const [selectedSubcategory, setSelectedSubcategory] = useState("");
-  const [selectedBadge, setSelectedBadge] = useState("");
-  const [priceMin, setPriceMin] = useState<number | undefined>();
-  const [priceMax, setPriceMax] = useState<number | undefined>();
+  const [selectedSort, setSelectedSort] = useState("");
   const [minorityTypes, setMinorityTypes] = useState<MinorityType[]>([]);
   const latestRequestIdRef = useRef(0);
-  const searchParamsKey = searchParams.toString();
 
-  const fetchServices = async (
-    categoryId?: string,
-    subcategoryId?: string,
-    badge?: string,
-    priceMin?: number,
-    priceMax?: number,
-    q?: string,
-    m?: string,
-    c?: string,
-  ) => {
+  const fetchServices = useCallback(async (filters: Partial<ListingFilters>) => {
     const requestId = ++latestRequestIdRef.current;
     setLoading(true);
     setFetchError(null);
     try {
-      const params: any = {
-        search: q ?? searchText,
-        city: c ?? searchLocation,
-        minorityType: m ?? minorityType,
-        page: 1,
-        limit: 10,
+      const params: Record<string, string> = {
+        page: filters.page?.trim() || "1",
+        limit: "10",
+        ...listingFiltersToApiParams(filters),
       };
-      
-      if (categoryId) params.categoryId = categoryId;
-      if (subcategoryId) params.subcategoryId = subcategoryId;
-      if (badge) params.badge = badge;
-      if (priceMin !== undefined && priceMax !== undefined) {
-        params.price = `${priceMin}-${priceMax}`;
-      }
 
       const res = await axios.get<ServicesListResponse>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/services/list`, {
         params,
@@ -90,7 +67,7 @@ const ServicePageContent = () => {
 
       setServices(Array.isArray(res.data.data) ? res.data.data : []);
       setTotalServices(typeof res.data.total === "number" ? res.data.total : 0);
-      setCurrentPage(typeof res.data.page === "number" ? res.data.page : 1);
+      setCurrentPage(typeof res.data.page === "number" ? res.data.page : Number(params.page) || 1);
       setItemsPerPage(typeof res.data.limit === "number" ? res.data.limit : Number(params.limit) || 10);
     } catch (err) {
       console.error(err);
@@ -104,31 +81,11 @@ const ServicePageContent = () => {
         setLoading(false);
       }
     }
-  };
-
-  const fetchSubcategories = async (categoryId: string) => {
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/services/subcategories/${categoryId}`);
-      const data: SubCategoryResponse = await response.json();
-      // setSubcategories(data.data); // Removed - handled by FilterAccordion
-    } catch (err) {
-      console.error('Error fetching subcategories:', err);
-      // setSubcategories([]); // Removed - handled by FilterAccordion
-    }
-  };
-
-  const syncCategoryInUrl = (category: Category) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("categoryId", category._id);
-    params.set("categorySlug", category.slug);
-    router.replace(`/services?${params.toString()}`);
-  };
+  }, []);
 
   const handleCategorySelect = (category: Category) => {
     setSelectedCategory(category);
-    setSelectedSubcategory("");
-    syncCategoryInUrl(category);
-    fetchServices(category._id, undefined);
+    setUrlFilters({ category: category._id, subcategory: "", page: "" });
   };
 
   useEffect(() => {
@@ -146,7 +103,7 @@ const ServicePageContent = () => {
       try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/categories/services`);
         const data: ServiceCategoryResponse = await res.json();
-        setCategories(data.data.serviceCategories);
+        setCategories(data?.data?.serviceCategories || []);
       } catch (err) {
         console.error('Failed to load service categories', err);
       }
@@ -156,47 +113,50 @@ const ServicePageContent = () => {
   }, []);
 
   useEffect(() => {
-    const hasCategoryFilter = Boolean(searchParams.get("categoryId") || searchParams.get("categorySlug"));
+    setSearchText(urlFilters.keyword);
+    setSearchLocation(urlFilters.location);
+    setMinorityType(urlFilters.minorityType);
+    setSelectedSort(urlFilters.sort || "");
+  }, [urlFilters]);
 
-    if (hasCategoryFilter) {
+  useEffect(() => {
+    fetchServices(urlFilters);
+  }, [fetchServices, urlFilters]);
+
+  useEffect(() => {
+    if (!urlFilters.category) {
+      setSelectedCategory(null);
       return;
     }
 
-    fetchServices();
-  }, [searchParams]);
-
-  useEffect(() => {
     if (categories.length === 0) {
       return;
     }
 
-    const categoryId = searchParams.get("categoryId");
-    const categorySlug = searchParams.get("categorySlug");
-
-    if (!categoryId && !categorySlug) {
-      return;
-    }
-
     const matchedCategory =
-      categories.find((category) => category._id === categoryId) ??
-      categories.find((category) => category.slug === categorySlug);
+      categories.find((category) => category._id === urlFilters.category) ??
+      categories.find((category) => category.slug === urlFilters.category);
 
-    if (!matchedCategory || selectedCategory?._id === matchedCategory._id) {
+    if (!matchedCategory) {
       return;
     }
 
-    setSelectedCategory(matchedCategory);
-    setSelectedSubcategory("");
-    fetchServices(matchedCategory._id, undefined, selectedBadge, priceMin, priceMax);
-  }, [categories, searchParamsKey, selectedCategory?._id, selectedBadge, priceMin, priceMax]);
+    if (selectedCategory?._id !== matchedCategory._id) {
+      setSelectedCategory(matchedCategory);
+    }
+    if (urlFilters.category !== matchedCategory._id) {
+      setUrlFilters({ category: matchedCategory._id }, { replace: true });
+    }
+  }, [categories, selectedCategory?._id, setUrlFilters, urlFilters.category]);
 
   const handleSearch = () => {
     const match = minorityTypes.find((type) => String(type._id) === String(minorityType));
-    router.push(buildSearchPageUrl({
+    setUrlFilters({
       keyword: searchText,
       location: searchLocation,
       minorityType: match?.name || minorityType,
-    }));
+      page: "",
+    });
   };
 
   return (
@@ -223,6 +183,19 @@ const ServicePageContent = () => {
           setMinorityType(filters.minorityType);
         }}
         onSearch={handleSearch}
+        onClearFilters={resetFilters}
+        showClearFilters={Boolean(
+          urlFilters.keyword ||
+          urlFilters.location ||
+          urlFilters.minorityType ||
+          urlFilters.category ||
+          urlFilters.subcategory ||
+          urlFilters.badge ||
+          urlFilters.sort ||
+          urlFilters.priceMin ||
+          urlFilters.priceMax ||
+          urlFilters.page
+        )}
         selectedCategory={selectedCategory}
         onCategorySelect={handleCategorySelect}
       />
@@ -232,28 +205,29 @@ const ServicePageContent = () => {
           <MarketErrorState
             title="Services are temporarily unavailable"
             description="We could not load service listings. Please try again."
-            onRetry={() => fetchServices()}
+            onRetry={() => fetchServices(urlFilters)}
           />
         </div>
       ) : null}
 
-      <BookServices services={services} totalProducts={totalServices} currentPage={currentPage} itemsPerPage={itemsPerPage} selectedCategory={selectedCategory} loading={loading} onCategorySelect={(categoryId) => {
+      <BookServices services={services} totalProducts={totalServices} currentPage={currentPage} itemsPerPage={itemsPerPage} selectedCategory={selectedCategory} loading={loading} sort={selectedSort} onCategorySelect={(categoryId) => {
         const category = categories.find(cat => cat._id === categoryId);
         if (category) {
           handleCategorySelect(category);
           return;
         }
-        fetchServices(categoryId, undefined, selectedBadge, priceMin, priceMax);
+        setUrlFilters({ category: categoryId, subcategory: "", page: "" });
       }} onSubcategorySelect={(subcategoryId) => {
-        setSelectedSubcategory(subcategoryId);
-        fetchServices(selectedCategory?._id, subcategoryId, selectedBadge, priceMin, priceMax);
+        setUrlFilters({ subcategory: subcategoryId, page: "" });
       }} onBadgeSelect={(badge) => {
-        setSelectedBadge(badge);
-        fetchServices(selectedCategory?._id, selectedSubcategory || undefined, badge, priceMin, priceMax);
+        setUrlFilters({ badge, page: "" });
       }} onPriceChange={(min, max) => {
-        setPriceMin(min);
-        setPriceMax(max);
-        fetchServices(selectedCategory?._id, selectedSubcategory || undefined, selectedBadge, min, max);
+        setUrlFilters({ priceMin: String(min), priceMax: String(max), page: "" }, { replace: true });
+      }} onSortChange={(sort) => {
+        setSelectedSort(sort);
+        setUrlFilters({ sort, page: "" }, { replace: true });
+      }} onPageChange={(page) => {
+        setUrlFilters({ page: String(page) });
       }} />
       <JoinVendorBanner/>
     </main>
@@ -277,17 +251,26 @@ function ServicePageFallback() {
   );
 }
 
-function FilterSection({ filters, onFiltersChange, onSearch, selectedCategory, onCategorySelect }: { 
+function FilterSection({ filters, onFiltersChange, onSearch, onClearFilters, showClearFilters, selectedCategory, onCategorySelect }: {
   filters: PublicSearchFilters;
   onFiltersChange: (filters: PublicSearchFilters) => void;
   onSearch?: () => void;
+  onClearFilters?: () => void;
+  showClearFilters?: boolean;
   selectedCategory?: Category | null;
   onCategorySelect?: (category: Category) => void;
 }) {
   return (
     <>
       <PublicFilterSection>
-        <PublicSearchFilterBar filters={filters} onChange={onFiltersChange} onSubmit={() => onSearch?.()} />
+        <PublicSearchFilterBar
+          filters={filters}
+          onChange={onFiltersChange}
+          onSubmit={() => onSearch?.()}
+          submitLabel="Apply filters"
+          showClearFilters={showClearFilters}
+          onClearFilters={onClearFilters}
+        />
       </PublicFilterSection>
 
       <BrowseServices

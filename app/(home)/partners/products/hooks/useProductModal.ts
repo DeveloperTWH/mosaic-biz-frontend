@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { Product } from '../types';
+import { deleteVendorProduct } from '@/lib/api/vendorProducts';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -79,25 +80,13 @@ export const useProductModal = () => {
     if (!confirm('Are you sure you want to delete this product?')) return false;
     
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/api/product/delete-product/${productId}`,
-        {
-          method: 'DELETE',
-          credentials: 'include',
-        }
-      );
-      
-      const data = await response.json();
-      if (data.success) {
-        toast.success('Product deleted successfully');
-        closeModal();
-        return true;
-      } else {
-        toast.error('Failed to delete product');
-      }
+      const result = await deleteVendorProduct(productId);
+      toast.success(result.message);
+      closeModal();
+      return true;
     } catch (error) {
       console.error('Error deleting product:', error);
-      toast.error('Error deleting product');
+      toast.error(error instanceof Error ? error.message : 'Error deleting product');
     }
     return false;
   };

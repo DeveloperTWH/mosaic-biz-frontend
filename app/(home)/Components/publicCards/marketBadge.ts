@@ -2,10 +2,11 @@ export function getBadgeImage(badge?: string | null): string | null {
   if (!badge) return null;
   const key = badge.trim().toLowerCase().replace(/[\s_-]+/g, "");
   const badgeMap: Record<string, string> = {
-    silver: "/badge/silver.png",
-    gold: "/badge/gold.png",
-    platinum: "/badge/platinum.png",
-    diamond: "/badge/diamond.png",
+    bronze: "/badge.png",
+    silver: "/badge/Silver.png",
+    gold: "/badge/Gold.png",
+    platinum: "/badge/Platinum.png",
+    diamond: "/badge/Diamond.png",
   };
   return badgeMap[key] ?? null;
 }

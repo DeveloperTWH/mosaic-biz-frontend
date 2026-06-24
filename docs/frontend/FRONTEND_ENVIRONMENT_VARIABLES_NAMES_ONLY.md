@@ -32,7 +32,7 @@
 |------|---------|---------------|
 | `NEXT_PUBLIC_CLIENT_BASE_URL` | Optional fallback origin for Stripe `return_url` when no browser origin is available | `lib/url/appUrl.ts` |
 
-**Note:** Stripe return URLs use `lib/url/appUrl.ts`, which prefers the current browser origin and falls back to configured public env values. Production login should run on `app.mosaicbizhub.com` so the frontend and API share the same Mosaic-owned site.
+**Note:** Stripe return URLs use `lib/url/appUrl.ts`, which prefers the current browser origin and falls back to configured public env values. Production should use the apex marketplace origin, `mosaicbizhub.com`. The old `app.mosaicbizhub.com` host is transition-only.
 
 ---
 

@@ -15,6 +15,7 @@ import {
   DashboardPagination,
   DashboardStatusPill,
 } from '@/components/ui/dashboard-primitives';
+import DashboardLoadingBlock from '@/components/ui/dashboard-loading-block';
 
 
 
@@ -70,6 +71,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
     productId: string;
     variantId?: string;
   }>({ type: 'product', productId: '' });
+  const [deleteInProgress, setDeleteInProgress] = useState(false);
 
 
   const toggleExpand = (id: string) => {
@@ -87,6 +89,9 @@ const ProductTable: React.FC<ProductTableProps> = ({
   };
 
   const handleDelete = async () => {
+    if (deleteInProgress) return;
+
+    setDeleteInProgress(true);
     try {
       if (deleteTarget.type === 'product') {
         await axios.delete(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/product/delete-product/${deleteTarget.productId}`, {
@@ -101,10 +106,11 @@ const ProductTable: React.FC<ProductTableProps> = ({
       }
 
       changePage(currentPage)
+      setShowDeleteModal(false);
     } catch (err) {
       toast.error('Delete failed');
     } finally {
-      setShowDeleteModal(false);
+      setDeleteInProgress(false);
     }
   };
 
@@ -117,6 +123,20 @@ const ProductTable: React.FC<ProductTableProps> = ({
   };
 
 
+
+  if (isLoading) {
+    return <DashboardLoadingBlock label="Loading products..." />;
+  }
+
+  if (error) {
+    return (
+      <DashboardEmptyState
+        title="Products could not be loaded"
+        description={error}
+        className="py-10"
+      />
+    );
+  }
 
   if (products.length === 0) {
     return (
@@ -442,9 +462,12 @@ const ProductTable: React.FC<ProductTableProps> = ({
 
       {showDeleteModal && (
         <DeleteConfirmationModal
-          onCancel={() => setShowDeleteModal(false)}
+          onCancel={() => {
+            if (!deleteInProgress) setShowDeleteModal(false);
+          }}
           onConfirm={handleDelete}
           title="Confirm Delete"
+          loading={deleteInProgress}
           message={
             deleteTarget.type === 'product'
               ? 'Are you sure you want to delete this product? This action will also delete all its variants.'

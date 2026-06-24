@@ -69,7 +69,7 @@ Set in `.env.local` for local dev (never commit secrets). Vercel project setting
 | Variable | Required | Purpose |
 |----------|----------|---------|
 | `NEXT_PUBLIC_API_BASE_URL` | Yes | Backend API root, e.g. `https://api.mosaicbizhub.com` |
-| `NEXT_PUBLIC_APP_URL` | Yes | Frontend origin, e.g. `http://localhost:3000` |
+| `NEXT_PUBLIC_APP_URL` | Yes | Frontend origin, e.g. `http://localhost:3000` locally or `https://mosaicbizhub.com` in production |
 | `NEXT_PUBLIC_SENTRY_DSN` | Recommended | Client error reporting — see [SENTRY_VERCEL_SETUP.md](SENTRY_VERCEL_SETUP.md) |
 | `SENTRY_ENVIRONMENT` | With Sentry | `development` / `preview` / `production` |
 | `NEXT_PUBLIC_RANKED_PATH` | Optional | Override ranked API path (default `/api/ranked`) |
@@ -81,6 +81,8 @@ baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.mosaicbizhub.com/"
 ```
 
 **Local dev note:** Pointing `NEXT_PUBLIC_API_BASE_URL` at production from `localhost` often hits **CORS** in the browser. Use a local backend on `:3001` for full UI dev, or QA on Vercel preview where CORS is allowlisted.
+
+**Production domain note:** `https://mosaicbizhub.com` is the canonical marketplace frontend. `https://www.mosaicbizhub.com` should redirect to apex, and `https://app.mosaicbizhub.com` is transition-only.
 
 ---
 
