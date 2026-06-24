@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useCallback, useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Slider from "@mui/material/Slider";
 import { Category, SubCategory, FoodCategoryResponse, SubCategoryResponse } from "@/types/Category";
+import { PUBLIC_BADGE_FILTER_OPTIONS } from "../../Components/publicSearch";
 
 interface FilterAccordionProps {
   onFilterChange?: (category: string, subCategory: string) => void;
@@ -33,16 +34,38 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({ onFilterChange, selec
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 700]);
   const [value, setValue] = useState<number[]>([20, 37]);
 
+  const fetchSubcategories = useCallback(async (categoryId: string) => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/foods/subcategories/${categoryId}`);
+      const data: SubCategoryResponse = await response.json();
+      setSubcategories(data.data);
+    } catch (err) {
+      console.error('Error fetching subcategories:', err);
+      setSubcategories([]);
+    }
+  }, []);
+
   useEffect(() => {
-    if (externalSelectedCategory) {
+    if (!externalSelectedCategory) {
+      return;
+    }
+
+    let cancelled = false;
+
+    void Promise.resolve().then(() => {
+      if (cancelled) return;
       setSelectedCategory(externalSelectedCategory);
       setSelectedSubCategory(null);
       if (externalSelectedCategory._id) {
         setOpenIndex(1);
-        fetchSubcategories(externalSelectedCategory._id);
+        void fetchSubcategories(externalSelectedCategory._id);
       }
-    }
-  }, [externalSelectedCategory]);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [externalSelectedCategory, fetchSubcategories]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -56,17 +79,6 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({ onFilterChange, selec
     };
     fetchCategories();
   }, []);
-
-  const fetchSubcategories = async (categoryId: string) => {
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/foods/subcategories/${categoryId}`);
-      const data: SubCategoryResponse = await response.json();
-      setSubcategories(data.data);
-    } catch (err) {
-      console.error('Error fetching subcategories:', err);
-      setSubcategories([]);
-    }
-  };
 
   const handleChange = (_event: Event, newValue: number | number[]) => {
     const values = Array.isArray(newValue) ? newValue : [newValue, newValue];
@@ -90,7 +102,7 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({ onFilterChange, selec
     },
     {
       title: "Select Badge",
-      items: ["Silver", "Gold", "Platinum", "Diamond"],
+      items: PUBLIC_BADGE_FILTER_OPTIONS.map((option) => option.label),
     },
     // {
     //   title: "Price",
@@ -220,7 +232,8 @@ const FilterAccordion: React.FC<FilterAccordionProps> = ({ onFilterChange, selec
 
                         if (section.title === "Select Badge") {
                           setSelectedBadge(item);
-                          onBadgeSelect?.(item.toLowerCase());
+                          const badgeOption = PUBLIC_BADGE_FILTER_OPTIONS.find((option) => option.label === item);
+                          onBadgeSelect?.(badgeOption?.value ?? item.toLowerCase());
                         }
                       }}
                       style={{

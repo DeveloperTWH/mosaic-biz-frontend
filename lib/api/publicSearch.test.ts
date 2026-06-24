@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
+  PUBLIC_BADGE_FILTER_OPTIONS,
   buildListingPageUrl,
   listingFiltersToApiParams,
   parseListingFiltersFromSearchParams,
@@ -11,6 +12,19 @@ describe("public listing search params", () => {
     assert.deepEqual(listingFiltersToApiParams({ badge: "bronze" }), {
       badge: "bronze",
     });
+  });
+
+  it("keeps every public badge tier aligned with backend-facing lower-case values", () => {
+    assert.deepEqual(
+      PUBLIC_BADGE_FILTER_OPTIONS.map((option) => option.value),
+      ["bronze", "silver", "gold", "platinum", "diamond"]
+    );
+
+    for (const option of PUBLIC_BADGE_FILTER_OPTIONS) {
+      assert.deepEqual(listingFiltersToApiParams({ badge: option.value }), {
+        badge: option.value,
+      });
+    }
   });
 
   it("persists selected state as the canonical state query param", () => {
@@ -36,10 +50,17 @@ describe("public listing search params", () => {
         keyword: "tax",
         location: "Maryland",
         sort: "price_asc",
+        country: "United States",
         page: "2",
       }),
-      "/services?q=tax&state=Maryland&sort=price_asc&page=2"
+      "/services?q=tax&state=Maryland&sort=price_asc&page=2&country=United+States"
     );
+  });
+
+  it("converts country filters to API country params", () => {
+    assert.deepEqual(listingFiltersToApiParams({ country: "United States" }), {
+      country: "United States",
+    });
   });
 
   it("builds a clean URL for filter reset", () => {
@@ -53,5 +74,16 @@ describe("public listing search params", () => {
 
     assert.equal(parsed.location, "Richmond");
     assert.equal(parsed.badge, "gold");
+  });
+
+  it("parses canonical state and country filters for browser navigation restore", () => {
+    const parsed = parseListingFiltersFromSearchParams(
+      new URLSearchParams("q=catering&state=Georgia&country=United+States&page=4")
+    );
+
+    assert.equal(parsed.keyword, "catering");
+    assert.equal(parsed.location, "Georgia");
+    assert.equal(parsed.country, "United States");
+    assert.equal(parsed.page, "4");
   });
 });

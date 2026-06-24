@@ -11,7 +11,7 @@ export interface AuthPageShellProps {
 export default function AuthPageShell({ typeLabel, title, hero, children }: AuthPageShellProps) {
   return (
     <div className="grid min-h-screen max-w-[100vw] grid-cols-1 overflow-x-hidden md:grid-cols-2">
-      <header className="absolute left-0 right-0 top-0 z-20 flex w-full items-center justify-between bg-white px-4 py-4 md:left-20 md:bg-transparent md:px-0">
+      <header className="absolute left-0 right-0 top-0 z-20 flex w-full items-center justify-between bg-white px-4 py-4 md:left-20 md:w-auto md:bg-transparent md:px-0">
         <Link href="/" className="text-xl font-bold tracking-wide text-brand-navy md:text-white">
           <img src="/login/logo.png" alt="Mosaic Biz Hub" />
         </Link>
