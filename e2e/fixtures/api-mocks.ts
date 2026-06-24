@@ -3,6 +3,10 @@ import { apiUrl } from "./env";
 
 export const MOCK_PRODUCT_ID = "507f1f77bcf86cd799439011";
 export const MOCK_BUSINESS_ID = "507f1f77bcf86cd799439012";
+export const MOCK_SERVICE_ID = "507f1f77bcf86cd799439013";
+export const MOCK_FOOD_ID = "507f1f77bcf86cd799439014";
+
+const MOCK_IMAGE = "/bgdetailpage.png";
 
 export const featuredProductsResponse = {
   products: [
@@ -12,7 +16,7 @@ export const featuredProductsResponse = {
       description: "Deterministic featured product for Playwright",
       categoryId: { _id: "cat1", name: "Handmade" },
       subcategoryId: null,
-      coverImage: "https://placehold.co/400x400/png",
+      coverImage: MOCK_IMAGE,
       slug: "e2e-featured-product",
       createdAt: "2026-01-01T00:00:00.000Z",
       price: 2499,
@@ -33,14 +37,86 @@ export const productListResponse = {
     {
       _id: MOCK_PRODUCT_ID,
       title: "E2E Test Product",
-      coverImage: "https://placehold.co/400x400/png",
+      coverImage: MOCK_IMAGE,
       price: 1999,
       slug: "e2e-test-product",
       businessId: MOCK_BUSINESS_ID,
+      businessDetails: { badge: "Gold" },
       status: "published",
     },
   ],
+  data: [
+    {
+      _id: MOCK_PRODUCT_ID,
+      title: "E2E Test Product",
+      coverImage: MOCK_IMAGE,
+      price: 1999,
+      slug: "e2e-test-product",
+      businessId: MOCK_BUSINESS_ID,
+      businessDetails: { badge: "Gold" },
+      status: "published",
+    },
+  ],
+  total: 1,
+  page: 1,
+  limit: 10,
   pagination: { currentPage: 1, totalPages: 1, totalProducts: 1 },
+};
+
+export const serviceListResponse = {
+  success: true,
+  data: [
+    {
+      _id: MOCK_SERVICE_ID,
+      title: "E2E Strategy Session",
+      description: "Deterministic service listing for launch evidence",
+      coverImage: MOCK_IMAGE,
+      averageRating: 0,
+      totalReviews: 0,
+      price: 7500,
+      businessDetails: {
+        businessName: "E2E Vendor Shop",
+        description: "Launch evidence service provider",
+        logo: MOCK_IMAGE,
+        badge: "Gold",
+      },
+      businessId: {
+        _id: MOCK_BUSINESS_ID,
+        businessName: "E2E Vendor Shop",
+        badge: "Gold",
+        logo: MOCK_IMAGE,
+      },
+    },
+  ],
+  total: 1,
+  page: 1,
+  totalPages: 1,
+  limit: 10,
+};
+
+export const foodListResponse = {
+  success: true,
+  data: [
+    {
+      _id: MOCK_FOOD_ID,
+      title: "E2E Pantry Box",
+      description: "Deterministic food listing for launch evidence",
+      coverImage: MOCK_IMAGE,
+      businessName: "E2E Food Market",
+      badge: "Gold",
+      businessId: {
+        _id: MOCK_BUSINESS_ID,
+        businessName: "E2E Food Market",
+        description: "Food vendor profile fixture",
+        badge: "Gold",
+        logo: MOCK_IMAGE,
+      },
+    },
+  ],
+  total: 1,
+  page: 1,
+  totalPages: 1,
+  limit: 10,
 };
 
 export const publicProductDetailResponse = {
@@ -48,14 +124,15 @@ export const publicProductDetailResponse = {
     _id: MOCK_PRODUCT_ID,
     title: "E2E Test Product",
     description: "Product detail fixture",
-    coverImage: "https://placehold.co/600x600/png",
-    images: ["https://placehold.co/600x600/png"],
+    coverImage: MOCK_IMAGE,
+    images: [MOCK_IMAGE],
     price: 1999,
     slug: "e2e-test-product",
     businessId: {
       _id: MOCK_BUSINESS_ID,
       businessName: "E2E Vendor Shop",
-      logo: "https://placehold.co/80x80/png",
+      logo: MOCK_IMAGE,
+      badge: "Gold",
     },
     variants: [
       {
@@ -64,7 +141,7 @@ export const publicProductDetailResponse = {
         stock: 10,
         attributes: { Size: "M", Color: "Blue" },
         price: 1999,
-        images: ["https://placehold.co/600x600/png"],
+        images: [MOCK_IMAGE],
       },
     ],
     status: "published",
@@ -73,13 +150,118 @@ export const publicProductDetailResponse = {
   },
 };
 
+export const publicServiceDetailResponse = {
+  success: true,
+  data: {
+    service: {
+      _id: MOCK_SERVICE_ID,
+      title: "E2E Strategy Session",
+      description: "Service detail fixture",
+      coverImage: MOCK_IMAGE,
+      images: [MOCK_IMAGE],
+      services: [
+        {
+          _id: "service-child-1",
+          name: "Launch Readiness Review",
+          description: "A focused service for launch preparation.",
+          image: MOCK_IMAGE,
+          durationMinutes: 60,
+          price: 7500,
+        },
+      ],
+      contact: {
+        phone: "555-0100",
+        email: "service@example.test",
+        address: "100 Market St, Atlanta, GA",
+        website: "https://mosaicbizhub.com",
+      },
+      businessHours: [
+        { day: "Monday", hours: "9:00 AM - 5:00 PM", closed: false },
+        { day: "Tuesday", hours: "9:00 AM - 5:00 PM", closed: false },
+      ],
+      averageRating: 0,
+      totalReviews: 0,
+      categoryId: { _id: "scat1", name: "Consulting" },
+      subcategoryId: { _id: "ssub1", name: "Business Strategy" },
+    },
+    business: {
+      _id: MOCK_BUSINESS_ID,
+      businessName: "E2E Vendor Shop",
+      description: "Launch evidence service provider",
+      logo: MOCK_IMAGE,
+      coverImage: MOCK_IMAGE,
+      email: "vendor@example.test",
+      phone: "555-0101",
+      badge: "Gold",
+      address: {
+        street: "100 Market St",
+        city: "Atlanta",
+        state: "GA",
+        country: "United States",
+        zipCode: "30303",
+      },
+      website: "https://mosaicbizhub.com",
+      socialLinks: { website: "https://mosaicbizhub.com" },
+    },
+  },
+};
+
+export const publicFoodDetailResponse = {
+  success: true,
+  data: {
+    food: {
+      _id: MOCK_FOOD_ID,
+      businessName: "E2E Food Market",
+      brand: "E2E Pantry Box",
+      foodType: "Prepared foods",
+      coverImage: MOCK_IMAGE,
+      images: [MOCK_IMAGE],
+      menuImage: MOCK_IMAGE,
+      tableTypes: ["No of Seats - Up to 4"],
+      bookingTimeSlots: ["9:00 AM", "10:00 AM"],
+      businessHours: [
+        { day: "Monday", hours: "9:00 AM - 5:00 PM", closed: false },
+        { day: "Tuesday", hours: "9:00 AM - 5:00 PM", closed: false },
+      ],
+      averageRating: 0,
+      totalReviews: 0,
+      location: {
+        address: "200 Pantry Ave, Atlanta, GA",
+        coordinates: [-84.388, 33.749],
+      },
+      categoryId: { _id: "fcat1", name: "Restaurants" },
+      subcategoryId: { _id: "fsub1", name: "Prepared Meals" },
+      badge: "Gold",
+    },
+    business: {
+      _id: MOCK_BUSINESS_ID,
+      businessName: "E2E Food Market",
+      description: "Launch evidence food vendor",
+      logo: MOCK_IMAGE,
+      coverImage: MOCK_IMAGE,
+      email: "food@example.test",
+      phone: "555-0102",
+      badge: "Gold",
+      address: {
+        street: "200 Pantry Ave",
+        city: "Atlanta",
+        state: "GA",
+        country: "United States",
+        zipCode: "30303",
+      },
+      website: "https://mosaicbizhub.com",
+      socialLinks: { website: "https://mosaicbizhub.com" },
+    },
+  },
+};
+
 export const rankedListResponse = {
   items: [
     {
       _id: MOCK_PRODUCT_ID,
       title: "E2E Test Product",
-      coverImage: "https://placehold.co/400x400/png",
-      firstEligible: { images: ["https://placehold.co/400x400/png"] },
+      coverImage: MOCK_IMAGE,
+      firstEligible: { images: [MOCK_IMAGE] },
     },
   ],
   pagination: { page: 1, pageSize: 8, total: 1 },
@@ -98,7 +280,7 @@ export const vendorsListResponse = {
     {
       _id: MOCK_BUSINESS_ID,
       businessName: "E2E Vendor Shop",
-      logo: "https://placehold.co/80x80/png",
+      logo: MOCK_IMAGE,
       listingType: "product",
       slug: "e2e-vendor-shop",
     },
@@ -149,13 +331,19 @@ export async function installPublicMarketplaceMocks(page: Page) {
       return mockJson(route, 200, productListResponse);
     }
     if (matchesApiPath(url, "/api/services/list")) {
-      return mockJson(route, 200, emptyListResponse);
+      return mockJson(route, 200, serviceListResponse);
     }
     if (matchesApiPath(url, "/api/foods/list") || matchesApiPath(url, "/api/food/list")) {
-      return mockJson(route, 200, emptyListResponse);
+      return mockJson(route, 200, foodListResponse);
     }
     if (matchesApiPath(url, "/api/categories/services")) {
-      return mockJson(route, 200, [{ _id: "scat1", name: "Consulting" }]);
+      return mockJson(route, 200, {
+        data: {
+          serviceCategories: [
+            { _id: "scat1", name: "Consulting", slug: "consulting", img: MOCK_IMAGE },
+          ],
+        },
+      });
     }
     if (matchesApiPath(url, "/api/admin/category/service")) {
       return mockJson(route, 200, [{ _id: "scat1", name: "Consulting" }]);
@@ -164,7 +352,31 @@ export async function installPublicMarketplaceMocks(page: Page) {
       return mockJson(route, 200, vendorsListResponse);
     }
     if (matchesApiPath(url, "/api/categories/products")) {
-      return mockJson(route, 200, [{ _id: "cat1", name: "Handmade" }]);
+      return mockJson(route, 200, {
+        data: {
+          productCategories: [
+            { _id: "cat1", name: "Handmade", slug: "handmade", img: MOCK_IMAGE },
+          ],
+        },
+      });
+    }
+    if (matchesApiPath(url, "/api/categories/foods")) {
+      return mockJson(route, 200, {
+        data: {
+          foodCategories: [
+            { _id: "fcat1", name: "Restaurants", slug: "restaurants", img: MOCK_IMAGE },
+          ],
+        },
+      });
+    }
+    if (matchesApiPath(url, "/api/products/subcategories/")) {
+      return mockJson(route, 200, { data: [{ _id: "psub1", name: "Accessories" }] });
+    }
+    if (matchesApiPath(url, "/api/services/subcategories/")) {
+      return mockJson(route, 200, { data: [{ _id: "ssub1", name: "Business Strategy" }] });
+    }
+    if (matchesApiPath(url, "/api/foods/subcategories/")) {
+      return mockJson(route, 200, { data: [{ _id: "fsub1", name: "Prepared Meals" }] });
     }
     if (matchesApiPath(url, "/api/minority-types")) {
       return mockJson(route, 200, []);
@@ -191,6 +403,32 @@ export async function installPublicMarketplaceMocks(page: Page) {
     }
     if (matchesApiPath(url, `/api/products/${MOCK_PRODUCT_ID}`)) {
       return mockJson(route, 200, publicProductDetailResponse);
+    }
+    if (matchesApiPath(url, `/api/public/services/${MOCK_SERVICE_ID}`)) {
+      return mockJson(route, 200, publicServiceDetailResponse);
+    }
+    if (matchesApiPath(url, `/api/service/${MOCK_SERVICE_ID}/reviews`)) {
+      return mockJson(route, 200, {
+        success: true,
+        data: {
+          reviews: [],
+          summary: { totalReviews: 0, averageRating: 0, ratingBreakdown: {} },
+          pagination: { total: 0, page: 1, limit: 10, totalPages: 0 },
+        },
+      });
+    }
+    if (matchesApiPath(url, `/api/public/foods/${MOCK_FOOD_ID}`)) {
+      return mockJson(route, 200, publicFoodDetailResponse);
+    }
+    if (matchesApiPath(url, `/api/food/${MOCK_FOOD_ID}/reviews`)) {
+      return mockJson(route, 200, {
+        success: true,
+        data: {
+          reviews: [],
+          summary: { totalReviews: 0, averageRating: 0, ratingBreakdown: {} },
+          pagination: { total: 0, page: 1, limit: 10, totalPages: 0 },
+        },
+      });
     }
     if (matchesApiPath(url, "/api/users/auth/check")) {
       return mockJson(route, 401, authCheckUnauthenticated);
