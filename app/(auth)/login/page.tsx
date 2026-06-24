@@ -5,11 +5,14 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { useState, Suspense } from 'react'
 import Link from 'next/link'
 import { Eye, EyeOff } from 'lucide-react';
+import { confirmPostLoginSession } from '@/lib/api/authSession';
+import { buildApiUrl } from '@/lib/api/httpClient';
 import { logAuthRequest } from '@/utils/authDebug';
 import { parseAuthJsonResponse } from '@/utils/parseAuthErrorResponse';
 import {
-  getAuthenticatedUser,
+  clearStaleClientSession,
   isBusinessOwner,
+  isCustomer,
   persistClientSession,
 } from '@/utils/authUtils';
 import AuthPageShell from '@/components/auth/AuthPageShell';
@@ -49,7 +52,7 @@ function LoginContent() {
     setError('');
 
     try {
-      const loginUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/login`;
+      const loginUrl = buildApiUrl('/api/users/login');
       const res = await fetch(loginUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -77,19 +80,77 @@ function LoginContent() {
       });
 
       if (data?.success && data.user) {
-        const sessionUser = await getAuthenticatedUser();
+        const sessionResult = await confirmPostLoginSession();
+        const sessionCheckUrl = buildApiUrl('/api/users/auth/check');
+        const sessionStatus =
+          sessionResult.kind === 'authenticated' || sessionResult.kind === 'unauthenticated'
+            ? 200
+            : (sessionResult.error.status ?? 0);
 
         logAuthRequest({
-          endpoint: `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/auth/check`,
+          endpoint: sessionCheckUrl,
           method: 'GET',
-          status: sessionUser ? 200 : 401,
+          status: sessionResult.kind === 'unauthenticated' ? 401 : sessionStatus,
           credentialsIncluded: true,
-          body: sessionUser ? { success: true, user: { role: sessionUser.role } } : undefined,
+          body:
+            sessionResult.kind === 'authenticated'
+              ? { success: true, user: { role: sessionResult.user.role } }
+              : sessionResult.kind === 'error'
+                ? { outcome: sessionResult.kind, errorKind: sessionResult.error.kind }
+                : { outcome: sessionResult.kind },
         });
 
-        if (!sessionUser) {
+        if (sessionResult.kind === 'unauthenticated') {
+          clearStaleClientSession();
           setError(
-            'Sign-in succeeded but session was not established. Try again or contact support.'
+            'Sign-in succeeded, but the session cookie was not available on the follow-up request. Check your browser cookie settings and try again.'
+          );
+          return;
+        }
+
+        if (sessionResult.kind === 'error') {
+          clearStaleClientSession();
+
+          switch (sessionResult.error.kind) {
+            case 'network':
+            case 'timeout':
+              setError(
+                'Sign-in succeeded, but session verification could not reach the server. Check your connection and try again.'
+              );
+              break;
+            case 'forbidden':
+              setError(
+                'Sign-in succeeded, but this account is not permitted to use this sign-in path.'
+              );
+              break;
+            case 'serverError':
+              setError(
+                'Sign-in succeeded, but session verification is temporarily unavailable. Please try again.'
+              );
+              break;
+            case 'malformed':
+              setError(
+                'Sign-in succeeded, but the session verification response was invalid. Please try again or contact support.'
+              );
+              break;
+            default:
+              setError(
+                'Sign-in succeeded, but session verification failed. Please try again.'
+              );
+          }
+          return;
+        }
+
+        const sessionUser = sessionResult.user;
+        const hasExpectedRole =
+          type === 'vendor' ? isBusinessOwner(sessionUser) : isCustomer(sessionUser);
+
+        if (!hasExpectedRole) {
+          clearStaleClientSession();
+          setError(
+            type === 'vendor'
+              ? 'This account does not have vendor access.'
+              : 'This account does not have customer access.'
           );
           return;
         }
@@ -109,7 +170,11 @@ function LoginContent() {
       }
     } catch (err) {
       console.error('Login error:', err);
-      setError('Something went wrong. Please try again.');
+      setError(
+        err instanceof TypeError
+          ? 'Unable to reach the sign-in service. Check your connection and try again.'
+          : 'Something went wrong. Please try again.'
+      );
     } finally {
       setLoading(false);
     }
