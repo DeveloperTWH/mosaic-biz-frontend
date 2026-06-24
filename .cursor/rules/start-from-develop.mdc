@@ -1,0 +1,105 @@
+---
+description: Feature-branch lifecycle — branch from develop, merge via PR, reset to develop at task completion
+alwaysApply: true
+---
+
+# Feature branch lifecycle (develop-centric)
+
+## Integration branch
+
+- **Base branch:** `develop` (remote: `launch/develop`)
+- **Production branch:** `main` — only via promote PR from `develop`; not used for day-to-day feature work
+- **Pattern:** One feature branch per task → integrate into `develop` → reset local repo to `develop` → next feature branch
+
+## Phase 1 — Start a task (always from `develop`)
+
+1. Be on latest `develop`:
+
+   ```powershell
+   git checkout develop
+   git pull launch develop
+   ```
+
+2. Create a **new short-lived feature branch**:
+
+   ```powershell
+   git checkout -b feat/short-description
+   ```
+
+   Prefixes: `feat/`, `fix/`, `polish/`, `docs/`, `chore/`, `audit/`, etc.
+
+3. If the user assigns an **existing feature branch**, checkout it and merge/rebase `develop` into it before continuing work.
+
+**Do not** start new work directly on `develop` or `main`.
+
+## Phase 2 — Work on the feature branch
+
+- All commits for the task stay on the feature branch
+- Push the feature branch to `launch` when ready for review or backup
+- Open PRs with **base = `develop`**, compare = feature branch
+
+## Phase 3 — Task completion (feature → `develop` → reset)
+
+When the feature is **done** (not after every message — only when the task is complete):
+
+1. **Integrate into `develop`** (default path):
+   - Push feature branch: `git push -u launch HEAD`
+   - Open PR to `develop` (or merge when the user explicitly asks)
+   - Do **not** merge to `main` unless the user requests a production promote
+
+2. **Only commit** when the user asks, or when completing a clearly scoped deliverable they expect committed
+
+3. **Reset local workspace to `develop`** after the feature is integrated or handed off:
+
+   ```powershell
+   git checkout develop
+   git pull launch develop
+   ```
+
+   If uncommitted changes remain:
+
+   ```powershell
+   git stash push -u -m "wip: brief description"
+   git checkout develop
+   git pull launch develop
+   ```
+
+4. **Do not** leave the workspace on a finished feature branch unless the user asks to stay there
+
+5. Report: feature branch name, PR URL if created, whether stashed, and that local repo is on `develop` ready for the next branch
+
+## Phase 4 — Next task
+
+Repeat Phase 1: `develop` → `git pull` → new feature branch.
+
+```mermaid
+flowchart LR
+  develop[develop]
+  feature[feature branch]
+  pr[PR to develop]
+  develop -->|checkout -b| feature
+  feature -->|push + PR| pr
+  pr -->|merge| develop
+  develop -->|reset local| develop
+```
+
+## Remote names
+
+| Remote | Repository |
+|--------|------------|
+| `launch` | `Digital-Builders-757/mosaic-biz-frontend-launch` (primary) |
+| `origin` | Alternate — use only if the user specifies |
+
+## Do not
+
+- Force-push `develop` or `main`
+- Commit to `develop` directly without user request (use feature branch + PR)
+- Stay on a completed feature branch after task completion
+- Reset to `develop` mid-task unless the user changes direction
+
+## Helper script (end of task)
+
+```powershell
+.\scripts\git-reset-to-develop.ps1        # clean tree
+.\scripts\git-reset-to-develop.ps1 -Stash   # stash first if dirty
+```

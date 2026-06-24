@@ -104,3 +104,51 @@ Current release posture: [PROJECT_STATUS.md](PROJECT_STATUS.md)
 Older docs and QA reports may reference `sprint/frontend-release-candidate` as the integration branch. That branch was used during the initial launch sprint. **Going forward, `develop` is the integration branch** and `main` is production.
 
 Historical PR evidence that targets the RC branch remains valid as archive; new work should target `develop`.
+
+---
+
+## Feature branch cycle (team default)
+
+Every task follows the same loop:
+
+1. **Start** on `develop` → pull → `git checkout -b feat/my-task`
+2. **Work** on the feature branch; push and open PR **into `develop`**
+3. **Complete** when the PR is merged (or the user confirms handoff)
+4. **Reset** local repo to `develop` and pull latest
+5. **Repeat** for the next task with a new feature branch
+
+```mermaid
+flowchart LR
+  develop[develop]
+  feature[feature branch]
+  pr[PR merge]
+  develop -->|checkout -b| feature
+  feature -->|push PR| pr
+  pr --> develop
+  develop -->|git-reset-to-develop| develop
+```
+
+Agents follow [`.cursor/rules/start-from-develop.mdc`](../.cursor/rules/start-from-develop.mdc): reset to `develop` only at **task completion**, not after every chat turn.
+
+## Reset to `develop` after each task
+
+When a feature is done and integrated (or handed off via PR):
+
+```powershell
+.\scripts\git-reset-to-develop.ps1
+```
+
+If you have uncommitted work to keep:
+
+```powershell
+.\scripts\git-reset-to-develop.ps1 -Stash
+git stash list
+git stash pop    # when ready to resume on a new branch
+```
+
+Then start the next feature:
+
+```powershell
+git checkout -b feat/next-task
+```
+
