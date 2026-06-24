@@ -1,0 +1,34 @@
+name: Enforce develop to main
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  enforce-develop-promotion:
+    name: Only develop may merge into main
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify develop promotion source
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          ALLOWED_REPO: Digital-Builders-757/mosaic-biz-frontend-launch
+        run: |
+          set -euo pipefail
+
+          if [ "$HEAD_REPO" != "$ALLOWED_REPO" ]; then
+            echo "Blocked: pull request head repository must be $ALLOWED_REPO (got: $HEAD_REPO)."
+            exit 1
+          fi
+
+          if [ "$HEAD_REF" != "develop" ]; then
+            echo "Blocked: only the develop branch may merge into main (got: $HEAD_REF)."
+            exit 1
+          fi
+
+          echo "Release promotion check passed: develop from $ALLOWED_REPO may merge into main."
