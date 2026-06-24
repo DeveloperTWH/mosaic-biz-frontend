@@ -8,6 +8,7 @@ Next.js marketplace frontend for **Mosaic Biz Hub** — a platform connecting co
 | Integration branch | `develop` |
 | Production branch | `main` |
 | API | `https://api.mosaicbizhub.com` (backend: `Techware-Hut/mosaic-backend`) |
+| Production frontend | `https://mosaicbizhub.com` |
 | Docs hub | **[docs/README.md](docs/README.md)** |
 | Current status | [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md) |
 
@@ -47,6 +48,8 @@ npm run dev
 4. Open `http://localhost:3000`.
 
 **Note:** Calling the production API from `localhost` often fails in the browser due to CORS. Run the backend locally on `:3001` for full UI dev, or use a Vercel preview for integration QA.
+
+**Production domain:** `https://mosaicbizhub.com` is the canonical marketplace frontend. `https://www.mosaicbizhub.com` should redirect to the apex; `https://app.mosaicbizhub.com` is transition-only until approved cutover smoke passes.
 
 ---
 

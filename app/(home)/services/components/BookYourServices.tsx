@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Service } from "@/types/service";
 import { Category } from "@/types/Category";
 import FilterAccordion from "./FilterAccordion";
@@ -19,6 +19,9 @@ interface BookServicesProps {
   onSubcategorySelect?: (subcategoryId: string) => void;
   onBadgeSelect?: (badge: string) => void;
   onPriceChange?: (min: number, max: number) => void;
+  sort?: string;
+  onSortChange?: (sort: string) => void;
+  onPageChange?: (page: number) => void;
 }
 
 const BookServices: React.FC<BookServicesProps> = ({
@@ -32,31 +35,18 @@ const BookServices: React.FC<BookServicesProps> = ({
   onSubcategorySelect,
   onBadgeSelect,
   onPriceChange,
+  sort = "",
+  onSortChange,
+  onPageChange,
 }) => {
-  const [selectedFilters, setSelectedFilters] = useState({
-    category: "",
-    subCategory: "",
-    badge: "",
-  });
-
   const startItem = totalProducts > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0;
   const endItem =
     totalProducts > 0 ? Math.min(startItem + services.length - 1, totalProducts) : 0;
-
-  const handleFilterChange = (filterType: keyof typeof selectedFilters, value: string) => {
-    setSelectedFilters((prev) => ({
-      ...prev,
-      [filterType]: prev[filterType] === value ? "" : value,
-    }));
-  };
+  const totalPages = totalProducts > 0 ? Math.ceil(totalProducts / itemsPerPage) : 1;
 
   const filterPanel = (
     <FilterAccordion
       selectedCategory={selectedCategory}
-      onFilterChange={(category, subCategory) => {
-        handleFilterChange("category", category);
-        handleFilterChange("subCategory", subCategory);
-      }}
       onCategorySelect={onCategorySelect}
       onSubcategorySelect={onSubcategorySelect}
       onBadgeSelect={onBadgeSelect}
@@ -68,12 +58,17 @@ const BookServices: React.FC<BookServicesProps> = ({
     <>
       <span className="market-result-count">Sort by:</span>
       <div className="market-select-wrap">
-        <select className="market-select w-auto min-w-[140px] px-3 py-1 text-sm" aria-label="Sort services">
-          <option>Default</option>
-          <option>Price: Low to High</option>
-          <option>Price: High to Low</option>
-          <option>Most Popular</option>
-          <option>Newest</option>
+        <select
+          className="market-select w-auto min-w-[140px] px-3 py-1 text-sm"
+          aria-label="Sort services"
+          value={sort}
+          onChange={(event) => onSortChange?.(event.target.value)}
+        >
+          <option value="">Default</option>
+          <option value="price_asc">Price: Low to High</option>
+          <option value="price_desc">Price: High to Low</option>
+          <option value="rating">Most Popular</option>
+          <option value="newest">Newest</option>
         </select>
         <div className="market-select-chevron">
           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -96,28 +91,53 @@ const BookServices: React.FC<BookServicesProps> = ({
       ) : services.length === 0 ? (
         <MarketEmptyState
           title="No services found"
-          description="Try adjusting your filters or search the marketplace."
-          ctaLabel="Search marketplace"
-          ctaHref="/search"
+          description="No services match the active filters. Try a broader search or clear filters."
+          ctaLabel="Browse all services"
+          ctaHref="/services"
         />
       ) : (
-        <div className="public-grid-listing public-grid-listing--services">
-          {services.map((service) => (
-            <ProductCard
-              key={service._id}
-              serviceId={service._id}
-              title={(service as any).businessDetails?.businessName || service.title}
-              image={service.coverImage}
-              description={(service as any).businessDetails?.description || service.description}
-              rating={service.averageRating}
-              totalRatings={service.averageRating}
-              reviews={service.totalReviews}
-              badge={(service as any).businessDetails?.badge || (service as any).badge}
-              price={(service as any).price}
-              logo={(service as any).businessDetails?.logo}
-            />
-          ))}
-        </div>
+        <>
+          <div className="public-grid-listing public-grid-listing--services">
+            {services.map((service) => (
+              <ProductCard
+                key={service._id}
+                serviceId={service._id}
+                title={(service as any).businessDetails?.businessName || service.title}
+                image={service.coverImage}
+                description={(service as any).businessDetails?.description || service.description}
+                rating={service.averageRating}
+                totalRatings={service.averageRating}
+                reviews={service.totalReviews}
+                badge={(service as any).businessDetails?.badge || (service as any).badge}
+                price={(service as any).price}
+                logo={(service as any).businessDetails?.logo}
+              />
+            ))}
+          </div>
+          {totalPages > 1 ? (
+            <nav className="mt-8 flex flex-wrap items-center justify-center gap-2" aria-label="Service results pagination">
+              <button
+                type="button"
+                className="market-btn-outline min-h-10 px-4 text-sm disabled:cursor-not-allowed disabled:opacity-50"
+                disabled={currentPage <= 1}
+                onClick={() => onPageChange?.(currentPage - 1)}
+              >
+                Previous
+              </button>
+              <span className="market-result-count px-2">
+                Page {currentPage} of {totalPages}
+              </span>
+              <button
+                type="button"
+                className="market-btn-outline min-h-10 px-4 text-sm disabled:cursor-not-allowed disabled:opacity-50"
+                disabled={currentPage >= totalPages}
+                onClick={() => onPageChange?.(currentPage + 1)}
+              >
+                Next
+              </button>
+            </nav>
+          ) : null}
+        </>
       )}
     </CatalogListingLayout>
   );

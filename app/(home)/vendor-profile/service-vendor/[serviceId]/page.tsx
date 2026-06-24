@@ -17,6 +17,7 @@ import MarketErrorState from "../../../Components/MarketErrorState";
 import MarketLoadingBlock from "../../../Components/MarketLoadingBlock";
 import AccountEmptyState from "@/components/ui/account-empty-state";
 import { formatMarketPrice, toFiniteNumber } from "@/lib/marketplace/display";
+import { SERVICE_DETAIL_RESPONSIVE_CLASSES } from "@/lib/marketplace/serviceDetailLayout";
 
 /* ─────────────── Types based on actual API response ─────────────── */
 type ServiceContact = {
@@ -337,10 +338,11 @@ function getBadgeImage(badge?: string): string | null {
   if (!badge) return null;
   const key = badge.trim().toLowerCase().replace(/[\s_-]+/g, "");
   const badgeMap: Record<string, string> = {
-    silver: "/badge/silver.png",
-    gold: "/badge/gold.png",
-    platinum: "/badge/platinum.png",
-    diamond: "/badge/diamond.png",
+    bronze: "/badge.png",
+    silver: "/badge/Silver.png",
+    gold: "/badge/Gold.png",
+    platinum: "/badge/Platinum.png",
+    diamond: "/badge/Diamond.png",
   };
   return badgeMap[key] ?? null;
 }
@@ -961,7 +963,7 @@ export default function ServiceVendorProfilePage() {
 
 
   return (
-    <div className="market-surface-light min-h-screen font-sans">
+    <div className={SERVICE_DETAIL_RESPONSIVE_CLASSES.pageShell}>
 
       {/* ── Hero Banner ── */}
 <div className="vendor-profile-hero-band">
@@ -1044,10 +1046,10 @@ export default function ServiceVendorProfilePage() {
         >
           ← Back to services
         </Link>
-        <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6">
+        <div className={SERVICE_DETAIL_RESPONSIVE_CLASSES.contentGrid}>
 
           {/* ── LEFT COLUMN ── */}
-          <div>
+          <div className={SERVICE_DETAIL_RESPONSIVE_CLASSES.leftColumn}>
             {/* Cover Image */}
             <div className="relative w-full h-[280px] md:h-[340px] overflow-visible border border-[#e8e1cf] bg-gray-100">
               {coverImage
@@ -1097,7 +1099,7 @@ export default function ServiceVendorProfilePage() {
             {/* Business Name & Info */}
             <div className="mt-7 border-b border-[#ece6d9] pb-5">
               <div className="flex items-center gap-2.5 flex-wrap">
-               <h2 className="text-[32px] font-poppins font-semibold leading-none text-brand-navy">
+               <h2 className="text-2xl font-poppins font-semibold leading-tight text-brand-navy sm:text-[32px] sm:leading-none">
   {contentHeading}
 </h2>
                 {businessName && title && title !== businessName ? (
@@ -1310,13 +1312,13 @@ export default function ServiceVendorProfilePage() {
           </div>
 
           {/* ── RIGHT SIDEBAR ── */}
-          <div className="space-y-6">
+          <div className={SERVICE_DETAIL_RESPONSIVE_CLASSES.sidebar}>
 
             {/* Business Info Card */}
             <div className="p-5 bg-white">
               {/* Logo */}
               <div className="flex items-center gap-2 pb-3">
-                <div className="w-[100px] h-[100px] rounded border bg-gray-50 overflow-hidden shrink-0 flex items-center justify-center">
+                <div className="h-20 w-20 shrink-0 overflow-hidden rounded border bg-gray-50 flex items-center justify-center sm:h-[100px] sm:w-[100px]">
                   {data.businessLogo
                     ? <img src={data.businessLogo} alt={data.businessName} className="w-full h-full object-contain p-1" />
                     : <span className="text-xs font-bold text-brand-navy-light">{data.businessName?.charAt(0) || "S"}</span>}
@@ -1333,7 +1335,7 @@ export default function ServiceVendorProfilePage() {
                   { label: "Address", value: businessAddress || contact.address, key: "address" },
                   { label: "Website", value: businessWebsite || contact.website, key: "website" },
                 ].map(row => (
-                  <div key={row.label} className="grid grid-cols-[96px_1fr] gap-2 items-start">
+                  <div key={row.label} className={SERVICE_DETAIL_RESPONSIVE_CLASSES.detailRow}>
                     <span className="font-montserrat font-bold text-brand-navy">{row.label}</span>
                     {row.key === null ? (
                       <span className="font-montserrat font-medium text-brand-muted">{row.value || "N/A"}</span>
@@ -1364,7 +1366,7 @@ export default function ServiceVendorProfilePage() {
                   </div>
                 ))}
                 {googleReviewLink ? (
-                  <div className="grid grid-cols-[96px_1fr] gap-2 items-start">
+                  <div className={SERVICE_DETAIL_RESPONSIVE_CLASSES.detailRow}>
                     <span className="font-montserrat font-bold text-brand-navy">Reviews</span>
                     <a
                       href={getSafeExternalUrl(googleReviewLink)}
@@ -1377,7 +1379,7 @@ export default function ServiceVendorProfilePage() {
                   </div>
                 ) : null}
                 {communityServiceLink ? (
-                  <div className="grid grid-cols-[96px_1fr] gap-2 items-start">
+                  <div className={SERVICE_DETAIL_RESPONSIVE_CLASSES.detailRow}>
                     <span className="font-montserrat font-bold text-brand-navy">Community</span>
                     <a
                       href={getSafeExternalUrl(communityServiceLink)}
@@ -1390,7 +1392,7 @@ export default function ServiceVendorProfilePage() {
                   </div>
                 ) : null}
                 {refundPolicyDocumentUrl ? (
-                  <div className="grid grid-cols-[96px_1fr] gap-2 items-center">
+                  <div className={SERVICE_DETAIL_RESPONSIVE_CLASSES.documentRow}>
                     <span className="font-montserrat font-bold text-brand-navy">Refund policy</span>
                     <a
                       href={refundPolicyDocumentUrl}
@@ -1405,7 +1407,7 @@ export default function ServiceVendorProfilePage() {
                   </div>
                 ) : null}
                 {termsDocumentUrl ? (
-                  <div className="grid grid-cols-[96px_1fr] gap-2 items-center">
+                  <div className={SERVICE_DETAIL_RESPONSIVE_CLASSES.documentRow}>
                     <span className="font-montserrat font-bold text-brand-navy">Terms doc</span>
                     <a
                       href={termsDocumentUrl}
@@ -1423,7 +1425,7 @@ export default function ServiceVendorProfilePage() {
             </div>
 
             {/* Book Service Form */}
-<div id="booking-section" className="overflow-hidden border border-[#e2c46a] bg-brand-cream">
+<div id="booking-section" className="min-w-0 overflow-hidden border border-[#e2c46a] bg-brand-cream">
   
   {/* Header */}
   <div className="border-b border-[#e6d3a3] px-5 py-4">
@@ -1511,11 +1513,11 @@ export default function ServiceVendorProfilePage() {
                 className="mt-0.5 h-4 w-4 accent-[#C7A040]"
               />
               <div className="min-w-0 flex-1">
-                <div className="flex items-start justify-between gap-3">
+                <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
                   <span className="text-xs font-semibold uppercase tracking-wide text-brand-navy-light">
                     {svc.name}
                   </span>
-                  <span className="text-xs font-semibold text-brand-navy">
+                  <span className="shrink-0 text-xs font-semibold text-brand-navy">
                     {formatMarketPrice(svc.price) ?? "Price on request"}
                   </span>
                 </div>
@@ -1722,7 +1724,7 @@ export default function ServiceVendorProfilePage() {
   {businessHours.map(h => (
     <div
       key={h._id}
-      className={`grid grid-cols-[120px_1fr] gap-x-2 items-center text-[12px] ${
+      className={`${SERVICE_DETAIL_RESPONSIVE_CLASSES.hoursRow} ${
         h.day === todayName ? "text-brand-navy" : "text-brand-muted"
       }`}
     >

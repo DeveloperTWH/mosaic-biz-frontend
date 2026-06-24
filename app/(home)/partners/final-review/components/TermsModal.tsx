@@ -217,7 +217,7 @@
           <div>
             <h3 className="font-semibold text-gray-900 mb-2">8. Cancellations</h3>
             <ul className="list-disc pl-5 text-sm space-y-1">
-              <li><span className="font-medium">How to Cancel:</span> Log in at www.mosaicbizhub.com → Profile → My Subscriptions → Cancel</li>
+              <li><span className="font-medium">How to Cancel:</span> Log in at mosaicbizhub.com → Profile → My Subscriptions → Cancel</li>
               <li><span className="font-medium">Service Disputes:</span> Submit a dispute if you believe contracted services weren't delivered. Valid claims may result in refunds or service adjustments.</li>
             </ul>
           </div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, AlertTriangle } from 'lucide-react';
+import { X, AlertTriangle, Loader2 } from 'lucide-react';
 
 interface Props {
   isOpen: boolean;
@@ -7,7 +7,8 @@ interface Props {
   message: string;
   confirmText?: string;
   cancelText?: string;
-  onConfirm: () => void;
+  isLoading?: boolean;
+  onConfirm: () => unknown;
   onCancel: () => void;
 }
 
@@ -17,6 +18,7 @@ export default function ConfirmDialog({
   message,
   confirmText = 'Confirm',
   cancelText = 'Cancel',
+  isLoading = false,
   onConfirm,
   onCancel
 }: Props) {
@@ -34,7 +36,9 @@ export default function ConfirmDialog({
           </div>
           <button
             onClick={onCancel}
+            disabled={isLoading}
             className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+            aria-label="Close dialog"
           >
             <X className="w-5 h-5 text-gray-500" />
           </button>
@@ -49,14 +53,17 @@ export default function ConfirmDialog({
         <div className="flex justify-end gap-3 px-6 py-4 bg-gray-50 rounded-b-lg">
           <button
             onClick={onCancel}
-            className="px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-100 transition-colors"
+            disabled={isLoading}
+            className="px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-100 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
           >
             {cancelText}
           </button>
           <button
             onClick={onConfirm}
-            className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition-colors"
+            disabled={isLoading}
+            className="inline-flex min-w-[96px] items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition-colors disabled:cursor-not-allowed disabled:opacity-70"
           >
+            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
             {confirmText}
           </button>
         </div>

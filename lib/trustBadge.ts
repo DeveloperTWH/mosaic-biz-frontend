@@ -1,9 +1,10 @@
 /** Trust badge tier utilities — shared across marketplace surfaces */
 
-export const TRUST_BADGE_TIERS = ["Silver", "Gold", "Platinum", "Diamond", "Pending"] as const;
+export const TRUST_BADGE_TIERS = ["Bronze", "Silver", "Gold", "Platinum", "Diamond", "Pending"] as const;
 export type TrustBadgeTier = (typeof TRUST_BADGE_TIERS)[number];
 
 const TIER_ALIASES: Record<string, TrustBadgeTier> = {
+  bronze: "Bronze",
   silver: "Silver",
   gold: "Gold",
   platinum: "Platinum",
@@ -37,8 +38,8 @@ export function pickBadgeValue(item: Record<string, unknown>): string | null {
 /** Map tier to public asset path */
 export function getBadgeImagePath(tier: TrustBadgeTier | string): string {
   const normalized = normalizeBadgeTier(tier);
-  if (!normalized || normalized === "Pending") return "/badge.png";
-  return `/badge/${normalized.toLowerCase()}.png`;
+  if (!normalized || normalized === "Pending" || normalized === "Bronze") return "/badge.png";
+  return `/badge/${normalized}.png`;
 }
 
 export function getBadgeAltText(tier: TrustBadgeTier | string): string {

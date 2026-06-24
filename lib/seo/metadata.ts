@@ -5,7 +5,7 @@ export const SITE_NAME = "Mosaic Biz Hub";
 export const DEFAULT_SITE_DESCRIPTION =
   "Discover and support trusted minority-owned businesses. Shop products, book services, and explore food from verified vendors on Mosaic Biz Hub.";
 export const DEFAULT_SHARE_IMAGE = "/herobanner.png";
-export const DEFAULT_SITE_URL = "https://app.mosaicbizhub.com";
+export const DEFAULT_SITE_URL = "https://mosaicbizhub.com";
 
 type PageMetadataInput = {
   title: string;
@@ -37,6 +37,7 @@ export function createPageMetadata({
   const canonicalPath = normalizeCanonicalPath(path);
 
   return {
+    metadataBase: getMetadataBase(),
     title,
     description,
     alternates: {
