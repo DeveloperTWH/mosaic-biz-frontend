@@ -8,6 +8,11 @@ import { useParams } from "next/navigation";
 import { toast } from 'react-toastify';
 import DeleteConfirmationModal from '@/app/components/DeleteConfirmationModal';
 import DashboardEmptyState from '@/components/ui/dashboard-empty-state';
+import {
+    DashboardPagination,
+    DashboardStatusPill,
+    type DashboardTone,
+} from '@/components/ui/dashboard-primitives';
 import { Service } from '@/types/service';
 import { ApiClientError, getUserSafeMessage } from '@/lib/api/errors';
 import {
@@ -15,7 +20,6 @@ import {
     deleteService,
     extractFieldErrorsFromError,
     getInventoryStatus,
-    getInventoryStatusClass,
     getInventoryStatusDetail,
     getInventoryStatusLabel,
     getPublicationSuccessMessage,
@@ -26,6 +30,7 @@ import {
     updateService,
     validateServiceForPublish,
     verifyPublicListing,
+    type ServiceInventoryStatus,
 } from '@/lib/api/services';
 
 
@@ -57,51 +62,11 @@ const ServiceTable: React.FC<ServiceTableProps> = ({
     const [deleteTarget, setDeleteTarget] = useState<string>('');
     const [actionServiceId, setActionServiceId] = useState<string | null>(null);
 
-    const changePage = (page: number) => {
-        if (page >= 1 && page <= totalPages) onPageChange(page);
-    };
-
-    const renderPagination = () => {
-        const pages = [];
-        const maxVisible = 5;
-        let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
-        let end = Math.min(totalPages, start + maxVisible - 1);
-        if (end - start < maxVisible - 1) start = Math.max(1, end - maxVisible + 1);
-
-        for (let i = start; i <= end; i++) {
-            pages.push(
-                <button
-                    key={i}
-                    onClick={() => changePage(i)}
-                    className={`px-3 py-1 border rounded ${currentPage === i
-                        ? 'bg-black text-white'
-                        : 'bg-white text-black hover:bg-gray-100'
-                        }`}
-                >
-                    {i}
-                </button>
-            );
-        }
-
-        return (
-            <div className="flex items-center justify-end gap-2 mt-4">
-                <button
-                    onClick={() => changePage(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className="px-3 py-1 text-black bg-white border rounded disabled:opacity-50"
-                >
-                    Prev
-                </button>
-                {pages}
-                <button
-                    onClick={() => changePage(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                    className="px-3 py-1 text-black bg-white border rounded disabled:opacity-50"
-                >
-                    Next
-                </button>
-            </div>
-        );
+    const getStatusTone = (status: ServiceInventoryStatus): DashboardTone => {
+        if (status === "published") return "success";
+        if (status === "draft") return "warning";
+        if (status === "publication_failed") return "danger";
+        return "neutral";
     };
 
     const handleDelete = async () => {
@@ -165,15 +130,14 @@ const ServiceTable: React.FC<ServiceTableProps> = ({
         return (
             <div className="flex flex-wrap justify-end gap-2">
                 {canShowPublicListingLink(service) ? (
-                    <Link href={getPublicServiceUrl(service._id)} target="_blank" rel="noopener noreferrer">
-                        <button
-                            type="button"
-                            className="inline-flex min-h-11 items-center gap-1 rounded border border-blue-200 px-2 py-1 text-xs text-blue-700"
-                            title="View Public Listing"
-                        >
-                            <Eye size={14} />
-                            View Public
-                        </button>
+                    <Link
+                        href={getPublicServiceUrl(service._id)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="dashboard-action dashboard-action--ghost min-h-10 px-3 py-1"
+                    >
+                        <Eye size={14} />
+                        View public
                     </Link>
                 ) : null}
 
@@ -182,7 +146,7 @@ const ServiceTable: React.FC<ServiceTableProps> = ({
                         type="button"
                         disabled={busy}
                         onClick={() => runPublicationAction(service._id, true)}
-                        className="inline-flex min-h-11 items-center gap-1 rounded bg-green-600 px-2 py-1 text-xs text-white disabled:opacity-50"
+                        className="dashboard-action dashboard-action--secondary min-h-10 px-3 py-1"
                     >
                         <Upload size={14} />
                         Publish
@@ -194,7 +158,7 @@ const ServiceTable: React.FC<ServiceTableProps> = ({
                         type="button"
                         disabled={busy}
                         onClick={() => runPublicationAction(service._id, false)}
-                        className="inline-flex min-h-11 items-center gap-1 rounded bg-red-600 px-2 py-1 text-xs text-white disabled:opacity-50"
+                        className="dashboard-action dashboard-action--danger min-h-10 px-3 py-1"
                     >
                         <Download size={14} />
                         Unpublish
@@ -202,18 +166,21 @@ const ServiceTable: React.FC<ServiceTableProps> = ({
                 ) : null}
 
                 <Link href={`/partners/${businessid}/inventory/edit-service/${service._id}`}>
-                    <button type="button" className="inline-flex min-h-11 items-center rounded p-2 text-green-600 hover:text-green-800">
+                    <button type="button" className="dashboard-icon-button dashboard-icon-button--warning">
                         <Pencil size={16} />
+                        <span className="sr-only">Edit service</span>
                     </button>
                 </Link>
 
                 <button
                     type="button"
-                    className="inline-flex min-h-11 items-center rounded p-2 text-red-600 hover:text-red-800"
+                    className="dashboard-icon-button dashboard-icon-button--danger"
                     onClick={() => {
                         setDeleteTarget(service._id);
                         setShowDeleteModal(true);
                     }}
+                    aria-label="Delete service"
+                    title="Delete service"
                 >
                     <Trash2 size={16} />
                 </button>
@@ -227,11 +194,11 @@ const ServiceTable: React.FC<ServiceTableProps> = ({
 
         return (
             <div className="space-y-1">
-                <span className={`inline-flex px-2 py-1 text-xs rounded-full ${getInventoryStatusClass(status)}`}>
+                <DashboardStatusPill tone={getStatusTone(status)}>
                     {getInventoryStatusLabel(status)}
-                </span>
+                </DashboardStatusPill>
                 {detail ? (
-                    <p className="max-w-xs text-xs text-amber-800" title={detail}>
+                    <p className="max-w-xs font-montserrat text-xs text-dashboard-warn-text" title={detail}>
                         {detail}
                     </p>
                 ) : null}
@@ -254,7 +221,7 @@ const ServiceTable: React.FC<ServiceTableProps> = ({
         <div className="dashboard-table-shell">
             <div className="hidden overflow-x-auto md:block">
                 <table className="min-w-full text-sm">
-                    <thead className="text-left text-white">
+                    <thead>
                         <tr>
                             <th className="px-4 py-3">Service</th>
                             <th className="px-4 py-3">Rating</th>
@@ -265,7 +232,7 @@ const ServiceTable: React.FC<ServiceTableProps> = ({
                     </thead>
                     <tbody>
                         {services.map(service => (
-                            <tr key={service._id} className="border-t">
+                            <tr key={service._id} className="border-t border-dashboard-border-light hover:bg-surface-cream">
                                 <td className="px-4 py-3">
                                     <div className="flex items-center gap-3">
                                         <div className="relative w-12 h-12 overflow-hidden border rounded">
@@ -278,8 +245,8 @@ const ServiceTable: React.FC<ServiceTableProps> = ({
                                             />
                                         </div>
                                         <div>
-                                            <p className="font-medium">{service.title}</p>
-                                            <p className="text-xs text-gray-500">{service.slug}</p>
+                                            <p className="font-medium text-dashboard-text">{service.title}</p>
+                                            <p className="text-xs text-dashboard-muted">{service.slug}</p>
                                         </div>
                                     </div>
                                 </td>
@@ -295,7 +262,7 @@ const ServiceTable: React.FC<ServiceTableProps> = ({
 
             <div className="block space-y-4 md:hidden">
                 {services.map(service => (
-                    <div key={service._id} className="p-4 space-y-3 bg-white border rounded shadow-sm">
+                    <div key={service._id} className="dashboard-mobile-card space-y-3">
                         <div className="flex items-center gap-3">
                             <div className="relative w-16 h-16 min-w-[64px] overflow-hidden border rounded">
                                 <Image
@@ -307,8 +274,8 @@ const ServiceTable: React.FC<ServiceTableProps> = ({
                                 />
                             </div>
                             <div>
-                                <p className="font-medium">{service.title}</p>
-                                <p className="text-xs text-gray-500">{service.slug}</p>
+                                <p className="font-medium text-dashboard-text">{service.title}</p>
+                                <p className="text-xs text-dashboard-muted">{service.slug}</p>
                             </div>
                         </div>
                         <p className="text-sm"><strong>Rating:</strong> {service.averageRating?.toFixed(1) || 'N/A'}</p>
@@ -319,7 +286,11 @@ const ServiceTable: React.FC<ServiceTableProps> = ({
                 ))}
             </div>
 
-            {renderPagination()}
+            <DashboardPagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={onPageChange}
+            />
 
             {showDeleteModal && (
                 <DeleteConfirmationModal

@@ -3,6 +3,7 @@
 import React from 'react';
 import { CheckCircle } from 'lucide-react';
 import { Subscription, SubscriptionPlantype } from '@/types/subscription';
+import { DashboardStatusPill } from '@/components/ui/dashboard-primitives';
 
 interface SubscriptionPlanProps {
   subscriptionPlan: SubscriptionPlantype | null;
@@ -31,67 +32,62 @@ const SubscriptionPlan: React.FC<SubscriptionPlanProps> = ({
       year: 'numeric',
     });
 
+  const statusTone = subscription.status === 'active' ? 'success' : 'neutral';
+
   return (
-    <div className="p-6 bg-white rounded shadow h-fit">
-      {/* Title & Subtitle */}
-      <h3 className="text-xl font-bold">Subscription Plan</h3>
-      <p className="text-sm text-gray-400">
+    <div className="dashboard-card h-fit">
+      <div className="flex flex-col gap-3 border-b border-dashboard-border-light pb-4">
+        <div>
+          <p className="dashboard-page-eyebrow">Plan</p>
+          <h3 className="font-poppins text-xl font-semibold text-dashboard-text">Subscription Plan</h3>
+        </div>
+        <p className="font-montserrat text-sm leading-relaxed text-dashboard-muted">
         No hidden fees, deposit requirements, or exclusivity clauses
       </p>
-
-      {/* Active Plan Badge */}
-      <div
-        className={`inline-block px-3 py-1 mt-3 text-sm font-medium text-white rounded-full ${
-          subscription.status === 'active'
-            ? 'bg-gradient-to-r from-green-400 to-orange-400'
-            : 'bg-gray-400'
-        }`}
-      >
-        {subscription.status.charAt(0).toUpperCase() +
-          subscription.status.slice(1)}
+        <DashboardStatusPill tone={statusTone}>
+          {subscription.status.charAt(0).toUpperCase() + subscription.status.slice(1)}
+        </DashboardStatusPill>
       </div>
 
-      {/* Plan Details */}
-      <div className="mt-4 space-y-1 text-sm">
-        <div className="flex justify-between">
-          <span className="text-gray-600">Plan :</span>
-          <span className="font-medium text-brand-navy">
+      <div className="mt-4 space-y-3 font-montserrat text-sm">
+        <div className="flex justify-between gap-4">
+          <span className="text-dashboard-muted">Plan</span>
+          <span className="font-semibold text-dashboard-text">
             {subscriptionPlan.name}
           </span>
         </div>
-        <div className="flex justify-between">
-          <span className="text-gray-600">Billing Amount :</span>
-          <span className="font-medium text-brand-navy">
+        <div className="flex justify-between gap-4">
+          <span className="text-dashboard-muted">Billing Amount</span>
+          <span className="font-semibold text-dashboard-text">
             ${subscriptionPlan.price} / Year
           </span>
         </div>
-        <div className="flex justify-between">
-          <span className="text-gray-600">Valid Upto :</span>
-          <span className="font-medium text-brand-navy">
+        <div className="flex justify-between gap-4">
+          <span className="text-dashboard-muted">Valid Until</span>
+          <span className="font-semibold text-dashboard-text">
             {formatDate(subscription.endDate)}
           </span>
         </div>
-        <div className="flex justify-between">
-          <span className="text-gray-600">Payment Status :</span>
-          <span className="font-medium text-brand-navy">
+        <div className="flex justify-between gap-4">
+          <span className="text-dashboard-muted">Payment Status</span>
+          <span className="font-semibold text-dashboard-text">
             {subscription.paymentStatus}
           </span>
         </div>
-        <div className="flex justify-between">
-          <span className="text-gray-600">Joined :</span>
-          <span className="font-medium text-brand-navy">
+        <div className="flex justify-between gap-4">
+          <span className="text-dashboard-muted">Joined</span>
+          <span className="font-semibold text-dashboard-text">
             {formatDate(subscription.startDate)}
           </span>
         </div>
       </div>
 
-      {/* Features List */}
-      <div className="mt-5 space-y-3">
+      <div className="mt-5 space-y-3 border-t border-dashboard-border-light pt-4">
         {Object.entries(subscriptionPlan.features).map(([key, value]) =>
           typeof value === 'boolean' && value ? (
             <div key={key} className="flex items-start gap-2">
-              <CheckCircle className="w-5 h-5 text-black" />
-              <p className="text-sm text-gray-700">
+              <CheckCircle className="h-5 w-5 shrink-0 text-brand-teal" />
+              <p className="font-montserrat text-sm text-dashboard-text">
                 {key
                   .replace(/([A-Z])/g, ' $1')
                   .replace(/^./, (str) => str.toUpperCase())}

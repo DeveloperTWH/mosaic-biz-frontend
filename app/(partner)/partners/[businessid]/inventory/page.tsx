@@ -13,6 +13,11 @@ import { PackageSearch, Star, AlertTriangle } from "lucide-react";
 import LoadingPage from '../components/LoadingPage';
 import NotFoundPage from '../components/NotFoundPage';
 import ServiceTable from '../components/ServiceTable';
+import {
+    DashboardPageHeader,
+    DashboardStatCard,
+    type DashboardTone,
+} from '@/components/ui/dashboard-primitives';
 
 
 
@@ -65,7 +70,7 @@ const Page = () => {
         if (listingType === "food") fetchFood(_id, currentPage);
     }, [business, currentPage, inventoryRefreshToken]);
 
-    const fetchProducts = async (businessId: string, page = 1, limit = 10) => {
+    async function fetchProducts(businessId: string, page = 1, limit = 10) {
         try {
             setIsLoading(true);
             const response = await axios.get(
@@ -86,9 +91,9 @@ const Page = () => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }
 
-    const fetchServices = async (businessId: string, page = 1, limit = 10) => {
+    async function fetchServices(businessId: string, page = 1, limit = 10) {
         try {
             setIsLoading(true);
             setError(null);
@@ -108,9 +113,9 @@ const Page = () => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }
 
-    const fetchFood = async (businessId: string, page = 1, limit = 10) => {
+    async function fetchFood(businessId: string, page = 1, limit = 10) {
         try {
             setIsLoading(true);
             const response = await axios.get(
@@ -130,7 +135,7 @@ const Page = () => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }
 
     const overviewData = [
         {
@@ -141,16 +146,16 @@ const Page = () => {
                         ? "Total Services"
                         : "Total Food",
             value: total, // ✅ total from API
-            icon: <PackageSearch className="w-5 h-5 text-white" />,
-            bg: "bg-custom-yellow",
-            border: "border-l-4 border-custom-yellow",
+            icon: <PackageSearch className="h-5 w-5" />,
+            tone: "gold" as DashboardTone,
+            description: "Total records returned for this inventory type.",
         },
         {
             label: "Available",
             value: total - OutofStockOrUnpublised, // ✅ (total - outOfStockOrUnpublished)
-            icon: <Star className="w-5 h-5 text-white" />,
-            bg: "bg-green-500",
-            border: "border-l-4 border-green-500",
+            icon: <Star className="h-5 w-5" />,
+            tone: "success" as DashboardTone,
+            description: "Listings or variants currently available.",
         },
         {
             label:
@@ -158,9 +163,9 @@ const Page = () => {
                     ? "Unpublished Services"
                     : "Out Of Stock",
             value: OutofStockOrUnpublised, // ✅ from API
-            icon: <AlertTriangle className="w-5 h-5 text-white" />,
-            bg: "bg-gray-400",
-            border: "border-l-4 border-gray-400",
+            icon: <AlertTriangle className="h-5 w-5" />,
+            tone: (OutofStockOrUnpublised > 0 ? "warning" : "neutral") as DashboardTone,
+            description: OutofStockOrUnpublised > 0 ? "Needs attention before customers can buy or book." : "No inventory attention needed right now.",
         },
     ];
 
@@ -181,25 +186,22 @@ const Page = () => {
 
                     {business && !isLoading && !error && (
                         <>
-                            <h1 className="text-xl font-bold capitalize">
-                                {business.listingType} Inventory
-                            </h1>
-                            <div className="grid grid-cols-1 gap-4 mb-6 sm:grid-cols-2 lg:grid-cols-3">
+                            <DashboardPageHeader
+                                eyebrow="Inventory"
+                                title={`${business.listingType} inventory`}
+                                description="Review listing readiness, stock or publication gaps, and the items customers can currently buy or book."
+                                className="mb-6"
+                            />
+                            <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                                 {overviewData.map((item, index) => (
-                                    <div
+                                    <DashboardStatCard
                                         key={index}
-                                        className={`flex items-center gap-4 p-4 bg-white rounded shadow ${item.border}`}
-                                    >
-                                        <div
-                                            className={`w-10 h-10 rounded-full flex items-center justify-center ${item.bg}`}
-                                        >
-                                            {item.icon}
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-medium text-gray-500">{item.label}</p>
-                                            <p className="text-xl font-semibold">{item.value}</p>
-                                        </div>
-                                    </div>
+                                        label={item.label}
+                                        value={item.value}
+                                        description={item.description}
+                                        icon={item.icon}
+                                        tone={item.tone}
+                                    />
                                 ))}
                             </div>
 

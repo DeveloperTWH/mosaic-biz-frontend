@@ -17,3 +17,20 @@ export { default as DashboardEmptyState } from "./dashboard-empty-state";
 export type { DashboardEmptyStateProps } from "./dashboard-empty-state";
 export { default as DashboardLoadingBlock } from "./dashboard-loading-block";
 export type { DashboardLoadingBlockProps } from "./dashboard-loading-block";
+export {
+  DashboardActionLink,
+  DashboardIconButton,
+  DashboardPageHeader,
+  DashboardPagination,
+  DashboardStatCard,
+  DashboardStatusPill,
+} from "./dashboard-primitives";
+export type {
+  DashboardActionLinkProps,
+  DashboardIconButtonProps,
+  DashboardPageHeaderProps,
+  DashboardPaginationProps,
+  DashboardStatCardProps,
+  DashboardStatusPillProps,
+  DashboardTone,
+} from "./dashboard-primitives";

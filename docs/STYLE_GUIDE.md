@@ -185,6 +185,11 @@ Operational hub routes (`/partners/[businessid]/*`) and multi-business dashboard
 | Onboarding forms | `VendorApplicationShell` with `dashboard` or `market` variant |
 | Background | `bg-surface-cream` |
 | Cards / tables | `.dashboard-card`, `.dashboard-table-shell` |
+| Page headers | `DashboardPageHeader` from `components/ui/dashboard-primitives.tsx` |
+| Operational stats | `DashboardStatCard` from `components/ui/dashboard-primitives.tsx` |
+| Status pills | `DashboardStatusPill` from `components/ui/dashboard-primitives.tsx` |
+| Actions | `DashboardActionLink` / `DashboardIconButton` from `components/ui/dashboard-primitives.tsx` |
+| Pagination | `DashboardPagination` from `components/ui/dashboard-primitives.tsx` |
 | Empty state | `DashboardEmptyState` from `components/ui/dashboard-empty-state.tsx` |
 | Loading | `DashboardLoadingBlock` from `components/ui/dashboard-loading-block.tsx` |
 | Nav chrome | `bg-brand-navy` sidebar, `dashboard-gold` active states |

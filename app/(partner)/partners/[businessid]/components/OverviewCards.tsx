@@ -2,13 +2,18 @@
 
 import React from 'react';
 import {
-  PackageSearch,
-  Star,
-  ShoppingBag,
   AlertTriangle,
+  PackageSearch,
   PlusCircle,
+  ShoppingBag,
+  Star,
 } from 'lucide-react';
-import Link from 'next/link';
+import { useParams } from 'next/navigation';
+import {
+  DashboardActionLink,
+  DashboardStatCard,
+  type DashboardTone,
+} from '@/components/ui/dashboard-primitives';
 
 interface OverviewCardsProps {
   listingType: "product" | "service" | "food";
@@ -25,78 +30,83 @@ const OverviewCards: React.FC<OverviewCardsProps> = ({
   totalOrdersOrBookings,
   outOfStockOrUnpublished,
 }) => {
-  // ✅ Conditionally update labels based on listingType
+  const { businessid } = useParams();
+  const listingLabel =
+    listingType === "product"
+      ? "products"
+      : listingType === "service"
+        ? "services"
+        : "food items";
+
   const overviewData = [
     {
       label:
         listingType === "product"
           ? "Total Products"
           : listingType === "service"
-          ? "Total Services"
-          : "Total Food",
+            ? "Total Services"
+            : "Total Food",
       value: total,
-      icon: <PackageSearch className="w-5 h-5 text-white" />,
-      bg: "bg-brand-gold",
-      border: "border-l-4 border-brand-gold",
+      icon: <PackageSearch className="h-5 w-5" />,
+      tone: "gold" as DashboardTone,
+      description: `Current ${listingLabel} reported by your inventory API.`,
     },
     {
       label: "Total Reviews",
       value: totalReviews,
-      icon: <Star className="w-5 h-5 text-white" />,
-      bg: "bg-brand-navy-light",
-      border: "border-l-4 border-brand-navy-light",
+      icon: <Star className="h-5 w-5" />,
+      tone: "navy" as DashboardTone,
+      description: "Review count currently available for this business.",
     },
     {
       label: listingType === "service" ? "Total Bookings" : "Total Orders",
       value: totalOrdersOrBookings,
-      icon: <ShoppingBag className="w-5 h-5 text-white" />,
-      bg: "bg-brand-orange",
-      border: "border-l-4 border-brand-orange",
+      icon: <ShoppingBag className="h-5 w-5" />,
+      tone: "orange" as DashboardTone,
+      description:
+        listingType === "service"
+          ? "Booking activity available for this service business."
+          : "Order activity available for this business.",
     },
     {
-      label:
-        listingType === "service"
-          ? "Unpublished Services"
-          : "Out Of Stock",
+      label: listingType === "service" ? "Unpublished Services" : "Out Of Stock",
       value: outOfStockOrUnpublished,
-      icon: <AlertTriangle className="w-5 h-5 text-white" />,
-      bg: "bg-dashboard-muted",
-      border: "border-l-4 border-dashboard-muted",
+      icon: <AlertTriangle className="h-5 w-5" />,
+      tone: (outOfStockOrUnpublished > 0 ? "warning" : "neutral") as DashboardTone,
+      description:
+        outOfStockOrUnpublished > 0
+          ? "Needs attention before customers can buy or book."
+          : "No inventory attention needed right now.",
     },
   ];
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center">
-        <h2 className="text-lg font-semibold heading">Overview</h2>
-        <Link
-          href="business/new"
-          className="flex w-full items-center justify-center gap-2 rounded bg-dashboard-gold px-4 py-2 text-sm font-medium text-brand-navy hover:bg-brand-gold-light sm:w-auto"
-        >
-          <PlusCircle className="w-4 h-4" /> Add New Business
-        </Link>
+    <section className="space-y-4">
+      <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
+        <div>
+          <p className="dashboard-page-eyebrow">Operations</p>
+          <h2 className="font-poppins text-lg font-semibold text-dashboard-text">
+            Business overview
+          </h2>
+        </div>
+        <DashboardActionLink href={`/partners/${businessid}/inventory`} className="w-full sm:w-auto">
+          <PlusCircle className="h-4 w-4" /> Manage inventory
+        </DashboardActionLink>
       </div>
 
-      {/* ✅ Responsive Grid */}
-      <div className="grid grid-cols-1 gap-4 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        {overviewData.map((item, index) => (
-          <div
-            key={index}
-            className={`flex items-center gap-4 p-4 bg-white rounded shadow ${item.border}`}
-          >
-            <div
-              className={`w-10 h-10 rounded-full flex items-center justify-center ${item.bg}`}
-            >
-              {item.icon}
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">{item.label}</p>
-              <p className="text-xl font-semibold">{item.value}</p>
-            </div>
-          </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {overviewData.map((item) => (
+          <DashboardStatCard
+            key={item.label}
+            label={item.label}
+            value={item.value}
+            description={item.description}
+            icon={item.icon}
+            tone={item.tone}
+          />
         ))}
       </div>
-    </div>
+    </section>
   );
 };
 
