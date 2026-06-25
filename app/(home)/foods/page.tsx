@@ -6,7 +6,7 @@ import BookServices from './components/BookYourServices';
 import { Service } from "@/types/service";
 import { Category } from "@/types/Category";
 import axios from "axios";
-import JoinVendorBanner from './components/JoinVendorBanner';
+import VendorExpandCta from '../Components/VendorExpandCta';
 import BrowseFoods from '../Components/BrowseFoods';
 import PublicSearchFilterBar from '../Components/PublicSearchFilterBar';
 import PublicFilterSection from '../Components/PublicFilterSection';
@@ -139,7 +139,7 @@ const FoodSection = () => {
         setUrlFilters({ priceMin: String(min), priceMax: String(max), page: "" }, { replace: true });
       }} />
 
-      <JoinVendorBanner/>
+      <VendorExpandCta ctaHref="/become-a-vendor" />
     </div>
   )
 }

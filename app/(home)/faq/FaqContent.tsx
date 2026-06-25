@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import VendorExpandCta from "../Components/VendorExpandCta";
 
 const faqs = [
   {
@@ -84,8 +83,6 @@ export default function FaqContent() {
           );
         })}
       </div>
-
-      <VendorExpandCta />
     </>
   );
 }

@@ -1,6 +1,6 @@
 import React from "react";
-import Link from "next/link";
 import PublicContentLayout from "../Components/PublicContentLayout";
+import { PolicyPageCta } from "../Components/PolicyPageCta";
 
 const Privacy = () => {
   return (
@@ -12,6 +12,15 @@ const Privacy = () => {
       ]}
       imageUrl="/about.png"
       proseVariant="legal"
+      footer={
+        <PolicyPageCta
+          headline="Your privacy matters"
+          subheadline="Safe • secure • transparent"
+          body="Mosaic Biz Hub is committed to protecting your data while delivering a secure and trusted marketplace experience for every customer and vendor."
+          href="/vendors"
+          linkLabel="Explore marketplace"
+        />
+      }
     >
       <h1 className="mb-2 font-poppins text-3xl font-bold text-brand-navy">
         Mosaic Biz Hub Privacy Policy
@@ -312,42 +321,6 @@ const Privacy = () => {
           We value your trust and are committed to protecting your privacy.
         </p>
       </section>
-
-      {/* CTA Section */}
-      <div className="mt-12 w-full">
-        <div
-          className="w-full bg-cover bg-center"
-          style={{ backgroundImage: "url('/contact/becomeVendor.png')" }}
-        >
-          <div className="bg-[#3333339E] px-4 py-16 text-center text-white sm:px-8 sm:py-24">
-            <div className="max-w-[900px] mx-auto">
-              <h2 className="text-white text-3xl font-bold mb-2">
-                YOUR PRIVACY MATTERS -
-              </h2>
-
-              <h2 className="text-white text-3xl font-bold mb-4">
-                SAFE • SECURE • TRANSPARENT
-              </h2>
-
-              <hr className="h-[2px] w-[180px] bg-white border-none mx-auto my-4" />
-              <hr className="h-[2px] w-[180px] bg-white border-none mx-auto mb-8" />
-
-              <p className="text-white text-lg leading-relaxed max-w-[700px] mx-auto mb-10 opacity-95">
-                Mosaic Biz Hub is committed to protecting your data while
-                delivering a secure and trusted marketplace experience for every
-                customer and vendor.
-              </p>
-
-              <Link
-                href="/vendors"
-                className="inline-block px-10 py-4 bg-transparent border-2 border-white text-white font-semibold text-lg transition-all duration-300 hover:bg-white hover:text-gray-800"
-              >
-                Explore Marketplace
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
     </PublicContentLayout>
   );
 };

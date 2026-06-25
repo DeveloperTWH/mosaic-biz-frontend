@@ -1,6 +1,6 @@
 import React from "react";
-import Link from "next/link";
 import PublicContentLayout from "../Components/PublicContentLayout";
+import { PolicyPageCta } from "../Components/PolicyPageCta";
 
 const ReturnRefundPolicy = () => {
   return (
@@ -12,6 +12,15 @@ const ReturnRefundPolicy = () => {
       ]}
       imageUrl="/about.png"
       proseVariant="legal"
+      footer={
+        <PolicyPageCta
+          headline="Shop with confidence"
+          subheadline="Transparent returns & refunds"
+          body="Mosaic Biz Hub is committed to maintaining a trusted marketplace by supporting clear return policies, fair dispute resolution, and transparent customer experiences."
+          href="/vendors"
+          linkLabel="Browse vendors"
+        />
+      }
     >
       <h1 className="mb-2 font-poppins text-3xl font-bold text-brand-navy">
         Mosaic Biz Hub Return & Refund Policy
@@ -290,42 +299,6 @@ const ReturnRefundPolicy = () => {
           info@mosaicbizhub.com
         </p>
       </section>
-
-      {/* CTA Section */}
-      <div className="mt-12 w-full">
-        <div
-          className="w-full bg-cover bg-center"
-          style={{ backgroundImage: "url('/contact/becomeVendor.png')" }}
-        >
-          <div className="bg-[#3333339E] py-24 px-8 text-center text-white">
-            <div className="max-w-[900px] mx-auto">
-              <h2 className="text-white text-3xl font-bold mb-2">
-                SHOP WITH CONFIDENCE -
-              </h2>
-
-              <h2 className="text-white text-3xl font-bold mb-4">
-                TRANSPARENT RETURNS & REFUNDS
-              </h2>
-
-              <hr className="h-[2px] w-[180px] bg-white border-none mx-auto my-4" />
-              <hr className="h-[2px] w-[180px] bg-white border-none mx-auto mb-8" />
-
-              <p className="text-white text-lg leading-relaxed max-w-[700px] mx-auto mb-10 opacity-95">
-                Mosaic Biz Hub is committed to maintaining a trusted marketplace
-                by supporting clear return policies, fair dispute resolution,
-                and transparent customer experiences.
-              </p>
-
-              <Link
-                href="/vendors"
-                className="inline-block px-10 py-4 bg-transparent border-2 border-white text-white font-semibold text-lg transition-all duration-300 hover:bg-white hover:text-gray-800"
-              >
-                Browse Vendors
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
     </PublicContentLayout>
   );
 };

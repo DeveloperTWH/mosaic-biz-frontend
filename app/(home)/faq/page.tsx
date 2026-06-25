@@ -1,4 +1,5 @@
 import PublicContentLayout from "../Components/PublicContentLayout";
+import VendorExpandCta from "../Components/VendorExpandCta";
 import FaqContent from "./FaqContent";
 
 export default function FaqPage() {
@@ -11,6 +12,7 @@ export default function FaqPage() {
       ]}
       imageUrl="/about.png"
       proseVariant="legal"
+      footer={<VendorExpandCta />}
     >
       <FaqContent />
     </PublicContentLayout>

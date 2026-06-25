@@ -11,6 +11,7 @@ import MarketEmptyState from "../../../Components/MarketEmptyState";
 import MarketErrorState from "../../../Components/MarketErrorState";
 import MarketImage from "../../../Components/MarketImage";
 import MarketLoadingBlock from "../../../Components/MarketLoadingBlock";
+import VendorProfileHero from "../../../Components/VendorProfileHero";
 import MarketPrice from "../../../Components/MarketPrice";
 import { toFiniteNumber } from "@/lib/marketplace/display";
 
@@ -408,29 +409,14 @@ export default function ProductVendorProfilePage() {
 
   return (
     <div className="market-surface-light min-h-screen">
-      <div className="vendor-profile-hero-band">
-        <img
-          src="/products/19099 1.png"
-          alt=""
-          className="absolute inset-0 h-full w-full object-cover opacity-40"
-        />
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/30 px-4 text-center">
-          <h1 className="vendor-profile-hero-title">
-            {profile?.businessName || "Vendor Profile"}
-          </h1>
-          <nav className="mt-2 font-montserrat text-sm text-white/90" aria-label="Breadcrumb">
-            <Link href="/" className="hover:text-white">
-              Home
-            </Link>
-            <span className="mx-2">/</span>
-            <Link href="/products" className="hover:text-white">
-              Products
-            </Link>
-            <span className="mx-2">/</span>
-            <span className="vendor-profile-breadcrumb-accent">Vendor profile</span>
-          </nav>
-        </div>
-      </div>
+      <VendorProfileHero
+        title={profile?.businessName || "Vendor Profile"}
+        breadcrumbs={[
+          { label: "Home", href: "/" },
+          { label: "Products", href: "/products" },
+          { label: "Vendor profile", accent: true },
+        ]}
+      />
 
       <CommerceMobileSearchBar
         filters={filters}

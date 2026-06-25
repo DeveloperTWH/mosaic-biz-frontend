@@ -271,6 +271,10 @@ When placing `bg-white` cards inside `market-page`, **always** use light-card ut
 
 Reuse `VendorExpandCta` from `app/(home)/Components/VendorExpandCta.tsx` instead of duplicating `w-screen ml-[-50vw]` bands.
 
+- CTA bands use **solid** `bg-market-cta-band` + `.market-readable-band` utilities — **never** place readable text on `/contact/becomeVendor.png` or other photographic backgrounds.
+- For policy-specific footers, use `PolicyPageCta` via `PublicContentLayout` `footer` prop (full-bleed below the legal card).
+- Decorative hero photos are allowed only with a full `bg-market-hero` overlay (see `PublicPageHero`, `VendorProfileHero`).
+
 ### Glass navbar
 
 Header uses `.market-glass-header` on `#site-header` with marketplace dusk frosted background.
