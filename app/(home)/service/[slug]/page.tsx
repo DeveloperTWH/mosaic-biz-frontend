@@ -2,6 +2,7 @@
 import PublicPageHero from '../../Components/PublicPageHero';
 import MarketLoadingBlock from '../../Components/MarketLoadingBlock';
 import MarketEmptyState from '../../Components/MarketEmptyState';
+import MarketErrorState from '../../Components/MarketErrorState';
 import FeatureBlogs from '@/app/(home)/Components/FeatureBlogs';
 import { Loader2, Camera, CircleUserRound, Globe, Import, Mail, MapPin, PenTool, PhoneCall, Share2 } from 'lucide-react';
 import Image from 'next/image';
@@ -38,6 +39,8 @@ const ServiceDetailPage = () => {
     const [service, setService] = useState<Service | null>(null);
     const [reviews, setReviews] = useState<Review[]>([]);
     const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState<'fetch' | 'not_found' | null>(null);
+    const [reloadToken, setReloadToken] = useState(0);
     const [showAll, setShowAll] = useState(false);
     const [form, setForm] = useState<BookingFormData>({
         name: '',
@@ -51,18 +54,27 @@ const ServiceDetailPage = () => {
 
     useEffect(() => {
         const fetchService = async () => {
+            setLoading(true);
+            setLoadError(null);
             try {
                 const res = await axios.get<GetServiceBySlugResponse>(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/services/${slug}`);
                 setService(res.data.data.service);
                 setReviews(res.data.data.reviews);
             } catch (error) {
                 console.error('Error fetching service:', error);
+                setService(null);
+                setReviews([]);
+                if (axios.isAxiosError(error) && error.response?.status === 404) {
+                    setLoadError('not_found');
+                } else {
+                    setLoadError('fetch');
+                }
             } finally {
                 setLoading(false);
             }
         };
         if (slug) fetchService();
-    }, [slug]);
+    }, [slug, reloadToken]);
 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -143,6 +155,25 @@ const ServiceDetailPage = () => {
     if (loading) return (
         <div className="bg-market-bg">
             <MarketLoadingBlock label="Loading service…" minHeight="min-h-[50vh]" />
+        </div>
+    );
+
+    if (!service && loadError === 'fetch') return (
+        <div className="bg-market-bg">
+            <PublicPageHero
+                title="Service"
+                variant="compact"
+                breadcrumbs={[{ label: "Home", href: "/" }, { label: "Services", href: "/services" }]}
+            />
+            <div className="container-page py-12">
+                <MarketErrorState
+                    title="Service temporarily unavailable"
+                    description="We could not load this service right now."
+                    onRetry={() => setReloadToken((n) => n + 1)}
+                    ctaLabel="Browse services"
+                    ctaHref="/services"
+                />
+            </div>
         </div>
     );
 

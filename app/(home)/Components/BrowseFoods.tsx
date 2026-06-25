@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { Category, FoodCategoryResponse } from "@/types/Category";
+import MarketLoadingBlock from "./MarketLoadingBlock";
 
 interface BrowseFoodsProps {
   onCategorySelect?: (category: Category) => void;
@@ -45,9 +46,7 @@ export default function BrowseFoods({ onCategorySelect }: BrowseFoodsProps) {
   if (loading) {
     return (
       <section className="bg-market-bg py-10">
-        <div className="mx-auto flex h-[280px] max-w-7xl items-center justify-center px-4">
-          <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-market-gold"></div>
-        </div>
+        <MarketLoadingBlock label="Loading food categories…" minHeight="min-h-[280px]" />
       </section>
     );
   }

@@ -131,62 +131,6 @@ function stripHtml(html: string): string {
   return html.replace(/<[^>]*>/g, "");
 }
 
-/* ---------- data hook (abort-safe + retry) ---------- */
-function useRankedProducts() {
-  const [items, setItems] = useState<RankedItem[] | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const ctrlRef = useRef<AbortController | null>(null);
-  const mountedRef = useRef(true);
-
-  const load = useCallback(async () => {
-    ctrlRef.current?.abort();
-    const controller = new AbortController();
-    ctrlRef.current = controller;
-
-    setLoading(true);
-    setError(null);
-    try {
-      const url = buildRankedUrl();
-      const res = await fetch(url, {
-        signal: controller.signal,
-        headers: { Accept: "application/json" },
-        cache: "no-store",
-      });
-      if (!res.ok) {
-        const text = await res.text().catch(() => "");
-        throw new Error(`HTTP ${res.status}: ${text || res.statusText}`);
-      }
-      const data = (await res.json()) as RankedResponse;
-      if (!data || !Array.isArray(data.items)) {
-        throw new Error("Unexpected response shape (missing items[])");
-      }
-      if (!mountedRef.current) return;
-      setItems(data.items.slice(0, PAGE_SIZE));
-    } catch (e: any) {
-      if (isAbortError(e)) return; // ignore navigation/unmount aborts
-      console.error("Category products fetch error:", e);
-      if (!mountedRef.current) return;
-      setError("Products are temporarily unavailable.");
-      setItems((prev) => prev ?? []);
-    } finally {
-      if (mountedRef.current) setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    mountedRef.current = true;
-    load();
-    return () => {
-      mountedRef.current = false;
-      ctrlRef.current?.abort();
-    };
-  }, [load]);
-
-  return { items, error, loading, reload: load };
-};
-
-
 type Filters = {
   brand: string;
   minPrice: number;
@@ -199,10 +143,10 @@ type Filters = {
 
 type Subcategory = { _id: string; name: string; slug: string };
 
+/* ---------- data loading ---------- */
 
 export default function SearchPageContent() {
   const { productid } = useParams<{ productid: string }>();
-  const { items, error, reload } = useRankedProducts();
   const categorySlug = productid ?? "";
 
   const [filters, setFilters] = useState<Filters>({
@@ -214,11 +158,16 @@ export default function SearchPageContent() {
   const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
   const [products, setProducts] = useState<RankedItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+  const [reloadToken, setReloadToken] = useState(0);
+
+  const reload = useCallback(() => setReloadToken((n) => n + 1), []);
 
   useEffect(() => {
     let abort = false;
     const run = async () => {
       setLoading(true);
+      setFetchError(null);
       try {
 
         const rankedParams = new URLSearchParams();
@@ -242,6 +191,10 @@ export default function SearchPageContent() {
             cache: "no-store",
           }),
         ]);
+
+        if (!prodRes.ok) {
+          throw new Error(`HTTP ${prodRes.status}`);
+        }
 
         if (!abort && subRes) {
           const subData = await subRes.json();
@@ -268,8 +221,10 @@ export default function SearchPageContent() {
 
           setProducts(priced);
         }
-      } catch {
+      } catch (e) {
+        console.error("Category products fetch error:", e);
         if (!abort) {
+          setFetchError("Products are temporarily unavailable.");
           setProducts([]);
           setSubcategories([]);
         }
@@ -279,7 +234,7 @@ export default function SearchPageContent() {
     };
     run();
     return () => { abort = true; };
-  }, [categorySlug, filters]);
+  }, [categorySlug, filters, reloadToken]);
 
 
   return (
@@ -288,12 +243,12 @@ export default function SearchPageContent() {
       <div className="flex flex-col gap-6 px-6 py-8 mx-auto md:flex-row">
         <FilterSidebar filters={filters} setFilters={setFilters} subcategories={subcategories} />
         <main className="flex-1">
-          {products === null || loading ? (
+          {loading ? (
             <SkeletonGrid />
-          ) : error ? (
+          ) : fetchError ? (
             <MarketErrorState
               title="Products are temporarily unavailable"
-              description="We could not load this product category right now."
+              description={fetchError}
               onRetry={reload}
               retryLabel="Retry"
               ctaLabel="Browse all products"

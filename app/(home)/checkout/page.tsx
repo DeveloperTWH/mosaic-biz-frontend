@@ -12,6 +12,7 @@ import { stripePromise } from '@/utils/stripe';
 import type { StripeError, PaymentIntent } from '@stripe/stripe-js';
 import { Suspense } from 'react';
 import { buildAppUrl } from '@/lib/url/appUrl';
+import MarketLoadingBlock from '../Components/MarketLoadingBlock';
 
 function CheckoutForm() {
   const stripe = useStripe();
@@ -78,7 +79,7 @@ function CheckoutClient() {
 
 export default function CheckoutPage() {
   return (
-    <Suspense fallback={<p className="text-center">Loading checkout...</p>}>
+    <Suspense fallback={<MarketLoadingBlock label="Loading checkout…" minHeight="min-h-[40vh]" className="commerce-shell" />}>
       <CheckoutClient />
     </Suspense>
   );

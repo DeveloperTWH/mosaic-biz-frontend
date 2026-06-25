@@ -8,6 +8,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import { Category, ServiceCategoryResponse } from "@/types/Category";
+import MarketLoadingBlock from "./MarketLoadingBlock";
 import "swiper/css";
 import "swiper/css/navigation";
 
@@ -63,11 +64,7 @@ export default function BrowseServices({
   if (loading) {
     return (
       <section className="bg-market-bg py-10">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="flex h-64 items-center justify-center">
-            <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-market-gold"></div>
-          </div>
-        </div>
+        <MarketLoadingBlock label="Loading service categories…" minHeight="min-h-[280px]" />
       </section>
     );
   }

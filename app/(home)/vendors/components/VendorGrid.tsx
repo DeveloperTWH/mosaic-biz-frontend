@@ -5,6 +5,7 @@ import CustomSelect from './CustomSelect';
 import Link from 'next/link';
 import MarketLoadingBlock from '../../Components/MarketLoadingBlock';
 import MarketEmptyState from '../../Components/MarketEmptyState';
+import MarketErrorState from '../../Components/MarketErrorState';
 
 interface Vendor {
     _id: string;
@@ -50,6 +51,8 @@ export default function VendorGrid() {
     const [limit] = useState(10);
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(true);
+    const [fetchError, setFetchError] = useState<string | null>(null);
+    const [reloadToken, setReloadToken] = useState(0);
 
     const [category, setCategory] = useState('');
     const [city, setCity] = useState('');
@@ -60,7 +63,8 @@ export default function VendorGrid() {
     useEffect(() => {
         const fetchVendors = async () => {
             try {
-                setLoading(true); // Start loading
+                setLoading(true);
+                setFetchError(null);
                 const queryParams = new URLSearchParams({
                     page: String(page),
                     limit: String(limit),
@@ -69,9 +73,10 @@ export default function VendorGrid() {
                     ...(debouncedSearch ? { search: debouncedSearch } : {}),
                 });
 
-                console.log(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/business?${queryParams}`);
-
                 const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/business?${queryParams}`);
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}`);
+                }
                 const data = await res.json();
 
                 if (data.success) {
@@ -83,15 +88,16 @@ export default function VendorGrid() {
                 }
             } catch (err) {
                 console.error('Error fetching vendors:', err);
+                setFetchError('We could not load vendors right now.');
                 setVendors([]);
                 setTotalPages(1);
             } finally {
-                setLoading(false); // Stop loading
+                setLoading(false);
             }
         };
 
         fetchVendors();
-    }, [page, category, city, debouncedSearch]); // 👈 use debouncedSearch instead of search
+    }, [page, category, city, debouncedSearch, reloadToken]);
 
 
     useEffect(() => {
@@ -141,6 +147,14 @@ export default function VendorGrid() {
             {/* Vendor Grid */}
             {loading ? (
                 <MarketLoadingBlock label="Loading vendors…" />
+            ) : fetchError ? (
+                <MarketErrorState
+                    title="Vendors temporarily unavailable"
+                    description={fetchError}
+                    onRetry={() => setReloadToken((n) => n + 1)}
+                    ctaLabel="Search marketplace"
+                    ctaHref="/search"
+                />
             ) : vendors.length === 0 ? (
                 <MarketEmptyState
                     title="No vendors found"

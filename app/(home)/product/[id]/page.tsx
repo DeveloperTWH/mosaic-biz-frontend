@@ -29,6 +29,7 @@ import TrustBadge from "../../Components/TrustBadge";
 import { pickBadgeValue } from "@/lib/trustBadge";
 import { buildSearchPageUrl, PublicSearchFilters } from "../../Components/publicSearch";
 import MarketEmptyState from "../../Components/MarketEmptyState";
+import MarketErrorState from "../../Components/MarketErrorState";
 import ShopperTrustCallout from "../../Components/ShopperTrustCallout";
 import { SHOPPER_PRODUCT_TRUST_NOTE } from "../../Components/marketTrustProof";
 import { getStockHint } from "../../Components/publicCards/publicProductCardMappers";
@@ -136,7 +137,7 @@ export default function ProductDetailPage() {
   const router = useRouter();
   const id = typeof params.id === 'string' ? params.id : params.id?.[0];
   const [product, setProduct] = useState<ProductDetailItem | null>(null);
-  const [loadState, setLoadState] = useState<"loading" | "error" | "ready">("loading");
+  const [loadState, setLoadState] = useState<"loading" | "error" | "not_found" | "ready">("loading");
   const [liked, setLiked] = useState(false);
   const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>({});
   const [selectedVariant, setSelectedVariant] = useState<Variant | null>(null);
@@ -244,8 +245,11 @@ export default function ProductDetailPage() {
       } catch (err) {
         console.error("Product detail load error:", err);
         setProduct(null);
-        setLoadState("error");
-        toast.error('Product details are temporarily unavailable.');
+        if (axios.isAxiosError(err) && err.response?.status === 404) {
+          setLoadState("not_found");
+        } else {
+          setLoadState("error");
+        }
       }
     };
     loadProduct();
@@ -585,7 +589,21 @@ setMainImage(firstImage);
     );
   }
 
-  if (loadState === "error" || !product) {
+  if (loadState === "error") {
+    return (
+      <div className="min-h-[60vh] bg-market-bg px-4 py-16">
+        <MarketErrorState
+          title="Product temporarily unavailable"
+          description="We could not load this product right now."
+          onRetry={() => router.refresh()}
+          ctaLabel="Browse all products"
+          ctaHref="/products"
+        />
+      </div>
+    );
+  }
+
+  if (loadState === "not_found" || !product) {
     return (
       <div className="min-h-[60vh] bg-market-bg px-4 py-16">
         <MarketEmptyState

@@ -7,12 +7,14 @@ import FilterBar from "../components/FilterBar";
 import FAQSection from "../../Components/FaQ";
 import ClientTestimonials from "../../Components/ClientTestimonials";
 import Link from "next/link";
-import { MoveRight, SlidersHorizontal, ChevronDown, AlertTriangle, Loader2 } from "lucide-react";
+import { MoveRight, SlidersHorizontal, ChevronDown, AlertTriangle } from "lucide-react";
 import ServiceCard from "./components/ServiceCard";
 import { Service } from '@/types/service';
 import AllServicesMap from "./components/AllServicesMap";
 import AffixSidebar from "./components/AffixSidebar"; // adjust path as needed
 import PublicPageHero from "../../Components/PublicPageHero";
+import MarketLoadingBlock from "../../Components/MarketLoadingBlock";
+import MarketErrorState from "../../Components/MarketErrorState";
 import { buildSearchPageUrl } from "../../Components/publicSearch";
 
 
@@ -38,6 +40,7 @@ export default function ServiceCategoryPage({ params }: PageProps) {
     const [searchLocation, setSearchLocation] = useState("");
     const [services, setServices] = useState<Service[]>([]);
     const [loading, setLoading] = useState(true);
+    const [fetchError, setFetchError] = useState<string | null>(null);
     const [minorityTypes, setMinorityTypes] = useState<MinorityType[]>([]);
 
     const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -66,15 +69,21 @@ export default function ServiceCategoryPage({ params }: PageProps) {
     const fetchServices = async (q?: string, m?: string, c?: string) => {
         try {
             setLoading(true);
+            setFetchError(null);
             const res = await fetch(
                 `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/services/list?categorySlug=${id}&search=${q ?? searchText}&minorityType=${m ?? minorityType}&state=${c ?? searchLocation}`
             );
             const data = await res.json();
             if (data.success) {
                 setServices(data.data);
+            } else {
+                setFetchError("We could not load services for this category right now.");
+                setServices([]);
             }
         } catch (err) {
             console.error("Failed to fetch services", err);
+            setFetchError("We could not load services for this category right now.");
+            setServices([]);
         } finally {
             setLoading(false);
         }
@@ -126,7 +135,6 @@ export default function ServiceCategoryPage({ params }: PageProps) {
     const handleMapSelect = (serviceId: string) => {
         setActiveService(serviceId);
         const el = cardRefs.current[serviceId];
-        console.log(el);
 
         if (el) {
             // Smooth scroll the page to this card
@@ -136,9 +144,18 @@ export default function ServiceCategoryPage({ params }: PageProps) {
 
 
     if (loading) return (
-        <div className="flex items-center justify-center p-5 text-market-teal">
-            <Loader2 className="mr-2 h-6 w-6 animate-spin" />
-            <span className="text-market-muted">Loading...</span>
+        <div className="bg-market-bg">
+            <PublicPageHero
+                title={`${slugToTitle(id)} Services`}
+                variant="compact"
+                breadcrumbs={[
+                    { label: "Home", href: "/" },
+                    { label: "Services", href: "/services" },
+                    { label: slugToTitle(id) },
+                ]}
+                imageUrl="/Service/service.png"
+            />
+            <MarketLoadingBlock label="Loading services…" minHeight="min-h-[40vh]" />
         </div>
     );
 
@@ -167,7 +184,17 @@ export default function ServiceCategoryPage({ params }: PageProps) {
                     setSearchLocation={setSearchLocation}
                     onSearch={handleSearch}
                 />
-                {services.length === 0 ? (
+                {fetchError ? (
+                    <div className="container-page py-12">
+                        <MarketErrorState
+                            title="Services temporarily unavailable"
+                            description={fetchError}
+                            onRetry={() => fetchServices()}
+                            ctaLabel="Browse all services"
+                            ctaHref="/services"
+                        />
+                    </div>
+                ) : services.length === 0 ? (
                     <div className="market-card mx-auto flex max-w-md flex-col items-center justify-center p-8 text-center">
                         <AlertTriangle className="mb-2 h-10 w-10 text-red-400" />
                         <span className="text-market-text">Service not found</span>

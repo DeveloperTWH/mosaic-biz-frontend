@@ -195,9 +195,8 @@ export default function ShopProducts() {
         </div>
 
         {/* Products Carousel Section */}
-        {loading && <MarketLoadingBlock label="Loading featured products…" minHeight="min-h-[200px]" />}
-        {items === null || (loading && items === null) ? (
-          <SkeletonCarousel />
+        {loading && items === null && !error ? (
+          <MarketLoadingBlock label="Loading featured products…" minHeight="min-h-[200px]" />
         ) : error ? (
           <MarketErrorState
             title="Featured products are temporarily unavailable"
@@ -207,7 +206,7 @@ export default function ShopProducts() {
             ctaHref="/products"
             className="market-card py-8"
           />
-        ) : items.length === 0 ? (
+        ) : !items?.length ? (
           <MarketEmptyState
             title="Featured products coming soon"
             description="Check back shortly or browse the full marketplace."
@@ -333,32 +332,3 @@ function FeaturedProductCard({ item }: { item: FeaturedProduct }) {
     </Link>
   );
 }
-
-/* ---------- Skeleton Carousel ---------- */
-function SkeletonCarousel() {
-  return (
-    <div className="relative">
-      <div className="absolute top-1/2 left-0 -translate-y-1/2 -translate-x-4 z-10">
-        <button className="h-12 w-12 rounded-full border border-white/10 bg-market-elevated"></button>
-      </div>
-      
-      <div className="absolute top-1/2 right-0 -translate-y-1/2 translate-x-4 z-10">
-        <button className="h-12 w-12 rounded-full border border-white/10 bg-market-elevated"></button>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 py-4">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="market-listing-card flex animate-pulse flex-col overflow-hidden">
-            <div className="aspect-[4/3] shrink-0 bg-market-elevated sm:aspect-square" />
-            <div className="flex flex-col gap-2 p-4">
-              <div className="h-5 rounded bg-market-elevated" />
-              <div className="h-4 rounded bg-market-elevated" />
-              <div className="mt-auto h-8 rounded bg-market-elevated" />
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
