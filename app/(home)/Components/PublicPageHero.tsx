@@ -59,7 +59,7 @@ const PublicPageHero = ({
       >
         {breadcrumbs.length > 0 ? (
           <nav aria-label="Breadcrumb" className="mb-3">
-            <ol className="flex flex-wrap items-center justify-center gap-x-1.5 font-montserrat text-xs text-market-text/80 sm:text-sm">
+            <ol className="flex flex-wrap items-center justify-center gap-x-1.5 font-montserrat text-xs text-market-text/90 sm:text-sm">
               {breadcrumbs.map((item, index) => (
                 <li key={`${item.label}-${index}`} className="flex items-center">
                   {index > 0 ? (

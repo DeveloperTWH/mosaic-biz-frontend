@@ -9,7 +9,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from 'swiper/modules';
 import ProductSevices from './components/ProductServices';
 import { Service } from '@/types/service';
-import JoinVendorBanner from './components/JoinVendorBanner';
+import VendorExpandCta from '../Components/VendorExpandCta';
 import BrowseCategories from './components/BrowsCategories';
 import FilterAccordion from './components/FilterAccordion';
 import { Category, SubCategory, SubCategoryResponse, CategoryResponse } from '@/types/Category';
@@ -398,7 +398,7 @@ const ProductsPageInner = () => {
                     console.log('Category filter from ProductServices:', category, subCategory);
                 }}
             />
-            <JoinVendorBanner />
+            <VendorExpandCta ctaHref="/become-a-vendor" />
         </div>
     )
 }

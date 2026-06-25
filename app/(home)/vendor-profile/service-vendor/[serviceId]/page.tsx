@@ -15,6 +15,7 @@ import { buildSearchPageUrl, PublicSearchFilters } from "../../../Components/pub
 import MarketEmptyState from "../../../Components/MarketEmptyState";
 import MarketErrorState from "../../../Components/MarketErrorState";
 import MarketLoadingBlock from "../../../Components/MarketLoadingBlock";
+import VendorProfileHero from "../../../Components/VendorProfileHero";
 import AccountEmptyState from "@/components/ui/account-empty-state";
 import { formatMarketPrice, toFiniteNumber } from "@/lib/marketplace/display";
 import { SERVICE_DETAIL_RESPONSIVE_CLASSES } from "@/lib/marketplace/serviceDetailLayout";
@@ -966,31 +967,15 @@ export default function ServiceVendorProfilePage() {
     <div className={SERVICE_DETAIL_RESPONSIVE_CLASSES.pageShell}>
 
       {/* ── Hero Banner ── */}
-<div className="vendor-profile-hero-band">
-
-  {/* Background Image */}
-  <img
-    src="/products/19099 1.png"
-    alt="vendor header"
-    className="absolute inset-0 object-cover w-full h-full opacity-40"
-  />
-
-  {/* Center Content */}
-  <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/30 text-center px-4">
-<h1 className="text-3xl md:text-4xl font-poppins font-semibold tracking-wide text-white uppercase">
-  {heroTitle}
-</h1>
-
-    <nav className="mt-2 text-sm text-white/85">
-      <Link href="/" className="hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60">Home</Link>
-      <span className="mx-2">//</span>
-      <Link href="/services" className="hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60">
-        {heroSection}
-      </Link>
-      <span className="mx-2">//</span>
-      <span className="text-brand-gold">{breadcrumbLabel}</span>
-    </nav>
-  </div>
+      <VendorProfileHero
+        title={heroTitle}
+        separator="//"
+        breadcrumbs={[
+          { label: "Home", href: "/" },
+          { label: heroSection, href: "/services" },
+          { label: breadcrumbLabel, accent: true },
+        ]}
+      />
 
   {/* 🔥 BADGE (NEW) */}
 {false && badgeImage && (
@@ -1029,7 +1014,6 @@ export default function ServiceVendorProfilePage() {
     </div>
   </div>
 )}
-</div>
 
       {/* ── Filter Bar ── */}
       <CommerceMobileSearchBar

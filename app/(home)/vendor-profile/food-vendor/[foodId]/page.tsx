@@ -13,6 +13,7 @@ import { buildSearchPageUrl, PublicSearchFilters } from "../../../Components/pub
 import MarketEmptyState from "../../../Components/MarketEmptyState";
 import MarketErrorState from "../../../Components/MarketErrorState";
 import MarketLoadingBlock from "../../../Components/MarketLoadingBlock";
+import VendorProfileHero from "../../../Components/VendorProfileHero";
 
 type CategoryRef = {
   _id?: string;
@@ -752,29 +753,15 @@ export default function FoodVendorProfilePage() {
 
   return (
     <div className="market-surface-light min-h-screen font-sans">
-      <div className="vendor-profile-hero-band">
-        <img
-          src="/products/19099 1.png"
-          alt="vendor header"
-          className="absolute inset-0 h-full w-full object-cover opacity-40"
-        />
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/30 px-4 text-center">
-          <h1 className="text-3xl font-poppins font-semibold uppercase tracking-wide text-white md:text-4xl">
-            {heroTitle}
-          </h1>
-          <nav className="mt-2 text-sm text-white/85">
-            <Link href="/" className="hover:text-white">
-              Home
-            </Link>
-            <span className="mx-2">//</span>
-            <Link href="/foods" className="hover:text-white">
-              {heroSection}
-            </Link>
-            <span className="mx-2">//</span>
-            <span className="text-brand-gold">{heroTitle}</span>
-          </nav>
-        </div>
-      </div>
+      <VendorProfileHero
+        title={heroTitle}
+        separator="//"
+        breadcrumbs={[
+          { label: "Home", href: "/" },
+          { label: heroSection, href: "/foods" },
+          { label: heroTitle, accent: true },
+        ]}
+      />
 
       <CommerceMobileSearchBar
         filters={filters}

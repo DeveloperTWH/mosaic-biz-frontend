@@ -1,6 +1,6 @@
 import React from "react";
-import Link from "next/link";
 import PublicContentLayout from "../Components/PublicContentLayout";
+import { PolicyPageCta } from "../Components/PolicyPageCta";
 
 const Dispute = () => {
   return (
@@ -12,6 +12,15 @@ const Dispute = () => {
       ]}
       imageUrl="/about.png"
       proseVariant="legal"
+      footer={
+        <PolicyPageCta
+          headline="Fair • transparent • accountable"
+          subheadline="Resolving disputes with trust"
+          body="Mosaic Biz Hub is committed to maintaining a transparent and community-centered marketplace where customers and vendors can resolve concerns respectfully and efficiently."
+          href="/contact"
+          linkLabel="Contact support"
+        />
+      }
     >
       <h1 className="mb-2 font-poppins text-3xl font-bold text-brand-navy">
         Dispute Resolution Process
@@ -333,42 +342,6 @@ const Dispute = () => {
           accountability, and community integrity.
         </p>
       </section>
-
-      {/* CTA Section */}
-      <div className="mt-12 w-full">
-        <div
-          className="w-full bg-cover bg-center"
-          style={{ backgroundImage: "url('/contact/becomeVendor.png')" }}
-        >
-          <div className="bg-[#3333339E] px-4 py-16 text-center text-white sm:px-8 sm:py-24">
-            <div className="max-w-[900px] mx-auto">
-              <h2 className="text-white text-3xl font-bold mb-2">
-                FAIR • TRANSPARENT • ACCOUNTABLE
-              </h2>
-
-              <h2 className="text-white text-3xl font-bold mb-4">
-                RESOLVING DISPUTES WITH TRUST
-              </h2>
-
-              <hr className="h-[2px] w-[180px] bg-white border-none mx-auto my-4" />
-              <hr className="h-[2px] w-[180px] bg-white border-none mx-auto mb-8" />
-
-              <p className="text-white text-lg leading-relaxed max-w-[700px] mx-auto mb-10 opacity-95">
-                Mosaic Biz Hub is committed to maintaining a transparent and
-                community-centered marketplace where Customers and Vendors can
-                resolve concerns respectfully and efficiently.
-              </p>
-
-              <Link
-                href="/contact"
-                className="inline-block px-10 py-4 bg-transparent border-2 border-white text-white font-semibold text-lg transition-all duration-300 hover:bg-white hover:text-gray-800"
-              >
-                Contact Support
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
     </PublicContentLayout>
   );
 };

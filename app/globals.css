@@ -303,6 +303,26 @@ body {
   @apply flex items-start gap-2.5 rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 font-montserrat text-xs leading-relaxed text-market-text/90 sm:text-sm;
 }
 
+.market-trust-proof-row--solid .market-trust-proof-item {
+  @apply border-white/15 bg-market-elevated/90 text-market-text;
+}
+
+.market-readable-band {
+  @apply relative w-full overflow-hidden bg-market-cta-band;
+}
+
+.market-readable-band__glow {
+  @apply pointer-events-none absolute inset-0 bg-market-glow-radial opacity-70;
+}
+
+.market-readable-band__content {
+  @apply relative px-4 py-16 text-center sm:px-8 sm:py-20 md:py-24;
+}
+
+.market-trust-badge-hint--band {
+  @apply text-market-text/90;
+}
+
 .market-trust-proof-icon {
   @apply mt-0.5 h-4 w-4 text-market-teal;
 }

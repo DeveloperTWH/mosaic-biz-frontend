@@ -5,7 +5,7 @@ import axios from "axios";
 import PublicPageHero from "../Components/PublicPageHero";
 import BookServices from "./components/BookYourServices";
 import { Service } from "@/types/service";
-import JoinVendorBanner from "./components/JoinVendorBanner";
+import VendorExpandCta from "../Components/VendorExpandCta";
 import BrowseServices from "../Components/BrowsServices";
 import { Category, ServiceCategoryResponse } from "@/types/Category";
 import PublicSearchFilterBar from "../Components/PublicSearchFilterBar";
@@ -229,7 +229,7 @@ const ServicePageContent = () => {
       }} onPageChange={(page) => {
         setUrlFilters({ page: String(page) });
       }} />
-      <JoinVendorBanner/>
+      <VendorExpandCta ctaHref="/become-a-vendor" />
     </main>
   );
 };

@@ -3,11 +3,13 @@ import { BadgeCheck } from "lucide-react";
 
 type MarketTrustBadgeHintProps = {
   audience?: "shopper" | "vendor";
+  variant?: "default" | "band";
   className?: string;
 };
 
 export default function MarketTrustBadgeHint({
   audience = "shopper",
+  variant = "default",
   className = "",
 }: MarketTrustBadgeHintProps) {
   const href = audience === "vendor" ? "/vendor/trustbadge" : "/consumer/trustbadge";
@@ -17,7 +19,9 @@ export default function MarketTrustBadgeHint({
       : "Trust badges show verified onboarding progress — not customer star ratings.";
 
   return (
-    <p className={`market-trust-badge-hint ${className}`.trim()}>
+    <p
+      className={`market-trust-badge-hint ${variant === "band" ? "market-trust-badge-hint--band" : ""} ${className}`.trim()}
+    >
       <BadgeCheck className="market-trust-badge-hint-icon shrink-0" aria-hidden />
       <span>
         {label}{" "}
